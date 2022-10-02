@@ -7,12 +7,10 @@ repeatedly polls for status on the task until it is complete.
 #}
 <h2 class="mt-2 mb-5">Compiling your paper</h2>
 <input type="hidden" name="taskid" value="{{taskid}}">
-<div class="alert alert-info">
-    <h3>Status: <span id="status"></span></h3>
-    <div id="result" class="d-none">
-	<h3>Result</h3>
-	<div id="response"></div>
-    </div>
+<h3>Status: <span id="status"></span></h3>
+<div id="result" class="d-none">
+    <h3>Result</h3>
+    <pre id="response"></pre>
 </div>
 <script>
 

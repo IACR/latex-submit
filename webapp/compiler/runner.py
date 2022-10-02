@@ -44,6 +44,8 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
     staging_has_files = any(staging_dir.iterdir())
     if staging_has_files:
         raise ValueError('staging directory must be empty')
+    latexmk_config = Path(staging_dir) / Path('latexmkrc')
+    latexmk_config.write_text('$pdf_mode = 4;')
     for entry in input_dir.iterdir():
         shutil.copy(entry, staging_dir, follow_symlinks=False)
     client = docker.from_env()
@@ -54,7 +56,7 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
         container = client.containers.run('debian-slim-texlive2022',
                                           detach=True,
                                           mounts=[mount])
-        code, output = container.exec_run(['latexmk', '-Werror', '-pdf', '-lualatex="lualatex -safer"', 'main'], workdir='/data')
+        code, output = container.exec_run('latexmk -lualatex="lualatex -safer" main', workdir='/data')
         localtarfile = open(output_tarfile_name, 'wb')
         tarball,stat = container.get_archive('data/')
         for chunk in tarball:
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     argparser.add_argument('--staging_directory',
                            default = 'staging')
     args = argparser.parse_args()
-    run_latex(args.input_dir, args.output_tarfile, args.staging_directory)
+    print(run_latex(args.input_dir, args.output_tarfile, args.staging_directory))
 
 
 
