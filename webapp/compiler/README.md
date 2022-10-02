@@ -1,6 +1,7 @@
-This is out of date.
+# LaTeX Compiler
 
-This is the setup for using the docker python SDK to compile latex.
+This part is mostly standalone, and is used by the web server as a way to compile
+uploaded LaTeX code. There is a command line interface for testing.
 
 # Quick start
 
@@ -15,7 +16,7 @@ docker build -t debian-slim-texlive2022 .
 (note the dot at the end). This will build the docker image from `Dockerfile`
 and tag it as `debian-slim-texlive2022`.
 
-3. for a test run, use `python3 run.py`.
+3. for a test run, use `python3 runner.py`.
 
 ## The design
 

@@ -1,3 +1,8 @@
+"""
+This is what runs latexmk in docker. It is called from our web server, but may
+also be used from the command line.
+"""
+
 import argparse
 import os
 from pathlib import Path
@@ -14,12 +19,16 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
 
        args:
            input_dirname: directory where user-uploaded latex sources are. symlinks
-               in this directory are ignored.
+               in this directory are ignored but subdirectories are allowed.
            output_tarfile_name:
                path to where resulting tarball should be deposited.
-       returns: True or False to indicate successful compilation.
+           staging_directory:
+               path to where input files are placed. This is mounted by docker
+               under /data. The default is for use by webapp.
+       returns: A string to indicate failure or success, along with the output
+                from running latexmk. TODO: make this json?
        raises: 
-          ValueError if the input_dirname does not contain main.tex
+          ValueError if some conditions are not satisfied.
           APIError if there is an error from the docker API.
 
           """
