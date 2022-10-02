@@ -1,0 +1,38 @@
+{% include "base_header.html" %}
+{#
+=================================================================
+This template is used to show progress of a LaTeX compliation. It
+repeatedly polls for status on the task until it is complete.
+=================================================================
+#}
+<h2 class="mt-2 mb-5">Compiling your paper</h2>
+<input type="hidden" name="taskid" value="{{taskid}}">
+<div class="alert alert-info">
+    <h3>Status: <span id="status"></span></h3>
+    <div id="result" class="d-none">
+	<h3>Result</h3>
+	<div id="response"></div>
+    </div>
+</div>
+<script>
+
+ var retries = 0;
+ function checkStatus() {
+     retries++;
+     fetch('/tasks/{{taskid}}')
+	 .then((response) => response.json())
+	 .then((data) => {
+	     console.log(data);
+	     document.getElementById('status').innerHTML = data.status;
+	     if (data.result) {
+		 document.getElementById('response').innerHTML = data.result;
+		 document.getElementById('result').classList.remove('d-none');
+	     }
+	     if (data.status == 'PENDING' || data.status == 'STARTED') {
+		 setTimeout(checkStatus, 4000);
+	     }
+	 });
+}
+setTimeout(checkStatus, 1000);
+</script>
+{% include "base_footer.html" %}

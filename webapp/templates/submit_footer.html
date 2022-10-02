@@ -1,0 +1,91 @@
+{% extends "base_footer.html" %}
+{% block endOfPage %}
+<script>
+ (function() {
+   'use strict'
+   // If someone comes back to this form, we want the button enabled again.
+   document.getElementById('submitButton').disabled = false;
+   let form = document.querySelector('.needs-validation');
+   form.addEventListener('submit', function (event) {
+     console.log('checking validity');
+     // Strip leading and trailing spaces. This causes minlength and maxlength
+     // attributes to be ignored on firefox, so we validate them in this function.
+     document.querySelectorAll('input[type="text"],input[type="email"],textarea').forEach(el => {
+       el.value = el.value.trim();
+     });
+     form.classList.add('was-validated')
+     // Note: this will not work as expected on firefox because minlength and
+     // maxlength is not validated on inputs if they are modified by javascript.
+     if (!form.checkValidity()) {
+       event.preventDefault()
+       event.stopPropagation()
+       // Scroll to the first wrong one.
+       let wrong = document.querySelector('input:invalid,input.is-invalid,textarea:invalid,select:invalid,select.is-invalid');
+       if (wrong) {
+         console.log('invalid element');
+         console.dir(wrong);
+         wrong.scrollIntoView({behavior: 'smooth', block:'start'});
+       }
+       console.log('form is not valid');
+       return;
+     }
+     if (!checkAuthorNames()) {
+       console.log('author name is invalid');
+       event.preventDefault();
+       event.stopPropagation();
+       document.getElementById('authorFields').scrollIntoView({behavior: 'smooth', block: 'start'});
+       document.getElementById('invalidAuthors').classList.remove('d-none');
+       return;
+     }
+     if (!checkAbstract()) {
+       console.log('abstract is invalid');
+       event.preventDefault();
+       event.stopPropagation();
+       abstractField.scrollIntoView({behavior: 'smooth', block: 'start'});
+       return;
+     }
+     if (!checkEmails()) {
+       console.log('emails not valid');
+       event.preventDefault()
+       event.stopPropagation()
+       document.getElementById('authorFields').scrollIntoView({behavior: 'smooth', block: 'start'});
+       document.getElementById('invalidAuthors').classList.remove('d-none');
+       return;
+     }
+     document.getElementById('invalidAuthors').classList.add('d-none');
+     if (!checkPublished()) {
+       console.log('publication section not filled out');
+       event.preventDefault()
+       event.stopPropagation()
+       document.getElementById('publicationInformation').scrollIntoView({behavior: 'smooth', block:'start'});
+       return;
+     }
+     // prevent clicking the button twice while it submits. It doesn't prevent someone
+     // from hitting the back button and resubmitting.
+     document.getElementById('submitButton').disabled = true;
+     return true;
+   }, false);
+   // Fetch the ror.json data set for autocomplete on affiliations with ROR IDs.
+   fetch('/js/autocomplete/ror.json', {
+     mode: 'no-cors',
+   }).then(response => {
+     if (response.status !== 200) {
+       console.log('Looks like there was a problem. Status Code: ' +
+                   response.status);
+       console.dir(response);
+       return;
+     }
+     response.json().then(function(data) {
+       affiliations = data;
+       let inputs = document.querySelectorAll('input.affiliation');
+       inputs.forEach(el => {
+         addAutocomplete(el);
+       });
+     });
+   }).catch(function(err) {
+     console.log('Fetch Error: ', err);
+   });
+ })();
+
+</script>
+{% endblock %}

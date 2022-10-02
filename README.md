@@ -1,0 +1,126 @@
+# IACR LaTeX Compiler
+
+NOTE: This is just a few fragments, and doesn't actually compile uploaded
+code yet. It just compiles some fixed file until we discuss what to store
+for an upload and how to authenticate people.
+
+This repository contains a web server that receives uploads of zip
+files with LaTeX sources for final versions of papers. It is intended
+to be used for the IACR Communications on Cryptology using the
+`iacrcc.cls` LaTeX class, but we hope that it can eventually be used
+more broadly.
+
+## Architecture
+
+The author is expected to upload a zip file to this server with their
+LaTeX sources, along with a paper ID that has been assigned at
+acceptance time.  This server will unzip the zip file into
+a directory identified by the paper ID, and then attempt to compile the
+LaTeX sources.
+
+Compilation of LaTeX received from third parties constitutes a
+security risk. For this reason, the production of PDF or HTML from
+LaTeX should either be done by authors or within a controlled
+environment. Due to the fact that LaTeX is a programming environment,
+we have chosen to provide a controlled environment so as to enforce a
+look and feel of the papers by limiting which LaTeX packages may be
+used. This is essentially the same approach taken by ACM and arXiv.
+
+NOTE: The implementation describe below uses celery, but I think this
+may be too heavyweight for what we want. All we really need is a queue
+of tasks to be performed, but this can be handled with Flask-executor
+that wraps a ThreadPoolExecutor. If we set this to have a single
+thread, then we could have a single server instead of
+flask+celery+redis. The advantage of celery is that you can scale it
+up and run it as a distributed service, because the celery workers can
+run on other machines. I don't think we really need that since we
+don't expect a big workload. Using Flask-executor would simplify our
+architecture by requiring only one app, namely the flask web server.
+
+This compiler service consists of three servers, namely a submission
+web server written in python/Flask, a Redis server, and a celery
+worker that runs the compilations.  The actual compilations are
+performed in a docker container that is created for each compilation,
+and these are run as celery tasks by the celery worker.  Using a
+docker container provides some degree of security against malicious
+uploaded LaTeX code.  The purpose of the Redis server is to handle a
+queue of tasks for the compilation server to perform, and report back
+results to the submission web server.  The glue between the servers is
+provided by the python Celery framework, using Redis as the message
+queue.
+
+The author submits a zip file containing all sources necessary for
+compiling thier paper. When an author uploads their zip file, it is
+stored with minimal metadata required to track the paper through the
+system (an email address of the submitting author and an ID from the
+review system). When the zip file is submitted, the web server
+registers a Celery task through Redis for the compilation server using
+the ID of the submission.
+
+Once the celery task is registered, the compilation server picks it up
+from a queue of tasks. The compilation server creates a docker
+instance with a limited version of texlive that contains the
+iacrcc.cls file but no other LaTeX classes. It runs latexmk to run
+lualatex plus either bibtex or biber, producing either an error log or
+a successful output.  If the compilation is successful, then the
+output from compliation is reported back (including the meta file
+produced from the iacrcc.cls during the compliation.  If the
+compilation fails, then a detailed error log is reported back to
+Redis, which is picked up by the web server.
+
+## The compiler process
+
+LaTeX environements can vary quite a bit, and this can complicate the
+submitting author's ability to submit suitably well formed LaTeX.  The
+controlled environment we use is based on texlive, but we allow access
+to only a limited number of packages. Because of this, it is important
+to provide detailed error messages to the submitting authors so that
+they may understand how to fix their problems.
+
+Installation is as follows:
+
+python3 -m pip install flask
+python3 -m pip install flask-limiter
+python3 -m pip install flask-mail
+sudo apt install redis-server
+see instructions for installing redis at https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04
+
+
+## Running the app
+
+In one shell, run:
+```
+python3 run.py
+```
+In another shell, run the celery worker with
+```
+celery -A tasks worker --loglevel=INFO
+```
+
+## Publishing workflow (not sure if we need this here)
+
+The purpose of this server is to fulfill part of the publishing
+workflow for a journal. Once a paper is accepted by a review process,
+the authors will be pointed to this server in order to upload their
+final versions.  This is but one part of a publishing workflow based
+on a LaTeX class that captures metadata about publications.
+
+A publishing workflow consists of several steps, which may
+include:
+
+1. writing by the author(s)
+2. submission for review
+3. a review process
+4. feedback to authors
+5. possible revision
+6. submission of final version
+7. copy editing
+8. production of final version
+9. registration of metadata
+10. hosting for publication.
+
+This project is only designed to fulfill steps 6, and 8-10.  One
+crucial feature of step 8 is that the `iacrcc` LaTeX class produces
+machine-readable metadata as a byproduct of compiling the LaTeX.
+
+

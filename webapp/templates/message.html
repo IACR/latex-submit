@@ -1,0 +1,21 @@
+{% include "base_header.html" %}
+{#
+=================================================================
+This template is used to show messages to users. The data should
+contain title and either message or error or both. Error is shown
+in red.
+=================================================================
+#}
+<h2 class="mt-2 mb-5">{{title}}</h2>
+
+{% if message %}
+<div class="alert alert-info">
+  {{message|safe}}
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-warning">
+  {{error|safe}}
+</div>
+{% endif %}
+{% include "base_footer.html" %}

@@ -1,0 +1,78 @@
+/***** THIS IS THE RIGHT CSS *****/
+
+/***** Big picture stuff: body, main divs, etc *****/
+body {
+  background: #f0f0f0;
+}
+
+/* the main div that surrounds all other content */
+#iacrccContent {
+  margin-top: 3rem;
+  background-color: #FEFEFE;
+  border-radius: .3rem;
+}
+
+div#topNavbar .iacrccname {
+    padding: 2rem;
+    font-size: 1.6rem;
+    transition: .4s;
+    color: #f0f0f0;
+}
+
+div#topNavbar {
+    height: 8rem;
+    background-color: #0A60AF;
+    display:flex;
+}
+
+/***** Images & icons (includes on nav) *****/
+div#topNavbar img.iacrlogo {
+  max-height: 6rem;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0px 0px 20px 0px rgba(255, 255, 255, .8);
+}
+
+img#iacrlogo {
+  max-height: 100px;
+  border-radius: 50%;
+  box-shadow: 0px 0px 20px 0px rgba(255, 255, 255, .8);
+}
+
+#iacrccFooter {
+  /* background-color: #f8f8f8;
+    padding: 20px; */
+  visibility: hidden;
+}
+
+/* used for <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> */
+span.latex {
+    color: #00248a;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.latex sub {
+  vertical-align: -0.1ex;
+  margin-left: -0.1667em;
+  margin-right: -0.025em;
+}
+
+.latex sup {
+  font-size: 0.9em;
+  text-transform:uppercase;
+
+}
+.latex sub {
+    font-size: 1em;
+}
+
+.latex sup {
+  font-size: 0.85em;
+  vertical-align: -0.2em;
+  margin-left: -0.26em;
+  margin-right: -0.05em;
+}
+
+.mycode {
+    font-family: var(--bs-font-monospace);
+}

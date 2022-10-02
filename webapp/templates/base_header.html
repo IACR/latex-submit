@@ -1,0 +1,25 @@
+{# This is the base header #}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="/css/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/iacrcc.css">
+    {% endblock %}
+  </head>
+
+  <body>
+    <noscript>
+      <h1 class="text-center">What a lovely hat</h1>
+      <h4 class="text-center">Is it made out of <a href="https://iacr.org/tinfoil.html">tin foil</a>?</h4>
+    </noscript>
+    <div class="align-items-center" id="topNavbar">
+      <a class="d-none mx-5 d-lg-inline" href="https://iacr.org/"><img class="iacrlogo" src="/img/iacrlogo_small.png" alt="IACR Logo" style="max-width:6rem;"></a>
+      <a class="iacrccname order-1" href="/">
+        <span class="longNavName">IACR Communications on Cryptology</span>
+      </a>
+    </div>
+    <main id="mainContent" class="container px-3 py-4 p-md-4">

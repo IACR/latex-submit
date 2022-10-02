@@ -1,0 +1,6 @@
+flask
+flask_mail
+pymysql
+flask_limiter
+python-dotenv
+celery

@@ -1,0 +1,3 @@
+# For questions about this, send email to Kevin McCurley
+User-agent: *
+Disallow: /

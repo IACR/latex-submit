@@ -1,0 +1,79 @@
+{# This base header is extended to add things in the head section. #}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="/css/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/eprint.css?v=9">
+    <title>{{TITLE}}</title>
+    {% endblock %}
+    <style>
+     body {
+       background: none;
+       background-color: #f3f3f3;
+     }
+     nav {
+       background-color: #f3f3f3 !important;
+     }
+     .navbar-light .navbar-nav .nav-link {
+       color: black !important;
+       border: 2px solid white;
+       background-color: #f3f3ff;
+     }
+     nav .nav-link:hover {
+       color: green !important;
+     }
+     #adminContent {
+       background-color: #fff;
+     }
+    </style>
+    <script>
+     MathJax = {
+       tex: {
+         inlineMath: [['$', '$'], ['\\(', '\\)']],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+         processEnvironments: false
+       }
+     };
+    </script>
+    <!-- we do not use a CDN. MathJax is too dangerous. -->
+    <script type="text/javascript" id="MathJax-script" async
+            src="/js/mathjax/tex-chtml.js">
+    </script>
+  </head>
+
+  <body>
+    <noscript>
+      <h1 class="text-center">What a lovely hat</h1>
+      <h4 class="text-center">Is it made out of <a href="https://iacr.org//tinfoil.html">tin foil</a>?</h4>
+    </noscript>
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <div class="navbar-brand d-none d-lg-block py-4 ms-4">
+          <a class="nav-link active" href="/"><img id="iacrlogo" src="/img/iacrlogo_small.png" class="img-fluid" alt="IACR Logo"></a>
+        </div>
+        <div class="navbar-brand">ePrint Admin</div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:rgba(128,128,128,.2);">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse ms-5" id="navbarNav">
+          <ul class="navbar-nav nav-fill">
+            <li class="nav-item">
+              <a class="nav-link active" href="/admin">Admin home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/admin/review">Review and approve</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/admin/edit">Edit a paper</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main id="adminContent" class="container px-md-4 py-3">
+
+{% block endOfHeader %}
+{% endblock %}

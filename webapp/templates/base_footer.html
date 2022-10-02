@@ -1,0 +1,28 @@
+</main>
+<div class="container-fluid mt-auto" id="iacrccFooter">
+  <a href="https://iacr.org/">
+    <img id="iacrlogo" src="/img/iacrlogo_small.png" class="img-fluid d-block mx-auto" alt="IACR Logo">
+  </a>
+  <div class="colorDiv"></div>
+  <div class="alert alert-success w-75 mx-auto">
+    Note: In order to protect the privacy of readers, we
+    does not use cookies or embedded third party content.
+  </div>
+</div>
+<script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+   var topNavbar = document.getElementById('topNavbar');
+   if (topNavbar) {
+     document.addEventListener('scroll', function(e) {
+       if (window.scrollY > 100) {
+         topNavbar.classList.add('scrolled');
+       } else {
+         topNavbar.classList.remove('scrolled');
+       }
+     })
+   }
+  </script>
+{% block endOfPage %}
+{% endblock %}
+</body>
+</html>
