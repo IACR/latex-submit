@@ -9,7 +9,7 @@ import docker
 from docker.errors import APIError
 from docker.types import Mount
 
-def run_latex(input_dirname, output_tarfile_name):
+def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/compiler/staging'):
     """Run latexmk safely in a docker container.
 
        args:
@@ -29,7 +29,7 @@ def run_latex(input_dirname, output_tarfile_name):
     main_tex_file = Path(input_dir, 'main.tex')
     if not main_tex_file.is_file():
         raise ValueError('missing main.tex')
-    staging_dir = Path('webapp/compiler/staging')
+    staging_dir = Path(staging_directory)
     if not staging_dir.is_dir():
         raise ValueError('missing staging directory')
     staging_has_files = any(staging_dir.iterdir())
@@ -72,8 +72,10 @@ if __name__ == '__main__':
                            default='tests/passing')
     argparser.add_argument('--output_tarfile',
                            default = '/tmp/passing.tar')
+    argparser.add_argument('--staging_directory',
+                           default = 'staging')
     args = argparser.parse_args()
-    run_latex(args.input_dir, args.output_tarfile)
+    run_latex(args.input_dir, args.output_tarfile, args.staging_directory)
 
 
 
