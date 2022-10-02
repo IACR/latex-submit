@@ -39,15 +39,15 @@ architecture by requiring only one app, namely the flask web server.
 
 This compiler service consists of three servers, namely a submission
 web server written in python/Flask, a Redis server, and a celery
-worker that runs the compilations.  The actual compilations are
-performed in a docker container that is created for each compilation,
-and these are run as celery tasks by the celery worker.  Using a
-docker container provides some degree of security against malicious
-uploaded LaTeX code.  The purpose of the Redis server is to handle a
-queue of tasks for the compilation server to perform, and report back
-results to the submission web server.  The glue between the servers is
-provided by the python Celery framework, using Redis as the message
-queue.
+worker that runs the compilations. The actual
+compilations are performed in a docker container that is created for
+each compilation, and these are run as celery tasks by the celery
+worker.  Using a docker container provides some degree of security
+against malicious uploaded LaTeX code.  The purpose of the Redis
+server is to handle a queue of tasks for the compilation server to
+perform, and report back results to the submission web server.  The
+glue between the servers is provided by the python Celery framework,
+using Redis as the message queue.
 
 The author submits a zip file containing all sources necessary for
 compiling thier paper. When an author uploads their zip file, it is
@@ -77,25 +77,57 @@ to only a limited number of packages. Because of this, it is important
 to provide detailed error messages to the submitting authors so that
 they may understand how to fix their problems.
 
-Installation is as follows:
+Installation is as follows (TODO: review this):
 
+```
 python3 -m pip install flask
 python3 -m pip install flask-limiter
 python3 -m pip install flask-mail
+python3 -m pip install celery
+python3 -m pip install redis
+python3 -m pip install docker
 sudo apt install redis-server
-see instructions for installing redis at https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04
+sudo apt install python3-celery
+```
+See instructions for [installing redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04).
+You only need to set the password for accessing redis.  This password
+is currently in `config.py`. (TODO: where should this be kept?)
 
+```
+cd webapp/compiler
+docker build -t debian-slim-texlive2022 .
+```
+(note the dot at the end). While you are in that directory, you should try
+```
+python3 runner.py
+```
+to check that the docker compiler is working. This will produce output in /tmp/passing.tar
 
-## Running the app
+## Running the app in dev
 
-In one shell, run:
+When Redis is installed, it is normally started and running via
+systemd. In order to start the web server, run:
 ```
 python3 run.py
 ```
-In another shell, run the celery worker with
+
+Then in another shell, start the celery worker by running:
 ```
-celery -A tasks worker --loglevel=INFO
+celery -A webapp.tasks worker --loglevel=DEBUG
 ```
+At this point you should be able to point your browser at localhost:5000
+
+## Running the app in production
+
+As stated above, the Redis server will ordinarily be started by systemd after it
+is installed (be sure to configure the password as in `config.py`).
+
+The web server would ordinarily be started behind apache running mod_wsgi. This requires
+a `.wsgi` file, which isn't completed yet.
+
+In production, the celery worker will have to also be started using
+systemd. I have not done this yet, but [see
+this](https://ahmadalsajid.medium.com/daemonizing-celery-beat-with-systemd-97f1203e7b32)
 
 ## Publishing workflow (not sure if we need this here)
 
