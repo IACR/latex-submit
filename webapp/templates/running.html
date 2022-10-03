@@ -5,12 +5,12 @@ This template is used to show progress of a LaTeX compliation. It
 repeatedly polls for status on the task until it is complete.
 =================================================================
 #}
-<h2 class="mt-2 mb-5">Compiling your paper</h2>
+<h2 class="mt-2 mb-3">Compiling your paper</h2>
 <input type="hidden" name="taskid" value="{{taskid}}">
 <h3>Status: <span id="status">PENDING</span></h3>
 <div id="result" class="d-none">
-    <h3>Result</h3>
-    <pre id="response"></pre>
+    <h3>LaTeX output</h3>
+    <pre id="response" class="mt-2" style="overflow-y: scroll;max-height:70vh;"></pre>
 </div>
 <script>
 
