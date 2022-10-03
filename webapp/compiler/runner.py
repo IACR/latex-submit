@@ -45,8 +45,6 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
     staging_has_files = any(staging_dir.iterdir())
     if staging_has_files:
         raise ValueError('staging directory must be empty')
-    latexmk_config = Path(staging_dir) / Path('latexmkrc')
-    latexmk_config.write_text('$pdf_mode = 4;')
     for entry in input_dir.iterdir():
         shutil.copy(entry, staging_dir, follow_symlinks=False)
     client = docker.from_env()

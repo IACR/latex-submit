@@ -25,6 +25,8 @@ ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
 
 # Install latex packages
 RUN tlmgr install latexmk
+COPY LatexMk /etc
+
 WORKDIR /data
 
 # This just keeps it running while we run latexmk and copy files off.
