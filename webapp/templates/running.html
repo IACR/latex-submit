@@ -25,8 +25,11 @@ repeatedly polls for status on the task until it is complete.
 	     if (data.result) {
 		 response = JSON.parse(data.result);
 		 if (response.code == 0) {
-		     document.getElementBy
-		 document.getElementById('response').innerHTML = data.result;
+		     document.getElementById('status').innerText = 'Compilation succeeded. Please check the log and view your PDF';
+		 } else {
+		     document.getElementById('status').innerText = 'Compilation failed';
+		 }
+		 document.getElementById('response').innerHTML = response.log;
 		 document.getElementById('result').classList.remove('d-none');
 	     }
 	     if (data.status == 'PENDING' || data.status == 'STARTED') {

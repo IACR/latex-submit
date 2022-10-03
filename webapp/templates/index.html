@@ -11,22 +11,22 @@
 </div>
 <form method="POST" action="/" enctype="multipart/form-data">
     <div class="form-group">
-    <label for="authoremail" class="form-label">Your email address (required)</label>
-    <input required class="form-control" id="authoremail" type="email" name="email" placeholder="email of submitting author" value="author1@digicrime.com">
+    <label for="email" class="form-label">Your email address (required)</label>
+    <input required class="form-control" id="email" type="email" name="email" placeholder="email of submitting author" value="author1@digicrime.com">
   </div>
   <div class="form-group mt-3">
     <label for="paperid" class="form-label">Paper ID (randomly generated for the moment)</label>
     <input required class="form-control" type="text" name="paperid" id="paperid" placeholder="paper ID">
   </div>
   <div class="form-group mt-3">
-      <label for="texfiles" class="form-label">Zip file with all
+      <label for="zipfile" class="form-label">Zip file with all
 	  <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
 	source files required to produce your paper (including iacrcc.cls at the moment).
 	The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> file should be named
 	<span class="mycode">main.tex</span>. Subdirectories are acceptable within the zip file,
 	but the	<span class="mycode">main.tex</span> file should be at the top level.
     </label>
-    <input required class="form-control" name="texfiles" type="file" accept=".zip">
+    <input required class="form-control" name="zipfile" type="file" accept=".zip">
   </div>
   <button type="submit" class="mt-3 btn btn-primary">Upload</button>
 </form>
@@ -34,7 +34,7 @@
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 function generateString(length) {
-    let result = ' ';
+    let result = '';
     const charactersLength = characters.length;
     for ( let i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));

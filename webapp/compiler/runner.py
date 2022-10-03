@@ -56,7 +56,7 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
         container = client.containers.run('debian-slim-texlive2022',
                                           detach=True,
                                           mounts=[mount])
-        code, output = container.exec_run('latexmk -lualatex="lualatex -safer" main', workdir='/data')
+        code, output = container.exec_run('latexmk -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
         localtarfile = open(output_tarfile_name, 'wb')
         tarball,stat = container.get_archive('data/')
         for chunk in tarball:
