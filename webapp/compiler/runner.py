@@ -4,6 +4,7 @@ also be used from the command line.
 """
 
 import argparse
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -49,7 +50,6 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
     for entry in input_dir.iterdir():
         shutil.copy(entry, staging_dir, follow_symlinks=False)
     client = docker.from_env()
-    output = ''
     try:
         # We mount the staging_dir as /data in the container.
         mount = Mount('/data', str(staging_dir.absolute()), type='bind')
@@ -63,6 +63,8 @@ def run_latex(input_dirname, output_tarfile_name, staging_directory='webapp/comp
             localtarfile.write(chunk)
         localtarfile.close()
         container.kill()
+        response = {'log': output.decode(), 'code': code}
+        return json.dumps(response, indent=2)
     except APIError as e:
         print(e)
         raise(e)

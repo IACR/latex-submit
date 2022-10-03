@@ -7,7 +7,7 @@ repeatedly polls for status on the task until it is complete.
 #}
 <h2 class="mt-2 mb-5">Compiling your paper</h2>
 <input type="hidden" name="taskid" value="{{taskid}}">
-<h3>Status: <span id="status"></span></h3>
+<h3>Status: <span id="status">PENDING</span></h3>
 <div id="result" class="d-none">
     <h3>Result</h3>
     <pre id="response"></pre>
@@ -23,11 +23,14 @@ repeatedly polls for status on the task until it is complete.
 	     console.log(data);
 	     document.getElementById('status').innerHTML = data.status;
 	     if (data.result) {
+		 response = JSON.parse(data.result);
+		 if (response.code == 0) {
+		     document.getElementBy
 		 document.getElementById('response').innerHTML = data.result;
 		 document.getElementById('result').classList.remove('d-none');
 	     }
 	     if (data.status == 'PENDING' || data.status == 'STARTED') {
-		 setTimeout(checkStatus, 4000);
+		 setTimeout(checkStatus, 3000);
 	     }
 	 });
 }
