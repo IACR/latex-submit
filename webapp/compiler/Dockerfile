@@ -24,7 +24,7 @@ RUN echo "Building with documentation: $DOCFILES" && \
 ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
 
 # Install latex packages
-RUN tlmgr install latexmk
+RUN tlmgr install latexmk multirow
 COPY LatexMk /etc
 
 WORKDIR /data
