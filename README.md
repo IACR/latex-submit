@@ -13,18 +13,14 @@ more broadly.
 ## Architecture
 
 The author is expected to upload a zip file to this server with their
-LaTeX sources, along with a paper ID that has been assigned at
-acceptance time.  This server will unzip the zip file into
-a directory identified by the paper ID, and then attempt to compile the
-LaTeX sources.
-
-Compilation of LaTeX received from third parties constitutes a
-security risk. For this reason, the production of PDF or HTML from
-LaTeX should either be done by authors or within a controlled
-environment. Due to the fact that LaTeX is a programming environment,
-we have chosen to provide a controlled environment so as to enforce a
-look and feel of the papers by limiting which LaTeX packages may be
-used. This is essentially the same approach taken by ACM and arXiv.
+LaTeX sources. Compilation of LaTeX received from third parties
+constitutes a security risk. For this reason, the production of PDF or
+HTML from LaTeX should either be done by authors or within a
+controlled environment. Due to the fact that LaTeX is a programming
+environment, we have chosen to provide a controlled environment so as
+to enforce a look and feel of the papers by limiting which LaTeX
+packages may be used. This is essentially the same approach taken by
+ACM and arXiv.
 
 NOTE: The implementation describe below uses celery, but I think this
 may be too heavyweight for what we want. All we really need is a queue
@@ -49,24 +45,30 @@ perform, and report back results to the submission web server.  The
 glue between the servers is provided by the python Celery framework,
 using Redis as the message queue.
 
-The author submits a zip file containing all sources necessary for
-compiling thier paper. When an author uploads their zip file, it is
-stored with minimal metadata required to track the paper through the
-system (an email address of the submitting author and an ID from the
-review system). When the zip file is submitted, the web server
-registers a Celery task through Redis for the compilation server using
-the ID of the submission.
+When the author uploads their zipfile, they also include a unique
+paper ID and the email address of the submitting author. For a paper
+ID of `xyz`, For a paper ID of `xyz`, the server will store data for
+this upload in the directory `webapp/data/xyz`. The server first
+stores the zip file there, and then unzips the zip file into
+`webapp/data/xyz/input`. After it runs LaTeX on the files, the output
+goes into webapp/data/xyz/output`. The server also stores a file
+`webapp/data/xyz/meta.json` with minimal metadata about the upload.
+
+One the web server has received the zip file and unzipped it, the web
+server registers a Celery task through Redis for the compilation
+server to run. The user's browser waits until the task is finished,
+and displays the results to the user.
 
 Once the celery task is registered, the compilation server picks it up
 from a queue of tasks. The compilation server creates a docker
-instance with a limited version of texlive that contains the
-iacrcc.cls file but no other LaTeX classes. It runs latexmk to run
-lualatex plus either bibtex or biber, producing either an error log or
-a successful output.  If the compilation is successful, then the
-output from compliation is reported back (including the meta file
-produced from the iacrcc.cls during the compliation.  If the
-compilation fails, then a detailed error log is reported back to
-Redis, which is picked up by the web server.
+container with a limited version of texlive along with the iacrcc.cls
+file.  It runs latexmk to run lualatex plus either bibtex or biber,
+producing either an error log or a successful output.  If the
+compilation is successful, then the output from compliation is
+reported back (including the meta file produced from the iacrcc.cls
+during the compliation.  If the compilation fails, then a detailed
+error log is reported back to Redis, which is picked up by the web
+server.
 
 ## The compiler process
 
@@ -88,9 +90,17 @@ python3 -m pip install redis
 python3 -m pip install docker
 sudo apt install redis-server
 sudo apt install python3-celery
+sudo apt install docker
 ```
+add user to docker group with
+```
+sudo usermod -aG docker $USER
+```
+Then you will need to logout and login again.
+
 See instructions for [installing redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04).
-You only need to set the password for accessing redis.  This password
+You only need to set the password for accessing redis by changing the line for
+`requirepass` in `/etc/redis/redis.conf`.  The password
 is currently in `config.py`. (TODO: where should this be kept?)
 
 ```

@@ -1,10 +1,12 @@
+import datetime
+import json
 from flask import Blueprint, render_template, request, jsonify
 from flask import current_app as app
-
-from webapp.tasks import run_latex_task, celery_app
 from celery.result import AsyncResult
 from pathlib import Path
 import zipfile
+
+from webapp.tasks import run_latex_task, celery_app
 
 home_bp = Blueprint('home_bp',
                     __name__,
@@ -46,22 +48,34 @@ def runlatex():
             entry.unlink()
     else:
         paper_dir.mkdir(parents=True)
+    # Save a json file with minimal metadata for debugging.
+    json_data = {'email': args.get('email'),
+                 'paperid': paperid,
+                 'ip_address': request.remote_addr,
+                 'date': str(datetime.datetime.now())}
+    json_file = paper_dir / Path('meta.json')
+    json_file.write_text(json.dumps(json_data, indent=2))
     # Now unzip the zip file into paper_dir
     zip_path = paper_dir / Path('all.zip')
     request.files['zipfile'].save(zip_path)
     zip_file = zipfile.ZipFile(zip_path)
-    zip_file.extractall(paper_dir)
-    # We don't keep the zip_file since we have unzipped it.
-    zip_path.unlink()
+    input_dir = paper_dir / Path('input')
+    zip_file.extractall(input_dir)
+    output_dir = paper_dir / Path('output')
+    if output_dir.is_dir():
+        for entry in output_dir.iterdir():
+            entry.unlink()
+    else:
+        output_dir.mkdir()
     # fire off a celery task
-    taskid = run_latex_task.delay(paperid)
+    taskid = run_latex_task.delay(str(input_dir.absolute()), str(output_dir.absolute()))
+    print(taskid)
     return render_template('running.html',
                            title='Compiling your LaTeX',
                            taskid=taskid.id)
 
 @home_bp.route('/tasks/<task_id>', methods=['GET'])
 def get_status(task_id):
-    print(celery_app.tasks.keys())
     task_result = celery_app.AsyncResult(task_id)
     result = {'task_id': task_id,
               'status': task_result.status,
