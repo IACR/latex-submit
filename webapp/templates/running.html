@@ -10,7 +10,10 @@ repeatedly polls for status on the task until it is complete.
 <h3>Status: <span id="status">PENDING</span></h3>
 <div id="result" class="d-none">
     <h3>LaTeX output</h3>
-    <pre id="response" class="mt-2" style="overflow-y: scroll;max-height:70vh;"></pre>
+    <div class="px-3 mt-3" style="overflow-y: scroll;max-height:70vh;background-color:#e8e8e8;">
+	<pre id="response"></pre>
+	<div id="endOfOutput"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></div>
+    </div>
 </div>
 <script>
 
@@ -31,6 +34,10 @@ repeatedly polls for status on the task until it is complete.
 		 }
 		 document.getElementById('response').innerHTML = response.log;
 		 document.getElementById('result').classList.remove('d-none');
+		 document.getElementById('endOfOutput').scrollIntoView({
+		     behavior: 'smooth',
+		     block: 'nearest',
+		     inline: 'start'});
 	     }
 	     if (data.status == 'PENDING' || data.status == 'STARTED') {
 		 setTimeout(checkStatus, 3000);

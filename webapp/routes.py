@@ -1,9 +1,10 @@
 import datetime
 import json
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, send_file
 from flask import current_app as app
 from celery.result import AsyncResult
 from pathlib import Path
+import string
 import zipfile
 
 from webapp.tasks import run_latex_task, celery_app
@@ -21,6 +22,10 @@ def home():
         return render_template('message.html',
                                title='Debug is not enabled',
                                error='Debug is not enabled')
+
+def _validate_paperid(paperid):
+    accepted_chars = string.digits + string.ascii_lowercase + string.ascii_uppercase + '-_'
+    return all(c in accepted_chars for c in paperid)
 
 def _validate_post(args, files):
     """args should contain paperid and email. files should contain zipfile."""
@@ -41,13 +46,17 @@ def runlatex():
                                title='Invalid parameters',
                                error=msg)
     paperid = args.get('paperid')
+    if not _validate_paperid(paperid):
+        return render_template('message.html',
+                               title='Invalid character in paperid',
+                               error='paperid is restricted to using characters {}'.format(accepted_chars))
     # TODO: make sure that paper id is safe to use as a path, so
     # we need to either base64 encode it or remove things like ../../../
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     if paper_dir.is_dir():
         # Empty the directory, removing previous attempt
         for entry in paper_dir.iterdir():
-            entry.unlink()
+            shutil.rmtree(entry)
     else:
         paper_dir.mkdir(parents=True)
     # Save a json file with minimal metadata for debugging.
@@ -71,10 +80,10 @@ def runlatex():
         output_dir.mkdir()
     # fire off a celery task
     taskid = run_latex_task.delay(str(input_dir.absolute()), str(output_dir.absolute()))
-    print(taskid)
-    return render_template('running.html',
-                           title='Compiling your LaTeX',
-                           taskid=taskid.id)
+    data = {'title': 'Compiling your LaTeX',
+            'taskid': taskid.id,
+            'paperid': paperid}
+    return render_template('running.html', **data)
 
 @home_bp.route('/tasks/<task_id>', methods=['GET'])
 def get_status(task_id):
@@ -83,3 +92,17 @@ def get_status(task_id):
               'status': task_result.status,
               'result': task_result.result}
     return jsonify(result), 200
+
+@home_bp.route('/pdf/<paperid>/main.pdf', methods=['GET'])
+def show_pdf(paperid):
+    if not _validate_paperid(paperid):
+        return render_template('message.html',
+                               title='Unable to retrieve file',
+                               error='paperid is invalid')
+    pdf_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path('output/main.pdf')
+    if pdf_path.is_file():
+        return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
+    return render_template('message.html',
+                           title='Unable to retrieve file {}'.format(str(pdf_path.absolute())),
+                           error='Unknown file. This is a bug')
+    
