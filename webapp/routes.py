@@ -41,6 +41,8 @@ def runlatex():
                                title='Invalid parameters',
                                error=msg)
     paperid = args.get('paperid')
+    # TODO: make sure that paper id is safe to use as a path, so
+    # we need to either base64 encode it or remove things like ../../../
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     if paper_dir.is_dir():
         # Empty the directory, removing previous attempt
