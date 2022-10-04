@@ -37,8 +37,6 @@ def run_latex(input_dirname, output_dirname):
     if not input_dir.is_dir():
         raise ValueError('input directory not found: {}'.format(str(input_dir)))
     output_dir = Path(output_dirname)
-    if not output_dir.is_dir():
-        raise ValueError('output directory {} not found'.format(str(output_dir)))
 
     main_tex_file = Path(input_dir, 'main.tex')
     if not main_tex_file.is_file():
@@ -50,9 +48,7 @@ def run_latex(input_dirname, output_dirname):
     staging_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path(tmpdirname)
     if staging_dir.is_dir():
         raise ValueError('staging directory {} already exists'.format(str(staging_dir)))
-    staging_dir.mkdir()
-    for entry in input_dir.iterdir():
-        shutil.copy(entry, staging_dir, follow_symlinks=False)
+    shutil.copytree(input_dir, staging_dir, symlinks=False)
     client = docker.from_env()
     try:
         # We mount the staging_dir as /data in the container.
@@ -66,8 +62,7 @@ def run_latex(input_dirname, output_dirname):
         # interferes with the fontspec package, which some people may rely upon. Without
         # --safer, there are attacks on the container that are possible using lua.io
         code, output = container.exec_run('latexmk -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
-        for entry in staging_dir.iterdir():
-            shutil.copy(entry, output_dir)
+        shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
         response = {'log': output.decode(), 'code': code}
         return json.dumps(response, indent=2)
@@ -92,7 +87,6 @@ if __name__ == '__main__':
     output_dir = Path('/tmp/output')
     if output_dir.is_dir():
         shutil.rmtree(output_dir)
-    output_dir.mkdir()
     print(run_latex(args.input_dir, str(output_dir)))
 
 
