@@ -25,9 +25,9 @@ def run_latex(input_dirname, output_dirname):
            input_dirname: directory where user-uploaded latex sources are. symlinks
                in this directory are ignored but subdirectories are allowed.
            output_dirname:
-               path to where resulting output should be deposited.
-       returns: A JSON string to indicate failure or success, along with the output
-                from running latexmk.
+               path to where resulting output should be deposited. Should not already exist.
+       returns: A dict with code and log. The code is the return code from running latexmk, and
+                log is the output from running latexmk.
        raises: 
           ValueError if some conditions are not satisfied.
           APIError if there is an error from the docker API.
@@ -37,6 +37,8 @@ def run_latex(input_dirname, output_dirname):
     if not input_dir.is_dir():
         raise ValueError('input directory not found: {}'.format(str(input_dir)))
     output_dir = Path(output_dirname)
+    if output_dir.is_dir():
+        raise ValueError('output_dir should not already exist')
 
     main_tex_file = Path(input_dir, 'main.tex')
     if not main_tex_file.is_file():
@@ -64,8 +66,7 @@ def run_latex(input_dirname, output_dirname):
         code, output = container.exec_run('latexmk -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
-        response = {'log': output.decode(), 'code': code}
-        return json.dumps(response, indent=2)
+        return {'log': output.decode(), 'code': code}
     except APIError as e:
         print(e)
         raise(e)
@@ -73,21 +74,26 @@ def run_latex(input_dirname, output_dirname):
         shutil.rmtree(staging_dir)
         container.stop()
         container.remove()
-    if code:
-        return 'Compilation failed: ' + output.decode()
-    else:
-        return 'Compilation success: ' + output.decode()
+    return {'code': 999, 'error': 'Compilation failed: ' + output.decode()}
 
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='Run a latex docker compilation')
     argparser.add_argument('--input_dir',
                            default='tests/passing')
+    argparser.add_argument('--output_dir',
+                           default='/tmp/output')
+    argparser.add_argument('--overwrite',
+                           action='store_true')
     args = argparser.parse_args()
-    output_dir = Path('/tmp/output')
+    output_dir = Path(args.output_dir)
     if output_dir.is_dir():
-        shutil.rmtree(output_dir)
-    print(run_latex(args.input_dir, str(output_dir)))
+        if args.overwrite:
+            shutil.rmtree(output_dir)
+        else:
+            print('use --overwrite to overwrite output_dir')
+            exit(1)
+    print(json.dumps(run_latex(args.input_dir, args.output_dir), indent=2))
 
 
 
