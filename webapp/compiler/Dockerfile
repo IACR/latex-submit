@@ -34,5 +34,8 @@ COPY iacrcc/iacrcc.bst /home/texlive/texmf/bibtex/bst/iacrcc/iacrcc.bst
 COPY iacrcc/CC-by.png /home/texlive/texmf/tex/latex/iacrcc/CC-by.png
 WORKDIR /data
 
-# This just keeps it running while we run latexmk and copy files off.
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+# This causes the container to run no more than 500 seconds. This is to protect against
+# lua code with an infinite loop, or something stupid like
+# \newcommand{\foo}{\foo}\foo which generates an infinite loop.
+# A single compilation should not take this long under any circumstances.
+ENTRYPOINT ["/bin/bash", "-c", "timeout 500 tail -f /dev/null"]
