@@ -74,7 +74,7 @@ def run_latex(input_dirname, output_dirname):
         # TODO: determine whether we should use --safer. There is evidence that this
         # interferes with the fontspec package, which some people may rely upon. Without
         # --safer, there are attacks on the container that are possible using lua.io
-        code, output = container.exec_run('latexmk -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
+        code, output = container.exec_run('latexmk -lualatex -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
         return {'log': output.decode(), 'code': code}
