@@ -2,13 +2,13 @@ import datetime
 import json
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask import current_app as app
-from celery.result import AsyncResult
 from pathlib import Path
+from . import executor, task_queue, PaperStatus
 import shutil
 import string
 import zipfile
 
-from webapp.tasks import run_latex_task, celery_app
+from webapp.tasks import run_latex_task
 
 home_bp = Blueprint('home_bp',
                     __name__,
@@ -51,6 +51,10 @@ def runlatex():
         return render_template('message.html',
                                title='Invalid character in paperid',
                                error='paperid is restricted to using characters {}'.format(accepted_chars))
+    if task_queue.get(paperid):
+        return render_template('message.html',
+                               title='Another one is running',
+                               error='At most one compilation may be queued on each paper.')
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     if paper_dir.is_dir():
         shutil.rmtree(paper_dir)
@@ -73,20 +77,66 @@ def runlatex():
     # Remove output from any previous run.
     if output_dir.is_dir():
         shutil.rmtree(output_dir)
-    # fire off a celery task
-    taskid = run_latex_task.delay(str(input_dir.absolute()), str(output_dir.absolute()), paperid)
+    # fire off a separate task to compile
+    task_queue[paperid] = executor.submit(run_latex_task, str(input_dir.absolute()),
+                                                          str(output_dir.absolute()),
+                                                          paperid)
     data = {'title': 'Compiling your LaTeX',
-            'taskid': taskid.id,
-            'paperid': paperid}
+            'paper_id': paperid}
     return render_template('running.html', **data)
 
-@home_bp.route('/tasks/<task_id>', methods=['GET'])
-def get_status(task_id):
-    task_result = celery_app.AsyncResult(task_id)
-    result = {'task_id': task_id,
-              'status': task_result.status,
-              'result': task_result.result}
-    return jsonify(result), 200
+@home_bp.route('/tasks/<paper_id>', methods=['GET'])
+def get_status(paper_id):
+    status = PaperStatus.UNKNOWN
+    msg = 'Unknown status'
+    # is the task in the queue or running?
+    future = task_queue.get(paper_id, None)
+    if future:
+        if future.cancelled():
+            status = PaperStatus.CANCELLED
+            msg = 'Compilation was cancelled'
+            task_queue.pop(paper_id, None)
+        elif future.running():
+            status = PaperStatus.RUNNING
+            msg = 'Compilation is running'
+        elif future._exception:
+            status = PaperStatus.EXCEPTION
+            msg = 'An exception occurred: {}'.format(str(future._exception))
+        elif future.done(): # must have returned a result
+            status = PaperStatus.COMPILED
+            msg = future.result()
+            # Tasks that are done should remove themselves. Should not happen.
+            task_queue.pop(paper_id, None)
+        else: # it's enqueued
+            status = PaperStatus.PENDING
+            try:
+                position = tuple(task_queue.keys()).index(paper_id)
+                size = len(task_queue)
+                msg = 'Pending (position {} out of {})'.format(position, size)
+            except Exception:
+                msg = 'Unknown position'
+    else:
+        # we rely upon the json file
+        paper_path = Path(app.config['DATA_DIR']) / Path(paper_id)
+        if not paper_path.is_dir():
+            status = PaperStatus.UNKNOWN
+        else:
+            json_file = paper_path / Path('meta.json')
+            if not json_file.is_file():
+                status = PaperStatus.UNKNOWN
+                msg = 'Cannot find JSON file'
+            else:
+                meta = json.loads(json_file.read_text(encoding='UTF-8'))
+                if 'code' not in meta:
+                    status = PaperStatus.UNKNOWN
+                    msg = 'Unknown status'
+                elif meta['code'] == 0:
+                    status = PaperStatus.COMPILED
+                    msg = 'Successfully compiled'
+                else:
+                    status = PaperStatus.FAILED_COMPILE
+                    msg = 'Exit code from latexmk was {}'.format(meta['code'])
+    return jsonify({'status': status.value, 'msg': msg}), 200
 
 @home_bp.route('/pdf/<paperid>/main.pdf', methods=['GET'])
 def show_pdf(paperid):

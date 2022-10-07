@@ -69,12 +69,7 @@ def run_latex(input_dirname, output_dirname):
                                           detach=True,                  # Detach the container
                                           network_disabled=True,        # Disable networking
                                           mounts=[mount])               # Specify our mount point = the staging dir
-        # TODO: figure out how to set a timeout on the run of the container, in order to
-        # protect against people running infinite loops in lualatex.
-        # TODO: determine whether we should use --safer. There is evidence that this
-        # interferes with the fontspec package, which some people may rely upon. Without
-        # --safer, there are attacks on the container that are possible using lua.io
-        code, output = container.exec_run('latexmk -lualatex -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
+        code, output = container.exec_run('latexmk -g -lualatex="lualatex --safer --nosocket --no-shell-escape" main', workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
         return {'log': output.decode(), 'code': code}

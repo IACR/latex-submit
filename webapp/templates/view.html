@@ -4,7 +4,7 @@
 This template is used to show the status of a compilation.
 =================================================================
 #}
-<h2 class="mt-2 mb-3">Uploaded paper</h2>
+<h2 class="mt-2 mb-3">Results from compilation</h2>
 <h3 class="mt-2 mb-3">{{status}}</h3>
 <nav class="mb-3">
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -21,6 +21,7 @@ This template is used to show the status of a compilation.
 <div class="tab-content" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#e8e8e8;">
     <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
 	<pre>{{log}}</pre>
+	<div id="endOfOutput"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></div>
     </div>
     {% if pdf %}
     <div class="tab-pane fade" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">
@@ -31,4 +32,10 @@ This template is used to show the status of a compilation.
     <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">...</div>
     {% endif %}
 </div>
+<script>
+ document.getElementById('endOfOutput').scrollIntoView({
+     behavior: 'smooth',
+     block: 'nearest',
+     inline: 'start'});
+</script>
 {% include "base_footer.html" %}
