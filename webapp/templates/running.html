@@ -6,7 +6,7 @@ repeatedly polls for status on the task until it is complete.
 =================================================================
 #}
 <h2 class="mt-2 mb-3">Compiling your paper</h2>
-<input type="hidden" name="taskid" value="{{taskid}}">
+<input type="hidden" name="paper_id" value="{{paper_id}}">
 <h3>Status: <span id="status">PENDING</span></h3>
 <div id="result" class="d-none">
     <h3>LaTeX output</h3>
@@ -20,7 +20,7 @@ repeatedly polls for status on the task until it is complete.
  var retries = 0;
  function checkStatus() {
      retries++;
-     fetch('/tasks/{{taskid}}')
+     fetch('/tasks/{{paper_id}}')
 	 .then((response) => response.json())
 	 .then((data) => {
 	     console.log(data);
@@ -39,8 +39,10 @@ repeatedly polls for status on the task until it is complete.
 		     block: 'nearest',
 		     inline: 'start'});
 	     }
-	     if (data.status == 'PENDING' || data.status == 'STARTED') {
+	     if (data.status == 'PENDING' || data.status == 'RUNNING') {
 		 setTimeout(checkStatus, 3000);
+	     } else {
+		 location.href = '/view/{{paper_id}}'
 	     }
 	 });
 }
