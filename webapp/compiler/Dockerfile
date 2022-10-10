@@ -24,7 +24,9 @@ RUN echo "Building with documentation: $DOCFILES" && \
 ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
 
 # Install latex packages
-RUN tlmgr install latexmk multirow xstring hyperxmp ifmtarg sectsty biblatex lastpage fancyvrb floatrow caption float lineno microtype tocloft sttools relsize import enumitem xargs ieeetran comment pgfplots pgf-blur calculator todonotes adjustbox collectbox standalone currfile gincltex svn-prov filemod biber tikzscale pbox forloop varwidth bigfoot environ
+RUN tlmgr install orcidlink llncs  # TODO: Remove this later
+RUN tlmgr install latexmk multirow xstring hyperxmp ifmtarg sectsty biblatex lastpage fancyvrb floatrow caption float lineno microtype tocloft sttools relsize import enumitem xargs ieeetran comment pgfplots pgf-blur calculator todonotes adjustbox collectbox standalone currfile gincltex svn-prov filemod biber tikzscale pbox forloop varwidth bigfoot environ ntheorem breakcites ifoddpage bbm cleveref bbm-macros blindtext tcolorbox pdfcol doublestroke preprint paralist glossaries mfirstuc xfor datatool mdframed zref needspace lipsum placeins thmtools
+RUN tlmgr install tocbibind mmap qtree pict2e tree-dvips braket qcircuit xypic
 COPY LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
