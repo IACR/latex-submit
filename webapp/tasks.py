@@ -22,7 +22,7 @@ def run_latex_task(input_path, output_path, paperid):
         start_time = time.time()
         output = runner.run_latex(input_path, output_path)
         end_time = time.time()
-        output['execution_time'] = end_time - start_time
+        output['execution_time'] = round(end_time - start_time, 2)
     except Exception as e:
         output['error'] = 'Exception running latex: ' + str(e)
     json_file = Path(output_path).parents[0] / Path('meta.json')

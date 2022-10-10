@@ -1,7 +1,9 @@
 import datetime
+from io import BytesIO
 import json
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask import current_app as app
+import os
 from pathlib import Path
 from . import executor, task_queue, PaperStatus
 import shutil
@@ -151,6 +153,16 @@ def show_pdf(paperid):
                            title='Unable to retrieve file {}'.format(str(pdf_path.absolute())),
                            error='Unknown file. This is a bug')
     
+def _expand_dir(path):
+    node = []
+    for dir in sorted(path.iterdir()):
+        child = {'name': dir.name}
+        if dir.is_dir():
+            child['children'] = _expand_dir(dir)
+        node.append(child)
+    return node
+
+
 @home_bp.route('/view/<paperid>', methods=['GET'])
 def view_results(paperid):
     if not _validate_paperid(paperid):
@@ -171,7 +183,25 @@ def view_results(paperid):
     json_file = paper_path / Path('meta.json')
     meta = json.loads(json_file.read_text(encoding='UTF-8'))
     meta['title'] = 'Results from compilation'
+    input_tree = []
+    output_dir = paper_path / Path('output')
+    meta['output'] = _expand_dir(output_dir)
     pdf_file = output_path / Path('main.pdf')
+    meta_file = output_path / Path('main.meta')
+    if meta_file.is_file():
+        meta['metadata'] = meta_file.read_text(encoding='UTF-8')
     if pdf_file.is_file():
         meta['pdf'] = True
     return render_template('view.html', **meta)
+
+@home_bp.route('/output/<paperid>', methods=['GET'])
+def download_output_zipfile(paperid):
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+    output_dir =  paper_dir / Path('output')
+    subdir_offset = len(str(paper_dir)) + 1
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        for f in output_dir.glob('**/*'):
+            zf.write(f, arcname=str(f)[subdir_offset:])
+    memory_file.seek(0)
+    return send_file(memory_file, download_name='output.zip', as_attachment=True)

@@ -20,14 +20,14 @@ div#topNavbar .iacrccname {
 }
 
 div#topNavbar {
-    height: 8rem;
     background-color: #0A60AF;
     display:flex;
 }
 
 /***** Images & icons (includes on nav) *****/
 div#topNavbar img.iacrlogo {
-  max-height: 6rem;
+  max-height: 8vh;
+  margin: 1rem;
   transition: .4s;
   border-radius: 50%;
   box-shadow: 0px 0px 20px 0px rgba(255, 255, 255, .8);
@@ -76,3 +76,19 @@ span.latex {
 .mycode {
     font-family: var(--bs-font-monospace);
 }
+
+.nav-tabs button.nav-link {
+    border-bottom: none;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+    border-color: #848484;
+    font-weight: 700;
+    margin-right: .3rem;
+    padding: .5rem 2rem .5rem 2rem;
+}
+button.nav-link {
+    text-decoration: none;
+    color: #404040;
+}
+
+
