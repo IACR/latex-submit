@@ -16,10 +16,10 @@ import stat
 import docker
 from docker.errors import APIError
 from docker.types import Mount
-
 _container = None
 
 def run_latex(input_dirname, output_dirname):
+
     """Run latexmk safely in a docker container.
 
        args:
@@ -61,6 +61,10 @@ def run_latex(input_dirname, output_dirname):
         for filename in filenames:
             file_path = Path(os.path.join(dirpath, filename))
             file_path.chmod(file_path.stat().st_mode | stat.S_IWOTH)
+    # Remove any leftover files from LaTeX runs by the author
+    for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log']:
+        if Path(staging_dir, 'main.' + i).is_file():
+            os.remove(str(staging_dir.absolute()) + '/main.' + i)
     client = docker.from_env()
     try:
         # We mount the staging_dir as /data in the container.
