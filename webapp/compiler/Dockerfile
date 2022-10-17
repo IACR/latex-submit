@@ -26,7 +26,10 @@ ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
 # Install latex packages
 RUN tlmgr install mwe minted orcidlink llncs  # TODO: Remove this later
 RUN tlmgr install latexmk multirow xstring hyperxmp ifmtarg sectsty biblatex lastpage fancyvrb floatrow caption float lineno microtype tocloft sttools relsize import enumitem xargs ieeetran comment pgfplots pgf-blur calculator todonotes adjustbox collectbox standalone currfile gincltex svn-prov filemod biber tikzscale pbox forloop varwidth bigfoot environ ntheorem breakcites ifoddpage bbm cleveref bbm-macros blindtext tcolorbox pdfcol doublestroke preprint paralist glossaries mfirstuc xfor datatool mdframed zref needspace lipsum placeins thmtools tocbibind mmap qtree pict2e tree-dvips braket qcircuit xypic dashbox was arydshln threeparttable booktabs cases ascmac cancel autonum etextools textpos everypage apptools boxedminipage chngcntr framed hanging ncctools tablefootnote xifthen subfigure tikz-cd appendix diagbox makecell ifsym capt-of bbold esvect totcount supertabular fifo-stack tikzmark fixmath here tabu hyphenat wrapfig changepage cjhebrew luabidi endnotes xurl seqsplit newunicodechar minibox mathabx quantikz lettrine minifp bbding fontawesome5 tabto-ltx xpatch marginnote morefloats silence yfonts tabulary pdfsync csquotes printlen csvsimple kantlipsum babel-greek datetime2 spverbatim subfiles version rotfloat ellipsis calrsfs tkz-euclide imakeidx academicons anyfontsize scalerel titlesec fixme blkarray circuitikz multibib sidecap mathalpha outlines graphbox eqparbox epigraph nextpage gensymb newtx dblfloatfix spath3 stmaryrd
-RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopts esint ltablex acro translations breakurl msc picture
+RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopts esint ltablex acro translations breakurl msc picture accsupp accessibility axessibility nag quoting mleftright subdepth tikzpeople stackengine savesym
+RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk
+# install some fonts
+RUN tlmgr install fandol noto arphic-ttf
 COPY LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
