@@ -57,12 +57,12 @@ def run_latex(input_dirname, output_dirname):
     # which need to get overwritten so make all files writeable
     for dirpath, dirnames, filenames in os.walk(staging_dir):
         dir_path = Path(dirpath)
-        dir_path.chmod(dir_path.stat().st_mode | stat.S_IWOTH)
+        dir_path.chmod(0o755)
         for filename in filenames:
             file_path = Path(os.path.join(dirpath, filename))
-            file_path.chmod(file_path.stat().st_mode | stat.S_IWOTH)
-    # Remove any leftover files from LaTeX runs by the author
-    for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log']:
+            file_path.chmod(0o644)
+    # Remove any leftover files from LaTeX or latexmk runs by the author
+    for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log', 'fls', 'fdb_latexmk']:
         if Path(staging_dir, 'main.' + i).is_file():
             os.remove(str(staging_dir.absolute()) + '/main.' + i)
     client = docker.from_env()
