@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="alert alert-warning w-75 mx-auto">
-    Ordinarily this page would only be shown in the email and paper ID are authenticated
-    from HotCRP through an HMAC in the URL. For now we allow supplying values for testing.
-</div>
-<nav>
+<nav class="mt-4">
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <button class="nav-link active" id="nav-form-tab" data-bs-toggle="tab" data-bs-target="#nav-form"
 	    type="button" role="tab" aria-controls="nav-form" aria-selected="true">Submission form</button>
@@ -14,6 +10,10 @@
 </nav>
 <div class="tab-content" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
+    <div class="alert alert-warning w-75 mx-auto">
+      Ordinarily this page would only be shown in the email and paper ID are authenticated
+      from HotCRP through an HMAC in the URL. For now we allow supplying values for testing.
+    </div>
     <div class="alert alert-light">
       <strong>Instructions:</strong> Use this form to upload the final version of your paper. All fields
       are required. See the help tab above for hints on how to avoid problems.
@@ -42,8 +42,9 @@
           source files required to produce your paper. You do not need to upload
           the <span class="text-monospace">iacrcc.cls</span> file.
           The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> file should be named
-          <span class="mycode">main.tex</span>. Subdirectories are acceptable within the zip file,
-          but the    <span class="mycode">main.tex</span> file should be at the top level.
+          <i-mono>main.tex</i-mono>. Subdirectories are acceptable within the zip file,
+          but the    <i-mono>main.tex</i-mono> file should be at the top level. There are
+	  <a href="/requirements.html">much more complete instructions here</a>.
         </label>
         <input required class="form-control w-50" name="zipfile" type="file" accept=".zip">
       </div>
@@ -53,52 +54,162 @@
   <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
     <p>
       In order to keep the cost of publishing low, the IACR
-      Communications in Cryptology uses an automatic submission
-      system, and it is important that authors adhere to the
-      requirements. Submissions are required to be prepared in
-      LaTeX using the {# TODO: make this link visible to all #}
-      <a target="_blank" href="https://github.com/IACR/latex/tree/main/iacrcc"><span class="text-monospace">iacrcc</span></a>
+      Communications in Cryptology uses an automatic submission system
+      for final versions of accepted papers.  It is important that
+      authors adhere to the requirements. Submissions are required to
+      be prepared in LaTeX using the {# TODO: make this link visible
+      to all #}
+      <a target="_blank"
+      href="https://github.com/IACR/latex/tree/main/iacrcc"><span class="text-monospace">iacrcc</span></a>
       document class. This document style is designed to provide a
       consistent appearance for articles in the journal, but more
-      importantly it is designed to facilitate automatic processing
+      importantly, it is designed to facilitate automatic processing
       of metadata required for indexing and registration of DOIs.
     </p>
-    <h5 id="automatic">Automatic processing</h5>
+    <h3>System overview</h3>
     <p>
-      We require that authors submit all of the files used to
-      produce their LaTeX document, so that we may automatically
-      prepare the PDF during the submission process. This system is
-      designed to minimize the amount of human intervention, so the
-      processing is automatic when you upload your LaTeX files.
+      This system is based on lualatex and latexmk (see below).
+      lualatex is capable of producing UTF-8 output, and unfortunately
+      pdflatex does not satisfy this requirement. For most authors you
+      will not notice a difference, and we recommend using lualatex
+      during the preparation of your paper. Note that many features of
+      lua are disabled in our system, so you should not depend on
+      advanced features of lualatex.
     </p>
     <p>
-      This system is based on lualatex because it is capable of
-      producing UTF-8 output (pdflatex is not). For most authors
-      you will not notice a difference, and we recommend using
-      lualatex during the preparation of your paper. Note that
-      many features of lua are disabled in our system, so you
-      should not depend on advanced features of lualatex.
+      In order to conserve resources, this system is currently based
+      on the texlive 2022 "medium" distribution of LaTeX. We then add
+      a large number of additional packages.  The resulting system
+      supports the vast majority of popular LaTeX packages, but it is
+      possible that we are missing LaTeX packages that you desire. If
+      this is the case, please let us know at
+      iacrcic-admin@iacr.org. Please do not
+      upload <i-mono>.sty</i-mono> or <i-mono>.cls</i-mono> files with
+      your paper (they will be removed before compilation).
     </p>
-    <h5 id="packages">LaTeX packages</h5>
     <p>
-      In order to conserve resources, this system is currently
-      based on the texlive 2022 "medium" distribution of LaTeX.
-      This system supports the vast majority of popular LaTeX packages,
-      but it is possible that we are missing LaTeX packages that you
-      desire. If this is the case, please let us know at
-      iacrcic-admin@iacr.org. Please do not upload <span class="text-monospace">.sty</span>
-      packages with your paper.
+      The full list of latex packages that we support are mentioned in our
+      <a href="https://github.com/IACR/latex-submit/webapp/compiler/Dockerfile">Dockerfile</a>
+      and can be installed with <i-code>tlmgr</i-code>. <span class="text-danger">NOTE: it
+	would be better for us to use tlmgr list to produce the complete list</span>
+      There is also
+      a <a href="/unsupported.html">list of prohibited LaTeX
+      packages</a>. If you find a package that you'd like to have
+      added, please send email
+      to <span class="text-monospace">iacrcic-admin</span><i-mono>@iacr.org</i-mono>.
     </p>
-    <h5 id="figures">Guidance for figures</h5>
+    <p>Compilation in our system is currently performed using
+      <blockquote>
+	<i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+      </blockquote>
+      If you wish to fully replicate our system, you can set up docker
+      on your system and use
+      our <a href="https://github.com/IACR/latex-submit/webapp/compiler/runner.py"><i-code>runner.py</i-code></a>.
+      That is a fair amount of work to set up, because it requires
+      docker to be installed. As an alternative, you can simply start from <i-code>texlive2022</i-code>
+      and add the packages listed in the Dockerfile.
+    </p>
     <p>
-      If you require graphics, we recommend using the graphics or graphicx LaTeX packages.
-      We support only png, jpg, and gif formats for included graphics (not PDF or eps).
+      The options on lualatex are designed to prevent attacks on the
+      system from hostile code.  Some LaTeX packages
+      are <a href="/unsupported.html">explicitly omitted</a> because
+      they use shell escapes, and it
+      is <a href="https://arxiv.org/abs/2102.00856">generally
+      unsafe</a> to accept LaTeX sources from a third party. We
+      explicitly blacklist some packages because they either invoke
+      \write18 or the os packages from lua.
     </p>
-    <h5 id="figures">Guidance for references</h5>
+    <h3>Requirements</h3>
+    <ol>
+      <li>All files for processing your paper must be submitted, including bibtex files and external figure
+	graphics files.</li>
+      <li>Your main LaTeX file must be at the root of your submission and must be named <i-mono>main.tex</i-mono></li>
+      <li>Some files will be removed before processing, so do not upload:
+	<ul>
+	  <li><i-mono>main.aux</i-mono></li>
+	  <li><i-mono>.bbl</i-mono> files</li>
+	  <li><i-mono>.sty</i-mono> files</li>
+	  <li><i-mono>.cls</i-mono> files</li>
+	  <li><i-mono>latexmkrc</i-mono> files</li>
+	</ul>
+      </li>
+      <li>Before you upload your files, make sure it compiles on your system using the line:
+	<blockquote>
+	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+	</blockquote>
+      </li>
+    </ol>
+    <h3 id="figures">Guidance for included graphics</h3>
     <p>
-      We strongly urge that you include DOIs for all references. We also recommend using
-      cryptobib.
+      If you require graphics, we recommend using the graphics or
+      graphicx LaTeX packages.  We support only png, jpg, and gif
+      formats for included graphics
+      (not <i-mono>PDF</i-mono>, <i-mono>eps</i-mono>,
+      or <i-mono>svg</i-mono>).
+      <i-mono>svg</i-mono> files are not supported because
+      the <i-mono>svg</i-mono> package relies upon shell escapes and features of
+      pdftex. You should convert <i-mono>svg</i-mono> files to a supported format.
     </p>
+    <h3 id="figures">Guidance for references</h3>
+    <p>
+      We require authors to upload their bibtex files with
+      bibliographic information for their references. You may use
+      either bibtex or biblatex/biber (our system autodetects
+      this).
+    </p>
+    <p>
+      We recommend using <a href="https://github.com/cryptobib/export"
+      target="_blank">cryptobib</a>. You can reduce the size of your
+      uploaded bibtex files using
+      the <a href="https://ctan.math.utah.edu/ctan/tex-archive/biblio/bibtex/utils/bibexport/bibexport.pdf"
+      target="_blank">bibexport</a> utility that is included with
+      texlive to export only the bibtex entries that you actually
+      \cite. Do not rely upon uploading <i-mono>.bbl<i-mono> files;
+      they will not be used.
+    </p>
+    <p>
+      We <strong>strongly</strong> urge that you include DOIs for all
+      references.  Some people have grown accustomed to omitting them
+      due to page limits in legacy publications, but this forum has no
+      such limits and DOIs are important for giving proper citation.
+      Your bibtex entries may include both a DOI field and a URL field
+      if you wish to cite two different versions (e.g., the official
+      publication and an eprint version).
+    </p>
+    <div class="text-danger">
+      <p>
+	NOTE to Joppe: It might be nice if we could link to both the official
+      version of a paper and the eprint/arxiv version of a paper in the same citation.
+      Unfortunately bibtex predates preprint servers by a few decades, and there are no
+      standard ways to include them. We could modify <i-mono>iacrcc.bst</i-mono>
+      to show links to both, but users of biblatex wouldn't benefit. There are
+      several ways that people typically provide links to papers:
+      <ol>
+	<li>the DOI field, which is well defined (but should not include
+	  https://doi.org/). Unfortunately many of these are behind paywalls.
+	</li>
+	<li>the URL field, which may contain the DOI link or some other link.</li>
+	<li>the ee field used to be exported by DBLP. ee is a nonstandard extension for
+	  "electronic edition"</li>
+	<li>the NOTE field with <i-mono>\url{}</i-mono></li>
+	<li>the <i-mono>eprint</i-mono> field suggested by
+	  <a href="https://arxiv.org/help/hypertex/bibstyles">arxiv</a>.
+	  In this case we would use
+	  <pre>
+	    @inproceedings{example,
+               title  = {Example title},
+               author = {Fester Bestertester},
+               doi    = {10.1007/978-3-031-17234-2_16},
+               eprint = {2022/724},
+               archivePrefix = {IACReprint}
+	    }
+	  </pre>
+	  Ideally this would produce a bibliographic reference with both hyperlinks
+	  https://doi.org/10.1007/978-3-031-17234-2_16 and https://eprint.iacr.org/2022/724.
+	</li>
+      </ol>
+      </p>
+    </div>
   </div>
 </div>
 

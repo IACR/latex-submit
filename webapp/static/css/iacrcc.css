@@ -73,7 +73,8 @@ span.latex {
   margin-right: -0.05em;
 }
 
-.mycode {
+/* custom element for monospace, which is used quite often. */
+i-mono {
     font-family: var(--bs-font-monospace);
 }
 
