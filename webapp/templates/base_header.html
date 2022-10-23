@@ -16,10 +16,36 @@
       <h1 class="text-center">What a lovely hat</h1>
       <h4 class="text-center">Is it made out of <a href="https://iacr.org/tinfoil.html">tin foil</a>?</h4>
     </noscript>
-    <div class="align-items-center" id="topNavbar">
-      <a class="d-none mx-5 d-lg-inline" href="https://iacr.org/"><img class="iacrlogo" src="/img/iacrlogo_small.png" alt="IACR Logo" style="max-width:6rem;"></a>
-      <a class="iacrccname order-1" href="/">
-        <span class="longNavName">IACR Communications on Cryptology</span>
-      </a>
-    </div>
+    <nav id="sitenav" class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	  <span class="navbar-toggler-icon"></span>
+	</button>
+	<a class="navbar-brand mx-md-5" href="https://iacr.org/"><img class="iacrlogo" src="/img/iacrlogo_small.png" alt="IACR Logo" style="max-width:6rem;"></a>
+	<div class="d-none d-md-inline navbar-brand">IACR Communications in Cryptology</div>
+	<span class="d-inline d-md-none navbar-brand">IACR CiC</span>
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+	  <ul class="navbar-nav mb-2 mb-lg-0 mx-auto">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/admin">Admin</a>
+            </li>
+{#            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+		Dropdown
+              </a>
+              <ul class="dropdown-menu">
+		<li><a class="dropdown-item" href="#">Action</a></li>
+		<li><a class="dropdown-item" href="#">Another action</a></li>
+		<li><hr class="dropdown-divider"></li>
+		<li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+#}
+	  </ul>
+	</div>
+      </div>
+    </nav>
     <main id="mainContent" class="container px-3 px-md-4">

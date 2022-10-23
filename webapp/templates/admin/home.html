@@ -1,0 +1,39 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<h1 class="mb-5 text-center">Admin console</h1>
+<p>
+  This page is reserved for the managing editor(s) of <a href="/">IACR CC</a>.
+  The UI and workflow is TBD:
+  <ol>
+    <li>Should we use a database to maintain this list?</li>
+    <li>What should we show in this table?</li>
+    <li>The clickthrough currently goes to /view/ID but we need a different
+      view for editors</li>
+    <li>Should we require approval from an editor, at which point we would
+      assign the DOI?</li>
+    <li>How should we handle communication to the author(s)?</li>
+    <li>How should we authenticate editors? What roles are required?</li>
+  </ol>
+</p>
+<h3>List of submitted papers</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Paper ID</th>
+      <th>Date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for paper in papers %}
+  <tr>
+    <td><a href="/view/{{paper.id}}">{{paper.id}}</a></td>
+    <td>{{paper.date}}</td>
+    <td>{{paper.code}}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</ul>
+
+{% endblock %}

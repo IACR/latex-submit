@@ -6,13 +6,18 @@
 	    type="button" role="tab" aria-controls="nav-form" aria-selected="true">Submission form</button>
     <button class="nav-link" id="nav-help-tab" data-bs-toggle="tab" data-bs-target="#nav-help"
 	    type="button" role="tab" aria-controls="nav-help" aria-selected="false">Help</button>
+    <button class="nav-link" id="nav-packages-tab" data-bs-toggle="tab" data-bs-target="#nav-packages"
+	    type="button" role="tab" aria-controls="nav-packages" aria-selected="false">LaTeX packages</button>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
     <div class="alert alert-warning w-75 mx-auto">
-      Ordinarily this page would only be shown in the email and paper ID are authenticated
-      from HotCRP through an HMAC in the URL. For now we allow supplying values for testing.
+      TODO:
+      Ordinarily this page would only be shown in response to an authenticated URL
+      from HotCRP. We allow users to change their email address, but not the paper ID.
+      If the paper has already been accepted, then this should show the /view page
+      instead.
     </div>
     <div class="alert alert-light">
       <strong>Instructions:</strong> Use this form to upload the final version of your paper. All fields
@@ -28,12 +33,14 @@
         <input required class="form-control w-50" type="text" name="paperid" id="paperid" placeholder="paper ID" pattern="[-_a-zA-Z0-9]{7,}">
       </div>#}
       <div class="form-group mt-4">
-        <label for="paperid" class="form-label">Paper ID (select one for now)</label>
+        <label for="paperid" class="form-label">Paper ID (select one for now, but eventually this will come from hotcrp)</label>
         <select class="form-select w-50" name="paperid">
           <option value="AAaaAA">AAaaAA</option>
           <option value="BBbbBB">BBbbBB</option>
           <option value="CCccCC">CCccCC</option>
           <option value="DDddDD">DDddDD</option>
+          <option value="EEeeEE">EEeeEE</option>
+          <option value="FFffFF">FFffFF</option>
         </select>
       </div>
       <div class="form-group mt-4">
@@ -52,6 +59,7 @@
     </form>
   </div>
   <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
+    <h3>System overview</h3>
     <p>
       In order to keep the cost of publishing low, the IACR
       Communications in Cryptology uses an automatic submission system
@@ -63,68 +71,69 @@
       href="https://github.com/IACR/latex/tree/main/iacrcc"><span class="text-monospace">iacrcc</span></a>
       document class. This document style is designed to provide a
       consistent appearance for articles in the journal, but more
-      importantly, it is designed to facilitate automatic processing
+      importantly, it is designed to perform automatic processing
       of metadata required for indexing and registration of DOIs.
     </p>
-    <h3>System overview</h3>
     <p>
       This system is based on lualatex and latexmk (see below).
       lualatex is capable of producing UTF-8 output, and unfortunately
       pdflatex does not satisfy this requirement. For most authors you
       will not notice a difference, and we recommend using lualatex
-      during the preparation of your paper. Note that many features of
+      during the preparation of your paper. Note that some features of
       lua are disabled in our system, so you should not depend on
       advanced features of lualatex.
     </p>
     <p>
       In order to conserve resources, this system is currently based
-      on the texlive 2022 "medium" distribution of LaTeX. We then add
-      a large number of additional packages.  The resulting system
+      on the texlive 2022 "medium" distribution of LaTeX, plus a large
+      number number of additional packages.  The resulting system
       supports the vast majority of popular LaTeX packages, but it is
       possible that we are missing LaTeX packages that you desire. If
       this is the case, please let us know at
-      iacrcic-admin@iacr.org. Please do not
+      iacrcic-admin@iacr.org. Do not
       upload <i-mono>.sty</i-mono> or <i-mono>.cls</i-mono> files with
       your paper (they will be removed before compilation).
-    </p>
-    <p>
-      The full list of latex packages that we support are mentioned in our
-      <a href="https://github.com/IACR/latex-submit/webapp/compiler/Dockerfile">Dockerfile</a>
-      and can be installed with <i-code>tlmgr</i-code>. <span class="text-danger">NOTE: it
-	would be better for us to use tlmgr list to produce the complete list</span>
-      There is also
-      a <a href="/unsupported.html">list of prohibited LaTeX
-      packages</a>. If you find a package that you'd like to have
-      added, please send email
-      to <span class="text-monospace">iacrcic-admin</span><i-mono>@iacr.org</i-mono>.
     </p>
     <p>Compilation in our system is currently performed using
       <blockquote>
 	<i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
       </blockquote>
+    </p>
+    <p>
+      This is designed to prevent attacks on the
+      system from hostile code (it is <a target="_blank"
+      href="https://arxiv.org/abs/2102.00856">generally unsafe</a> to
+      accept LaTeX sources from a third party). We run lualatex in a
+      docker sandbox, and we explicitly blacklist some packages
+      because they either invoke \write18 or the os packages from lua.
+    </p>
+    <p>
       If you wish to fully replicate our system, you can set up docker
       on your system and use
       our <a href="https://github.com/IACR/latex-submit/webapp/compiler/runner.py"><i-code>runner.py</i-code></a>.
       That is a fair amount of work to set up, because it requires
-      docker to be installed. As an alternative, you can simply start from <i-code>texlive2022</i-code>
-      and add the packages listed in the Dockerfile.
+      docker to be installed. As an alternative, you can simply start
+      from <i-code>texlive2022</i-code> and add the packages listed in
+      the Dockerfile. DO NOT USE pdflatex; use lualatex instead.
     </p>
-    <p>
-      The options on lualatex are designed to prevent attacks on the
-      system from hostile code.  Some LaTeX packages
-      are <a href="/unsupported.html">explicitly omitted</a> because
-      they use shell escapes, and it
-      is <a href="https://arxiv.org/abs/2102.00856">generally
-      unsafe</a> to accept LaTeX sources from a third party. We
-      explicitly blacklist some packages because they either invoke
-      \write18 or the os packages from lua.
-    </p>
-    <h3>Requirements</h3>
+    <h3>How to prepare your paper</h3>
     <ol>
-      <li>All files for processing your paper must be submitted, including bibtex files and external figure
-	graphics files.</li>
-      <li>Your main LaTeX file must be at the root of your submission and must be named <i-mono>main.tex</i-mono></li>
-      <li>Some files will be removed before processing, so do not upload:
+      <li>Your paper should be written in LaTeX using
+	the <i-mono>iacrcc</i-mono> document class. This may
+	be <a href="https://github.com/IACR/latex/tree/main/iacrcc">downloaded
+	from github</a>. If you start with something else
+	like <i-mono>article</i-mono>, the <i-mono>iacrcc</i-mono>
+	document class will require you to change your preamble somewhat. See
+	the <a href="#">documentation</a>
+	on <i-mono>iacrcc</i-mono>.</li>
+      <li>You should prepare a zip file containing all files required to prepare your
+      paper, including bibtex files and external figure	graphics files.</li>
+      <li>Your main LaTeX file must be at the root of your submission
+      and must be named <i-mono>main.tex</i-mono>.</li>
+      <li>If you choose to use a LaTeX package, make sure it is
+	<a href="#" onclick="showPackages();return false;">supported</a>.
+	Avoid using unusual fonts - this is a big source of potential problems.</li>
+      <li>Some files will be removed before processing, so do not include:
 	<ul>
 	  <li><i-mono>main.aux</i-mono></li>
 	  <li><i-mono>.bbl</i-mono> files</li>
@@ -211,14 +220,42 @@
       </p>
     </div>
   </div>
+  <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
+    <h3>Which LaTeX packages are allowed?</h3>
+    <p>
+      Due to resource constraints, our system does not load <i>every</i>
+      LaTeX package. The packages below are installed on the system, but beware
+      that <a href="#" onclick="showUnsupported();return false;">some packages will not work properly</a>
+      in a sandboxed system like this. Note also that our system uses lualatex, and
+      some packages are known to only work in pdflatex. Avoid those.
+    </p>
+    <p>
+      Below we list both supported and <a href="#"
+      onclick="showUnsupported();return false;">unsupported
+      packages</a>.  If you know of a package that you'd like to have
+      added, please send email
+      to <span class="text-monospace">iacrcic-admin</span><i-mono>@iacr.org</i-mono>.
+    </p>
+    {% include "installed.html" %}
+    {% include "unsupported.html" %}
+  </div>
 </div>
 
 <script>
  const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
- function help() {
-   let tabel = document.getElementById('nav-help');
-   bootstrap.Tab.getOrCreateInstance(tabel).show();
+ function showHelp() {
+   bootstrap.Tab.getOrCreateInstance(document.getElementById('nav-help-tab')).show();
+ }
+
+  function showPackages() {
+      packagesButton = document.getElementById('nav-packages-tab');
+      bootstrap.Tab.getOrCreateInstance(packagesButton).show();
+ }
+
+ function showUnsupported() {
+   showPackages();
+   document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
  }
 
  function generateString(length) {

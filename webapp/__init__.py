@@ -57,9 +57,10 @@ def create_app(config):
     mail.init_app(app)
     #executor.init_app(app)
     with app.app_context():
-        # from admin import admin_routes
+        from . import admin
         from . import routes
         app.register_blueprint(routes.home_bp)
+        app.register_blueprint(admin.admin_bp)
         return app
 
 
