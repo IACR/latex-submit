@@ -2,7 +2,7 @@
 \def\filedate{2022/09/04}
 
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\typeout{^^J  ***  LaTeX class for IACR Communications on Cryptology v\fileversion\space ***^^J}
+\typeout{^^J  ***  LaTeX class for IACR Communications in Cryptology v\fileversion\space ***^^J}
 \ProvidesClass{iacrcc}[\filedate]
 
 % IACR Communications in Cryptology DOCUMENT CLASS
@@ -37,17 +37,16 @@
 %%% HOWTO use this class
 %
 %% Title
-% Provide the title of the paper
-% This should look like:
+% Provide the title of the paper, this should look like:
 %\title[running  = {The iacrcc class},
 %       onclick  = {https://github.com/IACR/latex},
 %       subtitle = {A Template}
 %      ]{How to Use the IACR Communications in Cryptology Class}
-% Where the options in square brackets “[ ]”are optional and control the following:
-% running: the running title displayed in the headers
-% onclick: define what to do when clicking on the title. 
-%          This could be used to point to a webpage associated with this paper. 
-% subtitle: provide a subtitle
+% Where the options in square brackets “[ ]” are optional and control the following:
+% running: The running title displayed in the headers.
+% onclick: Define what to do when clicking on the title.
+%          This could be used to point to a webpage associated with the paper. 
+% subtitle: Provide a subtitle.
 %
 %% Authors are listed individually using the \addauthor tag followed by a list of affiliations.
 % The idea is that every author makes a separate call to this command.
@@ -57,20 +56,20 @@
 %            footnote  = {Thanks to my supervisor for the support.},
 %            onclick   = {https://www.mypersonalwebpage.com}
 %           ]{Alice Accomplished}
-% Where the options in square brackets “[ ]”are optional 
+% Where the options in square brackets “[ ]” are optional 
 % and control the following:
-% inst:     a numerical list pointing to the index of the institutaion 
+% inst:     A numerical list pointing to the index of the institution 
 %           in the affiliation array.
-% orcid:    create a small clickable orcid logo next to the authors name 
+% orcid:    Create a small clickable orcid logo next to the authors name 
 %           linking to the authors ORCID iD see: orcid.org.
-% footnote: create an author-specific footnote.
-% onclick:  define what to do when clicking on the author name: 
-%           e.g., can point to the academic webpage.
-% email:    define the e-mail address of this author.
+% footnote: Create an author-specific footnote.
+% onclick:  Define what to do when clicking on the author name: 
+%           e.g., can point to the personal / academic webpage.
+% email:    Define the e-mail address of this author.
 %
 % Affiliations are listed individually using the \affiliations command 
-% *after* the (list of) authors using \addauthor
-% This should look like (full example):
+% *after* the (list of) authors using \addauthor.
+% This should look like:
 % \affiliation[ror        = 05f950310,
 %              onclick    = {http://www.kuleuven.be/english},
 %              department = {Computer Security and Industrial Cryptography},              
@@ -80,31 +79,22 @@
 %              postcode   = {3001},
 %              country    = {Belgium}
 %             ]{KU Leuven}
-% Where the options in square brackets “[ ]”are optional and control 
+% Where the options in square brackets “[ ]” are optional and control 
 % the following (optional information is mainly used for meta-data collection):
-% ror:        provide the Research Organization Registry (ROR) indetifier 
+% ror:        Provide the Research Organization Registry (ROR) identifier 
 %             for this affiliation (see: ror.org). This is used for meta-data 
 %             collection only.
-% onclick:    define what to do when clicking on the affiliation name: 
+% onclick:    Define what to do when clicking on the affiliation name: 
 %             e.g., can point to the affiliation webpage.
-% department: department or suborganization name
-% street:     street address
-% city:       city name
-% state:      state or province name
-% postcode:   zip or postal code
-% country:    country name
+% department: Department or suborganization name.
+% street:     Street address.
+% city:       City name.
+% state:      State or province name.
+% postcode:   Zip or postal code.
+% country:    Country name.
 %
 % A footnote can be placed on the front page without a symbol / numbering using:
 % \genericfootnote{This is the full version of our paper published at XX}
-%
-% \begin{abstract}
-% Lorem ipsum dolor sit amet...
-% \end{abstract}
-%
-%% Warnings
-% - please don't use any \pagestyle or \thispagestyle command
-% - if you have proof with explicit \qed inside, you should either
-%   remove \qed symbols or replace them by \qedhere
 
 % Common definitions
 \RequirePackage{expl3} % used for text_purify on metadata.
@@ -165,8 +155,16 @@
 \DeclareOptionX*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptionsX<IACR>\relax
 
-% article class with a4paper
+% article class
 \LoadClass[10pt,twoside]{article}[2007/10/19]
+
+% iftex: Am I running under pdfTEX, XETEX or LuaTEX?
+\RequirePackage{iftex}
+
+\ifluatex
+  % Fixes for mathematics-related LuaLATEX issues
+  \RequirePackage{lualatex-math}
+\fi
 
 % xcolor starts from the basic facilities of the color package, 
 % and provides easy driver-independent access to several kinds 
@@ -231,6 +229,9 @@
 \robustify\addtolength
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This provides a command to insert the ORCiD logo, which is hyperlinked to 
+% the URL of the researcher whose iD was specified.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This copies over definition of the orcidlink from the orcidlink style file
 % by by Leo C. Stein which in turn is a package around Milo's code on TeX.SE,
 % see https://tex.stackexchange.com/a/445583/34063
@@ -270,6 +271,9 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % pgfkeys is a flexible key management system
+% The package provides a flexible key management system, whose keys are 
+% arranged in a tree-like structure; key values may be functions as well 
+% as strings or numbers.
 \RequirePackage{pgfkeys}
 
 \pgfkeys{/IACR-author/entities/.cd,
@@ -319,7 +323,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 }
 
 \pgfkeys{/IACR-license-CC-by/entities/.cd,
-  file/.initial={CC-by},
+  file/.initial={CC-by.png},
   text/.initial={Creative Commons License CC-BY 4.0.},
   url/.initial={http://creativecommons.org/licenses/by/4.0/},
   }
@@ -337,6 +341,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \@IACR@autoinsttrue
 \def\IACR@author@last{0}
 
+% Meta information is written out in [jobname].meta
 \newwrite\meta
 \immediate\openout\meta=\jobname.meta
 \newcount\num@authors
@@ -344,17 +349,37 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \newcount\num@affil
 \num@affil=0\relax
 
-\AtEndDocument{\immediate\closeout\meta}
+\AtEndDocument{
+  \immediate\closeout\meta%
+  % Check if either \title, \addauthor or \affiliation macros were redefined
+  % Also check if the font (\familydefault) or the margings (\paperwidth) were modified.
+  % Throw an error if so, these are needed for meta-data collection
+  \ifx\store@addauthor\addauthor\else
+    \ClassError{iacrcc}{The \string\addauthor\space macro seems to be redefined}{}%
+  \fi
+  \ifx\store@title\title\else
+    \ClassError{iacrcc}{The \string\title\space macro seems to be redefined}{}%
+  \fi
+  \ifx\store@affiliation\affiliation\else
+    \ClassError{iacrcc}{The \string\affiliation\space macro seems to be redefined}{}%
+  \fi
+  \ifx\store@font\familydefault\else
+    \ClassError{iacrcc}{The \string\familydefault\space macro seems to be redefined}{}%
+  \fi
+  \ifx\store@paperwidth\paperwidth\else
+    \ClassError{iacrcc}{The \string\paperwidth\space macro seems to be redefined}{}%
+  \fi
+}
 
 % latex3 syntax used for writing text to the .meta file. This requires
 % a TeX distribution from 2020 or later.
 \ExplSyntaxOn
-\ifdefined\text_purify
+\ifdefined\text_purify:n
 \else
 \ClassWarningNoLine{iacrcc}{The .meta file may be ill-formed.}
 \fi
 \cs_new:Npn\@writemeta#1{
-  \ifdefined\text_purify
+  \ifdefined\text_purify:n
   \immediate\write\meta{\text_purify:n #1}
   \else
   \immediate\write\meta{#1}
@@ -389,7 +414,6 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \global\let\@maketitle\relax
   \global\let\@thanks\@empty
   \global\let\@date\@empty
-  \global\let\title\relax
   \global\let\date\relax
   \global\let\and\relax
   % Adjust header size for title page
@@ -533,6 +557,8 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \IACR@author@params@clearkeys%
 }
 
+\let\store@addauthor\addauthor  % Save macro away
+
 % Provide the title of the paper
 \renewcommand\title[2][]{%
   \IACR@title@params@set@keys{#1}%
@@ -557,6 +583,8 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \fi
   \IACR@title@params@clearkeys%
 }
+
+\let\store@title\title  % Save macro away
 
 \newcommand\affiliation[2][]{%
   \global\advance\num@affil by 1\relax% 
@@ -608,6 +636,8 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \IACR@affiliation@params@clearkeys%
 }
 
+\let\store@affiliation\affiliation  % Save macro away
+
 \if@anonymous
   \gdef\@author{Anonymous Submission to \publname}%
   \gdef\IACR@runningauthors{}
@@ -625,7 +655,14 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \def\fnmsep{\unskip$^,$}
 
 % Head/foot
+% The fancyhdr package provides extensive facilities, both for constructing 
+% headers and footers, and for controlling their use.
 \RequirePackage{fancyhdr}
+
+% The graphicx package builds upon the graphics package, providing a key-value
+% interface for optional arguments to the \includegraphics command. 
+% This interface provides facilities that go far beyond what the graphics 
+% package offers on its own.
 \RequirePackage{graphicx}
 
 % if the author decides to use biblatex, then we pass options for the style to enforce
@@ -806,6 +843,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \pagestyle{fancy}
 
 %Abstract style, keywords
+\global\let\@IACR@print@keywords\@empty
 \def\@IACR@keywords{No keywords given.}
 
 \def\keywords{\@ifnextchar[{\IACR@@@keywords}{\IACR@@keywords}}
@@ -819,7 +857,9 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \gdef\@IACR@print@keywords{\unexpanded{#1}}%
 }
 
+% Sophisticated verbatim text
 \RequirePackage{fancyvrb} % used to write the abstract into \jobname.abstract
+
 \renewenvironment{abstract}{%
   \def\and{,\space}\edef\@writekeywords{\@IACR@keywords}%
   \@writemeta{keywords: \@IACR@print@keywords}%
@@ -932,7 +972,9 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \def\noteautorefname{Note}
 \def\caseautorefname{Case}
 
-% AMS math
+% amsmath: AMS mathematical facilities for LATEX
+% amssymb: Defines all the symbols found in the AMS symbol fonts
+% amsthm: Typesetting theorems (AMS style)
 \RequirePackage{amsmath,amssymb,amsthm}
 \RequirePackage{mathtools}
 \theoremstyle{definition}
@@ -1000,7 +1042,13 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \ignorespaces
 }
 
+\AtBeginDocument{
+  % make sure that TU is the default encoding for unicode.
+  % Other encodings may be used temporarily within the file.
+  \usepackage[TU]{fontenc}
+}
 \if@submission
+  % lineno: Line numbers on paragraphs
   \RequirePackage[mathlines]{lineno}
   \linenumbers
   \def\linenumberfont{\normalfont\tiny\sffamily\color{gray}}
@@ -1025,11 +1073,17 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   }
 \fi%submission
 
-% Microtype
+% Microtype: Subliminal refinements towards typographical perfection
 \RequirePackage{microtype}
 
-% Fonts
-\RequirePackage[T1]{fontenc}
+% The Latin Modern family of fonts consists of 72 text fonts and 20 mathematics fonts
 \RequirePackage{lmodern}
+
+% Store the default font family used
+\let\store@font\familydefault%
+
+% Store the paper width
+\let\store@paperwidth\paperwidth%
+
 \endinput
 %end of file iacrcc.cls
