@@ -5,6 +5,8 @@ from pathlib import Path
 import time
 from .compiler import runner
 from . import task_queue
+from .metadata import meta_parse
+from .metadata.compilation import Compilation, Meta, StatusEnum
 
 def run_latex_task(input_path, output_path, paperid):
     """Execute latex on input_path contents, writing into output_path.
@@ -25,19 +27,39 @@ def run_latex_task(input_path, output_path, paperid):
         output['execution_time'] = round(end_time - start_time, 2)
     except Exception as e:
         output['error'] = 'Exception running latex: ' + str(e)
-    json_file = Path(output_path).parents[0] / Path('meta.json')
     try:
+        json_file = Path(output_path).parents[0] / Path('compilation.json')
         if json_file.is_file():
-            jstr = json_file.read_text(encoding='UTF-8')
-            data = json.loads(jstr)
-            data['execution_time'] = output.get('execution_time', -1)
-            data['log'] = output.get('log', 'no log')
-            data['code'] = output.get('code', -1)
-            json_file.write_text(json.dumps(data, indent=2), encoding='UTF-8')
+            compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+            compilation.compile_time = output.get('execution_time', -1)
+            compilation.log = output.get('log', 'no log')
+            if 'error' in output:
+                compilation.error_msg = output.get('error')
+                compilation.status = StatusEnum.COMPILATION_FAILED
+            compilation.exit_code = output.get('exit_code', -1)
+            if compilation.exit_code != 0:
+                compilation.status = StatusEnum.COMPILATION_FAILED
+                compilation.error_msg = 'Error code of {} means that the compilation failed'.format(compilation.exit_code)
+            if compilation.status != StatusEnum.COMPILATION_FAILED:
+                metafile = Path(output_path) / Path('main.meta')
+                if metafile.is_file():
+                    try:
+                        data = meta_parse.read_meta(metafile)
+                        compilation.meta = Meta(**data)
+                        compilation.status = StatusEnum.COMPILATION_SUCCESS
+                    except Exception as me:
+                        compilation.error_msg = 'Failure to extract metadata: ' + str(me)
+                        compilation.status = StatusEnum.METADATA_PARSE_FAIL
+                else:
+                    compilation.status = StatusEnum.METADATA_FAIL
+                    compilation.error_msg = 'No metadata file'
+            json_file.write_text(compilation.json(indent=2, exclude_none=True), encoding='UTF-8')
         else:
             output['error'] = 'Missing json file.'
     except Exception as e:
         output['error'] = 'Exception saving output: ' + str(e)
+    if 'error' in output:
+        print('ERROR:' + output['error'])
     task_queue.pop(paperid, None)
     return json.dumps(output, indent=2)
 

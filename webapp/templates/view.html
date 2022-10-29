@@ -4,93 +4,87 @@
 This template is used to show the status of a compilation.
 =================================================================
 #}
-<h3 class="mt-2 mb-3">{{status}}</h3>
+<h3 class="mt-2 mb-3">{{status.value}}</h3>
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
           type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
-        {% if date %}
         <button class="nav-link" id="nav-output-tab" data-bs-toggle="tab" data-bs-target="#nav-output"
           type="button" role="tab" aria-controls="nav-output" aria-selected="false">Output</button>
-        {% endif %}
 	<button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
           type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
     </div>
 </nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-    {% if code == 0 and pdf %}
-      {% if metadata %}
+    {% if exit_code == 0 and pdf %}
+    {% if status.value == 'compilation_success' %}
     <div class="alert alert-success">It appears that your compilation worked. You should
       <a href="/pdf/{{paperid}}/main.pdf" target="_blank">check your PDF</a> and
       <a href="#" onclick="showMetadata();return false;">check the metadata</a>.</div>
-      {% else %}
-      <div class="alert alert-warning">It appears that your paper compiled, but did not use <span class="text-monospace">\documentclass{iacrcc.cls}</span></div>
-      {% endif %}
     {% else %}
-      <div class="alert alert-danger">Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error</a></div>
+    <div class="alert alert-warning">It appears that your paper compiled, but did not use <span class="text-monospace">\documentclass{iacrcc.cls}</span>. Please revise your LaTeX and resubmit.</div>
     {% endif %}
-  <pre>{{log}}</pre>
-  <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
-    </div>
-    {% if pdf %}
-    <div class="tab-pane fade" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">
-      <embed src="/pdf/{{paperid}}/main.pdf" width="100%" height="1400px"></embed>
-    </div>
-    {% endif %}
-    {% if date %}
-    <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
-      {% if pdf %}<h3 class="ms-3 mt-3"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></h3>{% endif %}
-      <table class="table ms-3 mt-2 table-bordered">
-        <tbody>
-          <tr>
-            <th>Date compiled:</th>
-            <td>{{date}}</td>
-          </tr>
-          <tr>
-            <th>Compilation time:</th>
-            <td>{{execution_time}} seconds</td>
-          </tr>
-          <tr>
-            <th>Return code from latexmk:</th>
-            <td>{{code}} {% if code == 0 %}(success){% endif %}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="ms-3">
-        {% if output %}
-        Output files from running latexmk: (<a href="/output/{{paperid}}">download zip file</a>)
-        <ul style="list-style: '-';">
-          {% for el in output recursive %}
-          <li>{{el.name}}
-            {% if el.children %}<ul style="list-style: '-';">{{ loop(el.children) }}</ul>{% endif %}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-    </div>
-    <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
-      <h3 class="ms-3">Extracted metadata</h3>
-      {% if metadata %}
-      <div class="alert alert-info mx-3">The accuracy of your metadata is extremely
-	important, so please check it over.
-	It will be used for several purposes:
-	<ol class="mb-0">
-	  <li>to produce the HTML page linking to your paper,</li>
-	  <li>to register for a DOI</li>
-	  <li>to supply information for indexing services like crossref,
-	    Google Scholar, DOAJ, Clarivate Web of Science,
-	    and Elsevier's Scopus service.</li>
-	</ol>
-      </div>
-      <p class="alert alert-danger">TODO: display this better and add a button to
-	submit final version.
-      </p>
-      <pre>{{metadata}}</pre>
-      {% else %}
-      <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>
+    {% else %} {# exit_code != 0 #}
+    <div class="alert alert-danger">
+      {% if error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error</a></div>
+    <div class="alert alert-danger"></div>
+    {% endif %} {# end of exit_code == 0 #}
+    <pre>{{log}}</pre>
+    <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
+  </div>
+  <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
+    {% if pdf %}<h3 class="ms-3 mt-3"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></h3>{% endif %}
+    <table class="table ms-3 mt-2 table-bordered">
+      <tbody>
+        <tr>
+          <th>Date compiled:</th>
+          <td>{{compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+        </tr>
+        <tr>
+          <th>Compilation time:</th>
+          <td>{{compile_time}} seconds</td>
+        </tr>
+        <tr>
+          <th>Return code from latexmk:</th>
+          <td>{{exit_code}} {% if exit_code == 0 %}(success){% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ms-3">
+      {% if output %}
+      Output files from running latexmk: (<a href="/output/{{paperid}}">download zip file</a>)
+      <ul style="list-style: '-';">
+        {% for el in output recursive %}
+        <li>{{el.name}}
+          {% if el.children %}<ul style="list-style: '-';">{{ loop(el.children) }}</ul>{% endif %}</li>
+        {% endfor %}
+      </ul>
       {% endif %}
     </div>
+  </div>
+  <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
+    <h3 class="ms-3">Extracted metadata</h3>
+    {% if metafile %}
+    <div class="alert alert-info mx-3">The accuracy of your metadata is extremely
+      important, so please check it over.
+      It will be used for several purposes:
+      <ol class="mb-0">
+	<li>to produce the HTML page linking to your paper,</li>
+	<li>to register for a DOI</li>
+	<li>to supply information for indexing services like crossref,
+	  Google Scholar, DOAJ, Clarivate Web of Science,
+	  and Elsevier's Scopus service.</li>
+      </ol>
+    </div>
+    <p class="alert alert-danger">TODO: display this better and add a button to
+      submit final version.
+    </p>
+    <pre>{{metafile}}</pre>
+    {{metafile}}
+    {% else %} {# no metafile #}
+      <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>
+  </div>
     {% endif %}
 </div>
 <script>

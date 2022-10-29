@@ -36,25 +36,50 @@ task is finished, and displays the results to the user. If the user tries to
 upload another version of their paper before the first one is finished, it
 is rejected until compilation of the first upload is completed.
 
-When the author uploads their zipfile, they also include a unique
-paper ID and the email address of the submitting author. For a paper
-ID of `xyz`, For a paper ID of `xyz`, the server will store data for
+When the author uploads their zipfile, they also include several
+items:
+* a unique paper ID that encodes the ID of the paper in the reviewing system.
+* an email address of the submitting author.
+* the original submission date prior to review
+* the acceptance date.
+These fields will be authenticated with an HMAC in the URL.
+For a paper ID of `xyz`, the server will store data for
 this upload in the directory `webapp/data/xyz`. The server first
-stores the zip file there, and then unzips the zip file into
+stores the zip file there along with some metadata in a file
+`webapp/data/xyz/compilation.json`. It then unzips the zip file into
 `webapp/data/xyz/input`. After it runs LaTeX on the files, the output
-goes into webapp/data/xyz/output`. The server also stores a file
-`webapp/data/xyz/meta.json` with minimal metadata about the upload.
+goes into webapp/data/xyz/output`. As the compilation happens, the file
+`compilation.json` gets updated accordingly. The data for this file follows
+a schema enforced by the file `webapp/metadata/compilation.py`.
 
-One the web server has received the zip file and unzipped it, the web
+When the web server has received the zip file and unzipped it, the web
 server submits a compilation to the ThreadPoolExecutor. When the
 thread runs, it creates a docker container with a limited version of
-texlive along with the iacrcc.cls file.  It runs latexmk to run
-lualatex plus either bibtex or biber, producing either an error log or
-a successful output.  If the compilation is successful, then the
-output from compliation is reported back (including the meta file
-produced from the iacrcc.cls during the compliation.  If the
-compilation fails, then a detailed error log is reported back to
-Redis, which is picked up by the web server.
+texlive along with the `iacrcc.cls` file.  It runs `latexmk` to
+compile the paper using `lualatex` plus either `bibtex` or `biber`,
+producing either an error log or a successful output.  If the
+LaTeX compilation is successful, then there is further processing on the `main.meta`
+output file from `iacrcc.cls`. There are various things that can go wrong:
+1. the zip file could be incomplete, or the `main.tex` file might be missing.
+2. the paper may fail to compile with `lualatex`. This can happen for various reasons,
+   including:
+   a. a missing style file in our texlive distribution.
+   b. missing metadata in the LaTeX file.
+   c. a missing font in our texlive distribution.
+   d. a flaw in the supplied metadata (e.g., no author with an email,
+      or an empty author name).
+
+The author may continue to upload the paper, which will overwrite any
+previous versions they submitted. Once they have had their paper pass
+the automated process, they are prompted to check the PDF for visual
+flaws and check the extracted metadata for accuracy. They then press a
+button to submit their paper for review by a copy editor.
+
+Once the author finalizes their submission, the copy editor will need to
+approve it. For this they can simply do a cursory check of the PDF and
+the metadata (we do not plan to use proofreading). When the editor approves
+it, the API will publish the paper, and the metadata can be submitted to
+crossref to assign a DOI (TBD).
 
 ## The compiler process
 
@@ -70,9 +95,7 @@ Installation is as follows (TODO: review this):
 ```
 python3 -m pip install flask
 python3 -m pip install flask-mail
-python3 -m pip install redis
 python3 -m pip install docker
-sudo apt install redis-server
 sudo apt install docker
 ```
 add user to docker group with
@@ -81,25 +104,17 @@ sudo usermod -aG docker $USER
 ```
 Then you will need to logout and login again.
 
-See instructions for [installing redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04).
-You only need to set the password for accessing redis by changing the line for
-`requirepass` in `/etc/redis/redis.conf`.  The password
-is currently in `config.py`. (TODO: where should this be kept?)
-
 ```
 cd webapp/compiler
 docker build -t debian-slim-texlive2022 .
 ```
 (note the dot at the end). While you are in that directory, you should try
-```
-python3 runner.py
-```
-to check that the docker compiler is working. This will produce output in /tmp/passing.tar
+running `webapp/compiler/runner.py` on some sample input to check that
+the docker compiler is working.
 
 ## Running the app in dev
 
-When Redis is installed, it is normally started and running via
-systemd. In order to start the web server, run:
+In order to start the web server, run:
 ```
 python3 run.py
 ```
@@ -107,9 +122,6 @@ python3 run.py
 At this point you should be able to point your browser at localhost:5000
 
 ## Running the app in production
-
-As stated above, the Redis server will ordinarily be started by systemd after it
-is installed (be sure to configure the password as in `config.py`).
 
 The web server would ordinarily be started behind apache running mod_wsgi. This requires
 a `.wsgi` file, which isn't completed yet.
