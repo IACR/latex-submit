@@ -80,7 +80,7 @@ def read_meta(metafile):
             elif line.startswith('citation:'):
                 parts = line.split()
                 assert(len(parts) == 3)
-                citation = {'type': parts[1].strip(),
+                citation = {'ptype': parts[1].strip(),
                             'id': parts[2].strip(),
                             'authorlist': []}
                 data['citations'].append(citation)
