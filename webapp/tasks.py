@@ -46,6 +46,9 @@ def run_latex_task(input_path, output_path, paperid):
                     try:
                         data = meta_parse.read_meta(metafile)
                         compilation.meta = Meta(**data)
+                        abstract_file = Path(output_path) / Path('main.abstract')
+                        if abstract_file.is_file():
+                            compilation.meta.abstract = abstract_file.read_text(encoding='UTF-8')
                         compilation.status = StatusEnum.COMPILATION_SUCCESS
                     except Exception as me:
                         compilation.error_msg = 'Failure to extract metadata: ' + str(me)
