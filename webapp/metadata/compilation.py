@@ -28,8 +28,10 @@ class StatusEnum(StrEnum):
     PENDING = 'pending'   # Submitted, but pending compilation
     MALFORMED_ZIP = 'malformed zipfile' # missing main.tex at top level.
     COMPILATION_FAILED = 'compilation_failed' # Compilation failed.
+    MISSING_ABSTRACT = 'missing_abstract'
     METADATA_FAIL = 'metadata_fail' # failed to produce .meta
     METADATA_PARSE_FAIL = 'metadata_parse_fail' # failed to parse the .meta file.
+    WRONG_VERSION = 'wrong_version' # not compiled with [version=final]
     COMPILATION_SUCCESS = 'compilation_success' # metadata extracted from successful compilation.
     AUTHOR_ACCEPTED = 'author_accepted' # author viewed metadata and PDF and accepted
     WITHDRAWN = 'withdrawn' # Withdrawn by author
@@ -134,6 +136,13 @@ class LicenseEnum(Enum):
                 return e
         return None
 
+class VersionEnum(StrEnum):
+    """Values from documentclass[version=<version>]."""
+    FINAL = 'final'
+    SUBMISSION = 'submission'
+    PREPRINT = 'preprint'
+
+
 class Citation(BaseModel):
     authors: str = Field(None,
                          title='BibTeX-style author list as a string',
@@ -223,6 +232,9 @@ class Meta(BaseModel):
                                           description=('The schema is serialized to disk, so that future versions can migrate '
                                                        'data to new schemas. Not to be confused with the version of json schema '
                                                        'specified in $schema.'))
+    version: VersionEnum = Field(...,
+                                 title='Version used in documentclass[version=...]',
+                                 description='Should be final.')
     DOI: Optional[str] = Field(None,
                                title='The DOI of the official publication',
                                description='This should always be shown if it exists')
@@ -240,7 +252,7 @@ class Meta(BaseModel):
     subtitle: str = Field(None,
                           title='Subtitle of paper',
                           description='May contain LaTeX or HTML entities')
-    abstract: str = Field(None,
+    abstract: str = Field(...,
                           title='Abstract of paper',
                           description='This is an abstract of the paper. May contain minimal LaTeX but should not contain HTML.')
     license: LicenseEnum = Field(LicenseEnum.CC_BY,
@@ -325,9 +337,9 @@ class Compilation(BaseModel):
     log: str = Field(None,
                      title='Log from running latexmk',
                      description='Will be absent until latex is attempted.')
-    error_msg: str = Field(None,
-                           title='Error message if some step failed',
-                           description='Used in the UI if necessary. See status')
+    error_log: List[str] = Field(...,
+                                 title='Error messages if some step failed',
+                                 description='Used in the UI if necessary. See status')
     exit_code: int = Field(-1,
                             title='Exit code from running latexmk',
                             description='These are not well defined.')

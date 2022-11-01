@@ -66,6 +66,9 @@ def read_meta(metafile):
                     k,v = get_key_val(line)
                     affiliation[k] = decoder.latex_to_text(v)
                     line = f.readline().rstrip()
+            elif line.startswith('version:'):
+                data['version'] = line[8:].strip()
+                line = f.readline().rstrip()
             elif line.startswith('title:'):
                 data['title'] = line[6:].strip() # decoder.latex_to_text(line[6:].strip())
                 line = f.readline().rstrip()

@@ -6,7 +6,7 @@ import time
 from .compiler import runner
 from . import task_queue
 from .metadata import meta_parse
-from .metadata.compilation import Compilation, Meta, StatusEnum
+from .metadata.compilation import Compilation, Meta, StatusEnum, VersionEnum
 
 def run_latex_task(input_path, output_path, paperid):
     """Execute latex on input_path contents, writing into output_path.
@@ -34,25 +34,35 @@ def run_latex_task(input_path, output_path, paperid):
             compilation.compile_time = output.get('execution_time', -1)
             compilation.log = output.get('log', 'no log')
             if 'error' in output:
-                compilation.error_msg = output.get('error')
+                compilation.error_log.append(output.get('error'))
                 compilation.status = StatusEnum.COMPILATION_FAILED
             compilation.exit_code = output.get('exit_code', -1)
             if compilation.exit_code != 0:
                 compilation.status = StatusEnum.COMPILATION_FAILED
-                compilation.error_msg = 'Error code of {} means that the compilation failed'.format(compilation.exit_code)
+                compilation.error_log.append('Error code of {} means that the compilation failed'.format(compilation.exit_code))
             if compilation.status != StatusEnum.COMPILATION_FAILED:
                 metafile = Path(output_path) / Path('main.meta')
                 if metafile.is_file():
                     try:
                         data = meta_parse.read_meta(metafile)
-                        compilation.meta = Meta(**data)
-                        compilation.status = StatusEnum.COMPILATION_SUCCESS
+                        abstract_file = Path(output_path) / Path('main.abstract')
+                        if not abstract_file.is_file():
+                            compilation.status = StatusEnum.MISSING_ABSTRACT
+                            compilation.error_log.append('An abstract is required.')
+                        else:
+                            data['abstract'] = abstract_file.read_text(encoding='UTF-8')
+                            compilation.meta = Meta(**data)
+                            if compilation.meta.version != VersionEnum.FINAL:
+                                compilation.status = StatusEnum.WRONG_VERSION
+                                compilation.error_log.append('Paper should use documentclass[version=final]')
+                            else:
+                                compilation.status = StatusEnum.COMPILATION_SUCCESS
                     except Exception as me:
-                        compilation.error_msg = 'Failure to extract metadata: ' + str(me)
+                        compilation.error_log.append('Failure to extract metadata: ' + str(me))
                         compilation.status = StatusEnum.METADATA_PARSE_FAIL
                 else:
                     compilation.status = StatusEnum.METADATA_FAIL
-                    compilation.error_msg = 'No metadata file'
+                    compilation.error_log.append('No metadata file')
             json_file.write_text(compilation.json(indent=2, exclude_none=True), encoding='UTF-8')
         else:
             output['error'] = 'Missing json file.'

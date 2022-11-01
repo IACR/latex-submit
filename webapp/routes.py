@@ -10,7 +10,7 @@ import shutil
 import string
 import zipfile
 from .metadata.compilation import Compilation, StatusEnum
-
+from .metadata import validate_paperid, get_doi
 from webapp.tasks import run_latex_task
 
 home_bp = Blueprint('home_bp',
@@ -31,10 +31,6 @@ def home():
         return render_template('message.html',
                                title='Debug is not enabled',
                                error='Debug is not enabled')
-
-def _validate_paperid(paperid):
-    accepted_chars = string.digits + string.ascii_lowercase + string.ascii_uppercase + '-_'
-    return all(c in accepted_chars for c in paperid)
 
 def _validate_post(args, files):
     """args should contain paperid and email. files should contain zipfile."""
@@ -62,10 +58,10 @@ def runlatex():
                                title='Invalid parameters',
                                error=msg)
     paperid = args.get('paperid')
-    if not _validate_paperid(paperid):
+    if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Invalid character in paperid',
-                               error='paperid is restricted to using characters {}'.format(accepted_chars))
+                               error='paperid is restricted to using characters -.a-z0-9')
     if task_queue.get(paperid):
         return render_template('message.html',
                                title='Another one is running',
@@ -81,7 +77,8 @@ def runlatex():
                  'email': args.get('email'),
                  'submitted': args.get('submitted'),
                  'accepted': args.get('accepted'),
-                 'compiled': datetime.datetime.now()}
+                 'compiled': datetime.datetime.now(),
+                 'error_log': []}
     compilation = Compilation(**json_data)
     json_file = paper_dir / Path('compilation.json')
     json_file.write_text(compilation.json(indent=2))
@@ -97,9 +94,18 @@ def runlatex():
                                title='Unable to unzip zipfile',
                                error='Unable to unzip this zip file.')
     tex_file = input_dir / Path('main.tex')
+    receivedDate = datetime.datetime.strptime(args.get('submitted')[:10],'%Y-%m-%d')
+    acceptedDate = datetime.datetime.strptime(args.get('accepted')[:10],'%Y-%m-%d')
+    publishedDate = datetime.date.today().strftime('%Y-%m-%d')
+    metadata = '\\def\\IACR@DOI{' + get_doi(paperid) + '}\n'
+    metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
+    metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
+    metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
+    metadata_file = input_dir / Path('main.iacrmetadata')
+    metadata_file.write_text(metadata)
     if not tex_file.is_file():
         compilation.status = StatusEnum.MALFORMED_ZIP
-        compilation.error_msg = 'Zip file required to have main.tex at top level'
+        compilation.error_log.append('Zip file required to have main.tex at top level')
         json_file.write_text(compilation.json(indent=2))
         # then no sense trying to compile
         return render_template('message.html',
@@ -173,7 +179,7 @@ def get_status(paper_id):
 
 @home_bp.route('/pdf/<paperid>/main.pdf', methods=['GET'])
 def show_pdf(paperid):
-    if not _validate_paperid(paperid):
+    if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
                                error='paperid is invalid')
@@ -196,7 +202,7 @@ def _expand_dir(path):
 
 @home_bp.route('/view/<paperid>', methods=['GET'])
 def view_results(paperid):
-    if not _validate_paperid(paperid):
+    if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
                                error='paperid is invalid')
@@ -217,7 +223,7 @@ def view_results(paperid):
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
         data.update(comp.dict())
     except Exception as e:
-        data['error'] = 'Unable to parse compilation: ' + str(e)
+        data['error_log'] = ['Unable to parse compilation: ' + str(e)]
     input_tree = []
     output_dir = paper_path / Path('output')
     data['output'] = _expand_dir(output_dir)

@@ -17,18 +17,21 @@ This template is used to show the status of a compilation.
 </nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
+    {% for error in error_log %}
+    <div class="alert alert-danger">Error: {{error}}</div>
+    {% endfor %}
     {% if exit_code == 0 and pdf %}
     {% if status.value == 'compilation_success' %}
     <div class="alert alert-success">It appears that your compilation worked. You should
       <a href="/pdf/{{paperid}}/main.pdf" target="_blank">check your PDF</a> and
       <a href="#" onclick="showMetadata();return false;">check the metadata</a>.</div>
     {% else %}
-    <div class="alert alert-warning">It appears that your paper compiled, but did not use <span class="text-monospace">\documentclass{iacrcc.cls}</span>. Please revise your LaTeX and resubmit.</div>
+    <div class="alert alert-warning">It appears that your paper compiled, but something was wrong
+      with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc.cls}</span>. Please revise your LaTeX and resubmit.</div>
     {% endif %}
     {% else %} {# exit_code != 0 #}
     <div class="alert alert-danger">
       {% if error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error</a></div>
-    <div class="alert alert-danger"></div>
     {% endif %} {# end of exit_code == 0 #}
     <pre>{{log}}</pre>
     <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
