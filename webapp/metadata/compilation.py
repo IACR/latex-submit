@@ -144,6 +144,9 @@ class VersionEnum(StrEnum):
 
 
 class Citation(BaseModel):
+    ptype: str = Field(None,
+                       title='BibTeX publication type',
+                       description='Article, inproceedings, etc.')
     authors: str = Field(None,
                          title='BibTeX-style author list as a string',
                          description='Authors are joined with \\and')
