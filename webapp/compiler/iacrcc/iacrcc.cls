@@ -219,26 +219,21 @@
 % Check the character encoding. lualatex and unicode are required for final versions.
 % We allow pdflatex to be used for preprint and submission modes, because it is faster
 % than lualatex.
-\ifcsstring{encodingdefault}{TU}{}{ % not unicode
-  \ifcsstring{@IACRversion}{final}{
-    \ifluatex
-      \ClassError{iacrcc}{^^JThe font encoding \encodingdefault is not supported.
-      Do not use the fontenc package, and use only unicode fonts.}{}
-    \else
-      \ClassError{iacrcc}{^^Jfinal versions must be compiled with lualatex.^^J}{}
-    \fi
-  }{%
-    \ifluatex
-      \ClassError{iacrcc}{^^JThe font encoding \encodingdefault is not supported.\MessageBreak
-        Do not use the fontenc package, and use only unicode fonts.}{}
-       \usepackage[TU]{fontenc}
-     \else
-      \ClassWarning{iacrcc}{^^J This package is intended to be used with lualatex\MessageBreak
-        because pdflatex does not support unicode output.^^J}{}
-    \fi
-    % set the default encoding to TU.
-  }
+% Suggested by David Carlisle to eliminate nastiness from the fontenc package.
+\AtBeginDocument{
+  \ifx\Umathchar\undefined\else
+  \ClassWarning{iacrcc}{You should not use fontenc. Please use lualatex with unicode fonts.}{}
+  \def\encodingdefault{TU}%
+ \fontencoding{TU}\selectfont
+ \fi
 }
+
+\ifluatex
+\else
+  \ifcsstring{@IACRversion}{final}{
+    \ClassError{iacrcc}{^^Jfinal versions must be compiled with lualatex.^^J}{}}{%
+    \ClassWarning{iacrcc}{^^J This package is intended to be used with lualatex^^J}{}}
+\fi
 
 % XMP (eXtensible Metadata Platform) is a mechanism proposed by Adobe 
 % for embedding document metadata within the document itself.
