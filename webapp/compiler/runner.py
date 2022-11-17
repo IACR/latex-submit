@@ -77,7 +77,7 @@ def run_latex(input_dirname, output_dirname):
                                           detach=True,                  # Detach the container
                                           network_disabled=True,        # Disable networking
                                           mounts=[mount])               # Specify our mount point = the staging dir
-        code, output = container.exec_run('latexmk -g -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main', workdir='/data')
+        code, output = container.exec_run('latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main', workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
         return {'log': output.decode(), 'exit_code': code}

@@ -20,7 +20,8 @@ home_bp = Blueprint('home_bp',
 
 @app.context_processor
 def inject_variables():
-    return {'journal_name': app.config['JOURNAL_NAME']}
+    return {'site_name': app.config['SITE_NAME'],
+            'site_shortname': app.config['SITE_SHORTNAME']}
 
 @home_bp.route('/', methods=['GET'])
 def home():
@@ -42,12 +43,29 @@ def _validate_post(args, files):
         return 'Missing submitted date'
     if 'accepted' not in args:
         return 'Missing accepted date'
+    if 'doccls' not in args:
+        return 'Missing doccls'
     # TODO: validate the hmac.
     if 'hmac' not in args:
         return 'Missing hmac'
     if 'zipfile' not in files:
         return 'Missing zip file'
     return None
+
+@home_bp.route('/submit', methods=['GET'])
+def submitform():
+    # TODO: authenticate the auth argument and paperid.
+    args = request.args.to_dict()
+    data = {'title': 'Test submit a paper',
+            'paperid': ''} # TODO: fix this. It is now supplied by javascript for testing.
+    if 'paperid' in args:
+        paperid = args.get('paperid')
+        if not validate_paperid(paperid):
+            return render_template('message.html',
+                                   title='Invalid character in paperid',
+                                   error='paperid is restricted to using characters -.a-z0-9')
+        data['paperid'] = paperid
+    return render_template('submit.html', **data)
 
 @home_bp.route('/submit', methods=['POST'])
 def runlatex():
@@ -75,6 +93,7 @@ def runlatex():
     json_data = {'paperid': paperid,
                  'status': StatusEnum.PENDING,
                  'email': args.get('email'),
+                 'doccls': args.get('doccls'),
                  'submitted': args.get('submitted'),
                  'accepted': args.get('accepted'),
                  'compiled': datetime.datetime.now(),

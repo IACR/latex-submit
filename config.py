@@ -11,7 +11,8 @@ class Config:
     DB_PASSWORD = 'l3t_m3_in_n0w'
     DB_HOST = 'localhost'
     DATA_DIR = 'webapp/data'
-    JOURNAL_NAME = 'IACR Communications in Cryptology'
+    SITE_NAME = 'IACR Publishing Pipeline'
+    SITE_SHORTNAME = 'IACR CiC'
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'

@@ -17,7 +17,11 @@ This template is used to show the status of a compilation.
 </nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-    {% for error in error_log %}
+    <div class="mb-3 d-flex">
+      <a class="btn btn-primary" href="/submit?paperid={{paperid}}">You may resubmit your paper</a>
+      {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
+    </div>
+      {% for error in error_log %}
     <div class="alert alert-danger">Error: {{error}}</div>
     {% endfor %}
     {% if exit_code == 0 and pdf %}

@@ -319,6 +319,9 @@ class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID derived from venue and id in review system',
                                           description='ID must be globally unique.')
+    doccls: str = Field(...,
+                        title='LaTeX document class',
+                        description='Intended target to compile for.')
     status: StatusEnum = Field(StatusEnum.PENDING,
                                title='Current status',
                                description='Indicates what stage the paper is at')
