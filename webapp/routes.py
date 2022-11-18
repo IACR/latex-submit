@@ -25,13 +25,8 @@ def inject_variables():
 
 @home_bp.route('/', methods=['GET'])
 def home():
-    if app.testing:
-        return render_template('index.html',
-                               title='Debug is enabled')
-    else:
-        return render_template('message.html',
-                               title='Debug is not enabled',
-                               error='Debug is not enabled')
+    return render_template('index.html',
+                           title=app.config['SITE_NAME'])
 
 def _validate_post(args, files):
     """args should contain paperid and email. files should contain zipfile."""
