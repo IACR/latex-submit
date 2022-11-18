@@ -104,6 +104,7 @@
 % xkeyval is an extension of the keyval package and offers additional macros
 % for setting keys and declaring and setting class or package options.
 \RequirePackage{xkeyval}
+
 \def\publname{IACR Communications in Cryptology}
 \def\IACR@vol{0}
 \def\IACR@no{0}
@@ -123,8 +124,6 @@
 % towards LaTeX class and package authors.
 \RequirePackage{etoolbox}
 
-\newcommand{\setfirstpage}[1]{\def\IACR@fp{#1}\setcounter{page}{#1}}
-\newcommand{\setlastpage}[1]{\def\IACR@lp{#1}}
 \newcommand{\setvolume}[1]{\def\IACR@vol{#1}}
 \newcommand{\setnumber}[1]{\def\IACR@no{#1}}
 \newcommand{\setISSN}[1]{\def\IACR@ISSN{#1}}
@@ -174,6 +173,27 @@
   \PassOptionsToClass{final}{article}
 }{}
 
+% xstring provides macros for manipulating strings - testing a string’s 
+% contents, extracting substrings, substitution of substrings and providing
+% numbers such as string length, position of, or number of recurrences of, 
+% a substring.
+% Required for IfSubStr
+\RequirePackage{xstring}
+
+% Options containing an equality sign are deleted from the original list by
+% the xkeyval package from the \@classoptionslist macro.
+% Remove allowed options and check if this macro is empty.
+\ifx\@classoptionslist\@empty\else
+  \edef\store@classoptionslist{\@classoptionslist}%
+  \StrDel{\store@classoptionslist}{floatrow}[\store@classoptionslist]%
+  \StrDel{\store@classoptionslist}{biblatex}[\store@classoptionslist]%
+  \StrDel{\store@classoptionslist}{,}[\store@classoptionslist]%
+  \StrDel{\store@classoptionslist}{ }[\store@classoptionslist]%
+  \ifx\store@classoptionslist\@empty\else
+    \ClassError{iacrcc}{^^JInvalid options passed to iacrcc: \store@classoptionslist}{}%
+  \fi
+\fi
+
 % article class
 \LoadClass[10pt,twoside]{article}[2007/10/19]
 
@@ -189,13 +209,6 @@
 % and provides easy driver-independent access to several kinds 
 % of color tints, shades, tones, and mixes of arbitrary colors. I
 \RequirePackage{xcolor}
-
-% xstring provides macros for manipulating strings - testing a string’s 
-% contents, extracting substrings, substitution of substrings and providing
-% numbers such as string length, position of, or number of recurrences of, 
-% a substring.
-% Required for IfSubStr
-\RequirePackage{xstring}
 
 % The hyperref package is used to handle cross-referencing commands in 
 % LaTeX to produce hypertext links in the document. 
@@ -214,6 +227,7 @@
   }
   % Old versions of hyperxmp do not support DOI
   \@ifpackagelater{hyperxmp}{2019/03/14}{\@hyperxmp@doitrue\hypersetup{keeppdfinfo=true}}{}
+  \@ifpackageloaded{biblatex}{}{\bibliographystyle{iacrcc}}
 }
 
 % Check the character encoding. lualatex and unicode are required for final versions.
@@ -316,7 +330,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   footnote/.initial=\@empty,
   onclick/.initial=\@empty,
   email/.initial=\@empty,
-  }
+}
 \def\IACR@author@params@set@keys#1{%%
   \pgfkeys{/IACR-author/entities/.cd,#1}}
 \def\IACR@author@params@get#1{%%
@@ -334,7 +348,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   state/.initial=\@empty,
   postcode/.initial=\@empty,
   country/.initial=\@empty,
-  }
+}
 \def\IACR@affiliation@params@set@keys#1{%%
   \pgfkeys{/IACR-affiliation/entities/.cd,#1}}
 \def\IACR@affiliation@params@get#1{%%
@@ -347,7 +361,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   running/.initial=\@empty,
   onclick/.initial=\@empty,
   subtitle/.initial=\@empty,
-  }
+}
 \def\IACR@title@params@set@keys#1{%%
   \pgfkeys{/IACR-title/entities/.cd,#1}}
 \def\IACR@title@params@get#1{%%
@@ -360,9 +374,23 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   file/.initial={CC-by.png},
   text/.initial={Creative Commons License CC-BY 4.0.},
   url/.initial={http://creativecommons.org/licenses/by/4.0/},
-  }
+}
 \def\IACR@license-CC-by@params@get#1{%%
   \pgfkeysvalueof{/IACR-license-CC-by/entities/#1}}
+
+\pgfkeys{/IACR-funding/entities/.cd,
+  country/.initial=\@empty,
+  grantid/.initial=\@empty,
+  fundref/.initial=\@empty,
+  ror/.initial=\@empty,
+}
+\def\IACR@funding@params@set@keys#1{%%
+  \pgfkeys{/IACR-funding/entities/.cd,#1}}
+\def\IACR@funding@params@get#1{%%
+  \pgfkeysvalueof{/IACR-funding/entities/#1}}
+\newcommand\IACR@funding@params@clearkeys{%
+  \IACR@funding@params@set@keys{country=\@empty,grantid=\@empty,fundref=\@empty,ror=\@empty}%
+}
 
 % Title/Author/affiliations
 \global\let\IACR@runningauthors\@empty
@@ -434,8 +462,8 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \ifx\@genericfootnote\@empty\else
     \renewcommand\thefootnote{}\footnotetext{\@genericfootnote}%
   \fi
-  \ifx\@displayemails\@empty\else
-    \renewcommand\thefootnote{}\footnotetext{\@displayemails}%
+  \ifx\IACR@displayemails\@empty\else
+    \renewcommand\thefootnote{}\footnotetext{\IACR@displayemails}%
   \fi
   \begingroup
     \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
@@ -466,7 +494,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 
 % Add support to display provided e-mail addresses 
 % in the footnote of the front page
-\global\let\@displayemails\@empty
+\global\let\IACR@displayemails\@empty
 
 % Add support for a footnote without symbol on the front page
 \global\let\@genericfootnote\@empty
@@ -559,10 +587,10 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   % First the provided footnote (if any) and next
   % the provided e-mail addresses
   \ifx\@IACRemail\@empty\else
-    \ifx\@displayemails\@empty
-      \edef\@displayemails{E-mail: \noexpand\url{\@IACRemail}~(#2)}%
+    \ifx\IACR@displayemails\@empty
+      \edef\IACR@displayemails{E-mail: \noexpand\url{\@IACRemail}~(#2)}%
     \else
-      \eappto\@displayemails{, \noexpand\url{\@IACRemail}~(#2)}%
+      \eappto\IACR@displayemails{, \noexpand\url{\@IACRemail}~(#2)}%
     \fi
     \@writemeta{\IACRSS email: \@IACRemail}%
   \fi
@@ -598,6 +626,30 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 
 \let\store@addauthor\addauthor  % Save macro away
 
+% Define the \addfunding macro to capture funding meta-data
+\newcommand{\addfunding}[2][\@empty]{%
+  \IACR@funding@params@set@keys{#1}%
+  \edef\@IACR@funding@name{#2}%
+  \edef\@IACR@funding@country{\IACR@funding@params@get{country}}%
+  \edef\@IACR@funding@grantid{\IACR@funding@params@get{grantid}}%
+  \edef\@IACR@funding@fundref{\IACR@funding@params@get{fundref}}%
+  \edef\@IACR@funding@ror{\IACR@funding@params@get{ror}}%
+  \@writemeta{funding:}%
+  \@writemeta{\IACRSS name: \@IACR@funding@name}%
+  \ifx\@IACR@funding@country\@empty\else
+    \@writemeta{\IACRSS country: \@IACR@funding@country}%
+  \fi
+  \ifx\@IACR@funding@grantid\@empty\else
+    \@writemeta{\IACRSS grantid: \@IACR@funding@grantid}%
+  \fi
+  \ifx\@IACR@funding@fundref\@empty\else
+    \@writemeta{\IACRSS fundref: \@IACR@funding@fundref}%
+  \fi  
+  \ifx\@IACR@funding@ror\@empty\else
+    \@writemeta{\IACRSS ror: \@IACR@funding@ror}%
+  \fi  
+}
+
 % Provide the title of the paper
 \renewcommand\title[2][]{%
   \IACR@title@params@set@keys{#1}%
@@ -629,7 +681,7 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \global\advance\num@affil by 1\relax% 
   \@writemeta{affiliation:}%
   \@writemeta{\IACRSS name: \unexpanded{#2}}%
-  \IACR@affiliation@params@set@keys{#1}%%
+  \IACR@affiliation@params@set@keys{#1}%
   \edef\@IACRror{\IACR@affiliation@params@get{ror}}%
   \edef\@IACRonclick{\IACR@affiliation@params@get{onclick}}%
   \edef\@IACRdepartment{\IACR@affiliation@params@get{department}}%
@@ -877,62 +929,73 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
 \renewcommand{\markboth}[2]{}
 \pagestyle{fancy}
 
-%Abstract style, keywords
-\global\let\@IACR@print@keywords\@empty
-\def\@IACR@keywords{No keywords given.}
+% Abstract style, keywords
+\global\let\@IACR@text@keywords\@empty
+\def\@IACR@keywords{}
+%%%%%%%%%%%%%%%%%%%%%%%
+% Macro \ifnotstring is used to check if an argument is just a string.
+% We use it for \keywords but can be useful for other metadata.
+\ExplSyntaxOn
+\prg_generate_conditional_variant:Nnn \tl_if_eq:nn { e } { T,F,TF }
+\cs_new_protected:Npn \onlystring:nn #1#2
+   {
+     \tl_if_eq:enTF { \text_purify:n { #1 } } { #1 }
+      {% It's ok, do nothing.
+      }
+      {% raise an error
+        % \PackageError{isstring}{#2 ^^J(#1)}{}
+        #2
+      }
+ }
+% Usage: \ifnotstring{I'm not text $\mathbb{a}$ so}{execute this}
+\NewDocumentCommand{\ifnotstring}{mm}{\onlystring:nn{#1}{#2}}
+\ExplSyntaxOff
 
-\def\keywords{\@ifnextchar[{\IACR@@@keywords}{\IACR@@keywords}}
-\def\IACR@@@keywords[#1]#2{
-  \gdef\@IACR@PDFkeywords{#1}%
+% Keywords are separated by commas. We store two different internal
+% macros for keywords; one allows math and one is plain text.
+% If the author use macros or math in their keywords, then they
+% require an optional argument:
+% \keywords[Dirac delta function, unit impulse]{Dirac $\delta$ function, unit impulse}
+
+% \@IACR@keywords may contain mathematics for display in LaTeX.
+% \@IACR@text@keywords is the plain text version used for PDF and metadata.
+
+\newcommand{\keywords}[2][\@empty]{
   \gdef\@IACR@keywords{#2}%
-  \gdef\@IACR@print@keywords{\unexpanded{#2}}%
-}
-\def\IACR@@keywords#1{%
-  \gdef\@IACR@keywords{#1}%
-  \gdef\@IACR@print@keywords{\unexpanded{#1}}%
+  \ifx#1\@empty
+    \ifnotstring{#2}{%
+      \ClassError{iacrcc}{%
+        ^^J Optional plaintext keyword argument required if keywords contain macros ^^J}}
+  \gdef\@IACR@text@keywords{#2}%
+  \else
+    \ifnotstring{#1}{%
+      \ClassError{iacrcc}{%
+        ^^J Optional argument to keywords may not contain macros ^^J}}
+      \gdef\@IACR@text@keywords{#1}%
+  \fi
 }
 
 % Sophisticated verbatim text
 \RequirePackage{fancyvrb} % used to write the abstract into \jobname.abstract
 
 \renewenvironment{abstract}{%
-  \def\and{,\space}\edef\@writekeywords{\@IACR@keywords}%
-  \@writemeta{keywords: \@IACR@print@keywords}%
+  \@writemeta{keywords: \@IACR@text@keywords}%
   \small\quotation\setlength{\parindent}{0pt}\noindent
   \textbf{\textsf{Abstract.}}
   \VerbatimOut{\jobname.abstract}}{
   \endVerbatimOut
   \input{\jobname.abstract}
+  \ifx\@IACR@keywords\@empty
+  \else
   \smallskip\par\textbf{\textsf{Keywords:}}
-    \def\and{\unskip\space\textperiodcentered\space\ignorespaces}\@IACR@keywords
+  % Replace comma by a centered period.
+  \expandarg\StrSubstitute{\@IACR@keywords}{,}{\unskip\space\textperiodcentered\space\ignorespaces}
+  \fi
   \endquotation%
   %% PDF keywords
-  \def\and{, }%
-  \def\thanks##1{}%
-  \def\footnote##1{}%
-  \def\inst##1{}%
-  \def\fnmsep{}%
-  \def\\{}%
-  \def\zap@first@space ##1{##1}
-  \def\insert@last@space##1,##2{%
-    ##1%
-    \ifx##2\@empty\space\else, \expandafter\insert@last@space##2\fi}
-  \def\zap@comma@space##1 ,##2{%
-    ##1%
-    \ifx##2\@empty\else, \expandafter\zap@comma@space##2\fi}
-  \def\zap@dbl@space##1 ##2{%
-    ##1%
-    \ifx##2\@empty\else\space\expandafter\zap@dbl@space##2\fi}
-  \ifdefined\@IACR@PDFkeywords
-    \hypersetup{pdfkeywords=\@IACR@PDFkeywords}
+  \ifx\@IACR@text@keywords\@empty
   \else
-    \protected@edef\@tmp{\expandafter\@IACR@keywords}
-    \protected@edef\@tmp{\expandafter\insert@last@space\@tmp,\@empty}
-    \protected@edef\@tmp{\expandafter\zap@comma@space\@tmp ,\@empty}
-    \protected@edef\@tmp{\expandafter\insert@last@space\@tmp,\@empty}
-    \protected@edef\@tmp{\expandafter\zap@dbl@space\@tmp \@empty}
-    \protected@edef\@tmp{\expandafter\zap@first@space \@tmp}
-    \hypersetup{pdfkeywords=\@tmp}
+    \hypersetup{pdfkeywords={\@IACR@text@keywords}}
   \fi
   %% PDF author
   \def\zap@one##1,##2{##1}
@@ -946,10 +1009,10 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
   \if@anonymous
     \hypersetup{pdfauthor={hidden for submission}}
   \else
-    \hypersetup{pdfauthor=\IACR@runningauthors}
+    \hypersetup{pdfauthor={\IACR@runningauthors}}
   \fi%!anonymous
   %% PDF title
-  \hypersetup{pdftitle=\@plaintitle}
+  \hypersetup{pdftitle={\@plaintitle}}
   % PDF metadata
   \ifcsstring{@IACRversion}{final}{
     \if@hyperxmp@doi{
@@ -957,14 +1020,15 @@ xscale=\@OrigHeightRecip*\@curXheight,transform shape]
         pdfdoi=\IACR@DOI,%
         pdfissn=\IACR@ISSN,%
         pdfpubtype=journal,%
-        pdfpublication=\publname,%
-        pdfvolumenum=\IACR@vol,%
-        pdfissuenum=\IACR@no,%
+        pdfpublication={\publname},%
+        pdfvolumenum={\IACR@vol},%
+        pdfissuenum={\IACR@no},%
         pdfpagerange={\IACR@fp-\IACR@lp},%
     }}
     \fi%hyperxmp@doi
   }{} % final
 }
+
 
 % autoref: capitals for Sections, and adding Algorithm
 \def\equationautorefname{Equation}%
