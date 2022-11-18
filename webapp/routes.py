@@ -260,3 +260,13 @@ def download_output_zipfile(paperid):
             zf.write(f, arcname=str(f)[subdir_offset:])
     memory_file.seek(0)
     return send_file(memory_file, download_name='output.zip', as_attachment=True)
+
+@home_bp.route('/iacrcc', methods=['GET'])
+def download_iacrcc_zipfile():
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        iacrcc_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('compiler/iacrcc')
+        for file in iacrcc_dir.iterdir():
+            zf.write(file, arcname=file.name.split('/')[-1])
+    memory_file.seek(0)
+    return send_file(memory_file, download_name='iacrcc.zip', as_attachment=True)
