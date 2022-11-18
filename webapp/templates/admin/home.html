@@ -21,6 +21,7 @@
     <tr>
       <th>Paper ID</th>
       <th>Date</th>
+      <th>Email</th>
       <th>Status</th>
       <th>Title</th>
     </tr>
@@ -31,6 +32,7 @@
     <td><a href="/view/{{paper.paperid}}">{{paper.paperid}}</a></td>
     <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
     <td>{{paper.status.value}}</td>
+    <td>{{paper.email}}</td>
     <td>{% if paper.meta %}{{paper.meta.title}}{% else %}(unknown){% endif %}</td>
   </tr>
   {% endfor %}
