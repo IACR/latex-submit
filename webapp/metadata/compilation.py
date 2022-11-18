@@ -39,11 +39,12 @@ class StatusEnum(StrEnum):
 
 class Affiliation(BaseModel):
     name: constr(min_length=3)
-    ror: Annotated[Optional[constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$')],
-                   Field(title='ROR ID of institution',
-                         description=('See https://ror.org/facts/ for format. The last two digits are supposed '
-                                      'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
-                                      'we do not implement validation on it.'))]
+    ror: constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$') = Field(
+        None,
+        title='ROR ID of institution',
+        description=('See https://ror.org/facts/ for format. The last two digits are supposed '
+                     'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
+                     'we do not implement validation on it.'))
     street: str = Field(None,
                       title='Street of affiliation',
                       description='May be any string')

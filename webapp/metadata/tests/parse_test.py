@@ -12,6 +12,8 @@ from compilation import Meta
 def test_meta1():
     tfile = Path('testdata/test1.meta')
     data = read_meta(tfile)
+    data['abstract'] = 'This came from an abstract file'
+    data['version'] = 'final'
     meta = Meta(**data)
     assert meta.title == 'Thoughts about "binary" functions on $GF(p^2)$ by Fester Bestertester\\ at 30°C'
     assert len(meta.citations) == 12
@@ -25,6 +27,8 @@ def test_meta1():
 def test_meta2():
     tfile = Path('testdata/test2.meta')
     data = read_meta(tfile)
+    data['abstract'] = 'This came from an abstract file'
+    data['version'] = 'preprint'
     meta = Meta(**data)
     assert meta.title == 'How to Use the {IACR} Communications in Cryptology Class'
     assert len(meta.citations) == 6
@@ -47,6 +51,8 @@ def test_meta2():
 def test_meta3():
     tfile = Path('testdata/test3.meta')
     data = read_meta(tfile)
+    data['abstract'] = 'This came from an abstract file'
+    data['version'] = 'submission'
     meta = Meta(**data)
     assert meta.title == 'Another example with biblatex'
     assert len(meta.citations) == 79

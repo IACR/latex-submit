@@ -18,6 +18,7 @@ class ProdConfig(Config):
     FLASK_ENV = 'production'
     DEBUG = False
     TESTING = False
+    DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     
 class DebugConfig(Config):
     FLASK_ENV = 'development'
