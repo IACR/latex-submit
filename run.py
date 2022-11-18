@@ -1,6 +1,6 @@
 from webapp import create_app
-from webapp import conf
+from webapp import config
 
-config = conf.DebugConfig()
-app = create_app(config)
+conf = config.DebugConfig()
+app = create_app(conf)
 app.run(host='0.0.0.0')
