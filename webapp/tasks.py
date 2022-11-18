@@ -40,7 +40,8 @@ def run_latex_task(input_path, output_path, paperid):
             if compilation.exit_code != 0:
                 compilation.status = StatusEnum.COMPILATION_FAILED
                 compilation.error_log.append('Error code of {} means that the compilation failed'.format(compilation.exit_code))
-            if compilation.status != StatusEnum.COMPILATION_FAILED:
+            if compilation.status != StatusEnum.COMPILATION_FAILED and compilation.doccls == 'iacrcc':
+                # Look for stuff we need for iacrcc.
                 metafile = Path(output_path) / Path('main.meta')
                 if metafile.is_file():
                     try:
