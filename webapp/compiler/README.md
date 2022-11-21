@@ -9,7 +9,7 @@ The steps to make this work are:
 
 1. install docker
 
-2. execute the command:
+2. cd to the webapp directory and execute the command:
 ```
 docker build -t debian-slim-texlive2022 .
 ```
@@ -48,3 +48,16 @@ why we might not want to include all of texlive-full:
 2. the docker image would be five times larger
 3. some may be unsafe to run on untrusted inputs.
 4. some may interfere with future conversion to HTML.
+
+## Running in production
+
+When running this as a wsgi app in production, the user that the app is running after requires
+access to docker. If this user is `www-data` as it would be under `mod_wsgi`, the solution is to
+execute:
+```
+sudo usermod -aG docker www-data
+```
+Then build the container as `www-data` using:
+```
+sudo -u www-data docker build -t debian-slim-texlive2022 .
+```
