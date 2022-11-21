@@ -31,7 +31,7 @@ RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopt
 RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk biblatex-trad biblatex-ext marginfix sidenotes
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
-COPY LatexMk /etc
+COPY compiler/LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
 USER texlive
