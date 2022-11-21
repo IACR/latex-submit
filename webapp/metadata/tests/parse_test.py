@@ -6,16 +6,20 @@ from pathlib import Path
 import pytest
 import sys
 sys.path.insert(0, '../')
-from meta_parse import read_meta
 from compilation import Meta
+sys.path.insert(0, '../latex/iacrcc/parser')
+from meta_parse import parse_meta
 
 def test_meta1():
-    tfile = Path('testdata/test1.meta')
-    data = read_meta(tfile)
+    tfile = Path('testdata/test1.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'final'
+    with pytest.raises(ValueError):
+        meta = Meta(**data)
+    data['authors'][0]['email'] = 'alice@wonderland.com'
     meta = Meta(**data)
-    assert meta.title == 'Thoughts about "binary" functions on $GF(p^2)$ by Fester Bestertester\\ at 30°C'
+    assert meta.title == 'Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester\\ at 30°C'
     assert len(meta.citations) == 12
     assert len(meta.authors) == 3
     assert meta.authors[0].email == 'alice@wonderland.com'
@@ -25,12 +29,12 @@ def test_meta1():
     assert meta.authors[2].orcid == None
 
 def test_meta2():
-    tfile = Path('testdata/test2.meta')
-    data = read_meta(tfile)
+    tfile = Path('testdata/test2.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'preprint'
     meta = Meta(**data)
-    assert meta.title == 'How to Use the {IACR} Communications in Cryptology Class'
+    assert meta.title == 'How to Use the IACR Communications in Cryptology Class'
     assert len(meta.citations) == 6
     assert len(meta.authors) == 2
     assert meta.authors[0].email == 'joppe.bos@nxp.com'
@@ -49,8 +53,8 @@ def test_meta2():
 
 
 def test_meta3():
-    tfile = Path('testdata/test3.meta')
-    data = read_meta(tfile)
+    tfile = Path('testdata/test3.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'submission'
     meta = Meta(**data)

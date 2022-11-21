@@ -1,13 +1,12 @@
 author:
   name: Alice Accomplished
   affil: 1,2
-  email: alice@wonderland.com
   orcid: 0000-0003-1010-8157
 author:
   name: Bob Badenuff
   affil: 1
 author:
-  name: Tancr{è}de Lepoint
+  name: Tancr{\`e}de Lepoint
   affil: 3,2,1
 affiliation:
   name: University of California, Santa Barbara
@@ -16,7 +15,8 @@ affiliation:
   name: University of Antartica
 affiliation:
   name: Bo{\u g}azi{\c c}i University
-title: Thoughts about "binary" functions on $GF(p^2)$ by Fester Bestertester\ at 30°C
+version: final
+title: Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester\ at 30°C
   subtitle: 
 keywords: 
 citation: misc AES

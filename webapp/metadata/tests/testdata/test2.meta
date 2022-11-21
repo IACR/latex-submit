@@ -1,10 +1,10 @@
 author:
-  name: Joppe W. Bos
+  name: Joppe W. \surname {Bos}
   affil: 1
   email: joppe.bos@nxp.com
   orcid: 0000-0003-1010-8157
 author:
-  name: Kevin S. McCurley
+  name: Kevin S. \surname {McCurley}
   affil: 2
   email: mccurley@digicrime.com
   orcid: 0000-0001-7890-5430
@@ -17,9 +17,10 @@ affiliation:
   country: Belgium
 affiliation:
   name: Self
-title: How to Use the {IACR} Communications in Cryptology Class
+version: final
+title: How to Use the IACR Communications in Cryptology Class
   subtitle: A Template
-keywords: Template \and LaTeX \and IACR
+keywords: Template, LaTeX, IACR
 citation: book fancynames
   title: Something about mathematics $x^n+y^n=z^n$ when $n=2$
   year: 2021

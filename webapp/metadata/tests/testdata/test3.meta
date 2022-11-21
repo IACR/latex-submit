@@ -1,10 +1,12 @@
 author:
-  name: Fester Bestertester
+  name: Fester \surname {Bestertester}
   affil: 
   email: nobody@example.com
   orcid: 0000-0002-0599-0192
+version: final
 title: Another example with biblatex
   subtitle: 
+keywords: 
 citation: periodical jcg
   title: Computers and Graphics
   volume: 35
