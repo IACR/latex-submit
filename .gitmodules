@@ -1,3 +1,4 @@
 [submodule "webapp/metadata/latex"]
 	path = webapp/metadata/latex
 	url = git@github.com:IACR/latex.git
+        ignore = dirty
