@@ -5,7 +5,8 @@ from pathlib import Path
 import time
 from .compiler import runner
 from . import task_queue
-from .metadata import meta_parse
+#from .metadata import meta_parse
+from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.compilation import Compilation, Meta, StatusEnum, VersionEnum
 
 def run_latex_task(input_path, output_path, paperid):
@@ -45,7 +46,8 @@ def run_latex_task(input_path, output_path, paperid):
                 metafile = Path(output_path) / Path('main.meta')
                 if metafile.is_file():
                     try:
-                        data = meta_parse.read_meta(metafile)
+                        metastr = metafile.read_text(encoding='UTF-8')
+                        data = meta_parse.parse_meta(metastr)
                         abstract_file = Path(output_path) / Path('main.abstract')
                         if not abstract_file.is_file():
                             compilation.status = StatusEnum.MISSING_ABSTRACT
