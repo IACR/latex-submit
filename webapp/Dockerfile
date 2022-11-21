@@ -35,9 +35,9 @@ COPY LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
 USER texlive
-COPY iacrcc/iacrcc.cls /home/texlive/texmf/tex/latex/iacrcc/iacrcc.cls
-COPY iacrcc/iacrcc.bst /home/texlive/texmf/bibtex/bst/iacrcc/iacrcc.bst
-COPY iacrcc/CC-by.png /home/texlive/texmf/tex/latex/iacrcc/CC-by.png
+COPY metadata/latex/iacrcc/iacrcc.cls /home/texlive/texmf/tex/latex/iacrcc/iacrcc.cls
+COPY metadata/latex/iacrcc/iacrcc.bst /home/texlive/texmf/bibtex/bst/iacrcc/iacrcc.bst
+COPY metadata/latex/iacrcc/CC-by.png /home/texlive/texmf/tex/latex/iacrcc/CC-by.png
 WORKDIR /data
 
 # This causes the container to run no more than 500 seconds. This is to protect against
