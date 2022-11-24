@@ -1,4 +1,9 @@
 [submodule "webapp/metadata/latex"]
 	path = webapp/metadata/latex
 	url = git@github.com:IACR/latex.git
-        ignore = dirty
+	ignore = dirty
+	branch = main
+[submodule "webapp/metadata/iacrtrans"]
+	path = webapp/metadata/iacrtrans
+	url = git@github.com:Cryptosaurus/iacrtrans.git
+	branch = master
