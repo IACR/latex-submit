@@ -231,11 +231,11 @@ def view_results(paperid):
         return render_template('message.html',
                                title='Paper was not compiled',
                                error='Paper was not compiled')
-    data = {'title': 'Results from compilation'}
+    data = {'title': 'Results from compilation', 'paperid': paperid}
     try:
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
-        data.update(comp.dict())
+        data['comp'] = comp
     except Exception as e:
         data['error_log'] = ['Unable to parse compilation: ' + str(e)]
     input_tree = []

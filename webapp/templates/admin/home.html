@@ -20,9 +20,10 @@
   <thead>
     <tr>
       <th>Paper ID</th>
+      <th>Venue</th>
       <th>Date</th>
-      <th>Email</th>
       <th>Status</th>
+      <th>Email</th>
       <th>Title</th>
     </tr>
   </thead>
@@ -30,6 +31,7 @@
   {% for paper in papers %}
   <tr>
     <td><a href="/view/{{paper.paperid}}">{{paper.paperid}}</a></td>
+    <td>{{paper.venue.value}}</td>
     <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
     <td>{{paper.status.value}}</td>
     <td>{{paper.email}}</td>
