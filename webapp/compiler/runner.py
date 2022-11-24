@@ -69,6 +69,13 @@ def run_latex(input_dirname, output_dirname):
     for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log', 'fls', 'fdb_latexmk']:
         if Path(staging_dir, 'main.' + i).is_file():
             os.remove(str(staging_dir.absolute()) + '/main.' + i)
+    # Remove any latexmkrc or .latexmkrc file.
+    latexmkrc_file = Path(staging_dir, 'latexmkrc')
+    if latexmkrc_file.is_file():
+        latexmkrc_file.unlink()
+    latexmkdr_file = Path(staging_dir, '.latexmkrc')
+    if latexmkrc_file.is_file():
+        latexmkrc_file.unlink()
     client = docker.from_env()
     try:
         # We mount the staging_dir as /data in the container.
