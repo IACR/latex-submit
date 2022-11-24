@@ -137,6 +137,16 @@ class LicenseEnum(Enum):
                 return e
         return None
 
+class VenueEnum(StrEnum):
+    IACRCC    = 'iacrcc'
+    TOSC      = 'tosc'
+    TCHES     = 'tches'
+    ASIACRYPT = 'asiacrypt'
+    CRYPTO    = 'crypto'
+    EUROCRYPT = 'eurocrypt'
+    PKC       = 'pkc'
+    TCC       = 'tcc'
+
 class VersionEnum(StrEnum):
     """Values from documentclass[version=<version>]."""
     FINAL = 'final'
@@ -320,9 +330,9 @@ class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID derived from venue and id in review system',
                                           description='ID must be globally unique.')
-    doccls: str = Field(...,
-                        title='LaTeX document class',
-                        description='Intended target to compile for.')
+    venue: VenueEnum = Field(...,
+                             title='The venue for the publication',
+                             description='This determines which cls to use.')
     status: StatusEnum = Field(StatusEnum.PENDING,
                                title='Current status',
                                description='Indicates what stage the paper is at')

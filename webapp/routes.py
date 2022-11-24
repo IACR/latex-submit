@@ -38,8 +38,8 @@ def _validate_post(args, files):
         return 'Missing submitted date'
     if 'accepted' not in args:
         return 'Missing accepted date'
-    if 'doccls' not in args:
-        return 'Missing doccls'
+    if 'venue' not in args:
+        return 'Missing venue'
     # TODO: validate the hmac.
     if 'hmac' not in args:
         return 'Missing hmac'
@@ -88,7 +88,7 @@ def runlatex():
     json_data = {'paperid': paperid,
                  'status': StatusEnum.PENDING,
                  'email': args.get('email'),
-                 'doccls': args.get('doccls'),
+                 'venue': args.get('venue'),
                  'submitted': args.get('submitted'),
                  'accepted': args.get('accepted'),
                  'compiled': datetime.datetime.now(),
@@ -265,7 +265,7 @@ def download_output_zipfile(paperid):
 def download_iacrcc_zipfile():
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
-        iacrcc_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('compiler/iacrcc')
+        iacrcc_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrcc')
         for file in iacrcc_dir.iterdir():
             zf.write(file, arcname=file.name.split('/')[-1])
     memory_file.seek(0)
