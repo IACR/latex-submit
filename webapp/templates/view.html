@@ -4,8 +4,7 @@
 This template is used to show the status of a compilation.
 =================================================================
 #}
-<h3 class="mt-2 mb-3">{{status.value}}</h3>
-<nav>
+<nav class="mt-3">
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
           type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
@@ -15,20 +14,24 @@ This template is used to show the status of a compilation.
           type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
     </div>
 </nav>
-<div class="tab-content pt-3" id="nav-tabContent" style="overflow-y: scroll;height:80vh;background-color:#ffffff;">
+<div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
       <a class="btn btn-primary" href="/submit?paperid={{paperid}}">You may resubmit your paper</a>
       {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
+      <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>
-      {% for error in error_log %}
+    {% for error in comp.error_log %}
     <div class="alert alert-danger">Error: {{error}}</div>
     {% endfor %}
-    {% if exit_code == 0 and pdf %}
-    {% if status.value == 'compilation_success' %}
+    {% if comp.exit_code == 0 and pdf %}
+    {% if comp.status.value == 'compilation_success' %}
     <div class="alert alert-success">It appears that your compilation worked. You should
-      <a href="/pdf/{{paperid}}/main.pdf" target="_blank">check your PDF</a> and
-      <a href="#" onclick="showMetadata();return false;">check the metadata</a>.</div>
+      <a href="/pdf/{{paperid}}/main.pdf" target="_blank">check your PDF</a>
+      {% if comp.venue == 'iacrcc' %}
+      and <a href="#" onclick="showMetadata();return false;">check the metadata</a>.
+      {% endif %}
+    </div>
     {% else %}
     <div class="alert alert-warning">It appears that your paper compiled, but something was wrong
       with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc.cls}</span>. Please revise your LaTeX and resubmit.</div>
@@ -37,7 +40,7 @@ This template is used to show the status of a compilation.
     <div class="alert alert-danger">
       {% if error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error</a></div>
     {% endif %} {# end of exit_code == 0 #}
-    <pre>{{log}}</pre>
+    <pre>{{comp.log}}</pre>
     <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
@@ -46,15 +49,15 @@ This template is used to show the status of a compilation.
       <tbody>
         <tr>
           <th>Date compiled:</th>
-          <td>{{compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+          <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
         </tr>
         <tr>
           <th>Compilation time:</th>
-          <td>{{compile_time}} seconds</td>
+          <td>{{comp.compile_time}} seconds</td>
         </tr>
         <tr>
           <th>Return code from latexmk:</th>
-          <td>{{exit_code}} {% if exit_code == 0 %}(success){% endif %}</td>
+          <td>{{comp.exit_code}} {% if exit_code == 0 %}(success){% endif %}</td>
         </tr>
       </tbody>
     </table>
@@ -72,6 +75,7 @@ This template is used to show the status of a compilation.
   </div>
   <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
     <h3 class="ms-3">Extracted metadata</h3>
+    {% if comp.venue == 'iacrcc' %}
     {% if metafile %}
     <div class="alert alert-info mx-3">The accuracy of your metadata is extremely
       important, so please check it over.
@@ -87,12 +91,17 @@ This template is used to show the status of a compilation.
     <p class="alert alert-danger">TODO: display this better and add a button to
       submit final version.
     </p>
+    <pre>{{comp.json(exclude_none=True,indent=2)}}</pre>
     <pre>{{metafile}}</pre>
-    {{metafile}}
     {% else %} {# no metafile #}
       <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>
   </div>
-    {% endif %}
+  {% endif %}
+  {% else %} {# not iacrcc #}
+  <p class="alert alert-warning">
+    Metadata extraction only works for iacrcc class. We hope to fix that in the future.
+  </p>
+  {% endif %}
 </div>
 <script>
  function scrollToError() {

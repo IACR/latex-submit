@@ -1,3 +1,4 @@
+
 {% extends "admin/admin_base.html" %}
 {% block content %}
 <h1 class="mb-5 text-center">Admin console</h1>
@@ -16,7 +17,7 @@
   </ol>
 </p>
 <h3>List of submitted papers</h3>
-<table class="table">
+<table class="table sortable" id="paperlist">
   <thead>
     <tr>
       <th>Paper ID</th>
@@ -41,5 +42,5 @@
   </tbody>
 </table>
 </ul>
-
+<script src="/js/sorttable.js"></script>
 {% endblock %}
