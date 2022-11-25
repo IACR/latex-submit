@@ -3,9 +3,10 @@ from io import BytesIO
 import json
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask import current_app as app
+from flask_mail import Message
 import os
 from pathlib import Path
-from . import executor, task_queue, PaperStatus
+from . import executor, mail, task_queue, PaperStatus
 import shutil
 import string
 import zipfile
@@ -133,6 +134,11 @@ def runlatex():
     task_queue[paperid] = executor.submit(run_latex_task, str(input_dir.absolute()),
                                                           str(output_dir.absolute()),
                                                           paperid)
+    msg = Message('Paper {} was submitted'.format(paperid),
+                  sender=app.config['EDITOR_EMAILS'],
+                  recipients=['iacrcc@digicrime.com']) # for testing
+    msg.body = 'This is just a test message for now. See https://testing.iacr.org/view/{}'.format(paperid)
+    mail.send(msg)
     data = {'title': 'Compiling your LaTeX',
             'paper_id': paperid}
     return render_template('running.html', **data)
