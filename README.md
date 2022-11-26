@@ -4,6 +4,12 @@ This repository contains a web server that receives uploads of zip
 files with LaTeX sources for final versions of papers. It is intended
 to be used for the IACR Communications on Cryptology using the
 `iacrcc.cls` LaTeX class, but others may find the framework useful.
+This project has a submodule from IACR/latex in order to import
+`iacrcc.cls`. In order to pull this in, use
+```
+git submodule update --init --recursive
+```
+This also pulls in `cryptobib` since IACR/latex depends on it.
 
 ## Architecture
 
