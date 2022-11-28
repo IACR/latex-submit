@@ -273,6 +273,7 @@ def download_iacrcc_zipfile():
     with zipfile.ZipFile(memory_file, 'w') as zf:
         iacrcc_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrcc')
         for file in iacrcc_dir.iterdir():
-            zf.write(file, arcname=file.name.split('/')[-1])
+            if file.name in ['iacrcc.cls', 'iacrcc.bst', 'iacrdoc.tex', 'template.tex', 'template.bib', 'biblio.bib']:
+                zf.write(file, arcname=('iacrcc/' + file.name))
     memory_file.seek(0)
     return send_file(memory_file, download_name='iacrcc.zip', as_attachment=True)
