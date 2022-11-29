@@ -34,7 +34,7 @@ This template is used to show the status of a compilation.
     </div>
     {% else %}
     <div class="alert alert-warning">It appears that your paper compiled, but something was wrong
-      with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc.cls}</span>. Please revise your LaTeX and resubmit.</div>
+      with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc}</span>. Please revise your LaTeX and resubmit.</div>
     {% endif %}
     {% else %} {# exit_code != 0 #}
     <div class="alert alert-danger">
