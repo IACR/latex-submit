@@ -137,7 +137,7 @@ def runlatex():
     msg = Message('Paper {} was submitted'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=['iacrcc@digicrime.com']) # for testing
-    msg.body = 'This is just a test message for now. See https://testing.iacr.org/view/{}'.format(paperid)
+    msg.body = 'This is just a test message for now. See https://publish.iacr.org/view/{}'.format(paperid)
     mail.send(msg)
     data = {'title': 'Compiling your LaTeX',
             'paper_id': paperid}
