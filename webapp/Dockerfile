@@ -34,7 +34,9 @@ RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm as
 COPY compiler/LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
-USER texlive
+# The :33 is to ensure that texlive has the same numeric GID as the www-data group,
+# so it can write to the staging directory.
+USER texlive:33
 COPY metadata/latex/iacrcc/iacrcc.cls /home/texlive/texmf/tex/latex/iacrcc/iacrcc.cls
 COPY metadata/latex/iacrcc/iacrcc.bst /home/texlive/texmf/bibtex/bst/iacrcc/iacrcc.bst
 COPY metadata/latex/iacrcc/CC-by.png /home/texlive/texmf/tex/latex/iacrcc/CC-by.png
