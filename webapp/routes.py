@@ -268,6 +268,10 @@ def download_output_zipfile(paperid):
     return send_file(memory_file, download_name='output.zip', as_attachment=True)
 
 @home_bp.route('/iacrcc', methods=['GET'])
+def iacrcc_homepage():
+    return render_template('iacrcc.html', title='iacrcc document class')
+
+@home_bp.route('/iacrcc.zip', methods=['GET'])
 def download_iacrcc_zipfile():
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
