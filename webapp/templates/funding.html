@@ -11,7 +11,7 @@ This template is used to show search on fundreg.
     IDs from the Crossref Funder Registry for <i-mono>\addfunding</i-mono> of
     <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>. If you received funding as a visitor,
     then you may use a ROR id in <i-mono>\addfunding</i-mono>.
-      Search is performed as you type. <a href="#">Help</a> is available.
+      Search is performed as you type. <a href="#helpModal" data-bs-toggle="modal">Help</a> is available.
   </p>
       <form class="mt-3">
         <div class="row align-items-center">
@@ -237,5 +237,44 @@ This template is used to show search on fundreg.
    elem.addEventListener('input', doSearch);
  });
 </script>
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Help on metadata search</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The <i-mono>\addfunding</i-mono> and <i-mono>\affiliation</i-mono> macros in
+          <i-mono>iacrcc.cls</i-mono> can use IDs that globally identify organizations.
+        </p>
+        <p>
+          The <i-mono>\affiliation</i-mono> macro expects an ID from the
+          <a href="https://ror.org/" target="_blank">Research Organization Registry</a> (ROR).
+          Not every organization will have such an ID, but there are
+          now 102,000 organizations that have been registered.
+        </p>
+        <p>The <i-mono>\addfunding</i-mono> macro may take one of two
+          kinds of IDs:
+          <ul>
+            <li>An ID from the
+              <a href="https://www.crossref.org/services/funder-registry/" target="_blank">Crossref Funder Registry</a>
+              (FUNDREG) is preferred. This includes almost 45,000
+              funding agencies.
+            </li>
+            <li>If you receive support from an organization to visit
+              them and they have a ROR ID, then you may include that.
+            </li>
+          </ul>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% include "base_footer.html" %}
 
