@@ -1,7 +1,6 @@
 import datetime
 from io import BytesIO
-import json
-from flask import Blueprint, render_template, request, jsonify, send_file
+from flask import json, Blueprint, render_template, request, jsonify, send_file
 from flask import current_app as app
 from flask_mail import Message
 import os
@@ -13,6 +12,7 @@ import zipfile
 from .metadata.compilation import Compilation, StatusEnum
 from .metadata import validate_paperid, get_doi
 from webapp.tasks import run_latex_task
+from .fundreg.search_lib import search
 
 home_bp = Blueprint('home_bp',
                     __name__,
@@ -281,3 +281,33 @@ def download_iacrcc_zipfile():
                 zf.write(file, arcname=('iacrcc/' + file.name))
     memory_file.seek(0)
     return send_file(memory_file, download_name='iacrcc.zip', as_attachment=True)
+
+@home_bp.route('/funding')
+def show_funding():
+    return render_template('funding.html', title='Funding and affiliation data')
+
+@home_bp.route('/funding/view/<id>')
+def view_funder(id):
+    result = search(app.config['XAPIAN_DB_PATH'],
+                    offset=0,
+                    textq='id:' + id,
+                    locationq=None,
+                    app=app)
+    if len(result.get('results')) > 0:
+        result = {'item': result.get('results')[0]}
+    else:
+        result = {'error': 'no such item'}
+    print(result)
+    return render_template('funding.html', **result)
+
+@home_bp.route('/funding/search', methods=['GET'])
+def get_results():
+    args = request.args.to_dict()
+    if 'textq' not in args and 'locationq' not in args:
+        return json.jsonify({'error': 'missing queries'})
+    return json.jsonify(search(app.config['XAPIAN_DB_PATH'],
+                               offset=args.get('offset', 0),
+                               textq=args.get('textq'),
+                               locationq=args.get('locationq'),
+                               source=args.get('source'),
+                               app=app))

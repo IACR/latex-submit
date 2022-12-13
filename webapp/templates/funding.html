@@ -1,0 +1,241 @@
+{% include "funding_header.html" %}
+{#
+=================================================================
+This template is used to show search on fundreg.
+=================================================================
+#}
+<div class="container mt-3">
+  <h2>Metadata search</h2>
+  <p class="mt-2">
+    This is designed to help you locate ROR identifiers for <i-mono>\affiliation</i-mono> or
+    IDs from the Crossref Funder Registry for <i-mono>\addfunding</i-mono> of
+    <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>. If you received funding as a visitor,
+    then you may use a ROR id in <i-mono>\addfunding</i-mono>.
+      Search is performed as you type. <a href="#">Help</a> is available.
+  </p>
+      <form class="mt-3">
+        <div class="row align-items-center">
+          <div class="col-sm-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="textq" placeholder="NSF">
+              <label for="textq">name</label>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="locationq" placeholder="Denmark">
+              <label for="locationq">country (optional)</label>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <select onchange="doSearch()" id="source" class="form-select form-select-lg" aria-label="Default select example">
+              <option value="all">Funding agencies</option>
+              <option value="ror">Affiliations</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="widecontainer">
+      {% if item %}
+      <div id="view" class="mt-4">
+        <div class="row">
+          <div class="col-6">
+            <h3 class="mb-4">{{item.name}}</h3>
+{% if item.source == 'fundreg' %}
+<p class="mb-2">To cite funding:
+  <button id="fundregcopy" class="ms-3 btn btn-sm btn-secondary"
+          aria-label="Copy to clipboard"
+          onclick="copyMetadata('fundregcopy', 'latexfundreg')">Copy \addfunding to clipboard</button>
+</p>
+<pre id="latexfundreg" class="py-2">
+\addfunding[crossref={{item.source_id}}
+            grantid={XXXXXX},
+            country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+{% else %}
+<p>
+  For an affiliation:<button id="bibcopy" class="ms-3 btn btn-sm btn-secondary"
+                                        aria-label="Copy to clipboard"
+                                        onclick="copyMetadata('bibcopy', 'latexaffiliation')">Copy \affiliation to clipboard</button>
+</p>
+<pre id="latexaffiliation" class="mt-2 py-2">
+\affiliation[ror        = {{item.source_id}},
+             onclick    = {optional url},
+             department = {optional department},
+             street     = {optional street address},
+             city       = {optional city},
+             state      = {optional state or region},
+             postcode   = {optional postal code},
+             country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+<p class="mt-4">
+  To cite funding as a visitor: <button id="fundingcopy" class="ms-3 btn btn-sm btn-secondary"
+                                        aria-label="Copy to clipboard"
+                                        onclick="copyMetadata('fundingcopy', 'latexfunding')">Copy \addfunding to clipboard</button>
+</p>
+<pre id="latexfunding" class="py-2">
+\addfunding[ror={{item.source_id}},
+            grantid={XXXXXX},
+            country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+{% endif %}
+            <p>
+              You need to supply the grantid. 
+            </p>
+          </div>
+          <div class="col-6">
+            {% if item.parents %}
+            <h5>Parent organizations</h5>
+            <ul>
+              {% for org in item.parents %}
+              <li><a href="{{url_for('home_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.children %}
+            <h5>Child organizations</h5>
+            <ul>
+              {% for org in item.children %}
+              <li><a href="{{url_for('home_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.related %}
+            <h5>Related organizations</h5>
+            <ul>
+              {% for org in item.related %}
+              <li><a href="{{url_for('home_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.altnames %}
+            <h5>Alternate names</h5>
+            <ul>
+              {% for nam in item.altnames %}
+              <li>{{nam}}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div id="results" class="mt-3"></div>
+    </div>
+{% raw %}
+<script id="results-template" type="text/x-handlebars-template">
+  <p>{{estimated_results}} results (if more than 1000, then refine your query)</p>
+  <ol>
+    {{#each results}}
+    <li role="presentation"><span style="text-transform:uppercase">{{source}}</span>:
+      <a href="/funding/view/{{id}}">{{name}}</a>
+      <span class="fw-light">{{country}}</span>
+      {{#if altnames}}
+      <div class="btn-group dropdown">
+        <span class="ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Alternate names</span>
+        <ul class="dropdown-menu">
+          {{#each altnames}}
+          <li class="dropdown-item">{{this}}</li>
+        {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ol>
+</script>
+{% endraw %}
+<script src="/static/js/handlebars-v4.7.7.js"></script>
+<script>
+  function copyMetadata(buttid, id) {
+    let range = document.createRange();
+    range.selectNode(document.getElementById(id));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    const copyTooltip = new bootstrap.Tooltip('#' + buttid,
+                                              {trigger: 'manual',
+                                               title: 'Copied!'});
+    console.log('copied');
+    copyTooltip.show();
+   setTimeout(function() {
+     copyTooltip.dispose();
+   }, 2000);
+ }
+  var theTemplateScript = document.getElementById('results-template').innerHTML;
+  var resultsTemplate = Handlebars.compile(theTemplateScript);
+  var textinput = document.getElementById('textq');
+  var locinput = document.getElementById('locationq');
+  var sourceinput = document.getElementById('source');
+
+ // Returns a function, that, as long as it continues to be invoked, will not
+ // be triggered. The function will be called after it stops being called for
+ // N milliseconds. If `immediate` is passed, trigger the function on the
+ // leading edge, instead of the trailing.
+ function debounce(func, wait, immediate) {
+   var timeout;
+   return function() {
+     var context = this, args = arguments;
+     var later = function() {
+       timeout = null;
+       if (!immediate) func.apply(context, args);
+     };
+     var callNow = immediate && !timeout;
+     clearTimeout(timeout);
+     timeout = setTimeout(later, wait);
+     if (callNow) func.apply(context, args);
+   };
+ };
+
+ 
+ let controller;
+ let signal;
+ 
+ var doSearch = debounce(function() {
+   args = {}
+   if (textinput.value || locinput.value) {
+     if (textinput.value) {
+       args['textq'] = textinput.value;
+     }
+     if (locinput.value) {
+       args['locationq'] = locinput.value;
+     }
+     if (sourceinput.value == 'ror') {
+       // restrict to ror
+       args['source'] = 'ror'
+     }
+     if (controller !== undefined) {
+       console.log('killing');
+       controller.abort();
+     }
+     controller = new AbortController();
+     signal = controller.signal;
+     fetch("{{url_for('home_bp.get_results')}}?" + new URLSearchParams(args), {signal})
+       .then((response) => response.json())
+       .then((data) => {
+         console.log(data);
+         let elem = document.getElementById('view');
+         if (elem) {elem.innerHTML = '';}
+         if (data.results.length > 0) {
+           document.getElementById('results').innerHTML = resultsTemplate(data);
+         } else {
+           document.getElementById('results').innerHTML = 'no results';
+         }
+         controller = undefined;
+       }).catch((error) => {
+         console.log('error in fetch');
+         console.log(error);
+       });
+   } else {
+     console.log('no query');
+   }
+ }, 500); // only after 250 ms.
+
+ document.querySelectorAll('input').forEach((elem) => {
+   elem.addEventListener('input', doSearch);
+ });
+</script>
+{% include "base_footer.html" %}
+

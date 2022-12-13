@@ -15,6 +15,7 @@ class Config:
     DB_NAME = 'iacrcc'
     DB_PASSWORD = 'l3t_m3_in_n0w'
     DB_HOST = 'localhost'
+    XAPIAN_DB_PATH = 'webapp/fundreg/xapian.db'
     DATA_DIR = 'webapp/data'
     SITE_NAME = 'IACR Publishing Pipeline'
     SITE_SHORTNAME = 'IACR CiC'
