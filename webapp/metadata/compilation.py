@@ -37,6 +37,23 @@ class StatusEnum(StrEnum):
     WITHDRAWN = 'withdrawn' # Withdrawn by author
     EDITOR_ACCEPTED = 'editor_accepted' # copy editor approved paper
 
+class Funder(BaseModel):
+    name: constr(min_length=3) = Field(...,
+                                       title='Name of organization',
+                                       description = 'Only requirement is minimum length of three characters')
+    ror: constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$') = Field(
+        None,
+        title='ROR ID of institution',
+        description=('See https://ror.org/facts/ for format. The last two digits are supposed '
+                     'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
+                     'we do not implement validation on it.'))
+    fundreg: constr(min_length=3) = Field(None,
+                                          title = 'Optional fundreg id',
+                                          description = 'ID from Crossref Funder registry')
+    country: constr(min_length=2) = Field(None,
+                                          title='Country of organization',
+                                          description=' Any identifier is acceptable')
+
 class Affiliation(BaseModel):
     name: constr(min_length=3)
     ror: constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$') = Field(
@@ -257,6 +274,8 @@ class Meta(BaseModel):
                                                   description='Affiliations are specified externally.')
     affiliations: List[Affiliation] = Field(None,
                                             title='List of affiliations for all authors.')
+    funders: List[Funder] = Field(None,
+                                  title='List of funding agencies')
     keywords: List[str] = Field(None,
                                 title='Author-supplied keywords',
                                 description='This is pretty useless, but is preserved for posterity')

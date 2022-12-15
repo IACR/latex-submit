@@ -1,0 +1,40 @@
+author:
+  name: Joppe W. B{\"o}s
+  affil: 1
+  email: joppe.bos@nxp.com
+  orcid: 0000-0003-1010-8157
+author:
+  name: Kevin S. McCurley
+  affil: 2,3
+  email: test2@digicrime.com
+  orcid: 0000-0001-7890-5430
+affiliation:
+  name: NXP S\v {e}mïc{\"o}ndúct\o {}rs
+  ror: 031v4g827
+  street: Interleuvenlaan 80
+  city: Leuven
+  postcode: 3001
+  country: Belgium
+affiliation:
+  name: Self
+  country: Elbonia
+affiliation:
+  name: Center for the Study of Idiocy
+  country: Freedonia
+funding:
+  name: Horizon 2020 Framework Programme
+  country: Elbonia
+  grantid: 5211-2
+  fundref: 1241171
+funding:
+  name: Just another foundation
+  country: United States
+  ror: 042c84f31
+funding:
+  name: National Fantasy Foundation
+  grantid: 57821-3
+  fundref: 1241171
+version: final
+title: How not to use the IACR Communications in Cryptology Cl\r {a}ss
+  subtitle: A Template
+keywords: Dirac delta function, unit impulse

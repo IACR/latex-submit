@@ -19,7 +19,7 @@ def test_meta1():
         meta = Meta(**data)
     data['authors'][0]['email'] = 'alice@wonderland.com'
     meta = Meta(**data)
-    assert meta.title == 'Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester\\ at 30°C'
+    assert meta.title == 'Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester at 30°C'
     assert len(meta.citations) == 12
     assert len(meta.authors) == 3
     assert meta.authors[0].email == 'alice@wonderland.com'
@@ -66,3 +66,19 @@ def test_meta3():
     assert meta.authors[0].orcid == '0000-0002-0599-0192'
     assert len(meta.authors[0].affiliations) == 0
     assert len(meta.affiliations) == 0
+
+def test_meta4():
+    tfile = Path('testdata/test4.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
+    data['abstract'] = 'We added an abstract'
+    meta = Meta(**data)
+    assert meta.title == 'How not to use the IACR Communications in Cryptology Clåss'
+    assert len(meta.citations) == 0
+    assert len(meta.authors) == 2
+    assert meta.authors[0].email == 'joppe.bos@nxp.com'
+    assert meta.authors[0].name == 'Joppe W. Bös'
+    assert meta.authors[0].orcid == '0000-0003-1010-8157'
+    assert len(meta.authors[0].affiliations) == 1
+    assert len(meta.affiliations) == 3
+    assert len(meta.funders) == 3
+    
