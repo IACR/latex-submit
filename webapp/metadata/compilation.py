@@ -37,7 +37,7 @@ class StatusEnum(StrEnum):
     WITHDRAWN = 'withdrawn' # Withdrawn by author
     EDITOR_ACCEPTED = 'editor_accepted' # copy editor approved paper
 
-class Funder(BaseModel):
+class Funder(BaseModel, extra=Extra.forbid):
     name: constr(min_length=3) = Field(...,
                                        title='Name of organization',
                                        description = 'Only requirement is minimum length of three characters')
@@ -47,12 +47,15 @@ class Funder(BaseModel):
         description=('See https://ror.org/facts/ for format. The last two digits are supposed '
                      'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
                      'we do not implement validation on it.'))
-    fundreg: constr(min_length=3) = Field(None,
+    fundref: constr(min_length=3) = Field(None,
                                           title = 'Optional fundreg id',
                                           description = 'ID from Crossref Funder registry')
     country: constr(min_length=2) = Field(None,
                                           title='Country of organization',
                                           description=' Any identifier is acceptable')
+    grantid: str = Field(None,
+                         title = 'Grant ID from funding agency',
+                         description = 'This optional field can be any string')
 
 class Affiliation(BaseModel):
     name: constr(min_length=3)
