@@ -81,4 +81,18 @@ def test_meta4():
     assert len(meta.authors[0].affiliations) == 1
     assert len(meta.affiliations) == 3
     assert len(meta.funders) == 3
+    assert meta.funders[0].name == 'Horizon 2020 Framework Programme'
+    assert meta.funders[0].country == 'Elbonia'
+    assert meta.funders[0].ror == None
+    assert meta.funders[0].grantid == '5211-2'
+    assert meta.funders[0].fundref == '1241171'
+    assert meta.funders[1].name == 'Just another foundation'
+    assert meta.funders[1].country == 'United States'
+    assert meta.funders[1].ror == '042c84f31'
+    assert meta.funders[1].fundref == None
+    assert meta.funders[2].name == 'National Fantasy Foundation'
+    assert meta.funders[2].country == None
+    assert meta.funders[2].ror == None
+    assert meta.funders[2].fundref == '517622'
+    assert meta.funders[2].grantid == '57821-3'
     
