@@ -52,7 +52,7 @@ This template is used to show search on fundreg.
           onclick="copyMetadata('fundregcopy', 'latexfundreg')">Copy \addfunding to clipboard</button>
 </p>
 <pre id="latexfundreg" class="py-2">
-\addfunding[crossref={{item.source_id}}
+\addfunding[fundref={{item.source_id}}
             grantid={XXXXXX},
             country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
 </pre>
