@@ -234,9 +234,10 @@ def view_results(paperid):
                                error='Unknown paper. Try resubmitting.')
     output_path = paper_path / Path('output')
     if not output_path.is_dir():
+        # TODO: there is apparently a bug that causes this to happen.
         return render_template('message.html',
                                title='Paper was not compiled',
-                               error='Paper was not compiled')
+                               error='Paper was not compiled: no directory {}'.format(str(output_path)))
     data = {'title': 'Results from compilation', 'paperid': paperid}
     try:
         json_file = paper_path / Path('compilation.json')
