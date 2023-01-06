@@ -93,7 +93,8 @@ def runlatex():
                  'submitted': args.get('submitted'),
                  'accepted': args.get('accepted'),
                  'compiled': datetime.datetime.now(),
-                 'error_log': []}
+                 'error_log': [],
+                 'warning_log': []}
     compilation = Compilation(**json_data)
     json_file = paper_dir / Path('compilation.json')
     json_file.write_text(compilation.json(indent=2))

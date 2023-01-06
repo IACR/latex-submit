@@ -24,6 +24,9 @@ This template is used to show the status of a compilation.
     {% for error in comp.error_log %}
     <div class="alert alert-danger">Error: {{error}}</div>
     {% endfor %}
+    {% for error in comp.warning_log %}
+    <div class="alert alert-warning">Warning: {{error}}</div>
+    {% endfor %}
     {% if comp.exit_code == 0 and pdf %}
     {% if comp.status.value == 'compilation_success' %}
     <div class="alert alert-success">It appears that your compilation worked. You should

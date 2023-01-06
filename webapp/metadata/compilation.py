@@ -379,6 +379,9 @@ class Compilation(BaseModel):
     error_log: List[str] = Field(...,
                                  title='Error messages if some step failed',
                                  description='Used in the UI if necessary. See status')
+    warning_log: List[str] = Field(...,
+                                   title='Warning messages',
+                                   description='May be used to warn author of overfull hbox, missing DOI in bibtex, etc')
     exit_code: int = Field(-1,
                             title='Exit code from running latexmk',
                             description='These are not well defined.')

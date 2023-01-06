@@ -14,7 +14,7 @@ def admin_message(data):
 
 admin_bp = Blueprint('admin_file', __name__)
 
-@admin_bp.route('/admin')
+@admin_bp.route('/admin/')
 def show_admin_home():
     papers = []
     errors = []

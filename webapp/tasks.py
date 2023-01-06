@@ -50,6 +50,10 @@ def run_latex_task(input_path, output_path, paperid):
                     try:
                         metastr = metafile.read_text(encoding='UTF-8')
                         data = meta_parse.parse_meta(metastr)
+                        # Check to see if references have DOIs.
+                        for citation in data.get('citations'):
+                            if citation.get('ptype') in ['article', 'book', 'inproceedings'] and 'doi' not in citation:
+                                compilation.warning_log.append('missing DOI on reference: {}'.format(citation.get('id')))
                         abstract_file = Path(output_path) / Path('main.abstract')
                         if not abstract_file.is_file():
                             compilation.status = StatusEnum.MISSING_ABSTRACT
