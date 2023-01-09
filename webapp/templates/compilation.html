@@ -1,0 +1,61 @@
+<div class="mx-3">
+  <div class="elem" id="paperid"><div class="elem_title">paper id:</div> {{comp.paperid}}</div>
+  <div class="elem" id="paper_title"><div class="elem_title">Title:</div> {{comp.meta.title}}</div>
+  <div class="elem" id="venue"><div class="elem_title">venue:</div> {{comp.venue.name}}</div>
+  <div class="elem" id="status"><div class="elem_title">status:</div> {{comp.status.value}}</div>
+  <div class="elem" id="exit_code"><div class="elem_title">exit code:</div> {{comp.exit_code}}</div>
+  <div class="elem" id="email"><div class="elem_title">email:</div> {{comp.email}}</div>
+  <div class="elem" id="submitted"><div class="elem_title">submitted:</div> {{comp.submitted}}</div>
+<div class="elem" id="accepted"><div class="elem_title">accepted:</div> {{comp.accepted}}</div>
+<div class="elem" id="compiled"><div class="elem_title">compiled:</div> {{comp.compiled}}</div>
+<div class="elem" id="compile_time"><div class="elem_title">compile_time:</div> {{comp.compile_time}} seconds</div>
+<div class="elem" id="doi"><div class="elem_title">DOI:</div> {{comp.meta.doi}}</div>
+<div class="elem" id="error_log">
+  <div class="elem_title">Errors:</div>
+  <div>
+    <div class="error_log_entry">First one</div>
+    {% for elem in comp.error_log %}
+    <div class="error_log_entry">{{elem}}</div>
+    {% endfor %}
+  </div>
+</div>
+<div class="elem" id="warning_log">
+  <div class="elem_title">Warnings:</div>
+  <div>
+    <div class="warning_log_entry">First entry</div>
+    {% for elem in comp.warning_log %}
+    <div class="warning_log_entry">{{elem}}</div>
+    {% endfor %}
+  </div>
+</div>
+<h5>Authors</h5>
+{% for author in comp.meta.authors %}
+{% if not loop.first %}
+<hr>
+{% endif %}
+<div class="author">
+  <div class="d-flex author_name"><div class="elem_title">name:</div> {{author.name}}</div>
+  <div class="d-flex author_surname"><div class="elem_title">surname:</div> {{author.surname}}</div>
+  <div class="d-flex author_email"><div class="elem_title">email:</div> {{author.email}}</div>
+  <div class="d-flex author_orcid"><div class="elem_title">orcid:</div> {{author.orcid}}</div>
+  <div class="d-flex"><div class="elem_title">Affiliations:</div>
+    <div>
+      {% for affil in author.affiliations %}
+      {% if not loop.first %}
+      <hr>
+      {% endif %}
+      <div class="affiliation">
+        {% set aff=comp.meta.affiliations[affil-1] %}
+        <div class="elem"><div class="elem_title">name:</div> {{aff.name}}</div>
+        <div class="elem"><div class="elem_title">ROR:</div> {{aff.ror}}</div>
+        <div class="elem"><div class="elem_title">Street:</div> {{aff.street}}</div>
+        <div class="elem"><div class="elem_title">City:</div> {{aff.city}}</div>
+        <div class="elem"><div class="elem_title">Post code:</div> {{aff.postcode}}</div>
+        <div class="elem"><div class="elem_title">Country:</div> {{aff.country}}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
