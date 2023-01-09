@@ -27,13 +27,15 @@ def run_latex(input_dirname, output_dirname):
                in this directory are ignored but subdirectories are allowed.
            output_dirname:
                path to where resulting output should be deposited. Should not already exist.
-       returns: A dict with code and log. The code is the return code from running latexmk, and
-                log is the output from running latexmk.
+       returns: A dict with code, log, and warnings. The code is the return code from running
+                latexmk, and log is the output from running latexmk. warnings is an array
+                of string warnings. Fatal errors will raise an exception instead.
        raises: 
           ValueError if some conditions are not satisfied.
           APIError if there is an error from the docker API.
 
           """
+    warnings = []
     input_dir = Path(input_dirname)
     if not input_dir.is_dir():
         raise ValueError('input directory not found: {}'.format(str(input_dir)))
@@ -62,6 +64,7 @@ def run_latex(input_dirname, output_dirname):
             file_path = Path(os.path.join(dirpath, filename))
             # remove any .sty files, since they can conflict with installed packages.
             if file_path.name.endswith('.sty') or file_path.name.endswith('.bbl'):
+                warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
             else:
                 file_path.chmod(0o644)
@@ -72,9 +75,11 @@ def run_latex(input_dirname, output_dirname):
     # Remove any latexmkrc or .latexmkrc file.
     latexmkrc_file = Path(staging_dir, 'latexmkrc')
     if latexmkrc_file.is_file():
+        warnings.append('File {} was removed before compiling'.format(latexmkrc_file.name))
         latexmkrc_file.unlink()
     latexmkdr_file = Path(staging_dir, '.latexmkrc')
     if latexmkrc_file.is_file():
+        warnings.append('File {} was removed before compiling'.format(latexmkrc_file.name))
         latexmkrc_file.unlink()
     client = docker.from_env()
     try:
@@ -95,7 +100,9 @@ def run_latex(input_dirname, output_dirname):
         shutil.rmtree(staging_dir)
         container.stop()
         container.remove()
-    return {'exit_code': 999, 'error': 'Compilation failed: ' + output.decode()}
+    return {'exit_code': 999,
+            'warnings': warnings,
+            'error': 'Compilation failed: ' + output.decode()}
 
 
 if __name__ == '__main__':

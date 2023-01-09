@@ -1,0 +1,28 @@
+{% extends "base_header.html" %}
+{% block head %}
+{{super()}}
+<style>
+ div.warning_log_entry {
+   padding: 5px;
+   margin-top: 5px;
+   background-color: yellow;
+ }
+ div.error_log_entry {
+   padding: 5px;
+   margin-top: 5px;
+   background-color: #ffd0d0;
+ }
+ div.elem {
+   display: flex;
+ }
+ div.list_heading {
+   font-weight: 600;
+ }
+ div.elem_title {
+   text-align: right;
+   font-weight: 600;
+   padding-right: 1em;
+   min-width: 8rem;
+ }
+</style>
+{% endblock %}

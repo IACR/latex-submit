@@ -1,4 +1,4 @@
-{% include "base_header.html" %}
+{% include "view_header.html" %}
 {#
 =================================================================
 This template is used to show the status of a compilation.
@@ -29,7 +29,7 @@ This template is used to show the status of a compilation.
     {% endfor %}
     {% if comp.exit_code == 0 and pdf %}
     {% if comp.status.value == 'compilation_success' %}
-    <div class="alert alert-success">It appears that your compilation worked. You should
+    <div class="alert alert-success">It appears that your compilation worked, but you should
       <a href="/pdf/{{paperid}}/main.pdf" target="_blank">check your PDF</a>
       {% if comp.venue == 'iacrcc' %}
       and <a href="#" onclick="showMetadata();return false;">check the metadata</a>.
@@ -94,7 +94,8 @@ This template is used to show the status of a compilation.
     <p class="alert alert-danger">TODO: display this better and add a button to
       submit final version.
     </p>
-    <pre>{{comp.json(exclude_none=True,indent=2)}}</pre>
+    {% include "compilation.html" %}
+    {% if comp.meta %}<pre>{{comp.meta.json(exclude_none=True,indent=2)}}</pre>{% endif %}
     <pre>{{metafile}}</pre>
     {% else %} {# no metafile #}
       <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>

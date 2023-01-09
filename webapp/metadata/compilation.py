@@ -36,6 +36,8 @@ class StatusEnum(StrEnum):
     AUTHOR_ACCEPTED = 'author_accepted' # author viewed metadata and PDF and accepted
     WITHDRAWN = 'withdrawn' # Withdrawn by author
     EDITOR_ACCEPTED = 'editor_accepted' # copy editor approved paper
+    DOI_FAILED = 'doi_failed' # registration of DOI failed
+    PUBLISHED = 'published' # approved by executive editor
 
 class Funder(BaseModel, extra=Extra.forbid):
     name: constr(min_length=3) = Field(...,

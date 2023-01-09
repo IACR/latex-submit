@@ -34,6 +34,24 @@ def run_latex_task(input_path, output_path, paperid):
             compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
             compilation.compile_time = output.get('execution_time', -1)
             compilation.log = output.get('log', 'no log')
+            latexlog = Path(output_path) / 'main.log'
+            for warning in output.get('warnings', []):
+                compilation.warning_log.append(warning)
+            if latexlog.is_file():
+                latexlog = latexlog.read_text(encoding='UTF-8')
+                # Flag some warnings and errors from the log. We may want to process the log
+                # line by line, since LaTeX is miserable at the try ... catch paradigm.
+                if 'LaTeX Warning: There were undefined references' in latexlog:
+                    compilation.error_log.append('LaTeX Warning: There were undefined references')
+                if 'LaTeX Warning: There were multiply-defined labels.' in latexlog:
+                    compilation.error_log.append('There were multiply-defined labels.')
+                if 'Unable to redefine math accent' in latexlog:
+                    compilation.warning_log.append('You may have lost a math character. Search for "redefine math accent"')
+                # TODO: check severity before declaring it an error
+                if 'Overfull \\hbox ' in latexlog:
+                    compilation.warning_log.append('You have an overfull hbox. Please correct it.')
+                if 'Overfull \\vbox ' in latexlog:
+                    compilation.warning_log.append('You have an overfull vbox. Please correct it.')
             if 'error' in output:
                 compilation.error_log.append(output.get('error'))
                 compilation.status = StatusEnum.COMPILATION_FAILED
@@ -53,7 +71,7 @@ def run_latex_task(input_path, output_path, paperid):
                         # Check to see if references have DOIs.
                         for citation in data.get('citations'):
                             if citation.get('ptype') in ['article', 'book', 'inproceedings'] and 'doi' not in citation:
-                                compilation.warning_log.append('missing DOI on reference: {}'.format(citation.get('id')))
+                                compilation.warning_log.append('missing DOI on reference: {}: "{}". It is important to include DOIs when available.'.format(citation.get('id'), citation.get('title', '')))
                         abstract_file = Path(output_path) / Path('main.abstract')
                         if not abstract_file.is_file():
                             compilation.status = StatusEnum.MISSING_ABSTRACT
