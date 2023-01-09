@@ -13,7 +13,6 @@
 <div class="elem" id="error_log">
   <div class="elem_title">Errors:</div>
   <div>
-    <div class="error_log_entry">First one</div>
     {% for elem in comp.error_log %}
     <div class="error_log_entry">{{elem}}</div>
     {% endfor %}
@@ -22,7 +21,6 @@
 <div class="elem" id="warning_log">
   <div class="elem_title">Warnings:</div>
   <div>
-    <div class="warning_log_entry">First entry</div>
     {% for elem in comp.warning_log %}
     <div class="warning_log_entry">{{elem}}</div>
     {% endfor %}
