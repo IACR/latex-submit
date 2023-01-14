@@ -151,7 +151,8 @@ def runlatex():
                         'accepted': args.get('accepted'),
                         'compiled': datetime.datetime.now(),
                         'error_log': [],
-                        'warning_log': []}
+                        'warning_log': [],
+                        'zipfilename': request.files['zipfile'].filename}
     compilation = Compilation(**compilation_data)
     compilation_file = candidate_dir / Path('compilation.json')
     compilation_file.write_text(compilation.json(indent=2))

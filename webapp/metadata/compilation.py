@@ -428,6 +428,9 @@ class Compilation(BaseModel):
     exit_code: int = Field(-1,
                             title='Exit code from running latexmk',
                             description='These are not well defined.')
+    zipfilename: str = Field(...,
+                             title='Name of uploaded zipfile',
+                             description='Useful for authors to know what they uploaded.')
     meta: Meta = Field(None,
                        title='Parsed metadata',
                        description='Present once status passes COMPILATION_SUCCESS')

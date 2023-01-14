@@ -67,7 +67,7 @@ This template is used to show the status of a compilation.
     <div class="ms-3">
       {% if output %}
       Output files from running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
-      <ul style="list-style: '-';">
+      <ul>
         {% for el in output recursive %}
         <li>{{el.name}}
           {% if el.children %}<ul style="list-style: '-';">{{ loop(el.children) }}</ul>{% endif %}</li>

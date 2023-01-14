@@ -95,7 +95,7 @@ We don't store every version that is uploaded, but we store
 potentially three versions:
 1. the "candidate" version from the author. This can be replaced by the author
    up until the time that they mark it as ready for copy editing.
-2. the "copyedit" version of the paper. This is created once the paper is
+2. the "lineno" version of the paper. This is created once the paper is
    finalized, and is essentially the same as the original finalized version
    except it contains line numbers.
 3. the "final" version of the paper. This is uploaded by the author in
@@ -109,24 +109,23 @@ webapp/data/<paperid>/candidate/all.zip
 webapp/data/<paperid>/candidate/input
 webapp/data/<paperid>/candidate/output
 webapp/data/<paperid>/candidate/compilation.json
-webapp/data/<paperid>/copyedit/input
-webapp/data/<paperid>/copyedit/output
-webapp/data/<paperid>/copyedit/compilation.json
+webapp/data/<paperid>/lineno/input
+webapp/data/<paperid>/lineno/output
+webapp/data/<paperid>/lineno/compilation.json
 webapp/data/<paperid>/final/all.zip
 webapp/data/<paperid>/final/input
 webapp/data/<paperid>/final/output
 webapp/data/<paperid>/final/compilation.json
 ```
 
-The server keeps track of the status on the paper versions with the file
-```
-webapp/data/<paperid>/status.json
-```
-This is a pydantic serialization of the `PaperStatus` object in
-`webapp/__init__.py`. The `compilation.json` files are serializations
-of the `Compilation` object in `webapp/metadata/compilation.py`.
+The server keeps track of the status on the paper versions with the
+file ``` webapp/data/<paperid>/status.json ``` This is a
+[pydantic](https://docs.pydantic.dev/) serialization of the
+`PaperStatus` object in `webapp/__init__.py`. The `compilation.json`
+files are serializations of the `Compilation` object in
+`webapp/metadata/compilation.py`.
 
-The workflow transitions between `candidate`, `copyedit`, and `final` are
+The workflow transitions between `candidate`, `lineno`, and `final` are
 shown in the figure below.
 
 ![workflow](Workflow_transitions.svg).
@@ -134,7 +133,7 @@ shown in the figure below.
 The `candidate` version is created at the very beginning when the
 author uploads their zip file. As soon as the `candidate` version is
 flagged as acceptable to the author, then it may no longer be
-edited. The `copyedit` version is created when the copy editor is
+edited. The `lineno` version is created when the copy editor is
 assigned. This is derived from the `candidate` version by only adding
 page numbers. The copy editor reviews the paper and creates a list of
 queries to the author for them to correct.  The `final` version is

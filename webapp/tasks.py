@@ -87,6 +87,8 @@ def run_latex_task(input_path, output_path, paperid):
                             if compilation.meta.version != VersionEnum.FINAL:
                                 compilation.status = CompileStatus.WRONG_VERSION
                                 compilation.error_log.append('Paper should use documentclass[version=final]')
+                            elif compilation.error_log:
+                                compilation.status = CompileStatus.COMPILATION_ERRORS
                             else:
                                 compilation.status = CompileStatus.COMPILATION_SUCCESS
                     except Exception as me:
