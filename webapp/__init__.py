@@ -25,7 +25,7 @@ class StrEnum(str, Enum):
                 return e
         return None
 
-class PaperStatus(StrEnum):
+class TaskStatus(StrEnum):
     """Status of a paper."""
     PENDING = 'PENDING'
     CANCELLED = 'CANCELLED'
@@ -34,7 +34,6 @@ class PaperStatus(StrEnum):
     FAILED_COMPILE = 'FAILED_COMPILE'
     COMPILED = 'COMPILED'
     UNKNOWN = 'UNKNOWN'
-
 
 # Globally accessible SMTP client. This can be used in unit tests as well.
 mail = Mail()

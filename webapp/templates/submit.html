@@ -29,9 +29,11 @@
       are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
       for hints on how to avoid problems.
     </div>
-    <form method="POST" action="/submit" enctype="multipart/form-data">
+    <form method="POST" action="{{url_for('home_bp.runlatex')}}" enctype="multipart/form-data">
       {# hmac is an HMAC on concatenation of paperID, received, accepted to make sure they are not changed. #}
       <input type="hidden" name="hmac" value="abcdefghijklmn">
+      <input type="hidden" name="version" value="{{version}}">
+      {# TODO: pick up submitted and accepted and email from URL #}
       <input type="hidden" name="submitted" value="2022-08-03T06:44:30.468749+00:00">
       <input type="hidden" name="accepted" value="2022-09-30T06:49:20.468749+00:00">
       <div class="form-group">

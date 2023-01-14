@@ -1,48 +1,35 @@
 {% include "view_header.html" %}
 {#
 =================================================================
-This template is used to show the status of a compilation.
+This template is used to show the results of a failed compilation
 =================================================================
 #}
-<nav class="mt-3">
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
-          type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
-        <button class="nav-link" id="nav-output-tab" data-bs-toggle="tab" data-bs-target="#nav-output"
-          type="button" role="tab" aria-controls="nav-output" aria-selected="false">Output</button>
-	<button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
-          type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
-    </div>
-</nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
       <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}">You may resubmit your paper</a>
-      {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
       <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>
+    {% if comp.error_log %}
+    <h4>Errors</h4>
     {% for error in comp.error_log %}
     <div class="alert alert-danger">Error: {{error}}</div>
     {% endfor %}
+    {% endif %}
     {% for error in comp.warning_log %}
     <div class="alert alert-warning">Warning: {{error}}</div>
     {% endfor %}
-    {% if comp.exit_code == 0 and pdf %}
-    {% if comp.status.value == 'compilation_success' %}
-    <div class="alert alert-success">It appears that your compilation worked, but you should
-      <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">check your PDF</a>
-      {% if comp.venue == 'iacrcc' %}
-      and <a href="#" onclick="showMetadata();return false;">check the metadata</a>.
-      {% endif %}
+    {% if pdf %}
+    <div class="alert alert-warning">
+      It appears a PDF was produced, but with errors. <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>
     </div>
-    {% else %}
+    {% endif %}
+    {% if not metafile %}
     <div class="alert alert-warning">It appears that your paper compiled, but something was wrong
       with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc}</span>. Please revise your LaTeX and resubmit.</div>
     {% endif %}
-    {% else %} {# exit_code != 0 #}
     <div class="alert alert-danger">
-      {% if error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error</a></div>
-    {% endif %} {# end of exit_code == 0 #}
+      {% if comp.exit_code != 0 and error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error below</a></div>
     <pre>{{comp.log}}</pre>
     <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
   </div>

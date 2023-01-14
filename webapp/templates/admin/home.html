@@ -8,8 +8,6 @@
   <ol>
     <li>Should we use a database to maintain this list?</li>
     <li>What should we show in this table?</li>
-    <li>The clickthrough currently goes to /view/ID but we need a different
-      view for editors</li>
     <li>Should we require approval from an editor, at which point we would
       assign the DOI?</li>
     <li>How should we handle communication to the author(s)?</li>
@@ -31,7 +29,7 @@
   <tbody>
   {% for paper in papers %}
   <tr>
-    <td><a href="/view/{{paper.paperid}}">{{paper.paperid}}</a></td>
+    <td><a href="/admin/view/{{paper.paperid}}">{{paper.paperid}}</a></td>
     <td>{{paper.venue.value}}</td>
     <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
     <td>{{paper.status.value}} ({{paper.error_log|length}}/{{paper.warning_log|length}})</td>

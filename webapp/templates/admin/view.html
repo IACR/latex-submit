@@ -1,0 +1,26 @@
+
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<h1 class="mb-5 text-center">Status on {{paper.paperid}}</h1>
+<table class="table">
+  <tbody>
+    <tr><th>Venue:</th><td>{{paper.venue}}</td></tr>
+    <tr><th>Status:</th><td>{{paper.status}}</td></tr>
+    <tr><th>email:</th><td>{{paper.email}}</td></tr>
+  </tbody>
+</table>
+<h4>Action log</h4>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in paper.log %}
+    <tr><td>{{event.when.strftime('%Y-%m-%d %H:%M:%S')}}</td><td>{{event.action}}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

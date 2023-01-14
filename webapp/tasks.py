@@ -7,7 +7,7 @@ from .compiler import runner
 from . import task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.compilation import Compilation, Meta, StatusEnum, VersionEnum
+from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum
 
 def run_latex_task(input_path, output_path, paperid):
     """Execute latex on input_path contents, writing into output_path.
@@ -43,8 +43,13 @@ def run_latex_task(input_path, output_path, paperid):
                 # line by line, since LaTeX is miserable at the try ... catch paradigm.
                 if 'LaTeX Warning: There were undefined references' in latexlog:
                     compilation.error_log.append('LaTeX Warning: There were undefined references')
+                    compilation.status = CompileStatus.COMPILATION_ERRORS
+                if 'Specify a country for each affiliation for the final version' in latexlog:
+                    compilation.error_log.append('At least one affiliation is missing a country')
+                    compilation.status = CompileStatus.COMPILATION_ERRORS
                 if 'LaTeX Warning: There were multiply-defined labels.' in latexlog:
                     compilation.error_log.append('There were multiply-defined labels.')
+                    compilation.status = CompileStatus.COMPILATION_ERRORS
                 if 'Unable to redefine math accent' in latexlog:
                     compilation.warning_log.append('You may have lost a math character. Search for "redefine math accent"')
                 # TODO: check severity before declaring it an error
@@ -54,14 +59,14 @@ def run_latex_task(input_path, output_path, paperid):
                     compilation.warning_log.append('You have an overfull vbox. Please correct it.')
             if 'error' in output:
                 compilation.error_log.append(output.get('error'))
-                compilation.status = StatusEnum.COMPILATION_FAILED
+                compilation.status = CompileStatus.COMPILATION_FAILED
             compilation.exit_code = output.get('exit_code', -1)
             if compilation.exit_code != 0:
-                compilation.status = StatusEnum.COMPILATION_FAILED
-                compilation.error_log.append('Error code of {} means that the compilation failed'.format(compilation.exit_code))
+                compilation.status = CompileStatus.COMPILATION_FAILED
+                compilation.error_log.append('Exit code of {} means that the compilation failed'.format(compilation.exit_code))
             elif compilation.venue.value != 'iacrcc':
-                compilation.status = StatusEnum.COMPILATION_SUCCESS
-            if compilation.status != StatusEnum.COMPILATION_FAILED and compilation.venue.value == 'iacrcc':
+                compilation.status = CompileStatus.COMPILATION_SUCCESS
+            if compilation.status != CompileStatus.COMPILATION_FAILED and compilation.venue.value == 'iacrcc':
                 # Look for stuff we need for iacrcc.
                 metafile = Path(output_path) / Path('main.meta')
                 if metafile.is_file():
@@ -74,21 +79,21 @@ def run_latex_task(input_path, output_path, paperid):
                                 compilation.warning_log.append('missing DOI on reference: {}: "{}". It is important to include DOIs when available.'.format(citation.get('id'), citation.get('title', '')))
                         abstract_file = Path(output_path) / Path('main.abstract')
                         if not abstract_file.is_file():
-                            compilation.status = StatusEnum.MISSING_ABSTRACT
+                            compilation.status = CompileStatus.MISSING_ABSTRACT
                             compilation.error_log.append('An abstract is required.')
                         else:
                             data['abstract'] = abstract_file.read_text(encoding='UTF-8')
                             compilation.meta = Meta(**data)
                             if compilation.meta.version != VersionEnum.FINAL:
-                                compilation.status = StatusEnum.WRONG_VERSION
+                                compilation.status = CompileStatus.WRONG_VERSION
                                 compilation.error_log.append('Paper should use documentclass[version=final]')
                             else:
-                                compilation.status = StatusEnum.COMPILATION_SUCCESS
+                                compilation.status = CompileStatus.COMPILATION_SUCCESS
                     except Exception as me:
                         compilation.error_log.append('Failure to extract metadata: ' + str(me))
-                        compilation.status = StatusEnum.METADATA_PARSE_FAIL
+                        compilation.status = CompileStatus.METADATA_PARSE_FAIL
                 else:
-                    compilation.status = StatusEnum.METADATA_FAIL
+                    compilation.status = CompileStatus.METADATA_FAIL
                     compilation.error_log.append('No metadata file')
             json_file.write_text(compilation.json(indent=2, exclude_none=True), encoding='UTF-8')
         else:
