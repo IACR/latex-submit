@@ -61,3 +61,6 @@ def get_doi(paperid):
         buffer += _alphabet[(index + key[i]) % len(_alphabet)]
     return _prefix + '/a' + buffer
 
+def validate_version(val):
+    return val in ['candidate', 'copyedit', 'final']
+

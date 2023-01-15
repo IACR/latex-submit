@@ -10,7 +10,7 @@ import shutil
 import string
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent
-from .metadata import validate_paperid, get_doi
+from .metadata import validate_paperid, get_doi, validate_version
 from webapp.tasks import run_latex_task
 from .fundreg.search_lib import search
 
@@ -23,9 +23,6 @@ home_bp = Blueprint('home_bp',
 def inject_variables():
     return {'site_name': app.config['SITE_NAME'],
             'site_shortname': app.config['SITE_SHORTNAME']}
-
-def _validate_version(val):
-    return val in ['candidate', 'final']
 
 @home_bp.route('/', methods=['GET'])
 def home():
@@ -52,7 +49,7 @@ def _validate_post(args, files):
     version = args.get('version')
     if not version:
         return 'Missing version'
-    if not _validate_version(version):
+    if not validate_version(version):
         return 'Invalid version:{}'.format(version)
     return None
 
@@ -61,7 +58,7 @@ def submitform():
     # TODO: authenticate the auth argument and paperid.
     args = request.args.to_dict()
     version = args.get('version', 'candidate')
-    if not _validate_version(version):
+    if not validate_version(version):
         msg = 'Invalid version: {}'.format(version),
         return render_template('message.html',
                                title = msg,
@@ -189,7 +186,7 @@ def get_status(paperid, version):
     status = TaskStatus.UNKNOWN
     if not validate_paperid(paperid):
         return jsonify({'status': TaskStatus.UNKNOWN, 'msg': 'Invalid paperid'})
-    if not _validate_version(version):
+    if not validate_version(version):
         return jsonify({'status': TaskStatus.UNKNOWN, 'msg': 'Unknown version'}), 200
     msg = 'Unknown status'
     # is the task in the queue or running?
@@ -247,7 +244,7 @@ def show_pdf(paperid,version):
         return render_template('message.html',
                                title='Unable to retrieve file',
                                error='paperid is invalid')
-    if not _validate_version(version):
+    if not validate_version(version):
         msg = 'Invalid version {}'.format(version)
         return render_template('message.html',
                                title=msg,
@@ -283,7 +280,7 @@ def view_results(paperid, version):
         return render_template('message.html',
                                title='Unable to retrieve file',
                                error='paperid is invalid')
-    if not _validate_version(version):
+    if not validate_version(version):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
@@ -329,7 +326,7 @@ def download_output_zipfile(version, paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
                                error='paperid is invalid')
-    if not _validate_version(version):
+    if not validate_version(version):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')

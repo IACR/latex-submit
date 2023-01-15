@@ -27,16 +27,19 @@
     </tr>
   </thead>
   <tbody>
-  {% for paper in papers %}
-  <tr>
-    <td><a href="/view/{{paper.paperid}}/candidate">{{paper.paperid}}</a></td>
-    <td>{{paper.venue.value}}</td>
-    <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-    <td>{{paper.status.value}} ({{paper.error_log|length}}/{{paper.warning_log|length}})</td>
-    <td>{{paper.email}}</td>
-    <td>{% if paper.meta %}{{paper.meta.title}}{% else %}(unknown){% endif %}</td>
-  </tr>
-  {% endfor %}
+    {% for paperid, versions in papers.items() %}
+    {% for version, paper in versions.items() %}
+    <tr>
+      <td>{% if loop.first %}<a href="/admin/view/{{paperid}}">{{paperid}}</a>{% endif %}</td>
+      <td><a href="/view/{{paperid}}/{{version}}">{{version}}</a></td>
+      <td>{{paper.venue.value}}</td>
+      <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+      <td>{{paper.status.value}} ({{paper.error_log|length}}/{{paper.warning_log|length}})</td>
+      <td>{{paper.email}}</td>
+      <td>{% if paper.meta %}{{paper.meta.title}}{% else %}(unknown){% endif %}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 {% for error in errors %}

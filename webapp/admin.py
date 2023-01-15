@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 from .metadata.compilation import Compilation, PaperStatus
-from .metadata import validate_paperid
+from .metadata import validate_paperid, validate_version
 
 """This has the views for the admin section under /admn. Everything
 should be protected with HTTP authentication in apache, but in
@@ -17,17 +17,21 @@ admin_bp = Blueprint('admin_file', __name__)
 
 @admin_bp.route('/admin/')
 def show_admin_home():
-    papers = []
+    papertree = {} # paperid -> version -> compilation
     errors = []
-    for f in Path(app.config['DATA_DIR']).glob('**/compilation.json'):
-        try:
-            comp = Compilation.parse_raw(f.read_text(encoding='UTF-8'))
-            papers.append(comp)
-        except Exception as e:
-            errors.append(str(f) + ':' + str(e))
+    for paperpath in Path(app.config['DATA_DIR']).iterdir():
+        versions = {}
+        for v in paperpath.iterdir():
+            if v.is_dir() and validate_version(v.name):
+                try:
+                    cstr = (v / Path('compilation.json')).read_text(encoding='UTF-8')
+                    versions[v.name] = Compilation.parse_raw(cstr)
+                except Exception as e:
+                    errors.append(str(v) + ':' + str(e))
+        papertree[paperpath.name] = versions
     data = {'title': 'IACR CC Upload Admin Home',
             'errors': errors,
-            'papers': sorted(papers, key=lambda x: x.compiled, reverse=True)}
+            'papers': papertree}
     return render_template('admin/home.html', **data)
 
 @admin_bp.route('/admin/view/<paperid>')
