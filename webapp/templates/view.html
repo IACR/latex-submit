@@ -17,7 +17,7 @@ This template is used to show the status of a compilation.
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
-      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}">You may resubmit your paper</a>
+      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may resubmit your paper</a>
       {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
       <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>

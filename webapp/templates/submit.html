@@ -13,15 +13,19 @@
 <div class="tab-content" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
     <div class="row">
-      <div class="alert alert-info col-6">
-	Papers submitted to the IACR Communications in Cryptology will be required to use the
-	<a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
-	the present time we also support uploads for other publishing venues, but the main purpose
-	of this site is to support a new generation of LaTeX document classes.
+      <div class="col-6">
+	<p class="alert alert-info">
+          Papers submitted to the IACR Communications in Cryptology will be required to use the
+	  <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
+	  the present time we also support uploads for other publishing venues, but the main purpose
+	  of this site is to support a new generation of LaTeX document classes.
+        </p>
       </div>
-      <div class="alert alert-warning col-6">
-	Warning: this site is for testing purposes only. Ordinarily a submission would need
-	to be authenticated as accepted by the review process.
+      <div class="col-6">
+        <p class="alert alert-warning">
+	  Warning: this site is for testing purposes only. Ordinarily a submission would need
+	  to be authenticated as accepted by the review process.
+        </p>
       </div>
     </div>
     <div class="alert alert-light w-75 mx-auto">
@@ -66,7 +70,7 @@
       </div>
       <div class="form-group mt-4">
         <label for="email" class="form-label">Your email address (required)</label>
-        <input required class="form-control w-50" id="email" type="email" name="email" placeholder="email of submitting author" value="">
+        <input required class="form-control w-50" id="email" type="email" name="email" placeholder="email of submitting author" value="{{email}}">
       </div>
       <div class="form-group mt-4">
         <label for="paperid" class="form-label">Paper ID</label>
@@ -110,6 +114,109 @@
     </form>
   </div>
   <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
+    <h3>How to prepare your paper</h3>
+    <ol>
+      <li>Your paper should be written in LaTeX using
+	the <i-mono>iacrcc</i-mono> document class. This may
+	be <a href="/iacrcc">downloaded here</a>. If you start with something else
+	like <i-mono>article</i-mono> or <i-mono>llncs</i-mono>, the <i-mono>iacrcc</i-mono>
+	document class will require you to change your preamble somewhat. See
+	the <a href="/iacrcc">documentation</a>
+	on <i-mono>iacrcc</i-mono>.</li>
+      <li>You should prepare a zip file containing all files required to prepare your
+      paper, including bibtex files and external figure	graphics files.</li>
+      <li>Your main LaTeX file must be at the root of your submission
+      and must be named <i-mono>main.tex</i-mono>.</li>
+      <li>If you choose to use a LaTeX package, make sure it is
+	<a href="#" onclick="showPackages();return false;">supported</a>.
+	Avoid using unusual fonts - this is a big source of potential problems.</li>
+      <li>Some files will be removed before processing, so do not include:
+	<ul>
+	  <li><i-mono>main.aux</i-mono></li>
+	  <li><i-mono>.bbl</i-mono> files</li>
+	  <li><i-mono>.sty</i-mono> files</li>
+	  <li><i-mono>.cls</i-mono> files</li>
+	  <li><i-mono>latexmkrc</i-mono> files</li>
+	</ul>
+      </li>
+      <li>Before you upload your files, make sure it compiles on your system using the line:
+	<blockquote>
+	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+	</blockquote>
+      </li>
+    </ol>
+    <h3 id="figures">Guidance for included graphics</h3>
+    <p>
+      If you require graphics, we recommend using the graphics or
+      graphicx LaTeX packages.  We support only png, jpg, and gif
+      formats for included graphics
+      (not <i-mono>PDF</i-mono>, <i-mono>eps</i-mono>,
+      or <i-mono>svg</i-mono>).
+      <i-mono>svg</i-mono> files are not supported because
+      the <i-mono>svg</i-mono> package relies upon shell escapes and features of
+      pdftex. You should convert <i-mono>svg</i-mono> files to a supported format.
+    </p>
+    <h3 id="figures">Guidance for references</h3>
+    <p>
+      We require authors to upload their bibtex files with
+      bibliographic information for their references. You may use
+      either bibtex or biblatex/biber (our system autodetects
+      this). Do not rely upon uploading <i-mono>.bbl</i-mono> files;
+      they will not be used.
+    </p>
+    <p>
+      We recommend using <a href="https://github.com/cryptobib/export"
+      target="_blank">cryptobib</a>. You can reduce the size of your
+      uploaded bibtex files using
+      the <a href="https://ctan.math.utah.edu/ctan/tex-archive/biblio/bibtex/utils/bibexport/bibexport.pdf"
+      target="_blank">bibexport</a> utility that is included with
+      texlive to export only the bibtex entries that you actually
+      \cite. 
+    </p>
+    <p>
+      We <strong>strongly</strong> urge that you include DOIs for all
+      references.  Some people have grown accustomed to omitting them
+      due to page limits in legacy publications, but this forum has no
+      such limits and DOIs are important for giving proper citation.
+      Your bibtex entries may include both a DOI field and a URL field
+      if you wish to cite two different versions (e.g., the official
+      publication and an eprint version).
+    </p>
+{#    <div class="text-danger">
+      <p>
+	NOTE to Joppe: It might be nice if we could link to both the official
+      version of a paper and the eprint/arxiv version of a paper in the same citation.
+      Unfortunately bibtex predates preprint servers by a few decades, and there are no
+      standard ways to include them. We could modify <i-mono>iacrcc.bst</i-mono>
+      to show links to both, but users of biblatex wouldn't benefit. There are
+      several ways that people typically provide links to papers:
+      <ol>
+	<li>the DOI field, which is well defined (but should not include
+	  https://doi.org/). Unfortunately many of these are behind paywalls.
+	</li>
+	<li>the URL field, which may contain the DOI link or some other link.</li>
+	<li>the ee field used to be exported by DBLP. ee is a nonstandard extension for
+	  "electronic edition"</li>
+	<li>the NOTE field with <i-mono>\url{}</i-mono></li>
+	<li>the <i-mono>eprint</i-mono> field suggested by
+	  <a href="https://arxiv.org/help/hypertex/bibstyles">arxiv</a>.
+	  In this case we would use
+	  <pre>
+	    @inproceedings{example,
+               title  = {Example title},
+               author = {Fester Bestertester},
+               doi    = {10.1007/978-3-031-17234-2_16},
+               eprint = {2022/724},
+               archivePrefix = {IACReprint}
+	    }
+	  </pre>
+	  Ideally this would produce a bibliographic reference with both hyperlinks
+	  https://doi.org/10.1007/978-3-031-17234-2_16 and https://eprint.iacr.org/2022/724.
+	</li>
+      </ol>
+      </p>
+</div>
+#}
     <h3>System overview</h3>
     <p>
       In order to keep the cost of publishing low, the IACR
@@ -167,108 +274,6 @@
       from <i-code>texlive2022</i-code> and add the packages listed in
       the Dockerfile. DO NOT USE pdflatex; use lualatex instead.
     </p>
-    <h3>How to prepare your paper</h3>
-    <ol>
-      <li>Your paper should be written in LaTeX using
-	the <i-mono>iacrcc</i-mono> document class. This may
-	be <a href="/iacrcc">downloaded here</a>. If you start with something else
-	like <i-mono>article</i-mono> or <i-mono>llncs</i-mono>, the <i-mono>iacrcc</i-mono>
-	document class will require you to change your preamble somewhat. See
-	the <a href="/iacrcc">documentation</a>
-	on <i-mono>iacrcc</i-mono>.</li>
-      <li>You should prepare a zip file containing all files required to prepare your
-      paper, including bibtex files and external figure	graphics files.</li>
-      <li>Your main LaTeX file must be at the root of your submission
-      and must be named <i-mono>main.tex</i-mono>.</li>
-      <li>If you choose to use a LaTeX package, make sure it is
-	<a href="#" onclick="showPackages();return false;">supported</a>.
-	Avoid using unusual fonts - this is a big source of potential problems.</li>
-      <li>Some files will be removed before processing, so do not include:
-	<ul>
-	  <li><i-mono>main.aux</i-mono></li>
-	  <li><i-mono>.bbl</i-mono> files</li>
-	  <li><i-mono>.sty</i-mono> files</li>
-	  <li><i-mono>.cls</i-mono> files</li>
-	  <li><i-mono>latexmkrc</i-mono> files</li>
-	</ul>
-      </li>
-      <li>Before you upload your files, make sure it compiles on your system using the line:
-	<blockquote>
-	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
-	</blockquote>
-      </li>
-    </ol>
-    <h3 id="figures">Guidance for included graphics</h3>
-    <p>
-      If you require graphics, we recommend using the graphics or
-      graphicx LaTeX packages.  We support only png, jpg, and gif
-      formats for included graphics
-      (not <i-mono>PDF</i-mono>, <i-mono>eps</i-mono>,
-      or <i-mono>svg</i-mono>).
-      <i-mono>svg</i-mono> files are not supported because
-      the <i-mono>svg</i-mono> package relies upon shell escapes and features of
-      pdftex. You should convert <i-mono>svg</i-mono> files to a supported format.
-    </p>
-    <h3 id="figures">Guidance for references</h3>
-    <p>
-      We require authors to upload their bibtex files with
-      bibliographic information for their references. You may use
-      either bibtex or biblatex/biber (our system autodetects
-      this).
-    </p>
-    <p>
-      We recommend using <a href="https://github.com/cryptobib/export"
-      target="_blank">cryptobib</a>. You can reduce the size of your
-      uploaded bibtex files using
-      the <a href="https://ctan.math.utah.edu/ctan/tex-archive/biblio/bibtex/utils/bibexport/bibexport.pdf"
-      target="_blank">bibexport</a> utility that is included with
-      texlive to export only the bibtex entries that you actually
-      \cite. Do not rely upon uploading <i-mono>.bbl<i-mono> files;
-      they will not be used.
-    </p>
-    <p>
-      We <strong>strongly</strong> urge that you include DOIs for all
-      references.  Some people have grown accustomed to omitting them
-      due to page limits in legacy publications, but this forum has no
-      such limits and DOIs are important for giving proper citation.
-      Your bibtex entries may include both a DOI field and a URL field
-      if you wish to cite two different versions (e.g., the official
-      publication and an eprint version).
-    </p>
-    <div class="text-danger">
-      <p>
-	NOTE to Joppe: It might be nice if we could link to both the official
-      version of a paper and the eprint/arxiv version of a paper in the same citation.
-      Unfortunately bibtex predates preprint servers by a few decades, and there are no
-      standard ways to include them. We could modify <i-mono>iacrcc.bst</i-mono>
-      to show links to both, but users of biblatex wouldn't benefit. There are
-      several ways that people typically provide links to papers:
-      <ol>
-	<li>the DOI field, which is well defined (but should not include
-	  https://doi.org/). Unfortunately many of these are behind paywalls.
-	</li>
-	<li>the URL field, which may contain the DOI link or some other link.</li>
-	<li>the ee field used to be exported by DBLP. ee is a nonstandard extension for
-	  "electronic edition"</li>
-	<li>the NOTE field with <i-mono>\url{}</i-mono></li>
-	<li>the <i-mono>eprint</i-mono> field suggested by
-	  <a href="https://arxiv.org/help/hypertex/bibstyles">arxiv</a>.
-	  In this case we would use
-	  <pre>
-	    @inproceedings{example,
-               title  = {Example title},
-               author = {Fester Bestertester},
-               doi    = {10.1007/978-3-031-17234-2_16},
-               eprint = {2022/724},
-               archivePrefix = {IACReprint}
-	    }
-	  </pre>
-	  Ideally this would produce a bibliographic reference with both hyperlinks
-	  https://doi.org/10.1007/978-3-031-17234-2_16 and https://eprint.iacr.org/2022/724.
-	</li>
-      </ol>
-      </p>
-    </div>
   </div>
   <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
     <h3>Which LaTeX packages are allowed?</h3>

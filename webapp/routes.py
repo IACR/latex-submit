@@ -72,6 +72,7 @@ def submitform():
             return render_template('message.html',
                                    title='Invalid character in paperid',
                                    error='paperid is restricted to using characters -.a-z0-9')
+        data['email'] = args.get('email', '')
         data['paperid'] = paperid
     return render_template('submit.html', **data)
 

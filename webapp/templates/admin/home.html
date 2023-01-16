@@ -30,7 +30,7 @@
   <tbody>
     {% for paperid, versions in papers.items() %}
     {% for version, paper in versions.items() %}
-    <tr{% if loop.first %} class="table-active"{% endif %}>
+    <tr{% if not loop.first %} class="table-light"{% endif %}>
       <td>{% if loop.first %}<a href="/admin/view/{{paperid}}">{{paperid}}</a>{% endif %}</td>
       <td><a href="/view/{{paperid}}/{{version}}">{{version}}</a></td>
       <td>{{paper.venue.value}}</td>
