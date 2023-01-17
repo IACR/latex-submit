@@ -7,7 +7,7 @@ This template is used to show the results of a failed compilation
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
-      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}">You may resubmit your paper</a>
+      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may resubmit your paper</a>
       <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>
     {% if comp.error_log %}
@@ -23,10 +23,6 @@ This template is used to show the results of a failed compilation
     <div class="alert alert-warning">
       It appears a PDF was produced, but with errors. <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>
     </div>
-    {% endif %}
-    {% if not metafile %}
-    <div class="alert alert-warning">It appears that your paper compiled, but something was wrong
-      with the metadata. Make sure you use <span class="text-monospace">\documentclass[version=final]{iacrcc}</span>. Please revise your LaTeX and resubmit.</div>
     {% endif %}
     <div class="alert alert-danger">
       {% if comp.exit_code != 0 and error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error below</a></div>

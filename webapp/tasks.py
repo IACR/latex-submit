@@ -42,7 +42,7 @@ def run_latex_task(input_path, output_path, paperid):
                 # Flag some warnings and errors from the log. We may want to process the log
                 # line by line, since LaTeX is miserable at the try ... catch paradigm.
                 if 'LaTeX Warning: There were undefined references' in latexlog:
-                    compilation.error_log.append('LaTeX Warning: There were undefined references')
+                    compilation.error_log.append('LaTeX Error: There were undefined references')
                     compilation.status = CompileStatus.COMPILATION_ERRORS
                 if 'Specify a country for each affiliation for the final version' in latexlog:
                     compilation.error_log.append('At least one affiliation is missing a country')
