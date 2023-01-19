@@ -22,6 +22,8 @@ RUN echo "Building with documentation: $DOCFILES" && \
     rm -r /install-tl-unx; rm install-tl-unx.tar.gz
 
 ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
+# Search for cryptobib after of current directory.
+ENV BIBINPUTS="${BIBINPUTS}:/home/texlive/texmf/tex/latex/iacrcc/cryptobib"
 
 # Install latex packages
 # NOTE: minted requires a shell escape, and is not supported.
@@ -31,6 +33,7 @@ RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopt
 RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk biblatex-trad biblatex-ext marginfix sidenotes doclicense ccicons
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
+RUN tlmgr install collection-bibtexextra
 COPY compiler/LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
@@ -43,6 +46,7 @@ COPY metadata/iacrtrans/CC-by.pdf /home/texlive/texmf/tex/latex/iacrcc/CC-by.pdf
 COPY metadata/iacrtrans/iacrtrans.cls /home/texlive/texmf/tex/latex/iacrcc/iacrtrans.cls
 COPY metadata/iacrtrans/settings.tosc.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tosc.tex
 COPY metadata/iacrtrans/settings.tches.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tches.tex
+COPY metadata/latex/iacrcc/cryptobib/ /home/texlive/texmf/tex/latex/iacrcc/cryptobib/
 WORKDIR /data
 
 # This causes the container to run no more than 500 seconds. This is to protect against

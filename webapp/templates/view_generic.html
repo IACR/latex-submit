@@ -1,0 +1,89 @@
+{% include "view_header.html" %}
+{#
+=================================================================
+This template is used to show the status of a compilation.
+=================================================================
+#}
+<nav class="mt-3">
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
+            type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
+    <button class="nav-link" id="nav-output-tab" data-bs-toggle="tab" data-bs-target="#nav-output"
+            type="button" role="tab" aria-controls="nav-output" aria-selected="false">Output</button>
+    <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
+            type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
+  </div>
+</nav>
+<div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
+  <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
+    <div class="mb-3 d-flex">
+      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}&email={{comp.email}}">You may resubmit your paper</a>
+      {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
+      <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
+    </div>
+    <div class="alert alert-success">It appears that your compilation worked, but you should
+      <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">check your PDF</a>
+    </div>
+    {% if comp.warning_log %}
+    <h4>Warnings</h4>
+    {% for error in comp.warning_log %}
+    <div class="alert alert-warning">Warning: {{error}}</div>
+    {% endfor %}
+    {% endif %}
+    <pre>{{comp.log}}</pre>
+    <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
+  </div>
+  <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
+    {% if pdf %}<h3 class="ms-3 mt-3"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h3>{% endif %}
+    <table class="table ms-3 mt-2 table-bordered">
+      <tbody>
+        <tr>
+          <th>Date compiled:</th>
+          <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+        </tr>
+        <tr>
+          <th>Compilation time:</th>
+          <td>{{comp.compile_time}} seconds</td>
+        </tr>
+        <tr>
+          <th>Return code from latexmk:</th>
+          <td>{{comp.exit_code}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ms-3">
+      {% if output %}
+      Output files from running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
+      <ul>
+        {% for el in output recursive %}
+        <li>{{el.name}}
+          {% if el.children %}<ul style="list-style: '-';">{{ loop(el.children) }}</ul>{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
+    <h3 class="ms-3">Extracted metadata</h3>
+    <p class="alert alert-warning">
+      Metadata extraction only works for iacrcc class. We hope to fix that in the future, because someone will need to enter metadata for these papers.
+    </p>
+  </div>
+</div>
+<script>
+ function scrollToError() {
+   document.getElementById('endOfOutput').scrollIntoView({
+     behavior: 'smooth',
+     block: 'nearest',
+     inline: 'start'});
+ }
+
+  function showMetadata() {
+      metaButton = document.getElementById('nav-meta-tab');
+      console.dir(metaButton);
+      bootstrap.Tab.getOrCreateInstance(metaButton).show();
+  }
+
+</script>
+
+{% include "base_footer.html" %}

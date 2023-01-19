@@ -9,7 +9,7 @@ from . import executor, mail, task_queue, TaskStatus
 import shutil
 import string
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent
+from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent, VenueEnum
 from .metadata import validate_paperid, get_doi, validate_version
 from webapp.tasks import run_latex_task
 from .fundreg.search_lib import search
@@ -319,7 +319,9 @@ def view_results(paperid, version):
         data['pdf'] = True
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
-    return render_template('view.html', **data)
+    if comp.venue == VenueEnum.IACRCC:
+        return render_template('view_iacrcc.html', **data)
+    return render_template('view_generic.html', **data)
 
 @home_bp.route('/output/<paperid>/<version>', methods=['GET'])
 def download_output_zipfile(version, paperid):
