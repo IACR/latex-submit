@@ -96,7 +96,7 @@ def run_latex_task(input_path, output_path, paperid):
                         compilation.status = CompileStatus.METADATA_PARSE_FAIL
                 else:
                     compilation.status = CompileStatus.METADATA_FAIL
-                    compilation.error_log.append('No metadata file')
+                    compilation.error_log.append('No metadata file. Are you sure you used iacrcc?')
             json_file.write_text(compilation.json(indent=2, exclude_none=True), encoding='UTF-8')
         else:
             output['error'] = 'Missing json file.'
