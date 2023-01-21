@@ -181,6 +181,9 @@ Installation is as follows (TODO: review this):
 ```
 python3 -m pip install flask
 python3 -m pip install flask-mail
+python3 -m pip install flask-login
+python3 -m pip install Flask-SQLAlchemy
+python3 -m pip install flask-WTF
 python3 -m pip install docker
 sudo apt install docker
 ```
