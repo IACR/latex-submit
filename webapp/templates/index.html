@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
 <div class="alert alert-danger mt-4">
   This site is under development and is not yet ready to be used. It is here only for
   testing purposes.

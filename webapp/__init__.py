@@ -7,7 +7,9 @@ in a separate task to compile the output.
 
 from collections import OrderedDict
 from flask import Flask, request, render_template, current_app
+from flask_login import LoginManager, UserMixin
 from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 import os
@@ -47,19 +49,38 @@ mail = Mail()
 task_queue = OrderedDict()
 
 executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='compiler')
-#executor.add_default_done_callback(_default_future_callback)
+
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+
+# DB used for keeping track of users.
+db = SQLAlchemy()
+
+# Now that db exists, we can import User
+from webapp.db_models import User
 
 def create_app(config):
     app = Flask('webapp', static_folder='static/', static_url_path='/')
     app.config.from_object(config)
-
     mail.init_app(app)
-    #executor.init_app(app)
+    db.init_app(app)
+    login_manager.init_app(app)
     with app.app_context():
         from . import admin
         from . import routes
+        from . import auth
         app.register_blueprint(routes.home_bp)
         app.register_blueprint(admin.admin_bp)
+        app.register_blueprint(auth.auth_bp)
+        db.create_all()
+        if config.USERS:
+            for user in config.USERS:
+                u = User.query.filter_by(email=user['email']).first()
+                if not u:
+                    db.session.add(User(user['email'],
+                                        user['role'],
+                                        user['password']))
+            db.session.commit()
         return app
 
 

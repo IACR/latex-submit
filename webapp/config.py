@@ -10,15 +10,13 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'testing'
     MAIL_PASSWORD = 'removed_in_checked_in_version'
+    SECRET_KEY = 'removed_in_checked_in_version'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
     UPLOAD_FOLDER = '/tmp'
-    DB_USER = 'iacrcc'
-    DB_NAME = 'iacrcc'
-    DB_PASSWORD = 'l3t_m3_in_n0w'
-    DB_HOST = 'localhost'
-    XAPIAN_DB_PATH = 'webapp/fundreg/xapian.db'
     DATA_DIR = 'webapp/data'
     SITE_NAME = 'IACR Publishing Pipeline'
     SITE_SHORTNAME = 'IACR CiC'
+    USERS = None
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'
@@ -30,4 +28,7 @@ class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
+    USERS = [{'email': 'testing@iacr.org',
+              'password': 'myenigm@',
+              'role': 'admin'}]
     
