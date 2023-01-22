@@ -176,7 +176,7 @@ def runlatex():
     msg = Message('Paper {} was submitted'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=['iacrcc@digicrime.com']) # for testing
-    msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
+    msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}{}'.format(app.config['ROOT_URL'], paper_url)
     mail.send(msg)
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
