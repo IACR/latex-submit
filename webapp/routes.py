@@ -5,7 +5,7 @@ from flask import current_app as app
 from flask_mail import Message
 import os
 from pathlib import Path
-from . import executor, mail, task_queue, TaskStatus
+from . import executor, mail, task_queue, TaskStatus, get_json_path, get_paper_url, get_pdf_url, validate_hmac
 import shutil
 import string
 import zipfile
@@ -29,10 +29,12 @@ def home():
     return render_template('index.html',
                            title=app.config['SITE_NAME'])
 
-def _validate_post(args, files):
+def _validate_submit(args, files):
     """args should contain paperid and email. files should contain zipfile."""
     if 'paperid' not in args:
         return 'Missing paperid'
+    if not validate_paperid(args.get('paperid')):
+        return 'Invalid paperid'
     if 'email' not in args:
         return 'Missing author email'
     if 'submitted' not in args:
@@ -41,7 +43,7 @@ def _validate_post(args, files):
         return 'Missing accepted date'
     if 'venue' not in args:
         return 'Missing venue'
-    # TODO: validate the hmac.
+    # TODO: validate the hmac from external sources.
     if 'hmac' not in args:
         return 'Missing hmac'
     if 'zipfile' not in files:
@@ -78,22 +80,23 @@ def submitform():
 
 @home_bp.route('/submit', methods=['POST'])
 def runlatex():
+    # TODO: this needs authentication from one of two places:
+    # 1. hotcrp will create an hmac with a key shared between this server and hotcrp.
+    # 2. this server will create an hmac for resubmission.
+    # TODO: check the version, and validate that.
     args = request.form.to_dict()
-    msg = _validate_post(args, request.files)
-    version = args.get('version')
+    msg = _validate_submit(args, request.files)
     if msg:
         return render_template('message.html',
                                title='Invalid parameters',
                                error=msg)
     paperid = args.get('paperid')
-    if not validate_paperid(paperid):
-        return render_template('message.html',
-                               title='Invalid character in paperid',
-                               error='paperid is restricted to using characters -.a-z0-9')
+    version = args.get('version')
     if task_queue.get(paperid):
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
+    paper_url = get_paper_url(paperid, version)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
     json_file = paper_dir / Path('status.json')
@@ -168,27 +171,37 @@ def runlatex():
     if output_dir.is_dir():
         shutil.rmtree(output_dir)
     # fire off a separate task to compile
-    task_queue[paperid] = executor.submit(run_latex_task, str(input_dir.absolute()),
-                                                          str(output_dir.absolute()),
+    task_queue[paperid] = executor.submit(run_latex_task, str(candidate_dir.absolute()),
                                                           paperid)
     msg = Message('Paper {} was submitted'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=['iacrcc@digicrime.com']) # for testing
     msg.body = 'This is just a test message for now. See https://publish.iacr.org/view/{}/{}'.format(paperid, version)
     mail.send(msg)
+    status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
-            'paperid': paperid,
-            'version': version}
+            'status_url': status_url}
     return render_template('running.html', **data)
 
-@home_bp.route('/tasks/<paperid>/<version>', methods=['GET'])
-def get_status(paperid, version):
-    """Check on the current status of a compilation via ajax."""
+@home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
+def get_status(paperid, version, auth):
+    """Check on the current status of a compilation via ajax.
+    This returns a json object with 'url', 'status', and 'msg', and the user will
+    be redirected to url when the compilation is completed.
+    """
+    if not validate_hmac(paperid, version, auth):
+        return jsonify({'status': TaskStatus.UNKNOWN,
+                        'msg': 'hmac is invalid'})
     status = TaskStatus.UNKNOWN
+    url = get_paper_url(paperid, version)
     if not validate_paperid(paperid):
-        return jsonify({'status': TaskStatus.UNKNOWN, 'msg': 'Invalid paperid'})
+        return jsonify({'url': url,
+                        'status': TaskStatus.UNKNOWN,
+                        'msg': 'Invalid paperid'})
     if not validate_version(version):
-        return jsonify({'status': TaskStatus.UNKNOWN, 'msg': 'Unknown version'}), 200
+        return jsonify({'url': url,
+                        'status': TaskStatus.UNKNOWN,
+                        'msg': 'Unknown version'}), 200
     msg = 'Unknown status'
     # is the task in the queue or running?
     future = task_queue.get(paperid, None)
@@ -218,11 +231,7 @@ def get_status(paperid, version):
                 msg = 'Unknown position'
     else:
         # we rely upon the json file
-        paper_path = Path(app.config['DATA_DIR']) / Path(paperid)
-        if not paper_path.is_dir():
-            status = TaskStatus.UNKNOWN
-        else:
-            json_file = paper_path / Path('compilation.json')
+        with get_json_path(paperid, version) as json_file:
             if not json_file.is_file():
                 status = TaskStatus.UNKNOWN
                 msg = 'Cannot find JSON file'
@@ -230,17 +239,19 @@ def get_status(paperid, version):
                 comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
                 if comp.exit_code == -1: # default
                     status = TaskStatus.UNKNOWN
-                    msg = 'Unknown status'
+                    msg = 'Exit code was not set'
                 elif comp.exit_code == 0:
                     status = TaskStatus.COMPILED
                     msg = 'Successfully compiled'
                 else:
                     status = TaskStatus.FAILED_COMPILE
                     msg = 'Exit code from latexmk was {}'.format(comp.exit_code)
-    return jsonify({'status': status.value, 'msg': msg}), 200
+    return jsonify({'url': url,
+                    'status': status.value,
+                    'msg': msg}), 200
 
-@home_bp.route('/pdf/<paperid>/<version>/main.pdf', methods=['GET'])
-def show_pdf(paperid,version):
+@home_bp.route('/view/<paperid>/<version>/<auth>/main.pdf', methods=['GET'])
+def show_pdf(paperid,version, auth):
     if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
@@ -250,6 +261,10 @@ def show_pdf(paperid,version):
         return render_template('message.html',
                                title=msg,
                                error=msg)
+    if not validate_hmac(paperid, version, auth):
+        return render_template('message.html',
+                               title = 'Invalid hmac',
+                               error = 'Invalid hmac')
     pdf_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('output/main.pdf')
     if pdf_path.is_file():
         return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
@@ -275,8 +290,8 @@ def _expand_dir(path):
 
 # We decide whether to show the "submit final" button based on whether
 # exit_code ==0 and compilation.error_log is empty.
-@home_bp.route('/view/<paperid>/<version>', methods=['GET'])
-def view_results(paperid, version):
+@home_bp.route('/view/<paperid>/<version>/<auth>', methods=['GET'])
+def view_results(paperid, version, auth):
     if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
@@ -285,6 +300,10 @@ def view_results(paperid, version):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
+    if not validate_hmac(paperid, version, auth):
+        return render_template('message.html',
+                               title = 'Invalid hmac',
+                               error = 'Invalid hmac')
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version)
     if not paper_path.is_dir():
         return render_template('message.html',
@@ -292,7 +311,8 @@ def view_results(paperid, version):
                                error='Unknown paper. Try resubmitting.')
     data = {'title': 'Results from compilation',
             'paperid': paperid,
-            'version': version}
+            'version': version,
+            'auth': auth}
     try:
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
@@ -316,13 +336,14 @@ def view_results(paperid, version):
     if meta_file.is_file():
         data['metafile'] = meta_file.read_text(encoding='UTF-8')
     if pdf_file.is_file():
-        data['pdf'] = True
+        data['pdf'] = get_pdf_url(paperid, version)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
     if comp.venue == VenueEnum.IACRCC:
         return render_template('view_iacrcc.html', **data)
     return render_template('view_generic.html', **data)
 
+# TODO: add /<hmac> to the end
 @home_bp.route('/output/<paperid>/<version>', methods=['GET'])
 def download_output_zipfile(version, paperid):
     if not validate_paperid(paperid):

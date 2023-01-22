@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 import json
 import os
 from pathlib import Path
+from . import get_paper_url
 from .metadata.compilation import Compilation, PaperStatus
 from .metadata import validate_paperid, validate_version
 from .db_models import Role
@@ -37,7 +38,8 @@ def show_admin_home():
             if v.is_dir() and validate_version(v.name):
                 try:
                     cstr = (v / Path('compilation.json')).read_text(encoding='UTF-8')
-                    versions[v.name] = Compilation.parse_raw(cstr)
+                    versions[v.name] = {'url': get_paper_url(paperpath.name, v.name),
+                                        'comp': Compilation.parse_raw(cstr)}
                 except Exception as e:
                     errors.append(str(v) + ':' + str(e))
         papertree[paperpath.name] = versions

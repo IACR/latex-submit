@@ -6,7 +6,6 @@ repeatedly polls for status on the task until it is complete.
 =================================================================
 #}
 <h2 class="mt-5 mb-3">Compiling your paper</h2>
-<input type="hidden" name="paperid" value="{{paperid}}">
 <h3>Status: <span id="status">PENDING</span></h3>
 <progress class="mt-2" id="progress" max="100"></progress>
 <script>
@@ -14,7 +13,7 @@ repeatedly polls for status on the task until it is complete.
  var retries = 0;
  function checkStatus() {
      retries++;
-     fetch('/tasks/{{paperid}}/{{version}}')
+     fetch('{{status_url}}')
 	 .then((response) => response.json())
 	 .then((data) => {
 	     console.log(data);
@@ -35,7 +34,7 @@ repeatedly polls for status on the task until it is complete.
 	     if (data.status == 'PENDING' || data.status == 'RUNNING') {
 		 setTimeout(checkStatus, 3000);
 	     } else {
-		 location.href = '/view/{{paperid}}/{{version}}'
+	       location.href = data.url;
 	     }
 	 });
 }

@@ -84,12 +84,14 @@ items:
 * the original submission date prior to review
 * the acceptance date.
 
-These fields will be authenticated with an HMAC in the URL.  For a
-paper ID of `xyz`, the server will store data for this upload in the
-directory `webapp/data/xyz`.  For this reason, the `paperid` must be
-"directory-safe" using only characters [-.a-z0-9]. The `paperid` is
-assumed to be globally unique and is assigned by the workflow prior to
-it being received by this server (e.g., by hotcrp).
+When the submission server forwards the author to at GET at /submit,
+the fields will be included as URL parameters, and include an HMAC To
+authenticate the payload. For paper ID of `xyz`, the server will store
+data for this upload in the directory `webapp/data/xyz`.  For this
+reason, the `paperid` must be "directory-safe" using only characters
+[-.a-z0-9]. The `paperid` is assumed to be globally unique and is
+assigned by the workflow prior to it being received by this server
+(e.g., by hotcrp).
 
 We don't store every version that is uploaded, but we store
 potentially three versions:
@@ -144,6 +146,22 @@ If the copy editor submits further queries to the author, then they can
 continue to upload a `final` version until the copy editor is satisfied.
 Once they are satisfied, the `final` version is frozen and used to
 produce the published paper.
+
+### Authentication in URLs
+
+As mentioned previously, when the author is referred to /submit, there
+will be URL paramters that are authenticated with an hmac using a key
+shared between the review system and this server. Thereafer the user
+is supplied with URLs of the form
+```
+/view/<paperid>/<version>/<auth>
+/view/<paperid>/<version>/<auth>/main.pdf
+```
+where `auth` is another hmac created by the server to obfuscate the URLs.
+An author is free to share these URLs with other authors so that we do
+not require authors to login on the site. This may change in the future,
+because there is now authentication on the site to restrict access to
+the `/admin` section of the site.
 
 ### The compilation process
 

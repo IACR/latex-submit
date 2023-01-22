@@ -12,11 +12,32 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
+import hashlib, hmac
 import os
+from pathlib import Path
 import sys
 
 # Make sure we aren't running on an old python.
 assert sys.version_info >= (3, 7)
+
+def get_json_path(paperid, version):
+    """Path to a paper version, where compilation.json is located."""
+    return Path(current_app.config['DATA_DIR']) / Path('{}/{}/compilation.json'.format(paperid,
+                                                                                       version))
+def create_hmac(paperid, version):
+    """Create hmac used for validating local URLs."""
+    return hmac.new(current_app.config['SECRET_KEY'].encode('utf-8'),
+                    (paperid+version).encode('utf-8'), hashlib.sha256).hexdigest()
+
+def validate_hmac(paperid, version, auth):
+    """Validate hmac from create_hmac."""
+    return hmac.compare_digest(create_hmac(paperid, version), auth)
+
+def get_paper_url(paperid, version):
+    return '/view/{}/{}/{}'.format(paperid, version, create_hmac(paperid, version))
+
+def get_pdf_url(paperid, version):
+    return '/view/{}/{}/{}/main.pdf'.format(paperid, version, create_hmac(paperid, version))
 
 class StrEnum(str, Enum):
     @classmethod

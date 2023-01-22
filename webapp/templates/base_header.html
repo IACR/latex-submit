@@ -47,7 +47,7 @@
                 {% endif %}
                 <li><a href="{{ url_for('auth.logout') }}" class="dropdown-item">Logout</a></li>
                 {% else %}
-                <li><a href="{{ url_for('auth.signup') }}" class="dropdown-item">Signup</a></li>
+                <li><a {# href="{{ url_for('auth.signup') }}" #} class="dropdown-item disabled">Signup</a></li>
                 <li><a href="{{ url_for('auth.login') }}" class="dropdown-item">Login</a></li>
                 {% endif %}
               </ul>

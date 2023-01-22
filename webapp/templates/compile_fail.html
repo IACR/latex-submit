@@ -7,7 +7,7 @@ This template is used to show the results of a failed compilation
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
-      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may resubmit your paper</a>
+      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}&auth={{auth}}">You may resubmit your paper</a>
       <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>
     {% if comp.error_log %}
@@ -21,16 +21,16 @@ This template is used to show the results of a failed compilation
     {% endfor %}
     {% if pdf %}
     <div class="alert alert-warning">
-      It appears a PDF was produced, but with errors. <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>
+      It appears a PDF was produced, but with errors. <a href="{{pdf}}" target="_blank">View PDF</a>
     </div>
     {% endif %}
     <div class="alert alert-danger">
       {% if comp.exit_code != 0 and error_msg %}Response from lualatex was: {{error_msg}}.<br>{% endif %}Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error below</a></div>
     <pre>{{comp.log}}</pre>
-    <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
+    <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
-    {% if pdf %}<h3 class="ms-3 mt-3"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h3>{% endif %}
+    {% if pdf %}<h3 class="ms-3 mt-3"><a href="{{pdf}}" target="_blank">View PDF</a></h3>{% endif %}
     <table class="table ms-3 mt-2 table-bordered">
       <tbody>
         <tr>

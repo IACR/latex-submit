@@ -18,11 +18,11 @@ This template is used to show the status of a compilation.
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
     <div class="mb-3 d-flex">
       <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}&email={{comp.email}}">You may resubmit your paper</a>
-      {% if pdf %}<h4 class="ms-3 my-0"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h4>{% endif %}
+      {% if pdf %}<h4 class="ms-3 my-0"><a href="{{pdf}}" target="_blank">View PDF</a></h4>{% endif %}
       <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
     </div>
     <div class="alert alert-success">It appears that your compilation worked, but you should
-      <a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">check your PDF</a>
+      <a href="{{pdf}}" target="_blank">check your PDF</a>
     </div>
     {% if comp.warning_log %}
     <h4>Warnings</h4>
@@ -31,10 +31,10 @@ This template is used to show the status of a compilation.
     {% endfor %}
     {% endif %}
     <pre>{{comp.log}}</pre>
-    <div id="endOfOutput">{% if pdf %}<a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a>{% endif %}</div>
+    <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
-    {% if pdf %}<h3 class="ms-3 mt-3"><a href="/pdf/{{paperid}}/{{version}}/main.pdf" target="_blank">View PDF</a></h3>{% endif %}
+    {% if pdf %}<h3 class="ms-3 mt-3"><a href="{{pdf}}" target="_blank">View PDF</a></h3>{% endif %}
     <table class="table ms-3 mt-2 table-bordered">
       <tbody>
         <tr>

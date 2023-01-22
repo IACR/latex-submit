@@ -27,9 +27,9 @@ def run_latex(input_dirname, output_dirname):
                in this directory are ignored but subdirectories are allowed.
            output_dirname:
                path to where resulting output should be deposited. Should not already exist.
-       returns: A dict with code, log, and warnings. The code is the return code from running
-                latexmk, and log is the output from running latexmk. warnings is an array
-                of string warnings. Fatal errors will raise an exception instead.
+       returns: A dict with exit_code, log, and warnings. The exit_code is the return code
+                from running latexmk, and log is the output from running latexmk. warnings
+                is an array of string warnings. Fatal errors will raise an exception instead.
        raises: 
           ValueError if some conditions are not satisfied.
           APIError if there is an error from the docker API.

@@ -32,12 +32,12 @@
     {% for version, paper in versions.items() %}
     <tr{% if not loop.first %} class="table-light"{% endif %}>
       <td>{% if loop.first %}<a href="/admin/view/{{paperid}}">{{paperid}}</a>{% endif %}</td>
-      <td><a href="/view/{{paperid}}/{{version}}">{{version}}</a></td>
-      <td>{{paper.venue.value}}</td>
-      <td>{{paper.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-      <td>{{paper.status.value}} ({{paper.error_log|length}}/{{paper.warning_log|length}})</td>
-      <td>{{paper.email}}</td>
-      <td>{% if paper.meta %}{{paper.meta.title}}{% else %}(unknown){% endif %}</td>
+      <td><a href="{{paper.url}}">{{version}}</a></td>
+      <td>{{paper.comp.venue.value}}</td>
+      <td>{{paper.comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+      <td>{{paper.comp.status.value}} ({{paper.comp.error_log|length}}/{{paper.comp.warning_log|length}})</td>
+      <td>{{paper.comp.email}}</td>
+      <td>{% if paper.comp.meta %}{{paper.comp.meta.title}}{% else %}(unknown){% endif %}</td>
     </tr>
     {% endfor %}
     {% endfor %}
