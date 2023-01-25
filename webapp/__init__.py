@@ -33,9 +33,6 @@ def validate_hmac(paperid, version, auth):
     """Validate hmac from create_hmac."""
     return hmac.compare_digest(create_hmac(paperid, version), auth)
 
-def get_paper_url(paperid, version):
-    return '/view/{}/{}/{}'.format(paperid, version, create_hmac(paperid, version))
-
 def get_pdf_url(paperid, version):
     return '/view/{}/{}/{}/main.pdf'.format(paperid, version, create_hmac(paperid, version))
 

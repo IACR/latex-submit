@@ -15,10 +15,9 @@ class Config:
     UPLOAD_FOLDER = '/tmp'
     XAPIAN_DB_PATH = 'webapp/fundreg/xapian.db'
     DATA_DIR = 'webapp/data'
-    SITE_NAME = 'IACR Publishing Pipeline'
+    SITE_NAME = 'IACR Publishing Portal'
     SITE_SHORTNAME = 'IACR CiC'
     USERS = None
-    ROOT_URL = 'http://localhost:5000'
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'
@@ -26,7 +25,6 @@ class ProdConfig(Config):
     TESTING = False
     XAPIAN_DB_PATH = '/var/www/wsgi/latex-submit/webapp/fundreg/xapian.db'
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
-    ROOT_URL = 'https://publish.iacr.org'
     
 class DebugConfig(Config):
     FLASK_ENV = 'development'

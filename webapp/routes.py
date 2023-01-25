@@ -5,7 +5,7 @@ from flask import current_app as app
 from flask_mail import Message
 import os
 from pathlib import Path
-from . import executor, mail, task_queue, TaskStatus, get_json_path, get_paper_url, get_pdf_url, validate_hmac
+from . import executor, mail, task_queue, TaskStatus, get_json_path, get_pdf_url, validate_hmac, create_hmac
 import shutil
 import string
 import zipfile
@@ -43,9 +43,9 @@ def _validate_submit(args, files):
         return 'Missing accepted date'
     if 'venue' not in args:
         return 'Missing venue'
-    # TODO: validate the hmac from external sources.
-    if 'hmac' not in args:
-        return 'Missing hmac'
+    # TODO: validate the hmac in token from external sources.
+    if 'token' not in args:
+        return 'Missing token'
     if 'zipfile' not in files:
         return 'Missing zip file'
     version = args.get('version')
@@ -57,8 +57,10 @@ def _validate_submit(args, files):
 
 @home_bp.route('/submit', methods=['GET'])
 def submitform():
-    # TODO: authenticate the auth argument and paperid.
     args = request.args.to_dict()
+    # TODO: make sure that there is either a token or auth parameter supplied as a
+    # url parameter. Authenticate either one.
+    token = args.get('token', 'todo:make sure this exists')
     version = args.get('version', 'candidate')
     if not validate_version(version):
         msg = 'Invalid version: {}'.format(version),
@@ -67,6 +69,7 @@ def submitform():
                                error = msg)
     data = {'title': 'Test submit a paper',
             'version': version,
+            'token': token,
             'paperid': ''} # TODO: fix this. It is now supplied by javascript for testing.
     if 'paperid' in args:
         paperid = args.get('paperid')
@@ -96,7 +99,6 @@ def runlatex():
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
-    paper_url = get_paper_url(paperid, version)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
     json_file = paper_dir / Path('status.json')
@@ -134,7 +136,10 @@ def runlatex():
         paper_status.log.append(LogEvent(when=datetime.datetime.now(),
                                          action='Zip file could not be unzipped'))
         json_file.write_text(paper_status.json(indent=2))
-        return redirect(url_for('home_bp.view_results', paperid=paperid, version=version), 302)
+        return redirect(url_for('home_bp.view_results',
+                                paperid=paperid,
+                                version=version,
+                                auth=create_hmac(paperid, version)), 302)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
         paper_status.log.append(LogEvent(when=datetime.datetime.now(),
@@ -176,7 +181,12 @@ def runlatex():
     msg = Message('Paper {} was submitted'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=['iacrcc@digicrime.com']) # for testing
-    msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}{}'.format(app.config['ROOT_URL'], paper_url)
+    paper_url = url_for('home_bp.view_results',
+                        paperid=paperid,
+                        version=version,
+                        auth=create_hmac(paperid, version),
+                        _external=True)
+    msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
     mail.send(msg)
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
@@ -193,13 +203,16 @@ def get_status(paperid, version, auth):
         return jsonify({'status': TaskStatus.UNKNOWN,
                         'msg': 'hmac is invalid'})
     status = TaskStatus.UNKNOWN
-    url = get_paper_url(paperid, version)
+    paper_url = url_for('home_bp.view_results',
+                        paperid=paperid,
+                        version=version,
+                        auth=create_hmac(paperid, version))
     if not validate_paperid(paperid):
-        return jsonify({'url': url,
+        return jsonify({'url': paper_url,
                         'status': TaskStatus.UNKNOWN,
                         'msg': 'Invalid paperid'})
     if not validate_version(version):
-        return jsonify({'url': url,
+        return jsonify({'url': paper_url,
                         'status': TaskStatus.UNKNOWN,
                         'msg': 'Unknown version'}), 200
     msg = 'Unknown status'
@@ -246,7 +259,7 @@ def get_status(paperid, version, auth):
                 else:
                     status = TaskStatus.FAILED_COMPILE
                     msg = 'Exit code from latexmk was {}'.format(comp.exit_code)
-    return jsonify({'url': url,
+    return jsonify({'url': paper_url,
                     'status': status.value,
                     'msg': msg}), 200
 

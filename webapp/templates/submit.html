@@ -34,8 +34,11 @@
       for hints on how to avoid problems.
     </div>
     <form method="POST" action="{{url_for('home_bp.runlatex')}}" enctype="multipart/form-data">
-      {# hmac is an HMAC on concatenation of paperID, received, accepted to make sure they are not changed. #}
-      <input type="hidden" name="hmac" value="abcdefghijklmn">
+      {# The home_bp.runlatex action can authenticate one of two ways:
+      1. with a token from hotcrp using a shared key.
+      2. with an hmac called "auth" that is supplied by this server. This is used for resubmissions.
+      #}
+      <input type="hidden" name="token" value="{{token}}">
       <input type="hidden" name="auth" value="{{auth}}">
       <input type="hidden" name="version" value="{{version}}">
       {# TODO: pick up submitted and accepted and email from URL #}

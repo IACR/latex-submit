@@ -15,9 +15,9 @@ from . import db
 #     return test_user.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 class Role(str, Enum):
-    ADMIN = 'admin'
-    COPYEDIT = 'copyedit'
     AUTHOR = 'author'
+    COPYEDIT = 'copyedit'
+    ADMIN = 'admin'
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

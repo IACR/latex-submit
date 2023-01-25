@@ -21,10 +21,11 @@
     {{ form.password.label(class_="col-2 col-form-label text-end")}}
     <div class="col-6">
       {{ form.password(class_="form-control") }}
-      {% if form.email.errors %}
+      {% if form.password.errors %}
       <ul class="errors">
         {% for error in form.password.errors %}
-        <li>{{ error }}</li>{% endfor %}
+        <li>{{ error }}</li>
+        {% endfor %}
       </ul>
       {% endif %}
     </div>
@@ -39,9 +40,14 @@
     {{ message }}
   </div>
   {% endfor %}
+  <p class="alert alert-info mt-4">
+    If you forgot your username or password, you have to contact an administrator.
+  </p>
+  {#
   <div class="mt-4">
     <span>Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign up.</a></span>
   </div>
+  #}
 </form>
 </div>
 
