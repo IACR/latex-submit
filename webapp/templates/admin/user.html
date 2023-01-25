@@ -1,8 +1,15 @@
 {# This is use by forms.py:AdminUserForm #}
 {% extends "admin/admin_base.html" %}
 {% block content %}
-<h1 class="mt-4">{% if form.email.data %}Edit user {{form.email.data}}{% else %}Create user{% endif %}</h1>
-<form method="POST" action="{{url_for('admin_file.user')}}">
+{% if form.email.data %}
+<h1 class="mt-4">Edit user {{form.email.data}}
+  <a class="ms-3 btn btn-warning" href="{{url_for('admin_file.recover', email=form.email.data)}}">Recover</a>
+</h1>
+{% else %}
+<h1 class="mt-4">Create user</h1>
+{% endif %}
+</h1>
+<form method="POST" action="{{url_for('admin_file.user', email=form.email.data)}}">
   {{ form.csrf_token }}
   {{ form.old_email() }}
   <div class="form-group mt-3 row">

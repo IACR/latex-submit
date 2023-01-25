@@ -173,7 +173,7 @@ def recover():
         user = User.query.filter_by(email=form.email.data).first()
         if not user:
             flash('Unknown user')
-            return redirect(url_for('admin_file.recover'))
+            return redirect(url_for('admin_file.all_users'))
         # Change the password for the user and send them an email.
         password = _generate_password()
         user.set_password(password)
@@ -187,11 +187,23 @@ def recover():
         maildata = {'email': user.email,
                     'servername': app.config['SITE_NAME'],
                     'password': password,
-                    'recover_url': url_for('auth.change_password',
+                    'recover_url': url_for('auth.confirm_email',
+                                           email=user.email,
+                                           auth=create_hmac(user.email, ''),
                                            _external=True)}
         msg.body = app.jinja_env.get_template('admin/recover_password.txt').render(maildata)
         mail.send(msg)
         flash('User {} password was changed and they were notified'.format(form.email.data))
         app.logger.info('user {} had their password changed'.format(form.email.data))
         return redirect(url_for('admin_file.all_users'))
+    args = request.args.to_dict()
+    email = args.get('email')
+    if not email:
+        flash('missing email parameter for /recover')
+        return redirect(url_for('admin_bp.all_users'))
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('Unknown user')
+        return redirect(url_for('admin_file.all_users'))
+    form.email.data = user.email
     return render_template('admin/recover.html', form=form)

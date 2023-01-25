@@ -3,7 +3,6 @@
 {% block content %}
 <h1 class="mb-5 text-center">List of users</h1>
 <a class="btn btn-primary" href="{{url_for('admin_file.user')}}">Create user</a>
-<a class="btn btn-primary" href="{{url_for('admin_file.recover')}}">Recover</a>
 <table class="table sortable mt-3" id="paperlist">
   <thead>
     <tr>
@@ -11,6 +10,7 @@
       <th>email</th>
       <th>Role</th>
       <th>creation date</th>
+      <th>last login</th>
     </tr>
   </thead>
   <tbody>
@@ -20,6 +20,7 @@
       <td><a href="{{url_for('admin_file.user', id=user.id)}}">{{user.email}}</a></td>
       <td>{{user.role.value}}</td>
       <td>{{user.created_on}}</td>
+      <td>{{user.last_login}}</td>
     {% endfor %}
   </tbody>
 </table>
