@@ -1,0 +1,71 @@
+{# This is use by forms.py:AdminUserForm #}
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<h1 class="mt-4">{% if form.email.data %}Edit user {{form.email.data}}{% else %}Create user{% endif %}</h1>
+<form method="POST" action="{{url_for('admin_file.user')}}">
+  {{ form.csrf_token }}
+  {{ form.old_email() }}
+  <div class="form-group mt-3 row">
+    {{ form.email.label(class_="col-2 col-form-label text-end") }}
+    <div class="col-6">
+      {{ form.email(placeholder='useremail@example.com',class_="form-control") }}
+      {% if form.email.errors %}
+      <ul class="errors">
+        {% for error in form.email.errors %}
+        <li>{{ error }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="form-group row mt-3">
+    {{ form.role.label(class_="col-2 col-form-label text-end")}}
+    <div class="col-6">
+      {{ form.role(class_="form-select") }}
+      {% if form.role.errors %}
+      <ul class="errors">
+        {% for error in form.role.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="offset-2 col-6">
+      {{ form.submit(class_="btn btn-primary") }}
+      <span class="{% if form.email.data %}d-inline{% else %}d-none{% endif %}">
+      {{ form.delete_cb(class_="ms-4 btn btn-danger", onclick="show_danger(this)") }}
+      {{form.delete_cb.label(class_="form-check-label text-danger")}}
+      </span>
+      <p id="warning" class="alert alert-danger mt-3 d-none">
+        Warning: deleting a user cannot be undone.
+      </p>
+      <p class="alert alert-info my-3">
+        {% if not form.old_email.data %}
+        Note: the user will receive an email with their temporary password when you submit this.
+        {% else %}
+        Note: the user will not be notified of any changes.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  {% for message in get_flashed_messages() %}
+  <div class="alert alert-warning mt-3">
+    {{ message }}
+  </div>
+  {% endfor %}
+</form>
+<script>
+ function show_danger(cb) {
+   console.log(cb.checked);
+   let el = document.getElementById('warning');
+   if (cb.checked) {
+     el.classList.remove('d-none');
+   } else {
+     el.classList.add('d-none');
+   }
+ }
+</script>
+</div>
+
+{% endblock %}

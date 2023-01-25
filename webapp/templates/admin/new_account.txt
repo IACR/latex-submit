@@ -1,0 +1,7 @@
+An account has been created for the email address {{email}} on {{servername}}.
+Your temporary password is {{password}}, but please use this link to set a new
+password:
+
+{{confirm_url}}
+
+
