@@ -33,7 +33,9 @@ def run_latex_task(paper_path, paperid):
     try:
         with Path(paper_path) / Path('compilation.json') as json_file:
             if json_file.is_file():
+                print('paper path exists: {}'.format(str(json_file)))
                 compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+                print('compilation is: {}'.format(compilation.json(indent=2)))
                 compilation.compile_time = output.get('execution_time', -1)
                 compilation.log = output.get('log', 'no log')
                 latexlog = Path(output_path) / 'main.log'
@@ -100,10 +102,12 @@ def run_latex_task(paper_path, paperid):
                         compilation.status = CompileStatus.METADATA_FAIL
                         compilation.error_log.append('No metadata file. Are you sure you used iacrcc?')
                 json_file.write_text(compilation.json(indent=2, exclude_none=True), encoding='UTF-8')
+                print('wrote json file: ' + compilation.json(indent=2,exclude_none=True))
             else:
                 output['error'] = 'Missing json file.'
     except Exception as e:
+        print('EXCEPTION writing output file')
         output['error'] = 'Exception saving output: ' + str(e)
-    task_queue.pop(paperid, None)
+    #task_queue.pop(paperid, None)
     return json.dumps(output, indent=2)
 
