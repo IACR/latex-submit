@@ -63,7 +63,7 @@ def run_latex(input_dirname, output_dirname):
         for filename in filenames:
             file_path = Path(os.path.join(dirpath, filename))
             # remove any .sty files, since they can conflict with installed packages.
-            if file_path.name.endswith('.sty') or file_path.name.endswith('.bbl'):
+            if file_path.name.endswith('.sty') or file_path.name.endswith('.cls'):
                 warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
             else:
@@ -92,7 +92,9 @@ def run_latex(input_dirname, output_dirname):
         code, output = container.exec_run('latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main', workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
-        return {'log': output.decode(), 'exit_code': code}
+        return {'log': output.decode(),
+                'warnings': warnings,
+                'exit_code': code}
     except APIError as e:
         print(e)
         raise(e)

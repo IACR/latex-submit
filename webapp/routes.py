@@ -136,10 +136,9 @@ def runlatex():
         paper_status.log.append(LogEvent(when=datetime.datetime.now(),
                                          action='Zip file could not be unzipped'))
         json_file.write_text(paper_status.json(indent=2))
-        return redirect(url_for('home_bp.view_results',
-                                paperid=paperid,
-                                version=version,
-                                auth=create_hmac(paperid, version)), 302)
+        return render_template('message.html',
+                               title='Failure to unzip your uploaded zip file',
+                               error='It appears that your zipfile is not a zip file: {}'.format(str(e)))
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
         paper_status.log.append(LogEvent(when=datetime.datetime.now(),
@@ -161,7 +160,7 @@ def runlatex():
                         'zipfilename': request.files['zipfile'].filename}
     compilation = Compilation(**compilation_data)
     compilation_file = candidate_dir / Path('compilation.json')
-    compilation_file.write_text(compilation.json(indent=2))
+    compilation_file.write_text(compilation.json(indent=2, exclude_none=True))
     receivedDate = datetime.datetime.strptime(args.get('submitted')[:10],'%Y-%m-%d')
     acceptedDate = datetime.datetime.strptime(args.get('accepted')[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
@@ -191,6 +190,7 @@ def runlatex():
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
             'status_url': status_url}
+    print('sending them running: ' + str(task_queue.keys()))
     return render_template('running.html', **data)
 
 @home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
@@ -217,6 +217,7 @@ def get_status(paperid, version, auth):
                         'msg': 'Unknown version'}), 200
     msg = 'Unknown status'
     # is the task in the queue or running?
+    print('check queue for : {}:'.format(paperid) + str(task_queue.keys()))
     future = task_queue.get(paperid, None)
     if future:
         if future.cancelled():
@@ -250,6 +251,9 @@ def get_status(paperid, version, auth):
                 msg = 'Cannot find JSON file'
             else:
                 comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+                print('parsed file:{}'.format(str(json_file)))
+                print('value is {}'.format(comp.json(indent=2)))
+                print(comp.json(indent=2))
                 if comp.exit_code == -1: # default
                     status = TaskStatus.UNKNOWN
                     msg = 'Exit code was not set'
@@ -340,7 +344,7 @@ def view_results(paperid, version, auth):
         # See https://github.com/IACR/latex-submit/issues/12
         return render_template('message.html',
                                title='Paper was not compiled',
-                               error='Paper was not compiled: no directory {}'.format(str(output_path)))
+                               error='Paper was not compiled: no directory {}. This is a known bug and you should try reloading this page.'.format(str(output_path)))
     input_tree = []
     output_dir = paper_path / Path('output')
     data['output'] = _expand_dir(output_dir)
