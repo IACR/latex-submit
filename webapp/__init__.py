@@ -22,8 +22,7 @@ assert sys.version_info >= (3, 7)
 
 def get_json_path(paperid, version):
     """Path to a paper version, where compilation.json is located."""
-    return Path(current_app.config['DATA_DIR']) / Path('{}/{}/compilation.json'.format(paperid,
-                                                                                       version))
+    return Path(current_app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('compilation.json')
 def create_hmac(paperid, version):
     """Create hmac used for validating local URLs."""
     return hmac.new(current_app.config['SECRET_KEY'].encode('utf-8'),
