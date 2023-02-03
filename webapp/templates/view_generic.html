@@ -52,10 +52,10 @@ This template is used to show the status of a compilation.
       </tbody>
     </table>
     <div class="ms-3">
-      {% if output %}
+      {% if comp.output_tree %}
       Output files from running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
       <ul>
-        {% for el in output recursive %}
+        {% for el in comp.output_tree.children recursive %}
         <li>{{el.name}}
           {% if el.children %}<ul style="list-style: '-';">{{ loop(el.children) }}</ul>{% endif %}</li>
         {% endfor %}
