@@ -275,7 +275,7 @@ def get_status(paperid, version, auth):
             msg = 'No record of compilation'
         else:
             status = record.task_status
-            msg = 'Compilation finished'
+            msg = 'Compilation {}'.format(status.value)
     if (status == TaskStatus.FINISHED or
         status == TaskStatus.CANCELLED or
         status == TaskStatus.FAILED_EXCEPTION):

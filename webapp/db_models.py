@@ -27,7 +27,7 @@ class Version(str, Enum):
 def validate_version(val):
     return val in [v.value for v in Version]
 
-qclass TaskStatus(str, Enum):
+class TaskStatus(str, Enum):
     """Status of a paper."""
     PENDING = 'PENDING'
     CANCELLED = 'CANCELLED'
