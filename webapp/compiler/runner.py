@@ -96,7 +96,6 @@ def run_latex(input_dirname, output_dirname):
                 'warnings': warnings,
                 'exit_code': code}
     except APIError as e:
-        print(e)
         raise(e)
     finally:
         shutil.rmtree(staging_dir)
@@ -104,7 +103,7 @@ def run_latex(input_dirname, output_dirname):
         container.remove()
     return {'exit_code': 999,
             'warnings': warnings,
-            'error': 'Compilation failed: ' + output.decode()}
+            'log': output.decode()}
 
 
 if __name__ == '__main__':

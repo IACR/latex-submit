@@ -1,4 +1,3 @@
-import glob
 import io
 import json
 import os
@@ -95,4 +94,3 @@ def test_meta4():
     assert meta.funders[2].ror == None
     assert meta.funders[2].fundref == '517622'
     assert meta.funders[2].grantid == '57821-3'
-    

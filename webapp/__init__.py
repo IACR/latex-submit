@@ -20,6 +20,9 @@ import sys
 # Make sure we aren't running on an old python.
 assert sys.version_info >= (3, 7)
 
+def paper_key(paperid, version):
+    return '/'.join((paperid, version))
+
 def get_json_path(paperid, version):
     """Path to a paper version, where compilation.json is located."""
     return Path(current_app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('compilation.json')
@@ -34,25 +37,6 @@ def validate_hmac(paperid, version, auth):
 
 def get_pdf_url(paperid, version):
     return '/view/{}/{}/{}/main.pdf'.format(paperid, version, create_hmac(paperid, version))
-
-class StrEnum(str, Enum):
-    @classmethod
-    def from_str(cls, val):
-        """Convert string to enum value."""
-        for e in cls:
-            if e.value == val:
-                return e
-        return None
-
-class TaskStatus(StrEnum):
-    """Status of a paper."""
-    PENDING = 'PENDING'
-    CANCELLED = 'CANCELLED'
-    RUNNING = 'RUNNING'
-    FAILED_EXCEPTION = 'FAILED_EXCEPTION'
-    FAILED_COMPILE = 'FAILED_COMPILE'
-    COMPILED = 'COMPILED'
-    UNKNOWN = 'UNKNOWN'
 
 # Globally accessible SMTP client. This can be used in unit tests as well.
 mail = Mail()

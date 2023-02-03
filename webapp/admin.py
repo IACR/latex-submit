@@ -11,8 +11,8 @@ import string
 from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatus
-from .metadata import validate_paperid, validate_version
-from .db_models import Role, User
+from .metadata import validate_paperid
+from .db_models import Role, User, validate_version
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 

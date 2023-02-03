@@ -5,13 +5,14 @@ from flask import current_app as app
 from flask_mail import Message
 import os
 from pathlib import Path
-from . import executor, mail, task_queue, TaskStatus, get_json_path, get_pdf_url, validate_hmac, create_hmac
+from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db
 import shutil
 import string
+from .db_models import CompileRecord, validate_version, TaskStatus
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent, VenueEnum
-from .metadata import validate_paperid, get_doi, validate_version
-from webapp.tasks import run_latex_task
+from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent, VenueEnum, FileTree
+from .metadata import validate_paperid, get_doi
+from .tasks import run_latex_task
 from .fundreg.search_lib import search
 
 home_bp = Blueprint('home_bp',
@@ -81,6 +82,14 @@ def submitform():
         data['paperid'] = paperid
     return render_template('submit.html', **data)
 
+def context_wrap(fn):
+    """Wrapper to pass context to function in thread."""
+    app_context = app.app_context()
+    def wrapper(*args, **kwargs):
+        with app_context:
+            return fn(*args, **kwargs)
+    return wrapper
+
 @home_bp.route('/submit', methods=['POST'])
 def runlatex():
     # TODO: this needs authentication from one of two places:
@@ -95,16 +104,18 @@ def runlatex():
                                error=msg)
     paperid = args.get('paperid')
     version = args.get('version')
-    if task_queue.get(paperid):
+    task_key = paper_key(paperid, version)
+    now = datetime.datetime.now()
+    if task_queue.get(task_key):
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
-    json_file = paper_dir / Path('status.json')
-    if json_file.is_file():
-        paper_status = PaperStatus.parse_raw(json_file.read_text(encoding='utf-8'))
-        paper_status.log.append(LogEvent(when=datetime.datetime.now(),
+    status_file = paper_dir / Path('status.json')
+    if status_file.is_file():
+        paper_status = PaperStatus.parse_raw(status_file.read_text(encoding='utf-8'))
+        paper_status.log.append(LogEvent(when=now,
                                          action='Upload of zip file'))
     else:
         paper_status_data = {'paperid': paperid,
@@ -113,37 +124,37 @@ def runlatex():
                              'venue': args.get('venue'),
                              'submitted': args.get('submitted'),
                              'accepted': args.get('accepted'),
-                             'log': [{'when': datetime.datetime.now(),
+                             'log': [{'when': now,
                                       'action': 'Upload of zip file'}]}
         paper_status = PaperStatus(**paper_status_data)
     # Save a json file with minimal metadata for debugging. This will
     # be updated at the end of the run.
-    json_file.write_text(paper_status.json(indent=2))
-    # TODO: handle the upload of the 'final' version as well.
-    candidate_dir = paper_dir / Path('candidate')
-    # TODO: this blows away everything for candidate version.
-    if candidate_dir.is_dir():
-        shutil.rmtree(candidate_dir)
-    candidate_dir.mkdir(parents=True)
+    status_file.write_text(paper_status.json(indent=2))
+    version_dir = paper_dir / Path(version)
+    # TODO: decide if we should save old compilations. This blows
+    # everything away for the version.
+    if version_dir.is_dir():
+        shutil.rmtree(version_dir)
+    version_dir.mkdir(parents=True)
     # Unzip the zip file into submitted_dir
-    zip_path = candidate_dir / Path('all.zip')
+    zip_path = version_dir / Path('all.zip')
     request.files['zipfile'].save(zip_path)
-    input_dir = candidate_dir / Path('input')
+    input_dir = version_dir / Path('input')
     try:
         zip_file = zipfile.ZipFile(zip_path)
         zip_file.extractall(input_dir)
     except Exception as e:
-        paper_status.log.append(LogEvent(when=datetime.datetime.now(),
+        paper_status.log.append(LogEvent(when=now,
                                          action='Zip file could not be unzipped'))
-        json_file.write_text(paper_status.json(indent=2))
+        status_file.write_text(paper_status.json(indent=2))
         return render_template('message.html',
                                title='Failure to unzip your uploaded zip file',
                                error='It appears that your zipfile is not a zip file: {}'.format(str(e)))
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
-        paper_status.log.append(LogEvent(when=datetime.datetime.now(),
+        paper_status.log.append(LogEvent(when=now,
                                          action='Zip file did not have main.tex at top level'))
-        json_file.write_text(paper_status.json(indent=2))
+        status_file.write_text(paper_status.json(indent=2))
         # then no sense trying to compile
         return render_template('message.html',
                                title='Missing main.tex',
@@ -154,13 +165,22 @@ def runlatex():
                         'venue': args.get('venue'),
                         'submitted': args.get('submitted'),
                         'accepted': args.get('accepted'),
-                        'compiled': datetime.datetime.now(),
+                        'compiled': now,
                         'error_log': [],
                         'warning_log': [],
                         'zipfilename': request.files['zipfile'].filename}
     compilation = Compilation(**compilation_data)
-    compilation_file = candidate_dir / Path('compilation.json')
-    compilation_file.write_text(compilation.json(indent=2, exclude_none=True))
+    comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
+    if not comprec:
+        comprec = CompileRecord(paperid=paperid,version=version)
+    comprec.task_status = TaskStatus.PENDING
+    comprec.started = now
+    compstr = compilation.json(indent=2, exclude_none=True)
+    comprec.result = compstr
+    db.session.add(comprec)
+    db.session.commit()
+    compilation_file = version_dir / Path('compilation.json')
+    compilation_file.write_text(compstr, encoding='UTF-8')
     receivedDate = datetime.datetime.strptime(args.get('submitted')[:10],'%Y-%m-%d')
     acceptedDate = datetime.datetime.strptime(args.get('accepted')[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
@@ -170,13 +190,17 @@ def runlatex():
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
-    output_dir = candidate_dir / Path('output')
+    output_dir = version_dir / Path('output')
     # Remove output from any previous run.
     if output_dir.is_dir():
         shutil.rmtree(output_dir)
-    # fire off a separate task to compile
-    task_queue[paperid] = executor.submit(run_latex_task, str(candidate_dir.absolute()),
-                                                          paperid)
+    # fire off a separate task to compile. We wrap run_latex_task so it
+    # can have the flask context to use sqlalchemy on the database.
+    task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           str(version_dir.absolute()),
+                                           paperid,
+                                           version,
+                                           task_key)
     msg = Message('Paper {} was submitted'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=['iacrcc@digicrime.com']) # for testing
@@ -190,7 +214,6 @@ def runlatex():
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
             'status_url': status_url}
-    print('sending them running: ' + str(task_queue.keys()))
     return render_template('running.html', **data)
 
 @home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
@@ -200,30 +223,29 @@ def get_status(paperid, version, auth):
     be redirected to url when the compilation is completed.
     """
     if not validate_hmac(paperid, version, auth):
-        return jsonify({'status': TaskStatus.UNKNOWN,
+        return jsonify({'status': TaskStatus.ERROR,
                         'msg': 'hmac is invalid'})
-    status = TaskStatus.UNKNOWN
     paper_url = url_for('home_bp.view_results',
                         paperid=paperid,
                         version=version,
                         auth=create_hmac(paperid, version))
     if not validate_paperid(paperid):
         return jsonify({'url': paper_url,
-                        'status': TaskStatus.UNKNOWN,
+                        'status': TaskStatus.ERROR,
                         'msg': 'Invalid paperid'})
     if not validate_version(version):
         return jsonify({'url': paper_url,
-                        'status': TaskStatus.UNKNOWN,
+                        'status': TaskStatus.ERROR,
                         'msg': 'Unknown version'}), 200
+    status = TaskStatus.PENDING
     msg = 'Unknown status'
     # is the task in the queue or running?
-    print('check queue for : {}:'.format(paperid) + str(task_queue.keys()))
-    future = task_queue.get(paperid, None)
+    task_key = paper_key(paperid, version)
+    future = task_queue.get(task_key, None)
     if future:
         if future.cancelled():
             status = TaskStatus.CANCELLED
             msg = 'Compilation was cancelled'
-            task_queue.pop(paperid, None)
         elif future.running():
             status = TaskStatus.RUNNING
             msg = 'Compilation is running'
@@ -231,10 +253,13 @@ def get_status(paperid, version, auth):
             status = TaskStatus.FAILED_EXCEPTION
             msg = 'An exception occurred: {}'.format(str(future._exception))
         elif future.done(): # must have returned a result
-            status = TaskStatus.COMPILED
-            msg = future.result()
-            # Tasks that are done should remove themselves. Should not happen.
-            task_queue.pop(paperid, None)
+            # Tasks that are done should remove themselves from task_queue, so this
+            # shouldn't happen
+            status = TaskStatus.FINISHED
+            if future.result.get('errors'):
+                msg = 'Finished with errors'
+            else:
+                msg = 'Compilation finished running'
         else: # it's enqueued
             status = TaskStatus.COMPILING
             try:
@@ -243,26 +268,18 @@ def get_status(paperid, version, auth):
                 msg = 'Pending (position {} out of {})'.format(position, size)
             except Exception:
                 msg = 'Unknown position'
-    else:
-        # we rely upon the json file
-        with get_json_path(paperid, version) as json_file:
-            if not json_file.is_file():
-                status = TaskStatus.UNKNOWN
-                msg = 'Cannot find JSON file'
-            else:
-                comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
-                print('parsed file:{}'.format(str(json_file)))
-                print('value is {}'.format(comp.json(indent=2)))
-                print(comp.json(indent=2))
-                if comp.exit_code == -1: # default
-                    status = TaskStatus.UNKNOWN
-                    msg = 'Exit code was not set'
-                elif comp.exit_code == 0:
-                    status = TaskStatus.COMPILED
-                    msg = 'Successfully compiled'
-                else:
-                    status = TaskStatus.FAILED_COMPILE
-                    msg = 'Exit code from latexmk was {}'.format(comp.exit_code)
+    else: # The task would normally remove itself from the task_queue.
+        record = CompileRecord.query.filter_by(paperid=paperid, version=version).first()
+        if not record:
+            status = TaskStatus.ERROR
+            msg = 'No record of compilation'
+        else:
+            status = record.task_status
+            msg = 'Compilation finished'
+    if (status == TaskStatus.FINISHED or
+        status == TaskStatus.CANCELLED or
+        status == TaskStatus.FAILED_EXCEPTION):
+        task_queue.pop(task_key, None)
     return jsonify({'url': paper_url,
                     'status': status.value,
                     'msg': msg}), 200
@@ -289,17 +306,6 @@ def show_pdf(paperid,version, auth):
                            title='Unable to retrieve file {}'.format(str(pdf_path.absolute())),
                            error='Unknown file. This is a bug')
     
-def _expand_dir(path):
-    """Return a file tree for a directory."""
-    node = []
-    for dir in sorted(path.iterdir()):
-        child = {'name': dir.name}
-        if dir.is_dir():
-            child['children'] = _expand_dir(dir)
-        node.append(child)
-    return node
-
-
 # when a paper fails to compile or has nonempty error_log, show just
 # the error log compile_error.html
 # if iacrcc, then show iacrcc_success.html
@@ -345,9 +351,8 @@ def view_results(paperid, version, auth):
         return render_template('message.html',
                                title='Paper was not compiled',
                                error='Paper was not compiled: no directory {}. This is a known bug and you should try reloading this page.'.format(str(output_path)))
-    input_tree = []
     output_dir = paper_path / Path('output')
-    data['output'] = _expand_dir(output_dir)
+    comp.output_tree = FileTree.from_path(output_dir)
     pdf_file = output_path / Path('main.pdf')
     meta_file = output_path / Path('main.meta')
     if meta_file.is_file():

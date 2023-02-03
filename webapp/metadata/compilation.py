@@ -391,6 +391,26 @@ class Meta(BaseModel):
             return False
         return True
         
+class FileTree(BaseModel):
+    """Used in the UI to display the file tree in output."""
+    name: str = Field(...,
+                      title='Name of node',
+                      description='Name of file or directory')
+    children: List['FileTree'] = Field(None)
+    def from_path(dirpath):
+        ft = FileTree(name=dirpath.name, children=[])
+        for dir in sorted(dirpath.iterdir()):
+            child = FileTree(name=dir.name)
+            if dir.is_dir():
+                child.children = FileTree.from_path(dir).children
+            else:
+                child.children = []
+            ft.children.append(child)
+        return ft
+
+
+FileTree.update_forward_refs()
+
 class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID derived from venue and id in review system',
@@ -434,6 +454,9 @@ class Compilation(BaseModel):
     meta: Meta = Field(None,
                        title='Parsed metadata',
                        description='Present once status passes COMPILATION_SUCCESS')
+    output_tree: FileTree = Field(None,
+                                  title='Directory tree of output',
+                                  description='Simple tree representation')
     
 
 if __name__ == '__main__':
