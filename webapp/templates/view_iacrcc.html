@@ -27,6 +27,12 @@ This template is used to show the status of a compilation for iacrcc.cls
       </ol>
     </div>
     {% include "compilation.html" %}
+    <p class="alert alert-info mt-2">
+      If you are satisfied with your paper and your metadata, you can submit it for
+      copy editing. Once you do that, you can no longer upload a new version.
+      <br><br>
+      <button class="btn btn-primary" disabled>Submit for copy edit (currently disabled)</button>
+    </p>
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
     {% if pdf %}<h3 class="ms-3 mt-3"><a href="{{pdf}}" target="_blank">View PDF</a></h3>{% endif %}
