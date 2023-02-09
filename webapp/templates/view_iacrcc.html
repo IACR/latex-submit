@@ -10,29 +10,23 @@ This template is used to show the status of a compilation for iacrcc.cls
             type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
     <button class="nav-link" id="nav-output-tab" data-bs-toggle="tab" data-bs-target="#nav-output"
             type="button" role="tab" aria-controls="nav-output" aria-selected="false">Output</button>
-    <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
-            type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
   </div>
 </nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-    <div class="mb-3 d-flex">
-      <a class="btn btn-primary" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may resubmit your paper</a>
-      {% if pdf %}<h4 class="ms-3 my-0"><a href="{{pdf}}" target="_blank">View PDF</a></h4>{% endif %}
-      <h4 class="ms-3">{{comp.status.value|replace('_', ' ')}}</h4>
+    <a class="btn btn-primary mb-3" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may still resubmit your paper</a>
+    <div class="alert alert-success">
+      Congratulations - your paper was compiled. The next steps are:
+      <ol>
+        <li><a href="{{pdf}}" target="_blank">check your PDF</a> to make sure it looks ok.</li>
+        <li>Check any warnings below</li>
+        <li>Check the <a href="#metadata">metadata</a> below</li>
+        <li>Once you have checked the PDF, warnings, and metadata, you can submit it
+          for copy editing.
+        </li>
+      </ol>
     </div>
-    <div class="alert alert-success">It appears that your compilation worked, but you should
-      <a href="{{pdf}}" target="_blank">check your PDF</a>
-      and <a href="#" onclick="showMetadata();return false;">check the metadata</a>.
-    </div>
-    {% if comp.warning_log %}
-    <h4>Warnings</h4>
-    {% for error in comp.warning_log %}
-    <div class="alert alert-warning">Warning: {{error}}</div>
-    {% endfor %}
-    {% endif %}
-    <pre>{{comp.log}}</pre>
-    <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
+    {% include "compilation.html" %}
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
     {% if pdf %}<h3 class="ms-3 mt-3"><a href="{{pdf}}" target="_blank">View PDF</a></h3>{% endif %}
@@ -62,47 +56,10 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endfor %}
       </ul>
       {% endif %}
+      <h3>latexmk log</h3>
+      <pre>{{comp.log}}</pre>
+      <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
     </div>
-  </div>
-  <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
-    <h3 class="ms-3">Extracted metadata</h3>
-    {% if metafile %}
-    <div class="alert alert-info mx-3">The accuracy of your metadata is extremely
-      important, so please check it over.
-      It will be used for several purposes:
-      <ol class="mb-0">
-	<li>to produce the HTML page linking to your paper,</li>
-	<li>to register for a DOI</li>
-	<li>to supply information for indexing services like crossref,
-	  Google Scholar, DOAJ, Clarivate Web of Science,
-	  and Elsevier's Scopus service.</li>
-      </ol>
-    </div>
-    <p class="alert alert-danger">TODO: display this better and add a button to
-      submit final version.
-    </p>
-    {% include "compilation.html" %}
-    {% if comp.meta %}<pre>{{comp.meta.json(exclude_none=True,indent=2)}}</pre>{% endif %}
-    <pre>{{metafile}}</pre>
-    {% else %} {# no metafile #}
-    <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>
-    {% endif %}
   </div>
 </div>
-<script>
- function scrollToError() {
-   document.getElementById('endOfOutput').scrollIntoView({
-     behavior: 'smooth',
-     block: 'nearest',
-     inline: 'start'});
- }
-
-  function showMetadata() {
-      metaButton = document.getElementById('nav-meta-tab');
-      console.dir(metaButton);
-      bootstrap.Tab.getOrCreateInstance(metaButton).show();
-  }
-
-</script>
-
 {% include "base_footer.html" %}
