@@ -5,3 +5,4 @@ python-dotenv
 flask-wtf
 flask-login
 flask-sqlalchemy
+arxiv-latex-cleaner

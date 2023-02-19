@@ -4,6 +4,7 @@ Library for handling output meta file from compiling latex.
 
 from nameparser import HumanName
 from pylatexenc.latex2text import LatexNodes2Text
+from arxiv_latex_cleaner import arxiv_latex_cleaner
 
 def get_key_val(line):
     """If line has form key: value, then return key, value."""
@@ -120,3 +121,13 @@ def read_meta(metafile):
             raise Exception('unexpected line {}'.format(line))
     return data
 
+def clean_abstract(text):
+    """Remove comments, todos, \begin{comment} from abstract."""
+    lines = text.splitlines(keepends=True)
+    # There is some doubt about whether to include things like \textrm
+    # in the commands_only_to_delete. It depends on how mathjax or
+    # katex is configured.
+    args = {'commands_only_to_delete': [],
+            'commands_to_delete': ['todo', 'footnote']}
+    clean_lines = arxiv_latex_cleaner._remove_comments_and_commands_to_delete(lines, args)
+    return ''.join(clean_lines)
