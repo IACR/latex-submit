@@ -23,7 +23,8 @@ This is the second paragraph. \\begin{comment}
 within comment environment.
 \\end{comment}
 You may still~\\footnote{Go bye bye} use percentages like 10\\% of the content.
-We remove \\todo{this is a todo}
+We remove \\todo{this is a removable todo} and \\todo[inline]{so is this} but
+the last one is not removed because arxiv_latex_cleaner does not recognize it.
 """
     output = clean_abstract(input)
     print(output)
@@ -36,4 +37,6 @@ We remove \\todo{this is a todo}
     assert 'bye not in output'
     assert '%' in output
     # \todo is removed.
-    assert 'todo' not in output
+    assert 'removable' not in output
+    # We might wish to catch this in the future.
+    assert 'so is this' in output
