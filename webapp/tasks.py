@@ -7,7 +7,8 @@ import time
 from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
-from .metadata.latex.iacrcc.parser import meta_parse, clean_abstract
+from .metadata.latex.iacrcc.parser import meta_parse
+from .metadata.meta_parse import clean_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, FileTree
 from .db_models import CompileRecord, TaskStatus
 
