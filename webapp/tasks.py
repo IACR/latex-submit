@@ -8,6 +8,7 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
+from .metadata.meta_parse import clean_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, FileTree
 from .db_models import CompileRecord, TaskStatus
 
@@ -101,7 +102,7 @@ def run_latex_task(paper_path, paperid, version, task_key):
                         compilation.status = CompileStatus.MISSING_ABSTRACT
                         compilation.error_log.append('An abstract is required.')
                     else:
-                        data['abstract'] = abstract_file.read_text(encoding='UTF-8')
+                        data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8'))
                     compilation.meta = Meta(**data)
                     if compilation.meta.version != VersionEnum.FINAL:
                         compilation.status = CompileStatus.WRONG_VERSION
