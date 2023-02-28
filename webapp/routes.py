@@ -15,6 +15,10 @@ from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
 
+ENGINES = {'lualatex': 'latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
+           'pdflatex': 'latexmk -g -pdf -pdflatex="pdflatex -interaction=nonstopmode --disable-write18 --no-shell-escape" main',
+           'xelatex': 'latexmk -g -pdfxe -xelatex="xelatex -interaction=nonstopmode -file-line-error -no-shell-escape" main'}
+
 home_bp = Blueprint('home_bp',
                     __name__,
                     template_folder='templates',
@@ -34,6 +38,10 @@ def _validate_submit(args, files):
     """args should contain paperid and email. files should contain zipfile."""
     if 'paperid' not in args:
         return 'Missing paperid'
+    if 'engine' not in args:
+        return 'Missing engine'
+    if args.get('engine') not in ENGINES:
+        return 'Invalid engine'
     if not validate_paperid(args.get('paperid')):
         return 'Invalid paperid'
     if 'email' not in args:
@@ -159,6 +167,7 @@ def runlatex():
         return render_template('message.html',
                                title='Missing main.tex',
                                error='Your zip file should contain main.tex at the top level.')
+    command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
                         'email': args.get('email'),
@@ -166,6 +175,7 @@ def runlatex():
                         'submitted': args.get('submitted'),
                         'accepted': args.get('accepted'),
                         'compiled': now,
+                        'command': command,
                         'error_log': [],
                         'warning_log': [],
                         'zipfilename': request.files['zipfile'].filename}
@@ -197,6 +207,7 @@ def runlatex():
     # fire off a separate task to compile. We wrap run_latex_task so it
     # can have the flask context to use sqlalchemy on the database.
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           command,
                                            str(version_dir.absolute()),
                                            paperid,
                                            version,

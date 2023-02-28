@@ -1,11 +1,11 @@
 <h3 id="unsupported" class="pt-3">LaTeX packages that are <span class="text-danger">not</span> supported</h3>
 <p>
-  We explicitly do not support some LaTeX packages on this
-  system because they invoke \write18, \ShellEscape, or
-  potentially unsafe lua code. This is enforced by running
-  lualatex in a sandbox.  Some of the packages listed below may
-  retain part of their functionality, but you should not rely
-  upon them.
+  We explicitly do not support some LaTeX packages on this system
+  either because they are unsupported under lualatex or they invoke
+  \write18, \ShellEscape, or potentially unsafe lua code. This is
+  enforced by running lualatex in a sandbox.  Some of the packages
+  listed below may retain part of their functionality, but you should
+  not rely upon them.
 </p>
 <ol class="packages" style="column-count:2;">
   <li>abc</li>
@@ -70,6 +70,7 @@
   <li>pstricks/pstricks-pdf</li>
   <li>pygmentex</li>
   <li>python</li>
+  <li>qcircuit</li>
   <li>rubik</li>
   <li>rubikrotation</li>
   <li>rubiktwocube</li>
@@ -91,6 +92,7 @@
   <li>verbments</li>
   <li>vpe</li>
   <li>xepersian</li>
+  <li>xypic</li>
 </ol>
 
 

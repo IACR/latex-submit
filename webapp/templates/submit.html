@@ -77,6 +77,14 @@
         <input required class="form-control w-50" id="email" type="email" name="email" placeholder="email of submitting author" value="{{email}}">
       </div>
       <div class="form-group mt-4">
+        <label for="engine" class="form-label">LaTeX engine to use</label>
+        <select class="form-select w-50" name="engine" id="engine">
+          <option value="lualatex">lualatex (required for iacrcc class)</option>
+          <option value="pdflatex" disabled>pdflatex</option>
+          <option value="xelatex" disabled>xelatex</option>
+        </select>
+      </div>
+      <div class="form-group mt-4">
         <label for="paperid" class="form-label">Paper ID</label>
         <input required class="form-control w-50" type="text" name="paperid" id="paperid" placeholder="paper ID" pattern="[-a-zA-Z0-9]{7,}" value="{{paperid}}">
       </div>
@@ -301,12 +309,27 @@
 </div>
 
 <script>
+ var engineSelect = document.getElementById('engine');
  function updateClsfile(sel) {
    document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
+   document.querySelectorAll('#engine option').forEach(el => {
+     el.disabled = false;
+     el.text = el.value;
+   });
    let value = sel.value;
    document.getElementById(value).classList.remove('d-none');
    if (value == 'iacrcc') {
      document.getElementById('doccls').value = 'iacrcc';
+     engineSelect.value = 'lualatex';
+     document.querySelectorAll('#engine option').forEach(el => {
+       if (el.value != 'lualatex') {
+         el.disabled = true;
+         el.text = el.value + ' (disabled)'
+       } else {
+         el.selected = true;
+         el.text = el.value + ' (required)'
+       }
+     });
    } else if (value == 'tosc' || value == 'tches') {
      document.getElementById('doccls').value = 'iacrtrans';
    } else {

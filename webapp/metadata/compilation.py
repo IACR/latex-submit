@@ -436,6 +436,8 @@ class Compilation(BaseModel):
     compile_time: float = Field(None,
                                 title='Number of seconds for compilation',
                                 description='May be none before it is compiled')
+    command: str = Field(None,
+                         title='latexmk command that was run')
     log: str = Field(None,
                      title='Log from running latexmk',
                      description='Will be absent until latex is attempted.')
