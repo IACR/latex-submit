@@ -14,7 +14,7 @@ This template is used to show the status of a compilation for iacrcc.cls
 </nav>
 <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
   <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-    <a class="btn btn-primary mb-3" href="/submit?paperid={{paperid}}&version={{version}}{% if comp %}&email={{comp.email}}{% endif %}">You may still resubmit your paper</a>
+    <a class="btn btn-primary mb-3" href="{{url_for('home_bp.show_submit_version', paperid={{paperid}},version={{version}},auth={{auth}}{% if comp %},email={{comp.email}},venue={{comp.venue}},doccls={{comp.doccls}}{% endif %})}}">You may still resubmit your paper</a>
     <div class="alert alert-success">
       Congratulations - your paper was compiled. The next steps are:
       <ol>

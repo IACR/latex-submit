@@ -12,9 +12,10 @@ from .metadata.meta_parse import clean_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, FileTree
 from .db_models import CompileRecord, TaskStatus
 
-def run_latex_task(paper_path, paperid, version, task_key):
+def run_latex_task(cmd, paper_path, paperid, version, task_key):
     """Execute latex on input_path contents, writing into output_path.
     args:
+       cmd: latex command to run
        paper_path: absolute string path to directory containing compilation.json
        paperid: unique id for paper
        version: a value of Version enum
@@ -34,7 +35,7 @@ def run_latex_task(paper_path, paperid, version, task_key):
     output_path = paper_path / Path('output')
     try:
         start_time = time.time()
-        output = runner.run_latex(input_path, output_path)
+        output = runner.run_latex(cmd, input_path, output_path)
         # The contract is that output may contain exit_code, log, and
         # an array of warnings.
         output['errors'] = []

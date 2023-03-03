@@ -18,7 +18,7 @@ from docker.errors import APIError
 from docker.types import Mount
 _container = None
 
-def run_latex(input_dirname, output_dirname):
+def run_latex(cmd, input_dirname, output_dirname):
 
     """Run latexmk safely in a docker container.
 
@@ -89,7 +89,7 @@ def run_latex(input_dirname, output_dirname):
                                           detach=True,                  # Detach the container
                                           network_disabled=True,        # Disable networking
                                           mounts=[mount])               # Specify our mount point = the staging dir
-        code, output = container.exec_run('latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main', workdir='/data')
+        code, output = container.exec_run(cmd, workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
         return {'log': output.decode(),
@@ -114,6 +114,8 @@ if __name__ == '__main__':
                            default='/tmp/output')
     argparser.add_argument('--overwrite',
                            action='store_true')
+    argparser.add_argument('--cmd',
+                           default='latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main')
     args = argparser.parse_args()
     output_dir = Path(args.output_dir)
     if output_dir.is_dir():
@@ -122,7 +124,9 @@ if __name__ == '__main__':
         else:
             print('use --overwrite to overwrite output_dir')
             exit(1)
-    print(json.dumps(run_latex(args.input_dir, args.output_dir), indent=2))
+    print(json.dumps(run_latex(args.cmd,
+                               args.input_dir,
+                               args.output_dir), indent=2))
 
 
 

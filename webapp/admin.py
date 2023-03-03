@@ -141,7 +141,7 @@ def user():
                                                auth=create_hmac(user.email,''),
                                                _external=True)}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
-            if 'DEBUG' in app.config:
+            if 'TESTING' in app.config:
                 print(msg.body)
             mail.send(msg)
             flash('User {} was created and they were notified.'.format(form.email.data))

@@ -33,74 +33,99 @@
       are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
       for hints on how to avoid problems.
     </div>
-    <form method="POST" action="{{url_for('home_bp.runlatex')}}" enctype="multipart/form-data">
-      {# The home_bp.runlatex action can authenticate one of two ways:
-      1. with a token from hotcrp using a shared key.
-      2. with an hmac called "auth" that is supplied by this server. This is used for resubmissions.
-      #}
-      <input type="hidden" name="token" value="{{token}}">
-      <input type="hidden" name="auth" value="{{auth}}">
-      <input type="hidden" name="version" value="{{version}}">
+    {% if form.errors %}
+      {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+        {% for error in field_errors %}
+          <div class="alert alert-danger">
+            {{ form[field_name].label }}: {{ error }}
+          </div>
+         {% endfor %}
+      {% endfor %}
+    {% endif %}
+    <form method="POST" action="{{url_for('home_bp.submit_version')}}" enctype="multipart/form-data">
+      {{ form.csrf_token }}
+      {% if form.auth.errors %}
+        {% for msg in form.auth.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {{ form.auth }}
+      {% if form.version.errors %}
+        {% for msg in form.version.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {{ form.version }}
       {# TODO: pick up submitted and accepted and email from URL #}
-      <input type="hidden" name="submitted" value="2022-08-03T06:44:30.468749+00:00">
-      <input type="hidden" name="accepted" value="2022-09-30T06:49:20.468749+00:00">
+      {% if form.submitted.errors %}
+        {% for msg in form.submitted.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {{ form.submitted }}
+      {% if form.accepted.errors %}
+        {% for msg in form.accepted.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {{ form.accepted }}
       <div class="form-group">
-        <label for="journal" class="form-label">Select a venue. At present only <span class="text-monospace">iacrcc</span> is fully supported.</label>
+        <label for="venue" class="form-label">Select a venue. At present only <span class="text-monospace">iacrcc</span> is fully supported.</label>
         <div class="row align-items-center">
           <div class="col-6">
-            <select id="venue" name="venue" class="form-select" aria-label="Select an article class" onchange="updateClsfile(this)">
-              <option selected value="iacrcc">IACR Communications in Cryptology</option>
-              <option value="tosc">IACR Transactions on Symmetric Cryptology (partially supported)</option>
-              <option value="tches">IACR Transactions on Cryptographic Hardware and Embedded Systems (partially supported)</option>
-              <option value="asiacrypt">Asiacrypt (Springer LNCS)</option>
-              <option value="crypto">Crypto (Springer LNCS)</option>
-              <option value="eurocrypt">Eurocrypt (Springer LNCS)</option>
-              <option value="pkc">PKC (Springer LNCS)</option>
-              <option value="tcc">TCC (Springer LNCS)</option>
-            </select>
-            <input type="hidden" name="doccls" id="doccls" value="iacrcc">
+            {#            {{ form.venue(class_='form-select', onchange='updateClsfile(this)') }} #}
+            {% if form.venue.errors %}
+              {% for msg in form.venue.errors %}
+                <div class="alert alert-danger">{{ msg }}</div>
+              {% endfor %}
+            {% endif %}
+            {{ form.venue(class_='form-select') }}
+            {% if form.doccls.errors %}
+              {% for msg in form.doccls.errors %}
+                <div class="alert alert-danger">{{ msg }}</div>
+              {% endfor %}
+            {% endif %}
+            {{ form.doccls }}
           </div>
           <div class="col-6">
-            <div class="clsfile" id="iacrcc">use <span class="text-monospace">documentclass iacrcc</span></div>
-            <div class="clsfile d-none" id="tosc">use <span class="text-monospace">documentclass iacrtrans</span></div>
-            <div class="clsfile d-none" id="tches">use <span class="text-monospace">documentclass iacrtrans</span></div>
-            <div class="clsfile d-none" id="asiacrypt">use <span class="text-monospace">documentclass llncs</span></div>
-            <div class="clsfile d-none" id="crypto">use <span class="text-monospace">documentclass llncs</span></div>
-            <div class="clsfile d-none" id="eurocrypt">use <span class="text-monospace">documentclass llncs</span></div>
-            <div class="clsfile d-none" id="pkc">use <span class="text-monospace">documentclass llncs</span></div>
-            <div class="clsfile d-none" id="tcc">use <span class="text-monospace">documentclass llncs</span></div>
+            <div class="clsfile" id="iacrcc">use <i-mono>documentclass iacrcc</i-mono></div>
+            <div class="clsfile d-none" id="tosc">use <i-mono>documentclass iacrtrans</i-mono></div>
+            <div class="clsfile d-none" id="tches">use <i-mono>documentclass iacrtrans</i-mono></div>
+            <div class="clsfile d-none" id="asiacrypt">use <i-mono>documentclass llncs</i-mono></div>
+            <div class="clsfile d-none" id="crypto">use <i-mono>documentclass llncs</i-mono></div>
+            <div class="clsfile d-none" id="eurocrypt">use <i-mono>documentclass llncs</i-mono></div>
+            <div class="clsfile d-none" id="pkc">use <i-mono>documentclass llncs</i-mono></div>
+            <div class="clsfile d-none" id="tcc">use <i-mono>documentclass llncs</i-mono></div>
           </div>
         </div>
       </div>
       <div class="form-group mt-4">
+        {% if form.email.errors %}
+          {% for msg in form.email.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
         <label for="email" class="form-label">Your email address (required)</label>
-        <input required class="form-control w-50" id="email" type="email" name="email" placeholder="email of submitting author" value="{{email}}">
+        {{form.email(class_='form-control w-50', placeholder='email of submitting author')}}
       </div>
       <div class="form-group mt-4">
+        {% if form.engine.errors %}
+          {% for msg in form.engine.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+        <label for="engine" class="form-label">LaTeX engine to use</label>
+        {{ form.engine(class_='form-select w-50') }}
+      </div>
+      <div class="form-group mt-4">
+        {% if form.paperid.errors %}
+          {% for msg in form.paperid.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
         <label for="paperid" class="form-label">Paper ID</label>
-        <input required class="form-control w-50" type="text" name="paperid" id="paperid" placeholder="paper ID" pattern="[-a-zA-Z0-9]{7,}" value="{{paperid}}">
+        {{ form.paperid(class_='form-control w-50', placeholder='paper ID', pattern='[-a-zA-Z0-9]{7,}') }}
       </div>
-{#      <div class="form-group mt-4">
-        <label for="paperid" class="form-label">Paper ID (select one for now, but eventually this will come from hotcrp. It will encode venue, issue, hotcrp ID)</label>
-        <select class="form-select w-50" name="paperid">
-          <option value="aaaaaa">aaaaaa</option>
-          <option value="bbbbbb">bbbbbb</option>
-          <option value="cccccc">cccccc</option>
-          <option value="ddddd-3">ddddd-3</option>
-          <option value="ee.ee-ee">ee.ee-ee</option>
-          <option value="ffabcd2">ffabcd2</option>
-          <option value="abcdefg">abcdefg</option>
-          <option value="missing-file">missing-file</option>
-          <option value="final-no-abstract">final-no-abstract</option>
-          <option value="final-no-license">final-no-license</option>
-          <option value="final-no-email">final-no-email</option>
-          <option value="preprint">preprint</option>
-          <option value="submission">submission</option>
-          <option value="not-iacrcc">not-iacrcc</option>
-          <option value="doesnotcompile">doesnotcompile</option>
-        </select>
-      </div>
-#}
       <div class="form-group mt-4">
         <label for="zipfile" class="form-label">Zip file with all
           <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
@@ -112,9 +137,14 @@
           <a href="#" onclick="showHelp();return false;">See the
           Help tab</a> for more complete instructions here.
         </label>
-        <input required class="form-control w-50" name="zipfile" type="file" accept=".zip">
+        {% if form.zipfile.errors %}
+          {% for msg in form.zipfile.errors %}
+          <div class="alert alert-danger">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+        {{ form.zipfile(class_='form-control w-50', accept='.zip') }}
       </div>
-      <button type="submit" class="mt-5 btn btn-primary">Upload</button>
+      {{ form.submit(class_='mt-5 btn btn-primary') }}
     </form>
   </div>
   <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
@@ -301,12 +331,27 @@
 </div>
 
 <script>
+ var engineSelect = document.getElementById('engine');
  function updateClsfile(sel) {
    document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
+   document.querySelectorAll('#engine option').forEach(el => {
+     el.disabled = false;
+     el.text = el.value;
+   });
    let value = sel.value;
    document.getElementById(value).classList.remove('d-none');
    if (value == 'iacrcc') {
      document.getElementById('doccls').value = 'iacrcc';
+     engineSelect.value = 'lualatex';
+     document.querySelectorAll('#engine option').forEach(el => {
+       if (el.value != 'lualatex') {
+         el.disabled = true;
+         el.text = el.value + ' (disabled)'
+       } else {
+         el.selected = true;
+         el.text = el.value + ' (required)'
+       }
+     });
    } else if (value == 'tosc' || value == 'tches') {
      document.getElementById('doccls').value = 'iacrtrans';
    } else {
@@ -328,19 +373,6 @@
    showPackages();
    document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
  }
-
- function generateString(length) {
-   let result = '';
-   const charactersLength = characters.length;
-   for ( let i = 0; i < length; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-
-   return result;
- }
- let paperidelem = document.getElementById('paperid');
- if (paperidelem.value == '') {
-   paperidelem.value = generateString(7);
- }
+ updateClsFile(document.getElementById('venue'));
 </script>
 {% endblock %}
