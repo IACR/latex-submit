@@ -14,6 +14,8 @@ from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, P
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
+from .forms import SubmitForm
+import logging
 
 ENGINES = {'lualatex': 'latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
            'pdflatex': 'latexmk -g -pdf -pdflatex="pdflatex -interaction=nonstopmode --disable-write18 --no-shell-escape" main',
@@ -34,61 +36,24 @@ def home():
     return render_template('index.html',
                            title=app.config['SITE_NAME'])
 
-def _validate_submit(args, files):
-    """args should contain paperid and email. files should contain zipfile."""
-    if 'paperid' not in args:
-        return 'Missing paperid'
-    if 'engine' not in args:
-        return 'Missing engine'
-    if args.get('engine') not in ENGINES:
-        return 'Invalid engine'
-    if not validate_paperid(args.get('paperid')):
-        return 'Invalid paperid'
-    if 'email' not in args:
-        return 'Missing author email'
-    if 'submitted' not in args:
-        return 'Missing submitted date'
-    if 'accepted' not in args:
-        return 'Missing accepted date'
-    if 'venue' not in args:
-        return 'Missing venue'
-    # TODO: validate the hmac in token from external sources.
-    if 'token' not in args:
-        return 'Missing token'
-    if 'zipfile' not in files:
-        return 'Missing zip file'
-    version = args.get('version')
-    if not version:
-        return 'Missing version'
-    if not validate_version(version):
-        return 'Invalid version:{}'.format(version)
-    return None
-
 @home_bp.route('/submit', methods=['GET'])
-def submitform():
-    args = request.args.to_dict()
-    # TODO: make sure that there is either a token or auth parameter supplied as a
-    # url parameter. Authenticate either one.
-    token = args.get('token', 'todo:make sure this exists')
-    version = args.get('version', 'candidate')
-    if not validate_version(version):
-        msg = 'Invalid version: {}'.format(version),
-        return render_template('message.html',
-                               title = msg,
-                               error = msg)
-    data = {'title': 'Test submit a paper',
-            'version': version,
-            'token': token,
-            'paperid': ''} # TODO: fix this. It is now supplied by javascript for testing.
-    if 'paperid' in args:
-        paperid = args.get('paperid')
-        if not validate_paperid(paperid):
+def show_submit_version():
+    form = SubmitForm(formdata=request.args)
+    # We validate even the request for this form. This makes sure that auth
+    # is correct.
+    if not form.validate():
+        if app.config['TESTING']:
+            logging.warning('TESTING MODE ONLY')
+            # go ahead and send a clean form anyway.
+            form = SubmitForm(formdata=request.args)
+        else:
+            logging.warning('{}:{}:{} form not authenticated'.format(form.paperid.data,
+                                                                     form.version.data,
+                                                                     form.auth.data))
             return render_template('message.html',
-                                   title='Invalid character in paperid',
-                                   error='paperid is restricted to using characters -.a-z0-9')
-        data['email'] = args.get('email', '')
-        data['paperid'] = paperid
-    return render_template('submit.html', **data)
+                                   title='This submission is not authorized.',
+                                   error='The token for this request is invalid')
+    return render_template('submit.html', form=form)
 
 def context_wrap(fn):
     """Wrapper to pass context to function in thread."""
@@ -99,25 +64,25 @@ def context_wrap(fn):
     return wrapper
 
 @home_bp.route('/submit', methods=['POST'])
-def runlatex():
-    # TODO: this needs authentication from one of two places:
-    # 1. hotcrp will create an hmac with a key shared between this server and hotcrp.
-    # 2. this server will create an hmac for resubmission.
-    # TODO: check the version, and validate that.
+def submit_version():
     args = request.form.to_dict()
-    msg = _validate_submit(args, request.files)
-    if msg:
-        return render_template('message.html',
-                               title='Invalid parameters',
-                               error=msg)
     paperid = args.get('paperid')
-    version = args.get('version')
+    version = args.get('version', 'candidate')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
     if task_queue.get(task_key):
+        logging.warning('Already running {}:{}'.format(form.paperid.data,
+                                                       form.version.data))
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
+    form = SubmitForm()
+    if not form.validate_on_submit():
+        logging.error('Validation failed {}:{}:{}'.format(form.paperid.data,
+                                                          form.version.data,
+                                                          form.auth.data))
+        form.auth.errors.append('Validation failed')
+        return render_template('submit.html', form=form)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
     status_file = paper_dir / Path('status.json')
@@ -146,27 +111,31 @@ def runlatex():
     version_dir.mkdir(parents=True)
     # Unzip the zip file into submitted_dir
     zip_path = version_dir / Path('all.zip')
-    request.files['zipfile'].save(zip_path)
+    try:
+        request.files['zipfile'].save(zip_path)
+    except Exception as e:
+        logging.error('Unable to save zip file: {}'.format(str(e)))
+        form.zipfile.errors.append('unable to save zip file')
+        return render_template('submit.html', form=form)
     input_dir = version_dir / Path('input')
     try:
         zip_file = zipfile.ZipFile(zip_path)
         zip_file.extractall(input_dir)
     except Exception as e:
+        logging.error('Unable to extract from zip file: {}'.format(str(e)))
         paper_status.log.append(LogEvent(when=now,
                                          action='Zip file could not be unzipped'))
         status_file.write_text(paper_status.json(indent=2))
-        return render_template('message.html',
-                               title='Failure to unzip your uploaded zip file',
-                               error='It appears that your zipfile is not a zip file: {}'.format(str(e)))
+        form.zipfile.errors.append('Unable to extract from zip file: {}'.format(str(e)))
+        return render_template('submit.html', form=form)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
         paper_status.log.append(LogEvent(when=now,
                                          action='Zip file did not have main.tex at top level'))
         status_file.write_text(paper_status.json(indent=2))
+        form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
-        return render_template('message.html',
-                               title='Missing main.tex',
-                               error='Your zip file should contain main.tex at the top level.')
+        return render_template('submit.html', form=form)
     command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
@@ -361,7 +330,7 @@ def view_results(paperid, version, auth):
         # See https://github.com/IACR/latex-submit/issues/12
         return render_template('message.html',
                                title='Paper was not compiled',
-                               error='Paper was not compiled: no directory {}. This is a known bug and you should try reloading this page.'.format(str(output_path)))
+                               error='Paper was not compiled: no directory {}. This is a bug that should not exist any more.'.format(str(output_path)))
     output_dir = paper_path / Path('output')
     comp.output_tree = FileTree.from_path(output_dir)
     pdf_file = output_path / Path('main.pdf')

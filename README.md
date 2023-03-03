@@ -203,6 +203,7 @@ python3 -m pip install flask-login
 python3 -m pip install Flask-SQLAlchemy
 python3 -m pip install flask-WTF
 python3 -m pip install docker
+python3 -m pip install arxiv-latex-cleaner
 sudo apt install docker
 ```
 add user to docker group with

@@ -18,11 +18,10 @@ class Config:
     SITE_NAME = 'IACR Publishing Portal'
     SITE_SHORTNAME = 'IACR CiC'
     USERS = None
+    TESTING = False
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'
-    DEBUG = False
-    TESTING = False
     XAPIAN_DB_PATH = '/var/www/wsgi/latex-submit/webapp/fundreg/xapian.db'
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     
@@ -30,6 +29,7 @@ class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
+    AUTHKEY = 'thisisjustfortestingpurposes'
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]
