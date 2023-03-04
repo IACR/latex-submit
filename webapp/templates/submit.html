@@ -73,19 +73,12 @@
         <label for="venue" class="form-label">Select a venue. At present only <span class="text-monospace">iacrcc</span> is fully supported.</label>
         <div class="row align-items-center">
           <div class="col-6">
-            {#            {{ form.venue(class_='form-select', onchange='updateClsfile(this)') }} #}
             {% if form.venue.errors %}
               {% for msg in form.venue.errors %}
                 <div class="alert alert-danger">{{ msg }}</div>
               {% endfor %}
             {% endif %}
-            {{ form.venue(class_='form-select') }}
-            {% if form.doccls.errors %}
-              {% for msg in form.doccls.errors %}
-                <div class="alert alert-danger">{{ msg }}</div>
-              {% endfor %}
-            {% endif %}
-            {{ form.doccls }}
+            {{ form.venue(class_='form-select', onchange='updateEngines(this)') }}
           </div>
           <div class="col-6">
             <div class="clsfile" id="iacrcc">use <i-mono>documentclass iacrcc</i-mono></div>
@@ -332,7 +325,7 @@
 
 <script>
  var engineSelect = document.getElementById('engine');
- function updateClsfile(sel) {
+ function updateEngines(sel) {
    document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
    document.querySelectorAll('#engine option').forEach(el => {
      el.disabled = false;
@@ -341,7 +334,6 @@
    let value = sel.value;
    document.getElementById(value).classList.remove('d-none');
    if (value == 'iacrcc') {
-     document.getElementById('doccls').value = 'iacrcc';
      engineSelect.value = 'lualatex';
      document.querySelectorAll('#engine option').forEach(el => {
        if (el.value != 'lualatex') {
@@ -352,10 +344,6 @@
          el.text = el.value + ' (required)'
        }
      });
-   } else if (value == 'tosc' || value == 'tches') {
-     document.getElementById('doccls').value = 'iacrtrans';
-   } else {
-     document.getElementById('doccls').value = 'llncs';
    }
  }
  const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
@@ -373,6 +361,6 @@
    showPackages();
    document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
  }
- updateClsFile(document.getElementById('venue'));
+ updateEngines(document.getElementById('venue'));
 </script>
 {% endblock %}

@@ -137,10 +137,6 @@ class SubmitForm(FlaskForm):
                            name='accepted',
                            validators=[InputRequired(), ValidDatetime()],
                            default='2022-09-30T06:49:20.468749+00:00') # TODO remove this.
-    doccls = HiddenField(id='doccls',
-                         name='doccls',
-                         validators=[InputRequired()],
-                         default='iacrcc')
     auth = HiddenField(id='auth',
                        name='auth',
                        validators = [InputRequired()])
@@ -170,10 +166,9 @@ class SubmitForm(FlaskForm):
                        self.version.data,
                        self.submitted.data,
                        self.accepted.data])
-        # TODO add these when we go live, since the dropdowns to
+        # TODO add this when we go live, since the dropdowns to
         # select them will disappear.
-        # self.venue.data,
-        # self.doccls.data])
+        # self.venue.data])
         return hmac.new(bytes(app.config['AUTHKEY'], 'utf-8'),
                         bytes(val, 'utf-8'),
                         hashlib.sha256).hexdigest()
@@ -183,7 +178,7 @@ class SubmitForm(FlaskForm):
         if not super().validate():
             logging.warning('failed to validate: ' + str(self.errors))
             return False
-        if (self.doccls.data == 'iacrcc' and
+        if (self.venue.data == 'iacrcc' and
             self.engine.data != 'lualatex'):
             self.engine.errors.append('lualatex is required for iacrcc')
             return False
