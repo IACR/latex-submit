@@ -73,13 +73,14 @@ def submit_version():
     submitted = args.get('submitted', '')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
+    form = SubmitForm()
     if task_queue.get(task_key):
-        logging.warning('Already running {}:{}'.format(form.paperid.data,
-                                                       form.version.data))
+        msg = 'Already running {}:{}'.format(form.paperid.data,
+                                             form.version.data)
+        logging.warning(msg)
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
-    form = SubmitForm()
     if not form.validate_on_submit():
         logging.error('Validation failed {}:{}:{}'.format(form.paperid.data,
                                                           form.version.data,
