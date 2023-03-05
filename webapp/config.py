@@ -29,7 +29,6 @@ class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
-    AUTHKEY = 'thisisjustfortestingpurposes'
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]

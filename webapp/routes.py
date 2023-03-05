@@ -3,6 +3,7 @@ from io import BytesIO
 from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for
 from flask import current_app as app
 from flask_mail import Message
+import hmac
 import os
 from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db
@@ -39,9 +40,9 @@ def home():
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
     form = SubmitForm(formdata=request.args)
-    # We validate even the request for this form. This makes sure that auth
-    # is correct.
-    if not form.validate():
+    # We only perform partial validation on the GET request to make sure that
+    # the auth token is valid.
+    if not form.check_auth():
         if app.config['TESTING']:
             logging.warning('TESTING MODE ONLY')
             # go ahead and send a clean form anyway.
@@ -68,6 +69,8 @@ def submit_version():
     args = request.form.to_dict()
     paperid = args.get('paperid')
     version = args.get('version', 'candidate')
+    accepted = args.get('accepted', '')
+    submitted = args.get('submitted', '')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
     if task_queue.get(task_key):
@@ -95,8 +98,8 @@ def submit_version():
                              'status': PaperStatusEnum.PENDING,
                              'email': args.get('email'),
                              'venue': args.get('venue'),
-                             'submitted': args.get('submitted'),
-                             'accepted': args.get('accepted'),
+                             'submitted': submitted,
+                             'accepted': accepted,
                              'log': [{'when': now,
                                       'action': 'Upload of zip file'}]}
         paper_status = PaperStatus(**paper_status_data)
@@ -141,8 +144,8 @@ def submit_version():
                         'status': CompileStatus.COMPILING,
                         'email': args.get('email'),
                         'venue': args.get('venue'),
-                        'submitted': args.get('submitted'),
-                        'accepted': args.get('accepted'),
+                        'submitted': submitted,
+                        'accepted': accepted,
                         'compiled': now,
                         'command': command,
                         'error_log': [],
@@ -160,8 +163,8 @@ def submit_version():
     db.session.commit()
     compilation_file = version_dir / Path('compilation.json')
     compilation_file.write_text(compstr, encoding='UTF-8')
-    receivedDate = datetime.datetime.strptime(args.get('submitted')[:10],'%Y-%m-%d')
-    acceptedDate = datetime.datetime.strptime(args.get('accepted')[:10],'%Y-%m-%d')
+    receivedDate = datetime.datetime.strptime(submitted[:10],'%Y-%m-%d')
+    acceptedDate = datetime.datetime.strptime(accepted[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
     metadata = '\\def\\IACR@DOI{' + get_doi(paperid) + '}\n'
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
@@ -187,7 +190,7 @@ def submit_version():
     paper_url = url_for('home_bp.view_results',
                         paperid=paperid,
                         version=version,
-                        auth=create_hmac(paperid, version),
+                        auth=create_hmac(paperid, version, '', ''),
                         _external=True)
     msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
     mail.send(msg)
@@ -202,13 +205,13 @@ def get_status(paperid, version, auth):
     This returns a json object with 'url', 'status', and 'msg', and the user will
     be redirected to url when the compilation is completed.
     """
-    if not validate_hmac(paperid, version, auth):
+    if not validate_hmac(paperid, version, '', '', auth):
         return jsonify({'status': TaskStatus.ERROR,
                         'msg': 'hmac is invalid'})
     paper_url = url_for('home_bp.view_results',
                         paperid=paperid,
                         version=version,
-                        auth=create_hmac(paperid, version))
+                        auth=create_hmac(paperid, version, '', ''))
     if not validate_paperid(paperid):
         return jsonify({'url': paper_url,
                         'status': TaskStatus.ERROR,
@@ -275,7 +278,7 @@ def show_pdf(paperid,version, auth):
         return render_template('message.html',
                                title=msg,
                                error=msg)
-    if not validate_hmac(paperid, version, auth):
+    if not validate_hmac(paperid, version, '', '', auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
@@ -295,6 +298,7 @@ def show_pdf(paperid,version, auth):
 # exit_code ==0 and compilation.error_log is empty.
 @home_bp.route('/view/<paperid>/<version>/<auth>', methods=['GET'])
 def view_results(paperid, version, auth):
+    """Note: in this view, auth is computed from paperid, version, '', ''."""
     if not validate_paperid(paperid):
         return render_template('message.html',
                                title='Unable to retrieve file',
@@ -303,7 +307,7 @@ def view_results(paperid, version, auth):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
-    if not validate_hmac(paperid, version, auth):
+    if not validate_hmac(paperid, version, '', '', auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
@@ -314,12 +318,12 @@ def view_results(paperid, version, auth):
                                error='Unknown paper. Try resubmitting.')
     data = {'title': 'Results from compilation',
             'paperid': paperid,
-            'version': version,
-            'auth': auth}
+            'version': version}
     try:
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
         data['comp'] = comp
+        data['auth'] = create_hmac(paperid, version, comp.submitted, comp.accepted)
     except Exception as e:
         return render_template('message.html',
                                title='Unable to parse compilation',

@@ -411,6 +411,9 @@ class FileTree(BaseModel):
 
 FileTree.update_forward_refs()
 
+# A retricted form of ISO date format.
+dt_regex = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
+
 class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID derived from venue and id in review system',
@@ -424,12 +427,12 @@ class Compilation(BaseModel):
     email: EmailStr = Field(...,
                             title='Email for submitting author',
                             description='Who submitted the paper')
-    submitted: datetime = Field(...,
-                                title='When paper was submitted for publications',
-                                description='Authenticated upon submission.')
-    accepted: datetime = Field(...,
-                               title='When the paper was accepted for publications',
-                               description = 'Authenticated upon acceptance')
+    submitted: constr(regex=dt_regex) = Field(...,
+                                              title='When paper was submitted for publication',
+                                              description='Authenticated upon submission.')
+    accepted: constr(regex=dt_regex) = Field(...,
+                                               title='When the paper was accepted for publication',
+                                               description = 'Authenticated upon acceptance.')
     compiled: datetime = Field(...,
                                title='When the article was last compiled',
                                description='Last compilation date')

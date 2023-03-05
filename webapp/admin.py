@@ -48,7 +48,9 @@ def show_admin_home():
                                                        paperid=paperpath.name,
                                                        version=v.name,
                                                        auth=create_hmac(paperpath.name,
-                                                                        v.name),
+                                                                        v.name,
+                                                                        '',
+                                                                        ''),
                                                        _external=True),
                                         'comp': Compilation.parse_raw(cstr)}
                 except Exception as e:

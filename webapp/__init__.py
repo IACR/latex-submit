@@ -26,17 +26,17 @@ def paper_key(paperid, version):
 def get_json_path(paperid, version):
     """Path to a paper version, where compilation.json is located."""
     return Path(current_app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('compilation.json')
-def create_hmac(paperid, version):
+def create_hmac(paperid, version, submitted, accepted):
     """Create hmac used for validating local URLs."""
     return hmac.new(current_app.config['SECRET_KEY'].encode('utf-8'),
-                    (paperid+version).encode('utf-8'), hashlib.sha256).hexdigest()
+                    (paperid+version+submitted+accepted).encode('utf-8'), hashlib.sha256).hexdigest()
 
-def validate_hmac(paperid, version, auth):
+def validate_hmac(paperid, version, submitted, accepted, auth):
     """Validate hmac from create_hmac."""
-    return hmac.compare_digest(create_hmac(paperid, version), auth)
+    return hmac.compare_digest(create_hmac(paperid, version, submitted, accepted), auth)
 
 def get_pdf_url(paperid, version):
-    return '/view/{}/{}/{}/main.pdf'.format(paperid, version, create_hmac(paperid, version))
+    return '/view/{}/{}/{}/main.pdf'.format(paperid, version, create_hmac(paperid, version, '', ''))
 
 # Globally accessible SMTP client. This can be used in unit tests as well.
 mail = Mail()

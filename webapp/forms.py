@@ -3,13 +3,13 @@
 from flask import current_app as app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
-from wtforms.validators import InputRequired, Email, EqualTo, Length
+from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError
 from .db_models import Role, validate_version, Version
 from .metadata import validate_paperid
+from .metadata.compilation import dt_regex
 import random, string # TODO - remove this
-from datetime import datetime
-import hmac, hashlib
+from . import create_hmac, validate_hmac
 import logging
 
 class LoginForm(FlaskForm):
@@ -80,41 +80,36 @@ class ValidVersion(object):
         if not validate_version(field.data):
             raise ValidationError(self.message)
 
-class ValidDatetime(object):
-    """Validator to check datetime for accepted and submitted fields."""
-    def __init__(self, message=None):
-        if not message:
-            message = 'Invalid paperid'
-        self.message = message
-
-    def __call__(self, form, field):
-        try:
-            then = datetime.fromisoformat(field.data)
-        except ValueError as e:
-            msg = 'Invalid {}:{}'.format(field.id, str(e))
-            raise ValidationError(msg)
-
-
 class SubmitForm(FlaskForm):
     """Form to submit a version of a paper. The auth field authenticates
     required fields. This may be supplied by an external link for the
     first submission, or may be supplied by the server for subsequent
-    versions.
+    versions. Validation for a POST is different than validation for a GET.
+    In the case of a GET, we only validate the auth field, but for a POST
+    we validate that all required fields are submitted.
     """
     def __init__(self, *args, **kwargs):
         """Set auth value from other fields."""
         super(SubmitForm, self).__init__(*args, **kwargs)
         if not self.auth.data:
-            self.auth.data = self.create_hmac()
+            self.auth.data = create_hmac(self.paperid.data,
+                                         self.version.data,
+                                         self.submitted.data,
+                                         self.accepted.data)
+            logging.warning('set auth to ' + self.auth.data)
+        else:
+            logging.warning('got auth of ' + self.auth.data)
     paperid = StringField(label='Paper ID',
                           id='paperid',
                           name='paperid',
-                          validators=[InputRequired(), ValidPaperId()],
+                          validators=[InputRequired('paper id is required'),
+                                      ValidPaperId()],
                           # TODO - remove default below
                           default=''.join(random.choices(string.ascii_lowercase + string.digits, k=8)))
     version = HiddenField(id='version',
                           name='version',
-                          validators=[InputRequired(), ValidVersion()],
+                          validators=[InputRequired('version field is required'),
+                                      ValidVersion()],
                           default=Version.CANDIDATE.value)
     venue = SelectField(label='Select a venue. At present only iacrcc is fully supported',
                         id='venue',
@@ -128,18 +123,20 @@ class SubmitForm(FlaskForm):
                                  ('pkc', 'PKC (Springer LNCS)'),
                                  ('tcc', 'TCC (Springer LNCS)')],
                         default = 'iacrcc',
-                        validators=[InputRequired()])
+                        validators=[InputRequired('venue field is required')])
     submitted = HiddenField(id='submitted',
                             name='submitted',
-                            validators=[InputRequired(), ValidDatetime()],
-                            default='2022-08-03T06:44:30.468749+00:00') # TODO remove this.
+                            validators=[InputRequired('Submission date is required'),
+                                        Regexp(dt_regex, message='Format of submitted is YYYY-mm-dd HH:MM:SS')],
+                            default='2022-08-03 06:44:30') # TODO remove this.
     accepted = HiddenField(id='accepted',
                            name='accepted',
-                           validators=[InputRequired(), ValidDatetime()],
-                           default='2022-09-30T06:49:20.468749+00:00') # TODO remove this.
+                           validators=[InputRequired('Accepted date is required'),
+                                       Regexp(dt_regex, message='Format of accepted is YYYY-mm-dd HH:MM:SS')],
+                           default='2022-09-30 17:49:20') # TODO remove this.
     auth = HiddenField(id='auth',
                        name='auth',
-                       validators = [InputRequired()])
+                       validators = [InputRequired('auth field is required')])
     email = EmailField(id='email',
                        name='email',
                        validators=[InputRequired(), Email()])
@@ -160,26 +157,19 @@ class SubmitForm(FlaskForm):
                         validators=[FileRequired(), FileAllowed(['zip'])])
     submit = SubmitField('Upload')
 
-    def create_hmac(self):
-        # Note that all fields have default values.
-        val = ''.join([self.paperid.data,
-                       self.version.data,
-                       self.submitted.data,
-                       self.accepted.data])
-        # TODO add this when we go live, since the dropdowns to
-        # select them will disappear.
-        # self.venue.data])
-        return hmac.new(bytes(app.config['AUTHKEY'], 'utf-8'),
-                        bytes(val, 'utf-8'),
-                        hashlib.sha256).hexdigest()
+    def check_auth(self):
+        return validate_hmac(self.paperid.data,
+                             self.version.data,
+                             self.submitted.data,
+                             self.accepted.data,
+                             self.auth.data)
 
     def validate(self, extra_validators=None):
-        """Basic validation on a GET. extra validators may be used on POST."""
-        if not super().validate():
+        if not super(FlaskForm, self).validate():
             logging.warning('failed to validate: ' + str(self.errors))
             return False
         if (self.venue.data == 'iacrcc' and
             self.engine.data != 'lualatex'):
             self.engine.errors.append('lualatex is required for iacrcc')
             return False
-        return hmac.compare_digest(self.auth.data, self.create_hmac())
+        return self.check_auth()
