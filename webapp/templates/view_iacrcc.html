@@ -62,10 +62,10 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endfor %}
       </ul>
       {% endif %}
-      <h3>latexmk log</h3>
-      <pre>{{comp.log}}</pre>
+      <h3>output log</h3>
+      <pre id="latexLog">{{latexlog}}</pre>
       <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
     </div>
   </div>
 </div>
-{% include "base_footer.html" %}
+{% include "view_footer.html" %}

@@ -340,10 +340,13 @@ def view_results(paperid, version, auth):
     comp.output_tree = FileTree.from_path(output_dir)
     pdf_file = output_path / Path('main.pdf')
     meta_file = output_path / Path('main.meta')
+    log_file = output_path / Path('main.log')
     if meta_file.is_file():
         data['metafile'] = meta_file.read_text(encoding='UTF-8')
     if pdf_file.is_file():
         data['pdf'] = get_pdf_url(paperid, version)
+    if log_file.is_file():
+        data['latexlog'] = log_file.read_text(encoding='UTF-8')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
     if comp.venue == VenueEnum.IACRCC:

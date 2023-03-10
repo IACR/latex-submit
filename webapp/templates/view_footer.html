@@ -1,0 +1,21 @@
+{# this is for anything containing the compilation log #}
+{% extends "base_footer.html" %}
+{% block endOfPage %}
+{{super()}}
+<script>
+  MathJax = {
+     tex: {
+       inlineMath: [['$', '$'], ['\\(', '\\)']],
+       displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+       processEnvironments: false
+     }
+   };
+  </script>
+  
+  <script>
+   console.log('marking')
+   var instance = new Mark("pre#latexLog");
+   instance.markRegExp(/LaTeX Warning/, {'accuracy': 'exact'});
+   instance.markRegExp(/Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
+  </script>
+{% endblock %}

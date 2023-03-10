@@ -24,6 +24,12 @@
    padding-right: 1em;
    min-width: 8rem;
  }
+ mark {
+   scroll-margin: 5em;
+ }
+ mark.latexError {
+   background-color: #f8d7da;
+ }
 </style>
 <script>
   MathJax = {
@@ -36,4 +42,5 @@
   </script>
   
   <script id="MathJax-script" async src="/js/mathjax/tex-chtml.js"></script>
+  <script src="/js/mark.min.js"></script>
 {% endblock %}
