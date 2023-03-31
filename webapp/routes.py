@@ -378,6 +378,12 @@ def download_output_zipfile(version, paperid):
 def iacrcc_homepage():
     return render_template('iacrcc.html', title='iacrcc document class')
 
+@home_bp.route('/iacrcc/iacrdoc.pdf', methods=['GET'])
+def iacrdoc_pdf():
+    pdf_path = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrcc/iacrdoc.pdf')
+    if pdf_path.is_file():
+        return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
+
 @home_bp.route('/iacrcc.zip', methods=['GET'])
 def download_iacrcc_zipfile():
     memory_file = BytesIO()

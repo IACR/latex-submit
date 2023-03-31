@@ -148,7 +148,7 @@ class SubmitForm(FlaskForm):
     engine = SelectField(label='LaTeX engine to use',
                          id='engine',
                          name='engine',
-                         choices=[('lualatex', 'lualatex (required for iacrcc class)'),
+                         choices=[('lualatex', 'lualatex'),
                                   ('pdflatex', 'pdflatex'),
                                   ('xelatex', 'xelatex')],
                          default = 'lualatex')
@@ -168,8 +168,8 @@ class SubmitForm(FlaskForm):
         if not super(FlaskForm, self).validate():
             logging.warning('failed to validate: ' + str(self.errors))
             return False
-        if (self.venue.data == 'iacrcc' and
-            self.engine.data != 'lualatex'):
-            self.engine.errors.append('lualatex is required for iacrcc')
-            return False
+        # if (self.venue.data == 'iacrcc' and
+        #     self.engine.data != 'lualatex'):
+        #     self.engine.errors.append('lualatex is required for iacrcc')
+        #     return False
         return self.check_auth()
