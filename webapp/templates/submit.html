@@ -250,9 +250,7 @@
       Communications in Cryptology uses an automatic submission system
       for final versions of accepted papers.  It is important that
       authors adhere to the requirements. Submissions are required to
-      be prepared in LaTeX using the {# TODO: make this link visible
-      to all #}
-      <a target="_blank"
+      be prepared in LaTeX using the <a target="_blank"
       href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
       document class. This document style is designed to provide a
       consistent appearance for articles in the journal, but more
@@ -261,8 +259,8 @@
     </p>
     <p>
       This system is based on lualatex and latexmk (see below).
-      lualatex is capable of producing UTF-8 output, and unfortunately
-      pdflatex does not satisfy this requirement. For most authors you
+      {# lualatex is capable of producing UTF-8 output, and unfortunately
+      pdflatex does not satisfy this requirement. #} For most authors you
       will not notice a difference, and we recommend using lualatex
       during the preparation of your paper. Note that some features of
       lua are disabled in our system, so you should not depend on
@@ -299,7 +297,7 @@
       That is a fair amount of work to set up, because it requires
       docker to be installed. As an alternative, you can simply start
       from <i-code>texlive2022</i-code> and add the packages listed in
-      the Dockerfile. DO NOT USE pdflatex; use lualatex instead.
+      the Dockerfile. {# DO NOT USE pdflatex; use lualatex instead.#}
     </p>
   </div>
   <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
@@ -326,6 +324,7 @@
 <script>
  var engineSelect = document.getElementById('engine');
  function updateEngines(sel) {
+   return;
    document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
    document.querySelectorAll('#engine option').forEach(el => {
      el.disabled = false;
