@@ -1,10 +1,11 @@
 author:
-  name: Joppe W. \surname {Bos}
+  name: Joppe W. Bos
   affil: 1
   email: joppe.bos@nxp.com
   orcid: 0000-0003-1010-8157
 author:
-  name: Kevin S. \surname {McCurley}
+  name: Kevin S. McCurley
+  surname: McCurley
   affil: 2
   email: mccurley@digicrime.com
   orcid: 0000-0001-7890-5430
