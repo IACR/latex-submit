@@ -24,7 +24,9 @@
       <div class="col-6">
         <p class="alert alert-warning">
 	  Warning: this site is for testing purposes only. Ordinarily a submission would need
-	  to be authenticated as accepted by the review process.
+	  to be authenticated as accepted by the review process. You can submit anything you
+          like as a test right now. Only the admins will see your submission, but we have
+          a sense of humor.
         </p>
       </div>
     </div>
@@ -324,7 +326,6 @@
 <script>
  var engineSelect = document.getElementById('engine');
  function updateEngines(sel) {
-   return;
    document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
    document.querySelectorAll('#engine option').forEach(el => {
      el.disabled = false;
@@ -332,6 +333,7 @@
    });
    let value = sel.value;
    document.getElementById(value).classList.remove('d-none');
+   return;
    if (value == 'iacrcc') {
      engineSelect.value = 'lualatex';
      document.querySelectorAll('#engine option').forEach(el => {
