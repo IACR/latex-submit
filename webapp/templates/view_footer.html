@@ -16,6 +16,6 @@
    console.log('marking')
    var instance = new Mark("pre#latexLog");
    instance.markRegExp(/LaTeX Warning/, {'accuracy': 'exact'});
-   instance.markRegExp(/Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
+   instance.markRegExp(/Error:|Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
   </script>
 {% endblock %}

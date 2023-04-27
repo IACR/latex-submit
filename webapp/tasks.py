@@ -76,8 +76,6 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                 compilation.warning_log.append('You may have lost a math character. Search for "redefine math accent"')
             if 'Missing character' in latexlog:
                 compilation.warning_log.append('You may have lost a character. Avoid using too many unusual fonts.')
-            if '/tex/latex/lm/t1lmr.fd' in latexlog:
-                compilation.warning_log.append('You should not use fontenc or T1 encoding.')
             # TODO: check severity before declaring it an error
             if 'Overfull \\hbox ' in latexlog:
                 compilation.warning_log.append('You have an overfull hbox. Please correct it.')
