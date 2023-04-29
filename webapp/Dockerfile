@@ -21,7 +21,7 @@ RUN echo "Building with documentation: $DOCFILES" && \
     /install-tl-unx/install-tl -profile /install-tl-unx/texlive.profile; \
     rm -r /install-tl-unx; rm install-tl-unx.tar.gz
 
-ENV PATH="/usr/local/texlive/2022/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
 ENV BIBINPUTS="${BIBINPUTS}:/home/texlive/texmf/tex/latex/iacrcc/cryptobib"
 
@@ -34,6 +34,8 @@ RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj v
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph
+# people use pdfpages to bypass uploading LaTeX.
+RUN tlmgr remove pdfpages pdfjam
 COPY compiler/LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
