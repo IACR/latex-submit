@@ -35,7 +35,7 @@ RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj v
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph
 # people use pdfpages to bypass uploading LaTeX.
-RUN tlmgr remove pdfpages pdfjam
+# RUN tlmgr remove pdfpages pdfjam
 COPY compiler/LatexMk /etc
 
 RUN useradd -ms /bin/bash texlive
