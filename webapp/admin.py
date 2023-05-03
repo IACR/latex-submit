@@ -140,7 +140,7 @@ def user():
                         'password': password,
                         'confirm_url': url_for('auth.confirm_email',
                                                email=user.email,
-                                               auth=create_hmac(user.email,''),
+                                               auth=create_hmac(user.email,'', '', ''),
                                                _external=True)}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
             if 'TESTING' in app.config:
@@ -191,7 +191,7 @@ def recover():
                     'password': password,
                     'recover_url': url_for('auth.confirm_email',
                                            email=user.email,
-                                           auth=create_hmac(user.email, ''),
+                                           auth=create_hmac(user.email, '', '', ''),
                                            _external=True)}
         msg.body = app.jinja_env.get_template('admin/recover_password.txt').render(maildata)
         mail.send(msg)

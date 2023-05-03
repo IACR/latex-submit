@@ -50,7 +50,7 @@ def logout():
 @auth_bp.route('/confirm_email/<email>/<auth>', methods=['GET'])
 def confirm_email(email, auth):
     """This just sets the last_login time."""
-    if not validate_hmac(email, '', auth):
+    if not validate_hmac(email, '', '', '', auth):
         return 'Invalid url'
     user = User.query.filter_by(email=email).first()
     if not user:
@@ -59,7 +59,7 @@ def confirm_email(email, auth):
     db.session.add(user)
     db.session.commit()
     login_user(user)
-    return redirect(url_for('auth.change_password'))
+    return redirect(url_for('home_bp.home'))
 
 @auth_bp.route('/change_password', methods=['GET', 'POST'])
 @login_required
