@@ -10,9 +10,9 @@ import secrets
 import string
 from pathlib import Path
 from . import db, create_hmac, mail
-from .metadata.compilation import Compilation, PaperStatus
+from .metadata.compilation import Compilation
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version
+from .db_models import Role, User, validate_version, PaperStatus
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -67,13 +67,9 @@ def show_admin_home():
 def show_admin_paper(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    status_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path('status.json')
-    if not status_path.is_file():
+    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
-    try:
-        status = PaperStatus.parse_raw(status_path.read_text(encoding='UTF-8'))
-    except Exception as e:
-        return admin_message('Unable to parse status:{}'.format(str(status_path)))
     data = {'title': 'Viewing {}'.format(paperid),
             'paper': status}
     return render_template('admin/view.html', **data)

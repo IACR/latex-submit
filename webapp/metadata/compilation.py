@@ -32,37 +32,6 @@ class PaperStatusEnum(StrEnum):
     COPY_EDIT_ACCEPT = 'copy_edit_accept'
     PUBLISHED = 'published'
   
-class LogEvent(BaseModel):
-    when: datetime = Field(...,
-                           title='When the event happened',
-                           description='UTC datetime.')
-    action: str = Field(...,
-                        title='What was the action',
-                        description='This is a free text field')
-  
-class PaperStatus(BaseModel):
-    paperid: constr(min_length=3) = Field(...,
-                                          title='Globally unique paper ID derived from venue and id in review system',
-                                          description='ID must be globally unique.')
-    venue: str = Field(...,
-                       title='The venue for the publication',
-                       description='This determines which cls to use.')
-    status: PaperStatusEnum = Field(...,
-                                    title='State of the paper',
-                                    description='See README.md')
-    email: EmailStr = Field(...,
-                            title='Email for submitting author',
-                            description='Who submitted the paper')
-    submitted: datetime = Field(...,
-                                title='When paper was submitted for publication',
-                                description='Authenticated upon submission.')
-    accepted: datetime = Field(...,
-                               title='When the paper was accepted for publication',
-                               description = 'Authenticated upon acceptance')
-    log: List[LogEvent] = Field(...,
-                                title='Log messages',
-                                description='Used in the admin UI if necessary. See status')
-
 class CompileStatus(StrEnum):
     """Used to categorize current status of a paper. Only shown to author and editor."""
     COMPILING = 'compiling'   # Submitted, but pending compilation

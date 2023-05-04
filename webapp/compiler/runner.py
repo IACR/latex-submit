@@ -72,6 +72,11 @@ def run_latex(cmd, input_dirname, output_dirname):
     for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log', 'fls', 'fdb_latexmk']:
         if Path(staging_dir, 'main.' + i).is_file():
             os.remove(str(staging_dir.absolute()) + '/main.' + i)
+    # Remove any texmf.cnf
+    texmf_cnf_file = Path(staging_dir, 'texmf.cnf')
+    if texmf_cnf_file.is_file():
+        warnings.append('File {} was removed before compiling'.format(texmf_cnf_file.name))
+        texmf_cnf_file.unlink()
     # Remove any latexmkrc or .latexmkrc file.
     latexmkrc_file = Path(staging_dir, 'latexmkrc')
     if latexmkrc_file.is_file():

@@ -9,9 +9,9 @@ from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db
 import shutil
 import string
-from .db_models import CompileRecord, validate_version, TaskStatus
+from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, PaperStatus, LogEvent, VenueEnum, FileTree
+from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, VenueEnum, FileTree
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
@@ -19,7 +19,7 @@ from .forms import SubmitForm
 import logging
 
 ENGINES = {'lualatex': 'latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
-           'pdflatex': 'latexmk -g -pdf -pdflatex="pdflatex -interaction=nonstopmode --disable-write18 --no-shell-escape" main',
+           'pdflatex': 'latexmk -g -pdf -pdflatex="pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape" main',
            'xelatex': 'latexmk -g -pdfxe -xelatex="xelatex -interaction=nonstopmode -file-line-error -no-shell-escape" main'}
 
 home_bp = Blueprint('home_bp',
@@ -64,17 +64,20 @@ def context_wrap(fn):
             return fn(*args, **kwargs)
     return wrapper
 
+# NOTE: there are constraints on what can be submitted based on
+# the current status for the paperid.
 @home_bp.route('/submit', methods=['POST'])
 def submit_version():
     args = request.form.to_dict()
     paperid = args.get('paperid')
-    version = args.get('version', 'candidate')
+    version = args.get('version', Version.CANDIDATE.value)
     accepted = args.get('accepted', '')
     submitted = args.get('submitted', '')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
     form = SubmitForm()
     if task_queue.get(task_key):
+        log_event(paperid, 'Attempt to resubmit while compiling')
         msg = 'Already running {}:{}'.format(form.paperid.data,
                                              form.version.data)
         logging.warning(msg)
@@ -89,27 +92,40 @@ def submit_version():
         return render_template('submit.html', form=form)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
-    status_file = paper_dir / Path('status.json')
-    if status_file.is_file():
-        paper_status = PaperStatus.parse_raw(status_file.read_text(encoding='utf-8'))
-        paper_status.log.append(LogEvent(when=now,
-                                         action='Upload of zip file'))
-    else:
-        paper_status_data = {'paperid': paperid,
-                             'status': PaperStatusEnum.PENDING,
-                             'email': args.get('email'),
-                             'venue': args.get('venue'),
-                             'submitted': submitted,
-                             'accepted': accepted,
-                             'log': [{'when': now,
-                                      'action': 'Upload of zip file'}]}
-        paper_status = PaperStatus(**paper_status_data)
-    # Save a json file with minimal metadata for debugging. This will
-    # be updated at the end of the run.
-    status_file.write_text(paper_status.json(indent=2))
+    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if not paper_status:
+        paper_status = PaperStatus(paperid=paperid,
+                                   venue=args.get('venue'),
+                                   email=args.get('email'),
+                                   submitted=submitted,
+                                   accepted=accepted,
+                                   status=PaperStatusEnum.PENDING.value)
+        db.session.add(paper_status)
+        db.session.commit()
+    # check that submission is allowed.
+    if paper_status.status == PaperStatusEnum.EDIT_PENDING:
+        return render_template('message.html',
+                               title='Paper was sent to copy editor',
+                               error='Paper may not be updated while it is in the hands of the copy editor')
+    if paper_status.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
+        return render_template('message.html',
+                               title='Paper is in final production steps',
+                               error='Paper may not be updated after copy edit acceptance')
+    if paper_status.status == PaperStatusEnum.PUBLISHED:
+        return render_template('message.html',
+                               title='Paper is already published',
+                               error='Paper may not be updated after it is published')
+    if paper_status.status == PaperStatusEnum.SUBMITTED:
+        paper_status.status = PaperStatusEnum.PENDING
+        db.session.add(paper_status)
+        db.session.commit()
+    if (paper_status.status == PaperStatusEnum.EDIT_FINISHED or
+        paper_status.status == PaperStatusEnum.FINAL_SUBMITTED):
+        # TODO: check that discussion items are finished
+        version = Version.FINAL.value
+    log_event(paperid, 'Upload of zip file for {}'.format(version))
     version_dir = paper_dir / Path(version)
-    # TODO: decide if we should save old compilations. This blows
-    # everything away for the version.
+    # This blows everything away for the version.
     if version_dir.is_dir():
         shutil.rmtree(version_dir)
     version_dir.mkdir(parents=True)
@@ -127,16 +143,12 @@ def submit_version():
         zip_file.extractall(input_dir)
     except Exception as e:
         logging.error('Unable to extract from zip file: {}'.format(str(e)))
-        paper_status.log.append(LogEvent(when=now,
-                                         action='Zip file could not be unzipped'))
-        status_file.write_text(paper_status.json(indent=2))
+        log_event(paperid, 'Zip file could not be unzipped')
         form.zipfile.errors.append('Unable to extract from zip file: {}'.format(str(e)))
         return render_template('submit.html', form=form)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
-        paper_status.log.append(LogEvent(when=now,
-                                         action='Zip file did not have main.tex at top level'))
-        status_file.write_text(paper_status.json(indent=2))
+        log_event(paperid, 'Zip file did not have main.tex at top level')
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
         return render_template('submit.html', form=form)

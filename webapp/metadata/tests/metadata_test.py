@@ -1,15 +1,18 @@
+import json
 from pathlib import Path
 import pytest
 import sys
 sys.path.insert(0, '../')
-from compilation import Compilation, FileTree
-from meta_parse import clean_abstract
+from compilation import Compilation, FileTree, CompileStatus
+from meta_parse import clean_abstract, check_bibtex
+import datetime
+from pathlib import Path
 
 def test_filetree():
     comp = Compilation.parse_raw(Path('testdata/compilation.json').read_text(encoding='UTF-8'))
-    comp.output_tree = FileTree.from_path(Path('../'))
-    assert comp.output_tree.name == '..'
-    assert len(comp.output_tree.children) == 7
+    comp.output_tree = FileTree.from_path(Path('testdata/bibtex'))
+    assert comp.output_tree.name == 'bibtex'
+    assert len(comp.output_tree.children) == 2
 
 def test_clean_abstract():
     input = """This is an abstract
@@ -40,3 +43,27 @@ the last one is not removed because arxiv_latex_cleaner does not recognize it.
     assert 'removable' not in output
     # We might wish to catch this in the future.
     assert 'so is this' in output
+
+def _test_bibtex_entry(case):
+    output_path = Path('testdata/bibtex/{}'.format(case))
+    compilation_data = {'paperid': 'abcdefg',
+                        'status': CompileStatus.COMPILING,
+                        'email': 'foo@example.com',
+                        'venue': 'eurocrypt',
+                        'submitted': '2023-01-02 01:02:03',
+                        'accepted': '2023-01-03 01:02:55',
+                        'compiled': datetime.datetime.now(),
+                        'command': 'dummy command',
+                        'error_log': [],
+                        'warning_log': [],
+                        'zipfilename': 'submit.zip'}
+    compilation = Compilation(**compilation_data)
+    check_bibtex(output_path, compilation)
+    return compilation
+
+def test_bibtex():
+    compilation = _test_bibtex_entry('ex1')
+    assert len(compilation.warning_log) == 34
+    compilation = _test_bibtex_entry('cryptobib')
+    print(json.dumps(compilation.error_log, indent=2))
+    assert len(compilation.warning_log) == 1574

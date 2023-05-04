@@ -1,5 +1,6 @@
 from datetime import datetime
 from . import db
+from .metadata.compilation import PaperStatusEnum
 from enum import Enum
 from flask_login import UserMixin
 from flask import request
@@ -38,7 +39,6 @@ class TaskStatus(str, Enum):
     ERROR = 'ERROR'
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), primary_key=False, unique=False, nullable=False)
@@ -78,6 +78,49 @@ class CompileRecord(db.Model):
                             default=TaskStatus.PENDING.value)
     started = db.Column(db.DateTime, index=False, nullable=False)
     result = db.Column(db.String, nullable=True)
+
+class DiscussionStatus(str, Enum):
+    """Status of a copyedit discussion item."""
+    PENDING = 'PENDING'
+    CANCELLED = 'CANCELLED'
+    DECLINED = 'DECLINED'
+    FIXED = 'FIXED'
+
+class Discussion(db.Model):
+    """This is similar to PaperComment in HotCRP. It is used for copyediting."""
+    id = db.Column(db.Integer, primary_key=True)
+    paperid = db.Column(db.String(32), nullable=False, index=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    created = db.Column(db.DateTime, index=False, nullable=False)
+    pageno = db.Column(db.Integer, nullable=True)
+    lineno = db.Column(db.Integer, nullable=True)
+    text = db.Column(db.Text, nullable=False)
+    reply = db.Column(db.Text, nullable=True) # from author.
+    status = db.Column(db.Enum(DiscussionStatus,
+                               values_callable=lambda x: [str(s.value) for s in DiscussionStatus]),
+                       default = DiscussionStatus.PENDING.value)
+
+class PaperStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    paperid = db.Column(db.String(32), nullable=False, unique=True, index=True)
+    venue = db.Column(db.String(32), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    submitted = db.Column(db.String(32), nullable=False)
+    accepted = db.Column(db.String(32), nullable=False)
+    status = db.Column(db.Enum(PaperStatusEnum,
+                               values_callable=lambda x: [str(s.value) for s in PaperStatusEnum]),
+                       default = PaperStatusEnum.PENDING.value)
+
+class LogEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    paperid = db.Column(db.String(32), db.ForeignKey('paper_status.paperid'), nullable=False)
+    dt = db.Column(db.DateTime, index=True, nullable=False)
+    action = db.Column(db.String(50), nullable=False) # free text field
+
+def log_event(paperid, action):
+    event = LogEvent(paperid=paperid,dt=datetime.now(),action=action)
+    db.session.add(event)
+    db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

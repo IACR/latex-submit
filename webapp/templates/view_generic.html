@@ -30,7 +30,7 @@ This template is used to show the status of a compilation.
     <div class="alert alert-warning">Warning: {{error}}</div>
     {% endfor %}
     {% endif %}
-    <pre id="latexLog">{{latexlog}}</pre>
+    <pre id="latexLog">{{comp.log}}</pre>
     <div id="endOfOutput">{% if pdf %}<a href="{{pdf}}" target="_blank">View PDF</a>{% endif %}</div>
   </div>
   <div class="tab-pane fade" id="nav-output" role="tabpanel" aria-labelledby="nav-output-tab">
