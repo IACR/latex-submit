@@ -5,6 +5,11 @@ Library for handling output meta file from compiling latex.
 from nameparser import HumanName
 from pylatexenc.latex2text import LatexNodes2Text
 from arxiv_latex_cleaner import arxiv_latex_cleaner
+from pybtex.database import parse_string, BibliographyData, BibliographyDataError
+import pybtex.errors
+
+from pathlib import Path
+import re
 
 def get_key_val(line):
     """If line has form key: value, then return key, value."""
@@ -120,6 +125,92 @@ def read_meta(metafile):
         else:
             raise Exception('unexpected line {}'.format(line))
     return data
+
+_required_fields = {
+    "article": ["author", "title", "journaltitle/journal", "year/date", "doi/url"],
+    "book": ["author", "title", "year/date"],
+    "booklet": ["author/editor", "title", "year/date"],
+    "inbook": ["author", "title", "booktitle", "year/date"],
+    "incollection": ["author", "title", "booktitle", "year/date"],
+    "manual": ["author/editor", "title", "year/date"],
+    "misc": ["author/editor", "title", "year/date"],
+    "online": ["author/editor", "title", "year/date", "url"],
+    "patent": ["author", "title", "number", "year/date"],
+    "proceedings": ["title", "year/date"],
+    "inproceedings": ["author", "title", "booktitle", "year/date", "doi/url"],
+    "thesis": ["author", "title", "type", "institution", "year/date"],
+    "phdthesis": ["author", "title", "type", "institution", "year/date"],
+    "unpublished": ["author", "title", "year/date"],
+    "mastersthesis": ["author", "title", "institution", "year/date"],
+    "techreport": ["author", "title", "institution", "year/date"],
+}
+
+def check_bib_entry(key, entry):
+    errors = []
+    if entry.persons:
+        for k in entry.persons:
+            entry.fields[k] = entry.persons[k]
+    typ = entry.type.lower()
+    if typ not in _required_fields:
+        errors.append('unrecognized bibtex type for {}: @{}'.format(key, typ))
+    else:
+        for field in _required_fields.get(typ):
+            if '/' in field:
+                alts = field.split('/')
+                if alts[0] not in entry.fields and alts[1] not in entry.fields:
+                    errors.append('bibtex entry {} requires {} field or {} field'.format(key, alts[0], alts[1]))
+            else:
+                if field not in entry.fields:
+                    errors.append('bibtex entry {} requires {} field'.format(key, field))
+    return errors
+
+def check_bibtex(output_path, compilation):
+    """Check aux and bibtex files for invalid references."""
+    try:
+        aux_file = Path(output_path) / Path('main.aux')
+        if not aux_file.is_file():
+            compilation.error_log.append('Missing aux file')
+            return
+        aux_lines = aux_file.read_text(encoding='UTF-8').splitlines()
+        # These identify the occurrences of \cite in the document. All
+        # should have references.
+        citation_pat = re.compile(r'\\citation{([^}]+)}')
+        bibfile_pat = re.compile(r'\\bibdata{([^}]+)}')
+        cite_keys = set()
+        bibfiles = []
+        for line in aux_lines:
+            res = citation_pat.search(line)
+            if res and res.group(1):
+                cite_keys.add(res.group(1))
+            res = bibfile_pat.search(line)
+            if res and res.group(1):
+                bibfiles.extend([b+'.bib' for b in res.group(1).split(',')])
+        # now read all of the bibtex files and grab the entries for
+        # these keys. We merge them all into a single database since
+        # each file must be parsed separately. See
+        # https://github.com/sciunto-org/python-bibtexparser/issues/186
+        # bibdatabase = bibtexparser.bibdatabase.BibDatabase()
+        # parser = bibtexparser.bparser.BibTexParser()
+        # parser.interpolate_strings = False
+        pybtex.errors.set_strict_mode(False)
+        bibstring = ''
+        for bibfile in bibfiles:
+            bib_path = Path(output_path) / Path(bibfile)
+            bibstring += '\n' + bib_path.read_text(encoding='UTF-8')
+        bibdata = parse_string(bibstring, 'bibtex')
+        used_entries = {}
+        for key in cite_keys:
+            if key not in bibdata.entries:
+                compilation.error_log.append('missing reference {}'.format(key))
+            else:
+                used_entries[key] = bibdata.entries.get(key)
+        for key, entry in used_entries.items():
+            try:
+                compilation.warning_log.extend(check_bib_entry(key, entry))
+            except Exception as e:
+                compilation.warning_log.append('error checking bibtex entry {}: {}. This may be a bug.'.format(key, str(e)))
+    except Exception as e:
+        compilation.error_log.append('Error checking for bibtex problems: {}. This may be a bug'.format(str(e)))
 
 def clean_abstract(text):
     """Remove comments, todos, \begin{comment} from abstract."""

@@ -260,13 +260,9 @@
       of metadata required for indexing and registration of DOIs.
     </p>
     <p>
-      This system is based on lualatex and latexmk (see below).
-      {# lualatex is capable of producing UTF-8 output, and unfortunately
-      pdflatex does not satisfy this requirement. #} For most authors you
-      will not notice a difference, and we recommend using lualatex
-      during the preparation of your paper. Note that some features of
-      lua are disabled in our system, so you should not depend on
-      advanced features of lualatex.
+      This system is based on lualatex and latexmk (see below), but older
+      compilers like pdflatex still work. We recommend using lualatex
+      because it has better support for UTF-8.
     </p>
     <p>
       In order to conserve resources, this system is currently based

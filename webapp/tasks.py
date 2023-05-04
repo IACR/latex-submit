@@ -8,9 +8,10 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.meta_parse import clean_abstract
+from .metadata.meta_parse import clean_abstract, check_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, FileTree
 from .db_models import CompileRecord, TaskStatus
+
 
 def run_latex_task(cmd, paper_path, paperid, version, task_key):
     """Execute latex on input_path contents, writing into output_path.
@@ -89,37 +90,40 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             compilation.error_log.append('Exit code of {} means that the compilation failed'.format(compilation.exit_code))
         elif compilation.venue.value != 'iacrcc':
             compilation.status = CompileStatus.COMPILATION_SUCCESS
-        if compilation.status != CompileStatus.COMPILATION_FAILED and compilation.venue.value == 'iacrcc':
-            # Look for stuff we need for iacrcc.
-            metafile = Path(output_path) / Path('main.meta')
-            if metafile.is_file():
-                try:
-                    metastr = metafile.read_text(encoding='UTF-8')
-                    data = meta_parse.parse_meta(metastr)
-                    # Check to see if references have DOIs.
-                    for citation in data.get('citations'):
-                        if citation.get('ptype') in ['article', 'book', 'inproceedings'] and 'doi' not in citation:
-                            compilation.warning_log.append('missing DOI on reference: {}: "{}". It is important to include DOIs when available.'.format(citation.get('id'), citation.get('title', '')))
-                    abstract_file = Path(output_path) / Path('main.abstract')
-                    if not abstract_file.is_file():
-                        compilation.status = CompileStatus.MISSING_ABSTRACT
-                        compilation.error_log.append('An abstract is required.')
-                    else:
-                        data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8'))
-                    compilation.meta = Meta(**data)
-                    if compilation.meta.version != VersionEnum.FINAL:
-                        compilation.status = CompileStatus.WRONG_VERSION
-                        compilation.error_log.append('Paper should use documentclass[version=final]')
-                    elif compilation.error_log:
-                        compilation.status = CompileStatus.COMPILATION_ERRORS
-                    else:
-                        compilation.status = CompileStatus.COMPILATION_SUCCESS
-                except Exception as me:
-                    compilation.error_log.append('Failure to extract metadata: ' + str(me))
-                    compilation.status = CompileStatus.METADATA_PARSE_FAIL
-            else:
-                compilation.status = CompileStatus.METADATA_FAIL
-                compilation.error_log.append('No metadata file. Are you sure you used iacrcc?')
+        if compilation.status != CompileStatus.COMPILATION_FAILED:
+            if compilation.venue.value == 'iacrcc':
+                # Look for stuff we need for iacrcc.
+                metafile = Path(output_path) / Path('main.meta')
+                if metafile.is_file():
+                    try:
+                        metastr = metafile.read_text(encoding='UTF-8')
+                        data = meta_parse.parse_meta(metastr)
+                        # Check to see if references have DOIs.
+                        for citation in data.get('citations'):
+                            if citation.get('ptype') in ['article', 'book', 'inproceedings'] and 'doi' not in citation:
+                                compilation.warning_log.append('missing DOI on reference: {}: "{}". It is important to include DOIs when available.'.format(citation.get('id'), citation.get('title', '')))
+                        abstract_file = Path(output_path) / Path('main.abstract')
+                        if not abstract_file.is_file():
+                            compilation.status = CompileStatus.MISSING_ABSTRACT
+                            compilation.error_log.append('An abstract is required.')
+                        else:
+                            data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8'))
+                        compilation.meta = Meta(**data)
+                        if compilation.meta.version != VersionEnum.FINAL:
+                            compilation.status = CompileStatus.WRONG_VERSION
+                            compilation.error_log.append('Paper should use documentclass[version=final]')
+                        elif compilation.error_log:
+                            compilation.status = CompileStatus.COMPILATION_ERRORS
+                        else:
+                            compilation.status = CompileStatus.COMPILATION_SUCCESS
+                    except Exception as me:
+                        compilation.error_log.append('Failure to extract metadata: ' + str(me))
+                        compilation.status = CompileStatus.METADATA_PARSE_FAIL
+                else:
+                    compilation.status = CompileStatus.METADATA_FAIL
+                    compilation.error_log.append('No metadata file. Are you sure you used iacrcc?')
+            else: # not iacrcc, so check references from bibtex and .aux.
+                res = check_bibtex(output_path, compilation)
         # This is a legacy to attempt to fix issue #12. I gave up and
         # made it dependent on the value in the database, but we still
         # store the compilation.json file.

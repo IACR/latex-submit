@@ -26,7 +26,7 @@ This template is used to show the results of a failed compilation
     {% endif %}
     {% if comp.exit_code != 0 %}
     <div class="alert alert-danger">
-      Response from lualatex was: {{error_msg}}.<br>Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error below</a>
+      Response from compiling was: {{error_msg}}.<br>Your upload did not compile. <a href="#" onclick="scrollToError();return false;">view error below</a>
     </div>
     {% endif %}
     <pre id="latexLog">{{latexlog}}</pre>
