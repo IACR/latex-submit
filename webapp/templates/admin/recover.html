@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mt-4">Reset password for user {{form.email.data}}</h1>
 {% set next=request.args.get('next', '') %}
 <form method="POST" action="{{url_for('admin_file.recover', next=request.args.get('next', ''))}}">
@@ -29,5 +30,5 @@
   {% endfor %}
 </form>
 </div>
-
+</main>
 {% endblock %}
