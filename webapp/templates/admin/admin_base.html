@@ -1,7 +1,81 @@
-{% include 'admin/admin_header.html' %}
+{# This base header is extended to add things in the head section. #}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="/css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/iacrcc.css">
+    <title>{{title}}</title>
+    {% endblock %}
+    <style>
+     body {
+       background: none;
+       background-color: #f3f3f3;
+     }
+     nav {
+       background-color: #f3f3f3 !important;
+     }
+     .navbar-light .navbar-nav .nav-link {
+       color: black !important;
+       border: 2px solid white;
+       background-color: #f3f3ff;
+     }
+     nav .nav-link:hover {
+       color: green !important;
+     }
+     #adminContent {
+       background-color: #fff;
+     }
+     table#paperlist th {
+	 cursor: pointer;
+     }
+    </style>
+    <script>
+     MathJax = {
+       tex: {
+         inlineMath: [['$', '$'], ['\\(', '\\)']],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+         processEnvironments: false
+       }
+     };
+    </script>
+    <!-- we do not use a CDN. MathJax is too dangerous. -->
+    <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+    {% block endOfHead %}
+    {% endblock %}
+  </head>
+
+  <body>
+    <noscript>
+      <h1 class="text-center">What a lovely hat</h1>
+      <h4 class="text-center">Is it made out of <a href="https://iacr.org//tinfoil.html">tin foil</a>?</h4>
+    </noscript>
+<nav class="navbar navbar-expand-lg bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="/"><img id="iacrlogo" src="/img/iacrlogo_small.png" class="d-none d-lg-inline me-5" style="max-height:50px;" alt="IACR Logo">IACR CiC</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse w-100" id="navContent">
+      <ul class="nav justify-content-lg-around mb-2 mb-lg-0 flex-lg-grow-1">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/admin">Admin Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/review">Review and Approve</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/copyedit">Copy editing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/allusers">Users</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 {% block content %}{% endblock %}
-</main>
-<script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
-{% block endOfPage %}{% endblock %}
 </body>
 </html>

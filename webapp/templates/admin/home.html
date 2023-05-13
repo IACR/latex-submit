@@ -1,17 +1,15 @@
-
 {% extends "admin/admin_base.html" %}
 {% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-5 text-center">Admin console</h1>
 <p>
   This page is reserved for the managing editor(s) of <a href="/">{{journal_name}}</a>.
   The UI and workflow is TBD:
   <ol>
-    <li>Should we use a database to maintain this list?</li>
-    <li>What should we show in this table?</li>
+    <li>How should we organize the views in this console?</li>
     <li>Should we require approval from an editor, at which point we would
       assign the DOI?</li>
     <li>How should we handle communication to the author(s)?</li>
-    <li>How should we authenticate editors? What roles are required?</li>
   </ol>
 </p>
 <h3>List of submitted papers</h3>
@@ -48,4 +46,5 @@
 {% endfor %}
 
 <script src="/js/sorttable.js"></script>
+</main>
 {% endblock %}

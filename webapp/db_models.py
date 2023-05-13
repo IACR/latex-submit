@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from flask import request
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
+from sqlalchemy.sql import func
 
 # from urlparse import urlparse, urljoin
 
@@ -90,8 +91,8 @@ class Discussion(db.Model):
     """This is similar to PaperComment in HotCRP. It is used for copyediting."""
     id = db.Column(db.Integer, primary_key=True)
     paperid = db.Column(db.String(32), nullable=False, index=True)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    created = db.Column(db.DateTime, index=False, nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created = db.Column(db.DateTime, index=False, nullable=False, default=func.now())
     pageno = db.Column(db.Integer, nullable=True)
     lineno = db.Column(db.Integer, nullable=True)
     text = db.Column(db.Text, nullable=False)
@@ -99,6 +100,8 @@ class Discussion(db.Model):
     status = db.Column(db.Enum(DiscussionStatus,
                                values_callable=lambda x: [str(s.value) for s in DiscussionStatus]),
                        default = DiscussionStatus.PENDING.value)
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 class PaperStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)

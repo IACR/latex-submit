@@ -15,7 +15,8 @@ from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, V
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
-from .forms import SubmitForm
+from .forms import SubmitForm, CompileForCopyEditForm
+from werkzeug.datastructures import MultiDict
 import logging
 
 ENGINES = {'lualatex': 'latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
@@ -54,6 +55,22 @@ def show_submit_version():
             return render_template('message.html',
                                    title='This submission is not authorized.',
                                    error='The token for this request is invalid')
+    paperid = form.paperid.data
+    # Submission form is only shown for papers that have no status or have status
+    # of PENDING or EDIT_FINISHED. The latter is when the author is submitting
+    # their final version.
+    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if paper_status:
+        if (paper_status.status != PaperStatusEnum.PENDING.value and
+            paper_status.status != PaperStatusEnum.EDIT_FINISHED.value):
+            return render_template('message.html',
+                                   title='This submission is not authorized.',
+                                   error='The paper should not be in this state: {}'.format(paper_status.status.value))
+        elif (paper_status.status == PaperStatusEnum.EDIT_FINISHED.value and
+              form.version.data != Version.FINAL.value):
+            return render_template('message.html',
+                                   title='Wrong version',
+                                   error='Version should be FINAL. This is a bug')
     return render_template('submit.html', form=form)
 
 def context_wrap(fn):
@@ -212,6 +229,137 @@ def submit_version():
             'status_url': status_url}
     return render_template('running.html', **data)
 
+# When an author sends for copy editing, we set the status to SUBMITTED and
+# compile it with line numbers to produce the COPYEDIT version. After
+# the compilation finishes, set the status to EDIT_PENDING and an email is
+# sent to the copy editor(s) to notify them that a paper is ready for copy editing.
+# TODO: This is a simplified version of the flow described in the README.md,
+# where the editor would assign a copy editor from a list. We might also allow
+# papers in the FINAL_SUBMITTED status to be sent again for copy editing if
+# the copy editor finds more things to complain about.
+@home_bp.route('/compile_for_copyedit', methods=['POST'])
+def compile_for_copyedit():
+    form = CompileForCopyEditForm()
+    if not form.validate_on_submit():
+        logging.error('copyedit Validation failed {}:{}:{}'.format(form.paperid.data,
+                                                                   form.version.data,
+                                                                   form.auth.data))
+        form.auth.errors.append('Validation failed')
+        return render_template('message.html',
+                               title='Please go back and try again',
+                               error='Validation failed. This is a bug')
+    paperid = form.paperid.data
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+    if not paper_dir.is_dir():
+        return render_template('message.html',
+                               title='Paper does not exist',
+                               error='Paper directory does not exist. This is a bug')
+    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if not paper_status:
+        return render_template('message.html',
+                               title='Missing status',
+                               error='Paper status does not exist. This is a bug')
+    # TODO: enable generating copy edit version from other states.
+    if paper_status.status != PaperStatusEnum.PENDING:
+        return render_template('message.html',
+                               title='Paper may not be sent to copy editor',
+                               error = 'Paper may not be sent for copy editing.')
+    task_key = paper_key(paperid, Version.COPYEDIT.value)
+    if task_queue.get(task_key):
+        log_event(paperid, 'Attempt to resubmit while compiling')
+        msg = 'Already running {}:{}'.format(form.paperid.data,
+                                             Version.COPYEDIT.value)
+        logging.warning(msg)
+        return render_template('message.html',
+                               title='Another one is running',
+                               error='At most one compilation may be queued on each paper.')
+    version_comprec = CompileRecord.query.filter_by(paperid=paperid,version=form.version.data).first()
+    if not version_comprec:
+        return render_template('message.html',
+                               title='Compilation not found',
+                               error='Compilation record was not found. This is a bug')
+    # Change the status to submitted, so that it cannot be updated by the author.
+    version_compilation = version_comprec.result
+    if not version_compilation:
+        return render_template('message.html',
+                               title='version_compilation not found',
+                               error='version_compilation was not found. This is a bug')
+    version_compilation = Compilation.parse_raw(version_compilation)
+    # TODO: if we switch to having the editor assign a copy editor, then
+    # the status will be set to PaperStatusEnum.SUBMITTED. For now we set it
+    # to EDIT_PENDING, assuming that the assignment of copy editor is automatic.
+    paper_status.status = PaperStatusEnum.EDIT_PENDING
+    db.session.add(paper_status)
+    db.session.commit()
+    log_event(paperid, 'Paper {} submitted for copy edit'.format(paperid))
+    copyedit_dir = paper_dir / Path(Version.COPYEDIT.value)
+    if copyedit_dir.is_dir():
+        shutil.rmtree(copyedit_dir)
+    copyedit_dir.mkdir(parents=True)
+    version_dir = paper_dir / Path(form.version.data)
+    version_input_dir = version_dir / Path('input')
+    copyedit_input_dir = copyedit_dir / Path('input')
+    shutil.copytree(version_input_dir,
+                    copyedit_input_dir)
+    copyedit_file = copyedit_input_dir / Path('main.copyedit')
+    copyedit_file.touch() # this iacrcc.cls to add line numbers.
+    copyedit_comprec = CompileRecord.query.filter_by(paperid=paperid,version=Version.COPYEDIT.value).first()
+    if not copyedit_comprec:
+        copyedit_comprec = CompileRecord(paperid=paperid,version=Version.COPYEDIT.value)
+    copyedit_comprec.task_status = TaskStatus.PENDING
+    now = datetime.datetime.now()
+    copyedit_comprec.started = now
+    copyedit_comprec.task_status = TaskStatus.PENDING
+    compilation = Compilation(**{'paperid': paperid,
+                                 'status': CompileStatus.COMPILING,
+                                 'version': Version.COPYEDIT.value,
+                                 'email': version_compilation.email,
+                                 'venue': version_compilation.venue,
+                                 'submitted': version_compilation.submitted,
+                                 'accepted': version_compilation.accepted,
+                                 'compiled': now,
+                                 'command': version_compilation.command,
+                                 'error_log': [],
+                                 'warning_log': [],
+                                 'zipfilename': version_compilation.zipfilename})
+    command = version_compilation.command
+    compstr = compilation.json(indent=2, exclude_none=True)
+    copyedit_comprec.result = compstr
+    db.session.add(copyedit_comprec)
+    db.session.commit()
+    compilation_file = copyedit_dir / Path('compilation.json')
+    compilation_file.write_text(compstr, encoding='UTF-8')
+    output_dir = copyedit_dir / Path('output')
+    # Remove output from any previous run.
+    if output_dir.is_dir():
+        shutil.rmtree(output_dir)
+    # fire off a separate task to compile. We wrap run_latex_task so it
+    # can have the flask context to use sqlalchemy on the database.
+    task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           command,
+                                           str(copyedit_dir.absolute()),
+                                           paperid,
+                                           Version.COPYEDIT.value,
+                                           task_key)
+    status_url = url_for('home_bp.get_status',
+                         paperid=paperid,
+                         version=Version.COPYEDIT.value,
+                         auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                         _external=True)
+    # Notify the copy editor.
+    msg = Message('Paper {} is ready for copy editing'.format(paperid),
+                  sender=app.config['EDITOR_EMAILS'],
+                  recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
+    copyedit_url = url_for('admin_bp.copyedit', paperid=paperid, _external=True)
+    msg.body = 'A paper for CiC needs copy editing.\n\nYou can view it at {}'.format(copyedit_url)
+    mail.send(msg)
+    if 'TESTING' in app.config:
+        print(msg.body)
+    data = {'title': 'Compiling your LaTeX for copy editor',
+            'status_url': status_url}
+    return render_template('running.html', **data)
+
+
 @home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
 def get_status(paperid, version, auth):
     """Check on the current status of a compilation via ajax.
@@ -361,7 +509,13 @@ def view_results(paperid, version, auth):
         data['latexlog'] = log_file.read_text(encoding='UTF-8')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
-    if comp.venue == VenueEnum.IACRCC:
+    if comp.venue == VenueEnum.IACRCC and version == Version.CANDIDATE.value:
+        formdata = MultiDict({'email': comp.email,
+                              'version': Version.CANDIDATE.value,
+                              'paperid': comp.paperid,
+                              'auth': create_hmac(comp.paperid, version, '', comp.email)})
+        form = CompileForCopyEditForm(formdata=formdata)
+        data['form'] = form
         return render_template('view_iacrcc.html', **data)
     return render_template('view_generic.html', **data)
 

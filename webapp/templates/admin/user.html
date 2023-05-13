@@ -1,6 +1,8 @@
 {# This is use by forms.py:AdminUserForm #}
 {% extends "admin/admin_base.html" %}
 {% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
+<h1 class="mb-5 text-center">User administration</h1>
 {% if form.email.data %}
 <h1 class="mt-4">Edit user {{form.email.data}}
   <a class="ms-3 btn btn-warning" href="{{url_for('admin_file.recover', email=form.email.data)}}">Recover</a>
@@ -74,5 +76,5 @@
  }
 </script>
 </div>
-
+</main>
 {% endblock %}

@@ -168,8 +168,58 @@ class SubmitForm(FlaskForm):
         if not super(FlaskForm, self).validate():
             logging.warning('failed to validate: ' + str(self.errors))
             return False
-        # if (self.venue.data == 'iacrcc' and
-        #     self.engine.data != 'lualatex'):
-        #     self.engine.errors.append('lualatex is required for iacrcc')
-        #     return False
+        return self.check_auth()
+
+class CompileForCopyEditForm(FlaskForm):
+    """This is a simple form submitted by the author to send their
+    candidate version or final version to the copy editor. The auth field
+    authenticates required fields. Validation for a POST is different than
+    validation for a GET.  In the case of a GET, we only validate the
+    auth field, but for a POST we validate that all required fields
+    are submitted. Submitting this form will result in creating the
+    copyedit version as a copy of the version that was requested.
+    """
+    def __init__(self, *args, **kwargs):
+        """Set auth value from other fields."""
+        super(CompileForCopyEditForm, self).__init__(*args, **kwargs)
+        if not self.auth.data:
+            self.auth.data = create_hmac(self.paperid.data,
+                                         self.version.data,
+                                         '',
+                                         self.email.data)
+            logging.warning('set auth to ' + self.auth.data)
+        else:
+            logging.warning('got auth of ' + self.auth.data)
+    paperid = HiddenField(label='Paper ID',
+                          id='paperid',
+                          name='paperid',
+                          validators=[InputRequired('paper id is required'),
+                                      ValidPaperId()])
+    version = HiddenField(id='version',
+                          name='version',
+                          validators=[InputRequired('version field is required'),
+                                      ValidVersion()],
+                          default=Version.CANDIDATE.value)
+    auth = HiddenField(id='auth',
+                       name='auth',
+                       validators = [InputRequired('auth field is required')])
+    email = HiddenField(id='email',
+                        name='email',
+                        validators=[InputRequired(), Email()])
+    submit = SubmitField('Finalize for copyedit')
+    def check_auth(self):
+        return validate_hmac(self.paperid.data,
+                             self.version.data,
+                             '',
+                             self.email.data,
+                             self.auth.data)
+
+    def validate(self, extra_validators=None):
+        if not super(FlaskForm, self).validate():
+            logging.warning('failed to validate: ' + str(self.errors))
+            return False
+        if (self.version.data != Version.CANDIDATE.value and
+            self.version.data != Version.FINAL.value):
+            logging.warning('CompileForCopyEditForm has wrong version: {}'.format(version.data))
+            return False
         return self.check_auth()

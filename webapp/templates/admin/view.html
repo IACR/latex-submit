@@ -1,11 +1,18 @@
 
 {% extends "admin/admin_base.html" %}
+{% block head %}
+{{super()}}
+    <script type="text/javascript" id="MathJax-script" async
+            src="/js/mathjax/tex-chtml.js">
+    </script>
+{% endblock %}
 {% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-5 text-center">Status on {{paper.paperid}}</h1>
 <table class="table">
   <tbody>
     <tr><th>Venue:</th><td>{{paper.venue}}</td></tr>
-    <tr><th>Status:</th><td>{{paper.status}}</td></tr>
+    <tr><th>Status:</th><td>{{paper.status.value}}{% if paper.status.value == 'submitted' %} <a href="/admin/copyedit/{{paper.paperid}}">copy edit</a>{% endif %}</td></tr>
     <tr><th>email:</th><td>{{paper.email}}</td></tr>
   </tbody>
 </table>
@@ -23,4 +30,5 @@
     {% endfor %}
   </tbody>
 </table>
+</main>
 {% endblock %}

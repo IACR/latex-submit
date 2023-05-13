@@ -2,6 +2,7 @@
 """
 import json
 import os
+import re
 from pathlib import Path
 import time
 from .compiler import runner
@@ -77,11 +78,22 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                 compilation.warning_log.append('You may have lost a math character. Search for "redefine math accent"')
             if 'Missing character' in latexlog:
                 compilation.warning_log.append('You may have lost a character. Avoid using too many unusual fonts.')
-            # TODO: check severity before declaring it an error
-            if 'Overfull \\hbox ' in latexlog:
-                compilation.warning_log.append('You have an overfull hbox. Please correct it.')
-            if 'Overfull \\vbox ' in latexlog:
-                compilation.warning_log.append('You have an overfull vbox. Please correct it.')
+            lines = latexlog.splitlines()
+            overfull_pat = re.compile(r'^Overfull \\(v|h)box \((\d+\.)')
+            for line in lines:
+                if line.startswith('LaTeX Warning: Label '):
+                    compilation.error_log.append(line)
+                elif line.startswith('LaTeX Warning: Citation '):
+                    compilation.error_log.append(line)
+                res = overfull_pat.search(line)
+                if res:
+                    if res.group(1) == 'v' and len(res.group(2)) > 3: # vbox of 100pts at least
+                        compilation.warning_log.append('Please fix: ' + line)
+                    if res.group(1) == 'h' and len(res.group(2)) > 2: # hbox of 10pts at least.
+                        if len(res.group(2)) > 3: # > 100pt too wide
+                            compilation.error_log.append('Please fix: ' + line)
+                        else:
+                            compilation.warning_log.append('Please fix: ' + line)
         if output.get('errors', []):
             compilation.status = CompileStatus.COMPILATION_FAILED
         compilation.exit_code = output.get('exit_code', -1)

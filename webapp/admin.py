@@ -1,6 +1,6 @@
 """These routes are for admin only, and therefoer have the
 admin_required decorator on them. All routes should start with /admin."""
-from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from flask_login import login_required, current_user
 from flask_mail import Message
@@ -12,7 +12,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus
+from .db_models import Role, User, validate_version, PaperStatus, Discussion
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -71,7 +71,7 @@ def show_admin_paper(paperid):
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     data = {'title': 'Viewing {}'.format(paperid),
-            'paper': status}
+            'paper': paper_status}
     return render_template('admin/view.html', **data)
 
 @admin_bp.route('/admin/allusers', methods=['GET'])
@@ -205,3 +205,65 @@ def recover():
         return redirect(url_for('admin_file.all_users'))
     form.email.data = user.email
     return render_template('admin/recover.html', form=form)
+
+@admin_bp.route('/admin/copyedit/<paperid>', methods=['GET'])
+@login_required
+@admin_required
+def copyedit(paperid):
+    if not validate_paperid(paperid):
+        return admin_message('Invalid paperid: {}'.format(paperid))
+    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if not paper_status:
+        return admin_message('Unknown paper: {}'.format(paperid))
+    translate_table = str.maketrans({'"': r'\"'})
+    discussion = [
+        {'id': 0,
+         'pageno': 1,
+         'lineno': 12,
+         'text': 'The $a<b$ caused an overfull hbox here'.translate(translate_table)
+         },
+        {'id': 1,
+         'pageno': 12,
+         'lineno': 13,
+         'text': 'There is a missing DOI on this "reference" RSA72'.translate(translate_table)
+         }]
+    data = {'title': 'Viewing {}'.format(paperid),
+            'discussion': discussion,
+            'numItems': len(discussion),
+            'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
+            'paper': paper_status}
+    return render_template('admin/copyedit.html', **data)
+
+@admin_bp.route('/admin/comments/<paperid>', methods=['GET'])
+@login_required
+@admin_required
+def comments(paperid):
+    if not validate_paperid(paperid):
+        return jsonify([])
+    notes = Discussion.query.filter(paperid==paperid).all()
+    return jsonify([n.as_dict() for n in notes])
+
+@admin_bp.route('/admin/comment', methods=['POST'])
+@login_required
+@admin_required
+def comment():
+    """This is for handling copy editing comments."""
+    data = request.json
+    print('data=' + json.dumps(data))
+    try:
+        action = data['action']
+        if action == 'delete':
+            db.session.query(Discussion).filter(Discussion.id==data['id']).delete()
+            db.session.commit()
+            return jsonify({'id': data['id']})
+        elif action == 'add':
+            d = Discussion(paperid=data['paperid'],
+                           creator_id=data['creator_id'],
+                           pageno=data['pageno'],
+                           lineno=data['lineno'],
+                           text=data['text'])
+            db.session.add(d)
+            db.session.commit()
+            return jsonify(d.as_dict())
+    except Exception as e:
+        return jsonify({'error': str(e)})
