@@ -33,7 +33,7 @@ RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopt
 RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk biblatex-trad biblatex-ext marginfix sidenotes doclicense ccicons leftidx tokcycle
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
-RUN tlmgr install collection-bibtexextra alphalph cellspace
+RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
 # people use pdfpages to bypass uploading LaTeX.
 # RUN tlmgr remove pdfpages pdfjam
 COPY compiler/LatexMk /etc
