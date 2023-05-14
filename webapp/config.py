@@ -5,6 +5,7 @@ basedir = path.abspath(path.dirname(__file__))
 class Config:
     EMAIL_NOREPLY = 'iacrcc-noreply@iacr.org'
     EDITOR_EMAILS = 'iacrcc-editor@iacr.org'
+    COPYEDITOR_EMAILS = 'iacrcc-copyedit@iacr.org'
     MAIL_SERVER = 'mx2.iacr.org'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
