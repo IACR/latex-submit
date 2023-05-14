@@ -8,6 +8,13 @@
    margin-top: .25rem;
    margin-bottom: .25rem;
  }
+ .discussionTabs {
+   max-height:70vh;
+   overflow-y:scroll;
+ }
+ ul#myTab .nav-item button.active, #tabContent {
+   background-color: #f0f0f0;
+ }
  alert.list-group-item {
    opacity: 0;
    transition: all 0.6s ease-out;
@@ -135,7 +142,20 @@
      appendComment(data['id'], data['pageno'], data['lineno'], data['text']);
    });
  }
+
+ {# Used for requesting a fix from a warning in the log. #}
+ function requestFix(index) {
+   document.getElementById('text').value = 'Please fix: ' + document.getElementById('warning-'+index).innerText;
+   setErrorMessage('Please supply a page number and line number');
+   const firstTab = document.querySelector('#myTab li:first-child button');
+   bootstrap.Tab.getInstance(firstTab).show(); // Select the first tab.
+ }
 </script>
+{% endblock %}
+{% block extraMenu %}
+<li class="nav-item">
+  <a class="btn btn-success" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
+</li>
 {% endblock %}
 {% block content %}
   <main id="adminContent" class="container-fluid px-md-4">
@@ -143,46 +163,179 @@
   <div class="col-8" id="pdf_viewer">
     <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
   </div>
-  <div class="col-4">
+  <div class="col-4 px-0">
     <div class="d-flex flex-column" style="height:90vh;">
       <p>
         <strong class="my-2 text-center">Copy edit on {{paper.paperid}}</strong><br>
         Status: {{paper.status.value}}, Venue: {{paper.venue}}, author email: {{paper.email}}
       </p>
-      <input type="hidden" id="paperid" value="{{paper.paperid}}">
-      <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
-      <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
-      <div class="row">
-        <div class="col-6">
-          <label for="pageno" class="form-label">Page number</label>
-          <input id="pageno" name="pageno" required type="number" class="form-control">
+      {#  tabs for discussion and warnings from compilation #}
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Feedback to authors</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false">Compile warnings</button>
+        </li>
+      </ul>
+      {# tabs to be shown #}
+      <div id="tabContent" class="tab-content p-3">
+        <div class="tab-pane fade show active" id="feedback" role="tabpanel" aria-labelledby="feedback-tab" tabindex="0">
+          <input type="hidden" id="paperid" value="{{paper.paperid}}">
+          <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
+          <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
+          <div class="row">
+            <div class="col-6">
+              <label for="pageno" class="form-label">Page number</label>
+              <input id="pageno" name="pageno" required type="number" class="form-control" placeholder="Page number is required">
+            </div>
+            <div class="col-6">
+              <label for="lineno" class="form-label">Line number</label>
+              <input id="lineno" name="lineno" required type="number" class="form-control" placeholder="Line number is required">
+            </div>
+            <div class="col-12">
+              <label for="text" class="form-label mt-3">Note to author</label>
+            </div>
+            <div class="col-12">
+              <textarea id="text" name="text" class="form-control" placeholder="Enter text instructions for the author"></textarea>
+              {#<input id="text" name="text" type="text" class="form-control" required>#}
+            </div>
+          </div>
+          <div id="error_msg" class="text-danger d-none"></div>
+          <button type="submit" class="mt-3 btn btn-primary" onclick="addComment()">Add comment</button>
+          <div id="discussion" class="list-group mt-3 discussionTabs">
+          </div>
+          <button class="my-4 btn btn-primary">Finish and send to author(s)</button>
         </div>
-        <div class="col-6">
-          <label for="lineno" class="form-label">Line number</label>
-          <input id="lineno" name="lineno" required type="number" class="form-control">
-        </div>
-        <div class="col-12">
-          <label for="text" class="form-label mt-3">Note to author</label>
-        </div>
-        <div class="col-12">
-          <input id="text" name="text" type="text" class="form-control" required>
+        <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
+          <p>Authors have already seen these, but apparently
+            ignored them. You can request them to fix individual items.
+          </p>
+          <div class="list-group discussionTabs">
+            {% if warnings %}
+            {% for warning in warnings %}
+            <div class="alert alert-warning d-flex fade show">
+              <div id="warning-{{loop.index}}">{{warning}}</div>
+              <div class="ms-3 d-flex flex-column align-items-end">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
+                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Copy</button>
+              </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-info">There were no warnings from the compilation.</div>
+            {% endif %}
+          </div>
         </div>
       </div>
-      <div id="error_msg" class="text-danger d-none"></div>
-      <button type="submit" class="mt-3 btn btn-primary" onclick="addComment()">Add comment</button>
-      <div id="discussion" class="list-group mt-3" style="max-height:70vh;overflow-y:scroll">
-      </div>
-      {# <script>
-       {% for item in discussion %}
-       console.log('adding item');
-       appendComment({{item.id}}, {{item.pageno}}, {{item.lineno}}, "{{item.text}}");
-       {% endfor %}
-      </script> #}
-    </div>
-    <button class="my-4 btn btn-primary">Finish and send to author(s)</button>
     </div>
   </div>
 </div>  
+{# modal for help. #}
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="helpModalLabel">Help for copy editors</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3>Overview</h3>
+        <p>
+          Your job as a copy editor is a little vague, but the
+          overriding principle is:
+          <em>If it's not wrong, don't change it.</em> A useful
+          resource for copy editing of mathematics was
+          <a target="_blank" href="https://docplayer.net/122465-Mathematics-into-type.html">published by the AMS</a>
+          and revised in 1999 to reflect the usage of LaTeX. This is
+          quite old, but still useful.
+        </p>
+        <p>
+          One principle that we stive for is that metadata should be
+          carefully checked. The LaTeX style is designed to encourage
+          authors to supply all necessary metadata, but there are
+          still some things that authors will overlook. These include:
+        </p>
+        <h4>ORCID IDs</h4>
+        <p>
+          All authors should supply an ORCID ID. There are very few exceptions
+          to this rule (dead authors qualify).
+        </p>
+        <h4>Author names</h4>
+        <p>
+          Author names should be written as they appear on other papers. You
+          should be skeptical of names that are written with only initials or
+          authors that are written in ALLCAPS.
+        </p>
+        <h4>Bibliographic references</h4>
+        <p>
+          The references should be checked carefully. We encourage authors to
+          use <a target="_blank" href="https://cryptobib.di.ens.fr/">CryptoBib</a>,
+          which is a large carefully curated BibTeX database of crypto
+          and security literature. One thing to check for is that
+          authors will sometimes omit DOIs from their references. In
+          some cases this is acceptable, since not everything has a
+          DOI; ACM SODA and USENIX conferences are notable examples.
+          Other references like standards or company documents may
+          also lack DOIs. If something doesn't have a DOI, you can
+          still request that authors at least supply a useful URL. The
+          compilation will flag these references to make it easy for you
+          to find them.
+        </p>
+        <h3>The user interface</h3>
+        <p>
+          Your task is to build a set of things that the author should correct,
+          and send them to the author for them to revise their paper and re-upload
+          their LaTeX. We do not assume that you know LaTeX, but it can be useful
+          in giving guidance to the author when something doesn't look right.
+        </p>
+        <p>
+          The main components of the user interface are:
+        </p>
+        <ol>
+          <li>The author PDF on the left. The version you are seeing has line numbers,
+            but the final version will not. They are present only for you to refer
+            to parts of the document.
+          </li>
+          <li>A column on the right with two tabs:
+            <ol>
+              <li>A form to construct comments to the author. Each comment has a page number,
+                line number, and your text note. These are not sent to the author until you
+                click the button at the bottom right to "Finish and send to authors."
+              </li>
+              <li>
+                A tab with possible warnings from the LaTeX compilation. These usually include
+                things like missing DOIs, overfull <code>\hboxes</code>, and characters
+                that may not have been rendered correctly. They can be difficult to decipher,
+                but you may wish to ask the author to fix them.
+              </li>
+            </ol>
+          </li>
+        </ol>
+        <h3>The workflow</h3>
+        <p>
+          Once you finish with your review and click on the "Finalize"
+          button at the bottom, then your suggestions are sent to the
+          author. They are then given a chance to fix their LaTeX and
+          upload their "final" version. You will be notified when this
+          happens, and you will have a chance to check and make sure
+          authors have performed all of the changes. If they do not,
+          then we recommend communicating with the authors over email
+          until you are satisfied.
+        </p>
+        <h3>Bugs</h3>
+        <p>
+          This system is all new as of 2023, and there are bound to be
+          bugs. You can write to iacrcc-editors@iacr.org if you need
+          help.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
  document.getElementById('pdf_viewer').scrollIntoView({behavior: "smooth"});
  fetch('/admin/comments/{{paper.paperid}}', {

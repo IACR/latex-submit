@@ -59,11 +59,9 @@ def show_submit_version():
     # Submission form is only shown for papers that have no status or have status
     # of PENDING or EDIT_FINISHED. The latter is when the author is submitting
     # their final version.
-    print(paperid)
     sql = db.select(PaperStatus).filter_by(paperid=paperid)
-    print(sql)
-    paper_status = db.session.execute(sql).one_or_none()
-    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if paper_status:
         if (paper_status.status != PaperStatusEnum.PENDING.value and
             paper_status.status != PaperStatusEnum.EDIT_FINISHED.value):
@@ -113,7 +111,9 @@ def submit_version():
         return render_template('submit.html', form=form)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
-    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         paper_status = PaperStatus(paperid=paperid,
                                    venue=args.get('venue'),
@@ -186,7 +186,9 @@ def submit_version():
                         'warning_log': [],
                         'zipfilename': request.files['zipfile'].filename}
     compilation = Compilation(**compilation_data)
-    comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
+    sql = db.select(CompileRecord).filter_by(paperid=paperid).filter_by(version=version)
+    comprec = db.session.execute(sql).scalar_one_or_none()
+    # legacy API: comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
     if not comprec:
         comprec = CompileRecord(paperid=paperid,version=version)
     comprec.task_status = TaskStatus.PENDING
@@ -258,7 +260,9 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='Paper does not exist',
                                error='Paper directory does not exist. This is a bug')
-    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return render_template('message.html',
                                title='Missing status',
@@ -277,7 +281,9 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
-    version_comprec = CompileRecord.query.filter_by(paperid=paperid,version=form.version.data).first()
+    sql = db.select(CompileRecord).filter_by(paperid=paperid, version=form.version.data)
+    version_comprec = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: version_comprec = CompileRecord.query.filter_by(paperid=paperid,version=form.version.data).first()
     if not version_comprec:
         return render_template('message.html',
                                title='Compilation not found',
@@ -307,7 +313,9 @@ def compile_for_copyedit():
                     copyedit_input_dir)
     copyedit_file = copyedit_input_dir / Path('main.copyedit')
     copyedit_file.touch() # this iacrcc.cls to add line numbers.
-    copyedit_comprec = CompileRecord.query.filter_by(paperid=paperid,version=Version.COPYEDIT.value).first()
+    sql = db.select(CompileRecord).filter_by(paperid=paperid, version=Version.COPYEDIT.value)
+    copyedit_comprec = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: copyedit_comprec = CompileRecord.query.filter_by(paperid=paperid,version=Version.COPYEDIT.value).first()
     if not copyedit_comprec:
         copyedit_comprec = CompileRecord(paperid=paperid,version=Version.COPYEDIT.value)
     copyedit_comprec.task_status = TaskStatus.PENDING
@@ -417,7 +425,9 @@ def get_status(paperid, version, auth):
             except Exception:
                 msg = 'Unknown position'
     else: # The task would normally remove itself from the task_queue.
-        record = CompileRecord.query.filter_by(paperid=paperid, version=version).first()
+        sql = db.select(CompileRecord).filter_by(paperid=paperid, version=version)
+        record = db.session.execute(sql).scalar_one_or_none()
+        # Legacy API: record = CompileRecord.query.filter_by(paperid=paperid, version=version).first()
         if not record:
             status = TaskStatus.ERROR
             msg = 'No record of compilation'

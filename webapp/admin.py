@@ -12,7 +12,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus, Discussion
+from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -68,7 +68,9 @@ def show_admin_home():
 def show_admin_paper(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     data = {'title': 'Viewing {}'.format(paperid),
@@ -95,7 +97,9 @@ def user():
        may not signup themselves."""
     form = AdminUserForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.old_email.data).first()
+        sql = db.select(User).filter_by(email=form.old_email.data)
+        user = db.session.execute(sql).scalar_one_or_none()
+        # Legacy API: user = User.query.filter_by(email=form.old_email.data).first()
         if user:
             user.email = form.email.data
             if form.delete_cb.data: # delete the user
@@ -116,7 +120,9 @@ def user():
                 db.session.add(user)
                 db.session.commit()
         else: # create a new user.
-            existing_user = User.query.filter_by(email=form.email.data).first()
+            sql = db.select(User).filter_by(email=form.email.data)
+            existing_user = db.session.execute(sql).scalar_one_or_none()
+            # Legacy API: existing_user = User.query.filter_by(email=form.email.data).first()
             if existing_user:
                 flash('That user already exists')
                 return redirect(url_for('admin_file.user'))
@@ -149,7 +155,9 @@ def user():
     args = request.args.to_dict()
     if args.get('id'):
         # in this case, edit an existing user.
-        user = User.query.filter_by(id=args.get('id')).first()
+        sql = db.select(User).filter_by(id=args.get('id'))
+        user = db.session.execute(sql).scalar_one_or_none()
+        # Legacy API: user = User.query.filter_by(id=args.get('id')).first()
         if user:
             form.email.data = user.email
             form.old_email.data = user.email
@@ -169,7 +177,9 @@ def recover():
     """
     form = RecoverForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        sql = db.select(User).filter_by(email=form.email.data)
+        user = db.session.execute(sql).scalar_one_or_none()
+        # Legacy API: user = User.query.filter_by(email=form.email.data).first()
         if not user:
             flash('Unknown user')
             return redirect(url_for('admin_file.all_users'))
@@ -200,7 +210,9 @@ def recover():
     if not email:
         flash('missing email parameter for /recover')
         return redirect(url_for('admin_bp.all_users'))
-    user = User.query.filter_by(email=email).first()
+    sql = db.select(User).filter_by(email=email)
+    user = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: user = User.query.filter_by(email=email).first()
     if not user:
         flash('Unknown user')
         return redirect(url_for('admin_file.all_users'))
@@ -213,24 +225,16 @@ def recover():
 def copyedit(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    print(paper_status)
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
-    translate_table = str.maketrans({'"': r'\"'})
-    discussion = [
-        {'id': 0,
-         'pageno': 1,
-         'lineno': 12,
-         'text': 'The $a<b$ caused an overfull hbox here'.translate(translate_table)
-         },
-        {'id': 1,
-         'pageno': 12,
-         'lineno': 13,
-         'text': 'There is a missing DOI on this "reference" RSA72'.translate(translate_table)
-         }]
+    comp_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value) / Path('compilation.json')
+    compilation = Compilation.parse_file(comp_path)
     data = {'title': 'Viewing {}'.format(paperid),
-            'discussion': discussion,
-            'numItems': len(discussion),
+            'warnings': compilation.warning_log,
             'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
             'paper': paper_status}
     return render_template('admin/copyedit.html', **data)
@@ -251,7 +255,9 @@ def copyedit_home():
 def comments(paperid):
     if not validate_paperid(paperid):
         return jsonify([])
-    notes = Discussion.query.filter(paperid==paperid).all()
+    sql = db.select(Discussion).filter_by(paperid=paperid)
+    notes = db.session.execute(sql).scalars().all()
+    # notes = Discussion.query.filter(paperid==paperid).all()
     return jsonify([n.as_dict() for n in notes])
 
 @admin_bp.route('/admin/comment', methods=['POST'])
