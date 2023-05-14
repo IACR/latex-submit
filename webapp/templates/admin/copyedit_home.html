@@ -1,0 +1,31 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
+<h1 class="mb-5 text-center">Papers for copy editing</h1>
+<p>
+  This shows papers that are in various stages of copy editing.
+  The UI and workflow is still TBD.
+</p>
+<table class="table sortable" id="paperlist">
+  <thead>
+    <tr>
+      <th>Paper ID</th>
+      <th>Status</th>
+      <th>Venue</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for paper in papers %}
+    <tr><td><a href="/admin/copyedit/{{paper.paperid}}">{{paper.paperid}}</a></td>
+      <td>{{paper.status.value}}</td>
+      <td>{{paper.venue}}</td>
+      <td>{{paper.email}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script src="/js/sorttable.js"></script>
+</main>
+{% endblock %}

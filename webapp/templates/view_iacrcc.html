@@ -29,7 +29,8 @@ This template is used to show the status of a compilation for iacrcc.cls
     {% include "compilation.html" %}
     <div class="alert alert-info mt-3">
       If you are satisfied with your paper and your metadata, you can submit it for
-      copy editing. <span class="text-danger">Once you do this, you can no longer upload a
+      copy editing. This will recompile a version with line numbers added and send it
+      to the copy editor. <span class="text-danger">Once you do this, you can no longer upload a
       new version until copy editing is finished.</span>
       <br><br>
     {% if form.errors %}

@@ -10,7 +10,7 @@ import secrets
 import string
 from pathlib import Path
 from . import db, create_hmac, mail
-from .metadata.compilation import Compilation
+from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
 from .db_models import Role, User, validate_version, PaperStatus, Discussion
 from .forms import AdminUserForm, RecoverForm
@@ -58,6 +58,7 @@ def show_admin_home():
         papertree[paperpath.name] = versions
     data = {'title': 'IACR CC Upload Admin Home',
             'errors': errors,
+            'journal_name': app.config['SITE_SHORTNAME'],
             'papers': papertree}
     return render_template('admin/home.html', **data)
 
@@ -233,6 +234,16 @@ def copyedit(paperid):
             'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
             'paper': paper_status}
     return render_template('admin/copyedit.html', **data)
+
+@admin_bp.route('/admin/copyedit', methods=['GET'])
+@login_required
+@admin_required
+def copyedit_home():
+    papers = PaperStatus.query.filter((PaperStatus.status == PaperStatusEnum.EDIT_PENDING) |
+                                      (PaperStatus.status == PaperStatusEnum.EDIT_FINISHED)).all()
+    data = {'title': 'Papers for copy editing',
+            'papers': papers}
+    return render_template('admin/copyedit_home.html', **data)
 
 @admin_bp.route('/admin/comments/<paperid>', methods=['GET'])
 @login_required

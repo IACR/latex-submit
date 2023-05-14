@@ -40,38 +40,10 @@
    document.getElementById('text').value = '';
  }
 
- {# This sends a comment to the server and gets a response before
-   it is added to the UI.  #}
- async function sendComment() {
-   let lineno = +document.getElementById('lineno').value;
-   let pageno = +document.getElementById('pageno').value;
-   if (lineno <= 0 || pageno <= 0) {
-     console.log('invalid fields');
-     return {"error": "Invalid fields"};
-   }
-   let data = {'action': 'add',
-               'paperid': '{{paper.paperid}}',
-               'pageno': +document.getElementById('pageno').value,
-               'lineno': +document.getElementById('lineno').value,
-               'text': document.getElementById('text').value,
-               'creator_id': +document.getElementById('creator_id').value};
-   resetForm();
-   const response = await fetch('/admin/comment', {
-     method: "POST",
-     mode: "cors", // no-cors, *cors, same-origin
-     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-     credentials: "same-origin", // include, *same-origin, omit
-     headers: {
-       "Content-Type": "application/json",
-     },
-     redirect: "follow", // manual, *follow, error
-     body: JSON.stringify(data), // body data type must match "Content-Type" header
-   });
-   return response.json(); // parses JSON response into native JavaScript objects
- }
  function editNote(id) {
    console.log('edit ' + id);
  }
+
  function deleteNote(id) {
    console.log('deleting ' + id);
    let data = {'action': 'delete', 'id': id};
@@ -97,6 +69,7 @@
      }
    });
  }
+
  function appendComment(id, pageno, lineno, text) {
    let template = document.getElementById('item-template').innerHTML;
    // TODO: Use a better template system like handlebars?
@@ -106,18 +79,57 @@
                       .replace(/<% text %>/g, text);
    let discussion = document.getElementById('discussion');
    discussion.innerHTML = discussion.innerHTML + template;
-}
+ }
+
+ function setErrorMessage(txt) {
+   let error_msg = document.getElementById('error_msg');
+   error_msg.innerHTML = txt;
+   if (txt === "") {
+     error_msg.classList.add('d-none');
+   } else {
+     error_msg.classList.remove('d-none');
+   }
+ }
+
+ {# This works by sending making basic checks on the client and then sending
+   it to the server to get the ID back. #}
  function addComment() {
-   let pageno = document.getElementById('pageno').value;
-   let lineno = document.getElementById('lineno').value;
    let text = document.getElementById('text').value;
-   sendComment().then((data) => {
+   if (text === '') {
+     setErrorMessage('You must supply note to author');
+     return;
+   }
+   let lineno = +document.getElementById('lineno').value;
+   if (lineno < 0) {
+     setErrorMessage('Invalid line number');
+     return;
+   }
+   let pageno = +document.getElementById('pageno').value;
+   if (pageno < 1) {
+     setErrorMessage('Invalid page number');
+     return;
+   }
+   let data = {'action': 'add',
+               'paperid': '{{paper.paperid}}',
+               'pageno': +document.getElementById('pageno').value,
+               'lineno': +document.getElementById('lineno').value,
+               'text': document.getElementById('text').value,
+               'creator_id': +document.getElementById('creator_id').value};
+   resetForm();
+   fetch('/admin/comment', {
+     method: "POST",
+     mode: "cors", // no-cors, *cors, same-origin
+     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+     credentials: "same-origin", // include, *same-origin, omit
+     headers: {
+       "Content-Type": "application/json",
+     },
+     redirect: "follow", // manual, *follow, error
+     body: JSON.stringify(data), // body data type must match "Content-Type" header
+   }).then((response) => response.json()).then((data) => {
      console.dir(data);
      if ("error" in data) {
-       let error_msg = document.getElementById('error_msg');
-       error_msg.innerHTML = 'Invalid page number or line number';
-       error_msg.classList.remove('d-none');
-       console.log("feedback of invalid data");
+       setErrorMessage(data['error']);
        return;
      }
      appendComment(data['id'], data['pageno'], data['lineno'], data['text']);
@@ -132,8 +144,11 @@
     <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
   </div>
   <div class="col-4">
-    <div class="d-flex flex-column" style="height:85vh;">
-      <strong class="my-2 text-center">Copy edit on {{paper.paperid}} (Venue: {{paper.venue}}, author email: {{paper.email}})</strong>
+    <div class="d-flex flex-column" style="height:90vh;">
+      <p>
+        <strong class="my-2 text-center">Copy edit on {{paper.paperid}}</strong><br>
+        Status: {{paper.status.value}}, Venue: {{paper.venue}}, author email: {{paper.email}}
+      </p>
       <input type="hidden" id="paperid" value="{{paper.paperid}}">
       <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
       <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
@@ -164,7 +179,7 @@
        {% endfor %}
       </script> #}
     </div>
-    <button class="my-3 btn btn-primary">Finish and send to author(s)</button>
+    <button class="my-4 btn btn-primary">Finish and send to author(s)</button>
     </div>
   </div>
 </div>  

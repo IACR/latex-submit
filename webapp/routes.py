@@ -6,7 +6,7 @@ from flask_mail import Message
 import hmac
 import os
 from pathlib import Path
-from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db
+from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 import shutil
 import string
 from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event
@@ -59,6 +59,10 @@ def show_submit_version():
     # Submission form is only shown for papers that have no status or have status
     # of PENDING or EDIT_FINISHED. The latter is when the author is submitting
     # their final version.
+    print(paperid)
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    print(sql)
+    paper_status = db.session.execute(sql).one_or_none()
     paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if paper_status:
         if (paper_status.status != PaperStatusEnum.PENDING.value and
@@ -262,8 +266,8 @@ def compile_for_copyedit():
     # TODO: enable generating copy edit version from other states.
     if paper_status.status != PaperStatusEnum.PENDING:
         return render_template('message.html',
-                               title='Paper may not be sent to copy editor',
-                               error = 'Paper may not be sent for copy editing.')
+                               title='Paper was already sent to copy editor',
+                               error = 'Paper was already sent for copy editing.')
     task_key = paper_key(paperid, Version.COPYEDIT.value)
     if task_queue.get(task_key):
         log_event(paperid, 'Attempt to resubmit while compiling')
@@ -350,7 +354,7 @@ def compile_for_copyedit():
     msg = Message('Paper {} is ready for copy editing'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
-    copyedit_url = url_for('admin_bp.copyedit', paperid=paperid, _external=True)
+    copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC needs copy editing.\n\nYou can view it at {}'.format(copyedit_url)
     mail.send(msg)
     if 'TESTING' in app.config:
