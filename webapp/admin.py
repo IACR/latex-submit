@@ -12,7 +12,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version
+from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -73,8 +73,11 @@ def show_admin_paper(paperid):
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
+    sql = db.select(LogEvent).filter_by(paperid=paperid)
+    events = db.session.execute(sql).scalars().all()
     data = {'title': 'Viewing {}'.format(paperid),
-            'paper': paper_status}
+            'paper': paper_status,
+            'events': events}
     return render_template('admin/view.html', **data)
 
 @admin_bp.route('/admin/allusers', methods=['GET'])

@@ -232,7 +232,8 @@ def submit_version():
     mail.send(msg)
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
-            'status_url': status_url}
+            'status_url': status_url,
+            'headline': 'Compiling your paper'}
     return render_template('running.html', **data)
 
 # When an author sends for copy editing, we set the status to SUBMITTED and
@@ -368,9 +369,38 @@ def compile_for_copyedit():
     if 'TESTING' in app.config:
         print(msg.body)
     data = {'title': 'Compiling your LaTeX for copy editor',
-            'status_url': status_url}
+            'status_url': status_url,
+            'headline': 'Recompiling your paper with line numbers for the copy editor'}
     return render_template('running.html', **data)
 
+
+@home_bp.route('/copyedit/<paperid>/<auth>', methods=['GET'])
+def view_copyedit(paperid, auth):
+    if not validate_hmac(paperid, '', '', '', auth):
+        return render_template('message.html',
+                               title='Invalid request',
+                               error='Your authentication cannot be verified')
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    if paper_status:
+        if paper_status.status == PaperStatusEnum.EDIT_PENDING.value:
+            return render_template('message.html',
+                                   title='Your copy edit was submitted',
+                                   message='You will receive an email when the copy editor finishes with your paper')
+        elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
+            # TODO: add template for responding to copy editing.
+            return render_template('message.html',
+                                   title='Respond to your copy edit',
+                                   message='This will be for responding to the copy editing when it is finished. This is TBD.')
+        else:
+            # TODO: handle the other cases like SUBMITTED or PENDING.
+            return render_template('message.html',
+                                   title='Error in paper status',
+                                   message='Your paper has status {}. This should not happen.'.format(paper_status.status))
+    else:
+        return render_template('message.html',
+                               title='Unknown paper',
+                               error='Unknown paper')
 
 @home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
 def get_status(paperid, version, auth):
@@ -381,10 +411,15 @@ def get_status(paperid, version, auth):
     if not validate_hmac(paperid, version, '', '', auth):
         return jsonify({'status': TaskStatus.ERROR,
                         'msg': 'hmac is invalid'})
-    paper_url = url_for('home_bp.view_results',
-                        paperid=paperid,
-                        version=version,
-                        auth=create_hmac(paperid, version, '', ''))
+    if version == Version.COPYEDIT.value:
+        paper_url = url_for('home_bp.view_copyedit',
+                            paperid=paperid,
+                            auth=create_hmac(paperid, '', '', ''))
+    else:
+        paper_url = url_for('home_bp.view_results',
+                            paperid=paperid,
+                            version=version,
+                            auth=create_hmac(paperid, version, '', ''))
     if not validate_paperid(paperid):
         return jsonify({'url': paper_url,
                         'status': TaskStatus.ERROR,

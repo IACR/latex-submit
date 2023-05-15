@@ -25,8 +25,8 @@
     </tr>
   </thead>
   <tbody>
-    {% for event in paper.log %}
-    <tr><td>{{event.when.strftime('%Y-%m-%d %H:%M:%S')}}</td><td>{{event.action}}</td></tr>
+    {% for event in events %}
+    <tr><td>{{event.dt.strftime('%Y-%m-%d %H:%M:%S')}}</td><td>{{event.action}}</td></tr>
     {% endfor %}
   </tbody>
 </table>
