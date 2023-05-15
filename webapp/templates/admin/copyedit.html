@@ -47,6 +47,7 @@
    document.getElementById('text').value = '';
  }
 
+ {#  We never finished this. #}
  function editNote(id) {
    console.log('edit ' + id);
  }
@@ -145,16 +146,17 @@
 
  {# Used for requesting a fix from a warning in the log. #}
  function requestFix(index) {
-   document.getElementById('text').value = 'Please fix: ' + document.getElementById('warning-'+index).innerText;
+   document.getElementById('text').value = 'Please fix: ' + document.getElementById('warning-text-' + index).innerText;
    setErrorMessage('Please supply a page number and line number');
    const firstTab = document.querySelector('#myTab li:first-child button');
    bootstrap.Tab.getInstance(firstTab).show(); // Select the first tab.
+   document.getElementById('warning-'+index).remove();
  }
 </script>
 {% endblock %}
 {% block extraMenu %}
 <li class="nav-item">
-  <a class="btn btn-success" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
+  <a class="btn btn-info" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
 </li>
 {% endblock %}
 {% block content %}
@@ -205,7 +207,7 @@
           <button type="submit" class="mt-3 btn btn-primary" onclick="addComment()">Add comment</button>
           <div id="discussion" class="list-group mt-3 discussionTabs">
           </div>
-          <button class="my-4 btn btn-primary">Finish and send to author(s)</button>
+          <button class="my-4 btn btn-success">Finish and send to author(s)</button>
         </div>
         <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
           <p>Authors have already seen these, but apparently
@@ -214,11 +216,11 @@
           <div class="list-group discussionTabs">
             {% if warnings %}
             {% for warning in warnings %}
-            <div class="alert alert-warning d-flex justify-content-between fade show">
-              <div id="warning-{{loop.index}}">{{warning}}</div>
+            <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show">
+              <div id="warning-text-{{loop.index}}">{{warning}}</div>
               <div class="ms-3 d-flex flex-column align-items-end">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
-                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Copy</button>
+                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Request</button>
               </div>
             </div>
             {% endfor %}
@@ -234,7 +236,7 @@
 {# modal for help. #}
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <div class="modal-content">
+    <div class="modal-content p-3">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="helpModalLabel">Help for copy editors</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
