@@ -60,9 +60,17 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             compilation.warning_log.append(warning)
         for error in output.get('errors', []):
             compilation.error_log.append(error)
-        latexlog = Path(output_path) / 'main.log'
-        if latexlog.is_file():
-            latexlog = latexlog.read_text(encoding='UTF-8')
+        logfile = Path(output_path) / 'main.log'
+        if logfile.is_file():
+            try:
+                latexlog = logfile.read_text(encoding='UTF-8')
+            except Exception as e:
+                compilation.warning_log.append('latex log is not UTF-8')
+                try:
+                    latexlog = logfile.read_text(encoding='iso-8859-1', errors='replace')
+                except Exception as ee:
+                    compilation.error_log.append('unable to read main.log as text')
+                    latexlog = ''
             # Flag some warnings and errors from the log. We may want to process the log
             # line by line, since LaTeX is miserable at the try ... catch paradigm.
             if 'LaTeX Warning: There were undefined references' in latexlog:
@@ -121,6 +129,12 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                         else:
                             data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8'))
                         compilation.meta = Meta(**data)
+                        # Check authors to see if they have ORCID and affiliations.
+                        for author in compilation.meta.authors:
+                            if not author.orcid:
+                                compilation.warning_log.append('author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name))
+                            if not author.affiliations:
+                                compilation.warning_log.append('author {} is lacking an affiliation'.format(author.name))
                         if compilation.meta.version != VersionEnum.FINAL:
                             compilation.status = CompileStatus.WRONG_VERSION
                             compilation.error_log.append('Paper should use documentclass[version=final]')

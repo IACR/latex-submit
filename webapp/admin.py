@@ -231,7 +231,6 @@ def copyedit(paperid):
     sql = db.select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
-    print(paper_status)
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     comp_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value) / Path('compilation.json')

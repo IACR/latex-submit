@@ -214,7 +214,7 @@
           <div class="list-group discussionTabs">
             {% if warnings %}
             {% for warning in warnings %}
-            <div class="alert alert-warning d-flex fade show">
+            <div class="alert alert-warning d-flex justify-content-between fade show">
               <div id="warning-{{loop.index}}">{{warning}}</div>
               <div class="ms-3 d-flex flex-column align-items-end">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>

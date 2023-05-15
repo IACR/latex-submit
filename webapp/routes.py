@@ -555,7 +555,14 @@ def view_results(paperid, version, auth):
     if pdf_file.is_file():
         data['pdf'] = get_pdf_url(paperid, version)
     if log_file.is_file():
-        data['latexlog'] = log_file.read_text(encoding='UTF-8')
+        try:
+            data['latexlog'] = log_file.read_text(encoding='UTF-8')
+        except Exception as e:
+            logging.error('Unable to read log file as UTF-8: {}'.format(paperid))
+            # If pdflatex is used, then it can sometimes create a log file that is not
+            # readable as UTF-8 (in spite of the _input_ encoding being set to UTF-8).
+            # see https://github.com/IACR/latex-submit/issues/26
+            data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
     if comp.venue == VenueEnum.IACRCC and version == Version.CANDIDATE.value:
