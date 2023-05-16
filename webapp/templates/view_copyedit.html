@@ -1,0 +1,86 @@
+{% include "view_header.html" %}
+{#
+========================================================================
+This template is used to show the status of a compilation for iacrcc.cls
+========================================================================
+#}
+<script>
+ function replyTo(id) {
+   document.getElementById("reply-modal-location").innerText = document.getElementById('location-' + id).innerText;
+   document.getElementById("reply-modal-text").innerText = document.getElementById('text-' + id).innerText;
+   document.getElementById('replyId').value = id;
+   const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));
+   modal.show();
+  }
+</script>
+<div class="row">
+  <div class="col-8" id="pdf_viewer">
+    <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
+  </div>
+  <div class="col-4">
+    <div class="d-flex flex-column" style="height:70vh">
+      <h4 class="mt-2 text-center">Copy edit on {{paperid}}
+      </h4>
+    <p>You should revise your LaTeX according to the instructions and then
+      submit a revised version using the button below.</p>
+    {% if warnings %}
+      {% for warning in warnings %}
+      <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show">
+        <div id="warning-text-{{loop.index}}">{{warning}}</div>
+        <div class="ms-3 d-flex flex-column align-items-end">
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
+          <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Request</button>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+      <div class="list-group-discussion">
+        {% for item in items %}
+        <alert class="alert list-group-item list-group-item-secondary fade show" id="item-{{item.id}}">
+          <div class="p-3 d-flex justify-content-between">
+            <div>
+              <p id="location-{{item.id}}">Page {{item.pageno}}, line {{item.lineno}}</p>
+              <span id="text-{{item.id}}">{{item.text}}</span>
+            </div>
+            <div class="ps-2 d-flex flex-column">
+              <button class="mt-2 btn btn-warning" onclick="replyTo({{item.id}},{{item.pageno}},{{item.lineno}})" title="Reply to the copy editor">Reply</button>
+            </div>
+          </div>
+        </alert>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="btn btn-primary">Upload final version</button>
+  </div>
+</div>  
+<div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="replyModalLabel">Respond to copy editors</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Original item:</p>
+        <input type="hidden" id="replyId">
+        <div class="alert alert-secondary">
+          <p id="reply-modal-location"></p>
+          <span id="reply-modal-text"></span>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="response" id="response">
+          <label class="form-check-label" for="response">I Will fix it</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="response" id="response">
+          <label class="form-check-label" for="response">Need clarification</label>
+        </div>
+        <textarea id="reply-text" name="text" class="mb-3 mt-2 form-control" placeholder="Enter text response if desired"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Respond</button>
+      </div>
+    </div>
+</div>
+{% include "view_footer.html" %}

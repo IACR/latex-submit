@@ -9,7 +9,7 @@ from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 import shutil
 import string
-from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event
+from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, VenueEnum, FileTree
 from .metadata import validate_paperid, get_doi
@@ -376,7 +376,7 @@ def compile_for_copyedit():
 
 @home_bp.route('/copyedit/<paperid>/<auth>', methods=['GET'])
 def view_copyedit(paperid, auth):
-    if not validate_hmac(paperid, '', '', '', auth):
+    if not validate_hmac(paperid, Version.COPYEDIT.value, '', '', auth):
         return render_template('message.html',
                                title='Invalid request',
                                error='Your authentication cannot be verified')
@@ -388,10 +388,14 @@ def view_copyedit(paperid, auth):
                                    title='Your copy edit was submitted',
                                    message='You will receive an email when the copy editor finishes with your paper')
         elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
-            # TODO: add template for responding to copy editing.
-            return render_template('message.html',
-                                   title='Respond to your copy edit',
-                                   message='This will be for responding to the copy editing when it is finished. This is TBD.')
+            sql = db.select(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING.value)
+            items = db.session.execute(sql).scalars().all()
+            print(items)
+            data = {'paperid': paperid,
+                    'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
+                    'items': items,
+                    'final_url': url_for('home_bp.submit_version')}
+            return render_template('view_copyedit.html', **data)
         else:
             # TODO: handle the other cases like SUBMITTED or PENDING.
             return render_template('message.html',

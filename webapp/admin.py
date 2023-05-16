@@ -12,7 +12,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent
+from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -240,6 +240,37 @@ def copyedit(paperid):
             'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
             'paper': paper_status}
     return render_template('admin/copyedit.html', **data)
+
+@admin_bp.route('/admin/finish_copyedit', methods=['POST'])
+@login_required
+@admin_required
+def finish_copyedit():
+    args = request.form.to_dict()
+    paperid = args.get('paperid')
+    if not validate_paperid(paperid):
+        return admin_message('Invalid paperid: {}'.format(paperid))
+    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    if not paper_status:
+        return admin_message('Unknown paper: {}'.format(paperid))
+    paper_status.status = PaperStatusEnum.EDIT_FINISHED.value
+    db.session.add(paper_status)
+    db.session.commit()
+    numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()
+    msg = Message('Copy editing was finished on your paper',
+                  sender=app.config['EDITOR_EMAILS'],
+                  recipients=[paper_status.email])
+    maildata = {'journal_name': app.config['JOURNAL_NAME'],
+                'paperid': paperid,
+                'numitems': numitems,
+                'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
+                'final_url': url_for('home_bp.view_copyedit', paperid=paperid,auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                                     _external=True)}
+    msg.body = app.jinja_env.get_template('admin/copyedit_finished.txt').render(maildata)
+    if 'TESTING' in app.config:
+        print(msg.body)
+    mail.send(msg)
+    return redirect(url_for('admin_file.copyedit_home'), code=302)
 
 @admin_bp.route('/admin/copyedit', methods=['GET'])
 @login_required

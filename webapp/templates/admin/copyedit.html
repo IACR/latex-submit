@@ -207,7 +207,10 @@
           <button type="submit" class="mt-3 btn btn-primary" onclick="addComment()">Add comment</button>
           <div id="discussion" class="list-group mt-3 discussionTabs">
           </div>
-          <button class="my-4 btn btn-success">Finish and send to author(s)</button>
+          <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
+            <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
+            <button class="my-4 btn btn-success" type="submit">Finish and send to author(s)</button>
+          </form>
         </div>
         <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
           <p>Authors have already seen these, but apparently
@@ -220,7 +223,7 @@
               <div id="warning-text-{{loop.index}}">{{warning}}</div>
               <div class="ms-3 d-flex flex-column align-items-end">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
-                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Request</button>
+                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Include</button>
               </div>
             </div>
             {% endfor %}

@@ -18,6 +18,7 @@ class Config:
     DATA_DIR = 'webapp/data'
     SITE_NAME = 'IACR Publishing Portal'
     SITE_SHORTNAME = 'IACR CiC'
+    JOURNAL_NAME = 'IACR Communications in Cryptology'
     USERS = None
     TESTING = False
 
