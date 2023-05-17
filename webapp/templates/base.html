@@ -1,3 +1,71 @@
-{% include 'base_header.html' %}
-{% block content %}{% endblock %}
-{% include 'base_footer.html' %}
+{# This is the base header #}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="/css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/iacrcc.css">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    {% block endOfHead %}
+    {% endblock %}
+  </head>
+
+  <body>
+    <noscript>
+      <h1 class="text-center">What a lovely hat</h1>
+      <h4 class="text-center">Is it made out of <a href="https://iacr.org/tinfoil.html">tin foil</a>?</h4>
+    </noscript>
+    <nav id="sitenav" class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	  <span class="navbar-toggler-icon"></span>
+	</button>
+	<a class="navbar-brand mx-md-5" href="https://iacr.org/"><img class="iacrlogo" src="/img/iacrlogo_small.png" alt="IACR Logo" style="max-width:6rem;"></a>
+	<div class="d-none d-md-inline navbar-brand">{{site_name}}</div>
+	<span class="d-inline d-md-none navbar-brand">{{site_shortname}}</span>
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+	  <ul class="navbar-nav mb-2 mb-lg-0 mx-auto">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active ms-md-5" aria-current="page" href="/submit">Submit a paper</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active ms-md-5" aria-current="page" href="/funding">Lookup</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a href="#" class="ms-md-5 nav-link dropdown-toggle" data-bs-toggle="dropdown"><img src="/img/user.svg"></a>
+              <ul class="dropdown-menu">
+                {% if current_user and current_user.is_authenticated %}
+                <li class="dropdown-item-text">{{current_user.email}}</li>
+                <li><hr class="dropdown-divider"></li>
+                {% if current_user.role.value == 'admin' %}
+                <li><a href="{{ url_for('admin_file.show_admin_home') }}" class="dropdown-item">Admin portal</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.change_password') }}" class="dropdown-item">Change password</a></li>
+                <li><a href="{{ url_for('auth.logout') }}" class="dropdown-item">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}" class="dropdown-item">Login</a></li>
+                {% endif %}
+              </ul>
+            </li>
+	  </ul>
+        </div>
+      </div>
+    </nav>
+    {% block content %}
+    <main id="mainContent" class="container px-3 px-md-4">
+    </main>
+    {% endblock %}
+    {% block footer %}
+    <div class="container-fluid mt-auto" id="pageFooter">
+    </div>
+    {% endblock %}
+    {% block endOfPage %}
+    {% endblock %}
+  </body>
+</html>

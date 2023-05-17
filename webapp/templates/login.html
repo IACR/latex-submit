@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
 <h1 class="mt-4">Log In</h1>
 {% set next=request.args.get('next', '') %}
 <form method="POST" action="{{url_for('auth.login', next=request.args.get('next', ''))}}">
@@ -50,5 +51,5 @@
   #}
 </form>
 </div>
-
+</main>
 {% endblock %}

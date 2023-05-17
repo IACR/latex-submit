@@ -1,9 +1,14 @@
-{% include "view_header.html" %}
+{% extends "base.html" %}
 {#
 ========================================================================
-This template is used to show the status of a compilation for iacrcc.cls
+This template is used to show the status of a compilation for copyedit
 ========================================================================
 #}
+{% block endOfHead %}
+{% include "view_header.html" %}
+{% endblock %}
+{% block content %}
+<main id="mainContent" class="container-fluid px-3 px-md-4">
 <script>
  function replyTo(id) {
    document.getElementById("reply-modal-location").innerText = document.getElementById('location-' + id).innerText;
@@ -21,9 +26,12 @@ This template is used to show the status of a compilation for iacrcc.cls
     <div class="d-flex flex-column" style="height:70vh">
       <h4 class="mt-2 text-center">Copy edit on {{paperid}}
       </h4>
-      <p>You should revise your LaTeX according to the instructions. Please reply to each item.
-        Once you respond to all items, you will be able to submit a revised version using
-        the button below. </p>
+      <p> Please reply to each item. You should revise your LaTeX
+        according to the instructions below, but try to confine your
+        changes to only these issues.  Once you respond to all items,
+        you will be able to submit a revised version using the button
+        below. You can use this page as a checklist for your revisions.
+      </p>
     {% if warnings %}
       {% for warning in warnings %}
       <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show">
@@ -48,7 +56,7 @@ This template is used to show the status of a compilation for iacrcc.cls
               <span id="check-{{item.id}}" class="d-none text-success mt-2">✔</span>
             </div>
           </div>
-          <div class="d-none item p-3 text-info bg-white" id="item-{{item.id}}"></div>
+          <div class="d-none item p-3 bg-success-subtle" id="item-{{item.id}}"></div>
         </alert>
         {% endfor %}
       </div>
@@ -131,5 +139,9 @@ This template is used to show the status of a compilation for iacrcc.cls
         <button type="button" class="btn btn-primary" onClick="sendResponse()">Respond</button>
       </div>
     </div>
-</div>
+  </div>
+</main>
+{% endblock %} {# content #}
+{% block endOfPage %}
 {% include "view_footer.html" %}
+{% endblock %}

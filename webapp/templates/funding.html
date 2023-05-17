@@ -1,9 +1,81 @@
-{% include "funding_header.html" %}
 {#
 =================================================================
 This template is used to show search on fundreg.
 =================================================================
 #}
+{% set title='Crossref Funding Registry Search' %}
+{% extends "base.html" %}
+{% block endOfHead %}
+<style>
+ @media screen and (min-width:992px) {
+   .dropper:hover .dropdown-menu {
+     display:block;
+     margin-top: 2rem;
+   }
+   .dropper .dropdown-menu {
+     display:none;
+   }
+ }
+ .header img {
+   max-width: 3rem;
+   margin-right: 1rem;
+   margin-left: 1rem;
+ }
+ img.icon {
+   max-width: 2rem;
+ }
+ .widecontainer {
+   --bs-gutter-x: 1.5rem;
+   --bs-gutter-y: 0;
+   width: 100%;
+   padding-right: calc(var(--bs-gutter-x) * 0.5);
+   padding-left: calc(var(--bs-gutter-x) * 0.5);
+   margin-right: auto;
+   margin-left: auto;
+ }
+
+ @media (min-width: 576px) {
+   .widecontainer {
+     max-width: 540px;
+   }
+ }
+ @media (min-width: 768px) {
+   .widecontainer {
+     max-width: 720px;
+   }
+ }
+ @media (min-width: 992px) {
+   .widecontainer {
+     max-width: 960px;
+   }
+ }
+ @media (min-width: 1200px) {
+   .widecontainer {
+     max-width: 1140px;
+   }
+ }
+ @media (min-width: 1400px) {
+   .widecontainer {
+     max-width: 1320px;
+   }
+ }
+ @media (min-width: 1600px) {
+   .widecontainer {
+     max-width: 1500px;
+   }
+ }
+ @media (min-width: 1800px) {
+   .widecontainer {
+     max-width: 1600px;
+   }
+ }
+ pre#latex {
+   background-color: #f8f8f8;
+ }
+</style>
+{% endblock %} {# endOfHead #}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
 <div class="container mt-3">
   <h2>Metadata search</h2>
   <p class="mt-2">
@@ -278,5 +350,6 @@ This template is used to show search on fundreg.
     </div>
   </div>
 </div>
-{% include "base_footer.html" %}
+</main>
+{% endblock %} {# end of content #}
 

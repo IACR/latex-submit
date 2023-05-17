@@ -1,7 +1,4 @@
-{# this is for anything containing the compilation log #}
-{% extends "base_footer.html" %}
-{% block endOfPage %}
-{{super()}}
+{# this is included in endOfPage for anything containing the compilation log #}
 <script>
   MathJax = {
      tex: {
@@ -18,4 +15,3 @@
    instance.markRegExp(/LaTeX Warning/, {'accuracy': 'exact'});
    instance.markRegExp(/Error:|Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
   </script>
-{% endblock %}

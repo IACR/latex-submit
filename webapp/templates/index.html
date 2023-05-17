@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-
+<main id="mainContent" class="container px-3 px-md-4">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
   {{ message }}
@@ -50,4 +50,5 @@
 </p>
 {% include "installed.html" %}
 {% include "unsupported.html" %}
-{% endblock %}
+</main>
+{% endblock %} {# content #}

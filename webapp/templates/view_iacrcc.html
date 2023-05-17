@@ -1,9 +1,14 @@
-{% include "view_header.html" %}
+{% extends "base.html" %}
 {#
 ========================================================================
 This template is used to show the status of a compilation for iacrcc.cls
 ========================================================================
 #}
+{% block endOfHead %}
+{% include "view_header.html" %}
+{% endblock %}
+{% block content %}
+<main id="mainContent" class="container-fluid px-3 px-md-4">
 <nav class="mt-3">
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
@@ -106,4 +111,9 @@ This template is used to show the status of a compilation for iacrcc.cls
     </div>
   </div>
 </div>
+</main>
+{% endblock %} {# content #}
+{% block endOfPage %}
 {% include "view_footer.html" %}
+{% endblock %}
+

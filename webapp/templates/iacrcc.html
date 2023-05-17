@@ -1,4 +1,6 @@
-{% include "base_header.html" %}
+{% extends "base.html" %}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
 <h2 class="mt-5 mb-3">The iacrcc document class</h2>
 <p>
   Papers for the IACR Communications in Cryptology must be prepared
@@ -7,10 +9,12 @@
   crucial part of the publishing pipeline, because they allow us to
   extract all the metadata required for open access publishing.
 </p>
+<a class="btn btn-success float-end" href="/iacrcc.zip">Download</a>
 <p>
-  You can download the LaTeX files in a <a href="/iacrcc.zip">zip file</a>.
+  You can <a href="/iacrcc.zip">download the LaTeX files in a zip file</a>.
   This download includes the LaTeX document class, the bibliography style,
   a template to start from, and documentation.
 </p>
 <iframe src="/iacrcc/iacrdoc.pdf" width="100%" height="1200px"></iframe>
-{% include "base_footer.html" %}
+</main>
+{% endblock %} {# content #}
