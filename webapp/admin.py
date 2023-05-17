@@ -140,7 +140,7 @@ def user():
                                                         app.config['SITE_NAME'])
             msg = Message(subject,
                   sender=app.config['EDITOR_EMAILS'],
-                  recipients=['iacrcc@digicrime.com'])
+                  recipients=['iacrcc@digicrime.com',form.email.data])
             maildata = {'email': user.email,
                         'servername': app.config['SITE_NAME'],
                         'password': password,
