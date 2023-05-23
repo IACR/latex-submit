@@ -446,7 +446,7 @@ def get_status(paperid, version, auth):
     if version == Version.COPYEDIT.value:
         paper_url = url_for('home_bp.view_copyedit',
                             paperid=paperid,
-                            auth=create_hmac(paperid, '', '', ''))
+                            auth=create_hmac(paperid, version, '', ''))
     else:
         paper_url = url_for('home_bp.view_results',
                             paperid=paperid,
