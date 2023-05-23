@@ -72,6 +72,24 @@
         {% endfor %}
       {% endif %}
       {{ form.accepted }}
+        {% if form.journal.errors %}
+        {% for msg in form.journal.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {{ form.journal }}
+        {% if form.volume.errors %}
+        {% for msg in form.volume.errors %}
+        <div class="form-text text-danger">{{msg}}</div>
+        {% endfor %}
+        {% endif %}
+        {{ form.volume }}
+        {% if form.issue.errors %}
+        {% for msg in form.issue.errors %}
+        <div class="form-text text-danger">{{msg}}</div>
+        {% endfor %}
+        {% endif %}
+        {{ form.issue }}
       <div class="form-group">
         <label for="venue" class="form-label">Select a venue. At present only <span class="text-monospace">iacrcc</span> is fully supported.</label>
         <div class="row align-items-center">
@@ -84,7 +102,7 @@
             {{ form.venue(class_='form-select', onchange='updateEngines(this)') }}
           </div>
           <div class="col-6">
-            <div class="clsfile" id="iacrcc">use <i-mono>documentclass iacrcc</i-mono></div>
+            <div class="clsfile" id="cic">use <i-mono>documentclass iacrcc</i-mono></div>
             <div class="clsfile d-none" id="tosc">use <i-mono>documentclass iacrtrans</i-mono></div>
             <div class="clsfile d-none" id="tches">use <i-mono>documentclass iacrtrans</i-mono></div>
             <div class="clsfile d-none" id="asiacrypt">use <i-mono>documentclass llncs</i-mono></div>
@@ -331,7 +349,7 @@
    let value = sel.value;
    document.getElementById(value).classList.remove('d-none');
    return;
-   if (value == 'iacrcc') {
+   if (value == 'cic') {
      engineSelect.value = 'lualatex';
      document.querySelectorAll('#engine option').forEach(el => {
        if (el.value != 'lualatex') {

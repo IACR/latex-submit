@@ -4,6 +4,6 @@ flask_limiter
 python-dotenv
 flask-wtf
 flask-login
-flask-sqlalchemy
+sqlalchemy
 arxiv-latex-cleaner
 pybtex

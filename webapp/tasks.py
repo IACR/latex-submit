@@ -108,10 +108,10 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
         if compilation.exit_code != 0:
             compilation.status = CompileStatus.COMPILATION_FAILED
             compilation.error_log.append('Exit code of {} means that the compilation failed'.format(compilation.exit_code))
-        elif compilation.venue.value != 'iacrcc':
+        elif compilation.venue != 'cic':
             compilation.status = CompileStatus.COMPILATION_SUCCESS
         if compilation.status != CompileStatus.COMPILATION_FAILED:
-            if compilation.venue.value == 'iacrcc':
+            if compilation.venue == 'cic':
                 # Look for stuff we need for iacrcc.
                 metafile = Path(output_path) / Path('main.meta')
                 if metafile.is_file():
@@ -148,7 +148,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                 else:
                     compilation.status = CompileStatus.METADATA_FAIL
                     compilation.error_log.append('No metadata file. Are you sure you used iacrcc?')
-            else: # not iacrcc, so check references from bibtex and .aux.
+            else: # not cic, so check references from bibtex and .aux.
                 res = check_bibtex(output_path, compilation)
         # This is a legacy to attempt to fix issue #12. I gave up and
         # made it dependent on the value in the database, but we still
