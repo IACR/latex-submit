@@ -97,7 +97,15 @@ def run_latex(cmd, input_dirname, output_dirname):
         code, output = container.exec_run(cmd, workdir='/data')
         shutil.copytree(staging_dir, output_dir, symlinks=False)
         container.kill()
-        return {'log': output.decode(),
+        # Warning: the output may be malformed bytes with mixed character encodings
+        # if it was run with pdflatex. We first try to read as UTF-8 strict, and
+        # then read it as iso-8859-1 with an error handler to replace it with the
+        # official replacement character of � (U+FFFD).
+        try:
+            log = output.decode(encoding='UTF-8')
+        except Exception as e:
+            log = output.decode(encoding='iso-8859-1', errors='replace')
+        return {'log': log,
                 'warnings': warnings,
                 'exit_code': code}
     except APIError as e:
@@ -106,9 +114,13 @@ def run_latex(cmd, input_dirname, output_dirname):
         shutil.rmtree(staging_dir)
         container.stop()
         container.remove()
+    try:
+        log = output.decode(encoding='UTF-8')
+    except Exception as e:
+        log = output.decode(encoding='iso-8859-1', errors='replace')
     return {'exit_code': 999,
             'warnings': warnings,
-            'log': output.decode()}
+            'log': log}
 
 
 if __name__ == '__main__':
