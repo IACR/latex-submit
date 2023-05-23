@@ -8,10 +8,11 @@ import os
 from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 import shutil
+from sqlalchemy import select
 import string
-from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus
+from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, VenueEnum, FileTree
+from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, FileTree
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
@@ -59,7 +60,7 @@ def show_submit_version():
     # Submission form is only shown for papers that have no status or have status
     # of PENDING or EDIT_FINISHED. The latter is when the author is submitting
     # their final version.
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if paper_status:
@@ -109,9 +110,35 @@ def submit_version():
                                                           form.auth.data))
         form.auth.errors.append('Validation failed')
         return render_template('submit.html', form=form)
+    # check that the journal, volume, and issue exist.
+    journal_id = args.get('venue')
+    journal = db.session.execute(select(Journal).filter_by(name=journal_id)).scalar_one_or_none()
+    if not journal:
+        return render_template('message.html',
+                               title='Unknown journal {}'.format(journal_id),
+                               error='Unknown journal {}'.format(journal_id))
+    volume = db.session.execute(select(Volume).filter_by(name=args.get('volume'),
+                                                         journal_id=journal.id)).scalar_one_or_none()
+    if not volume:
+        # First time we see the volume, so create it.
+        volume = Volume(name=args.get('volume'),
+                        journal_id=journal.id)
+        db.session.add(volume)
+        db.session.commit()
+    issue = db.session.execute(select(Issue).filter_by(name=args.get('issue'),volume_id=volume.id)).scalar_one_or_none()
+    if not issue:
+        issue = Issue(name=args.get('issue'),
+                      volume_id=volume.id)
+        db.session.add(issue)
+        db.session.commit()
+    print('journal')
+    print(journal.volumes)
+    print('volume')
+    print(volume.issues)
+    print(issue)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
@@ -120,6 +147,7 @@ def submit_version():
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
+                                   issue_id=int(args.get('issue')),
                                    status=PaperStatusEnum.PENDING.value)
         db.session.add(paper_status)
         db.session.commit()
@@ -186,7 +214,7 @@ def submit_version():
                         'warning_log': [],
                         'zipfilename': request.files['zipfile'].filename}
     compilation = Compilation(**compilation_data)
-    sql = db.select(CompileRecord).filter_by(paperid=paperid).filter_by(version=version)
+    sql = select(CompileRecord).filter_by(paperid=paperid).filter_by(version=version)
     comprec = db.session.execute(sql).scalar_one_or_none()
     # legacy API: comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
     if not comprec:
@@ -261,7 +289,7 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='Paper does not exist',
                                error='Paper directory does not exist. This is a bug')
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
@@ -282,7 +310,7 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
-    sql = db.select(CompileRecord).filter_by(paperid=paperid, version=form.version.data)
+    sql = select(CompileRecord).filter_by(paperid=paperid, version=form.version.data)
     version_comprec = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: version_comprec = CompileRecord.query.filter_by(paperid=paperid,version=form.version.data).first()
     if not version_comprec:
@@ -314,7 +342,7 @@ def compile_for_copyedit():
                     copyedit_input_dir)
     copyedit_file = copyedit_input_dir / Path('main.copyedit')
     copyedit_file.touch() # this iacrcc.cls to add line numbers.
-    sql = db.select(CompileRecord).filter_by(paperid=paperid, version=Version.COPYEDIT.value)
+    sql = select(CompileRecord).filter_by(paperid=paperid, version=Version.COPYEDIT.value)
     copyedit_comprec = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: copyedit_comprec = CompileRecord.query.filter_by(paperid=paperid,version=Version.COPYEDIT.value).first()
     if not copyedit_comprec:
@@ -380,7 +408,7 @@ def view_copyedit(paperid, auth):
         return render_template('message.html',
                                title='Invalid request',
                                error='Your authentication cannot be verified')
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     if paper_status:
         if paper_status.status == PaperStatusEnum.EDIT_PENDING.value:
@@ -388,7 +416,7 @@ def view_copyedit(paperid, auth):
                                    title='Your copy edit was submitted',
                                    message='You will receive an email when the copy editor finishes with your paper')
         elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
-            sql = db.select(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING.value)
+            sql = select(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING.value)
             items = db.session.execute(sql).scalars().all()
             print(items)
             data = {'paperid': paperid,
@@ -464,7 +492,7 @@ def get_status(paperid, version, auth):
             except Exception:
                 msg = 'Unknown position'
     else: # The task would normally remove itself from the task_queue.
-        sql = db.select(CompileRecord).filter_by(paperid=paperid, version=version)
+        sql = select(CompileRecord).filter_by(paperid=paperid, version=version)
         record = db.session.execute(sql).scalar_one_or_none()
         # Legacy API: record = CompileRecord.query.filter_by(paperid=paperid, version=version).first()
         if not record:
@@ -569,7 +597,7 @@ def view_results(paperid, version, auth):
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
-    if comp.venue == VenueEnum.IACRCC and version == Version.CANDIDATE.value:
+    if comp.venue == 'cic' and version == Version.CANDIDATE.value:
         formdata = MultiDict({'email': comp.email,
                               'version': Version.CANDIDATE.value,
                               'paperid': comp.paperid,

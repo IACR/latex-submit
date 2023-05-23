@@ -69,7 +69,7 @@ This template is used to show the results of a failed compilation
   </div>
   <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
     <h3 class="ms-3">Extracted metadata</h3>
-    {% if comp.venue == 'iacrcc' %}
+    {% if comp.venue == 'cic' %}
     {% if metafile %}
     <div class="alert alert-info mx-3">The accuracy of your metadata is extremely
       important, so please check it over.
@@ -92,7 +92,7 @@ This template is used to show the results of a failed compilation
       <div class="alert alert-danger mx-4">No metadata! Are you sure you used the <span class="text-monospace">iacrcc</span> document class?</div>
   </div>
   {% endif %}
-  {% else %} {# not iacrcc #}
+  {% else %} {# not cic #}
   <p class="alert alert-warning">
     Metadata extraction only works for iacrcc class. We hope to fix that in the future, because someone will need to enter metadata for these papers.
   </p>

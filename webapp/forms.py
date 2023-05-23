@@ -3,8 +3,8 @@
 from flask import current_app as app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
-from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp
-from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError
+from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
+from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField
 from .db_models import Role, validate_version, Version
 from .metadata import validate_paperid
 from .metadata.compilation import dt_regex
@@ -80,6 +80,28 @@ class ValidVersion(object):
         if not validate_version(field.data):
             raise ValidationError(self.message)
 
+def maxmin_check(name, min=-1, max=-1):
+    if min >= 0 and max >= 0:
+        message = 'Invalid {}: must be an integer between {} and {}'.format(name, min, max)
+    elif min >= 0:
+        message = 'Invalid {}: must be an integer at least {}'.format(name, min)
+    elif max >= 0:
+        message = 'Invalid {}: must be integer at most {}'.format(name, max)
+    else:
+        'Invalid {}'.format(name)
+
+    def _check_hidden(form, field):
+        if len(field.data) < 1:
+            raise ValidationError(message)
+        try:
+            intval = int(field.data)
+            if ((min != -1 and intval < min) or
+                (max != -1 and intval > max)):
+                raise ValidationError(message)
+        except Exception as e:
+            raise ValidationError(str(e))
+    return _check_hidden
+
 class SubmitForm(FlaskForm):
     """Form to submit a version of a paper. The auth field authenticates
     required fields. This may be supplied by an external link for the
@@ -96,9 +118,6 @@ class SubmitForm(FlaskForm):
                                          self.version.data,
                                          self.submitted.data,
                                          self.accepted.data)
-            logging.warning('set auth to ' + self.auth.data)
-        else:
-            logging.warning('got auth of ' + self.auth.data)
     paperid = StringField(label='Paper ID',
                           id='paperid',
                           name='paperid',
@@ -111,18 +130,29 @@ class SubmitForm(FlaskForm):
                           validators=[InputRequired('version field is required'),
                                       ValidVersion()],
                           default=Version.CANDIDATE.value)
-    venue = SelectField(label='Select a venue. At present only iacrcc is fully supported',
+    journal = HiddenField(id='journal',
+                          name='journal',
+                          # TODO: figure out what is acceptable
+                          validators=[InputRequired('journal is required'),
+                                      AnyOf([j['name'] for j in app.config['JOURNALS']])],
+                          # TODO remove default value below
+                          default='cic')
+    volume = HiddenField(id='volume',
+                         name='volume',
+                         default=2023,
+                         validators=[maxmin_check(name='volume',min=2023), InputRequired('Volume is required')])
+    issue = HiddenField(id='issue',
+                        name='issue',
+                        default=2,
+                        validators=[maxmin_check(name='issue',min=1)])
+    venue = SelectField(label='Select a venue. At present only cic is fully supported',
                         id='venue',
                         name='venue',
-                        choices=[('iacrcc', 'IACR Communications in Cryptology'),
+                        choices=[('cic', 'IACR Communications in Cryptology'),
                                  ('tosc', 'IACR Transactions on Symmetric Cryptology (partially supported)'),
                                  ('tches', 'IACR Transactions on Cryptographic Hardware and Embedded Systems (partially supported)'),
-                                 ('asiacrypt', 'Asiacrypt (Springer LNCS)'),
-                                 ('crypto', 'Crypto (Springer LNCS)'),
-                                 ('eurocrypt', 'Eurocrypt (Springer LNCS)'),
-                                 ('pkc', 'PKC (Springer LNCS)'),
-                                 ('tcc', 'TCC (Springer LNCS)')],
-                        default = 'iacrcc',
+                                 ('lncs', 'Any LNCS proceedings (partially supported)')],
+                        default = 'cic',
                         validators=[InputRequired('venue field is required')])
     submitted = HiddenField(id='submitted',
                             name='submitted',

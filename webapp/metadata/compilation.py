@@ -169,16 +169,6 @@ class LicenseEnum(Enum):
                 return e
         return None
 
-class VenueEnum(StrEnum):
-    IACRCC    = 'iacrcc'
-    TOSC      = 'tosc'
-    TCHES     = 'tches'
-    ASIACRYPT = 'asiacrypt'
-    CRYPTO    = 'crypto'
-    EUROCRYPT = 'eurocrypt'
-    PKC       = 'pkc'
-    TCC       = 'tcc'
-
 class VersionEnum(StrEnum):
     """Values from documentclass[version=<version>]."""
     FINAL = 'final'
@@ -387,9 +377,9 @@ class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID derived from venue and id in review system',
                                           description='ID must be globally unique.')
-    venue: VenueEnum = Field(...,
-                             title='The venue for the publication',
-                             description='This determines which cls to use.')
+    venue: constr(min_length=3) = Field(...,
+                                        title='The venue for the publication',
+                                        description='This determines which cls to use. It\'s the key into the journal object in the database.')
     status: CompileStatus = Field(CompileStatus.COMPILING,
                                   title='Current status',
                                   description='Indicates what stage the paper is at')

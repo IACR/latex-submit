@@ -9,7 +9,9 @@ from collections import OrderedDict
 from flask import Flask, request, render_template, current_app
 from flask_login import LoginManager, UserMixin
 from flask_mail import Mail
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 import hashlib, hmac
@@ -54,17 +56,37 @@ executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='compiler')
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
-# DB used for keeping track of users.
-db = SQLAlchemy()
+class SQLAlchemy():
+    """Wrapper for sqlalchemy scoped_session and engine, like flask-sqlalchemy."""
+    def __init__(self, engine, session):
+        self.engine = engine
+        self.session = session
 
-# Now that db exists, we can import User
-from webapp.db_models import User
+# DB wrapper is global so we can have easy access to engine and session.
+db = SQLAlchemy(None, None)
+
+# In case we want to try to force the pragma for sqlite3.
+# @event.listens_for(Engine, 'connect')
+# def set_sqlite_pragma(conn, record):
+#     """This can be used to enable cascade deletes automatically."""
+#     print('connected')
+#     cursor = conn.cursor()
+#     cursor.execute('PRAGMA foreign_keys=ON')
+#     cursor.close
 
 def create_app(config):
     app = Flask('webapp', static_folder='static/', static_url_path='/')
     app.config.from_object(config)
     mail.init_app(app)
-    db.init_app(app)
+    db.engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
+    db.session = scoped_session(sessionmaker(autocommit=False,autoflush=False,bind=db.engine))
+    def shutdown_session(ex):
+        db.session.remove()
+    app.teardown_request(shutdown_session)
+    from webapp.db_models import Base, User, Journal
+    Base.query = db.session.query_property()
+    # Create database tables if they don't already exist.
+    Base.metadata.create_all(bind=db.engine)
     login_manager.init_app(app)
     with app.app_context():
         from . import admin
@@ -73,7 +95,6 @@ def create_app(config):
         app.register_blueprint(routes.home_bp)
         app.register_blueprint(admin.admin_bp)
         app.register_blueprint(auth.auth_bp)
-        db.create_all()
         if config.USERS:
             for user in config.USERS:
                 u = User.query.filter_by(email=user['email']).first()
@@ -82,6 +103,11 @@ def create_app(config):
                                         user['role'],
                                         user['password']))
             db.session.commit()
+        for journal in config.JOURNALS:
+            j = Journal.query.filter_by(name=journal['name']).first()
+            if not j:
+                db.session.add(Journal(journal))
+        db.session.commit()
         return app
 
 

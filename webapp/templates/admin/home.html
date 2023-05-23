@@ -17,6 +17,55 @@
     <li>How should we handle communication to the author(s)?</li>
   </ol>
 </p>
+<h3>List of journals</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>key</th>
+      <th>name</th>
+      <th>ISSN</th>
+      <th>DOI prefix</th>
+      <th>volumes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for journal in journals %}
+      <td>{{journal.name}}</td>
+      <td>{{journal.longname}}</td>
+      <td>{{journal.ISSN}}</td>
+      <td>{{journal.DOI_PREFIX}}</td>
+      <td>{{journal.volumes|length}} volumes</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h3>List of papers</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>paperid</th>
+      <th>venue</th>
+      <th>email</th>
+      <th>submitted</th>
+      <th>accepted</th>
+      <th>status</th>
+      <th>issue ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for paper in papers %}
+      <td>{{paper.paperid}}</td>
+      <td>{{paper.venue}}</td>
+      <td>{{paper.email}}</td>
+      <td>{{paper.submitted}}</td>
+      <td>{{paper.accepted}}</td>
+      <td>{{paper.status}}</td>
+      <td>{{paper.issue_id}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 <h3>List of submitted papers</h3>
 <table class="table sortable" id="paperlist">
   <thead>
@@ -31,7 +80,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for paperid, versions in papers.items() %}
+    {% for paperid, versions in papertree.items() %}
     {% for version, paper in versions.items() %}
     <tr{% if not loop.first %} class="table-light"{% endif %}>
       <td>{% if loop.first %}<a href="/admin/view/{{paperid}}">{{paperid}}</a>{% endif %}</td>

@@ -1,20 +1,16 @@
+"""
+This defines the database models for SQLAlchemy in 2.0 style.
+"""
 from datetime import datetime
-from . import db
 from .metadata.compilation import PaperStatusEnum
 from enum import Enum
 from flask_login import UserMixin
-from flask import request
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
+from sqlalchemy import Integer, String, Text, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.sql import func
-
-# from urlparse import urlparse, urljoin
-
-# def is_safe_url(target):
-#     # Is this URL safe to redirect to?
-#     ref_url = urlparse(request.host_url)
-#     test_url = urlparse(urljoin(request.host.url, target))
-#     return test_user.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from . import db
+from typing import List, Optional
 
 class Role(str, Enum):
     AUTHOR = 'author'
@@ -39,16 +35,19 @@ class TaskStatus(str, Enum):
     FINISHED = 'FINISHED'
     ERROR = 'ERROR'
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(200), primary_key=False, unique=False, nullable=False)
-    role = db.Column(db.Enum(Role,
-                             values_callable=lambda x: [str(member.value) for member in Role]),
-                     unique=False,
-                     nullable=False)
-    created_on = db.Column(db.DateTime, index=False, unique=False, nullable=True)
-    last_login = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+class Base(DeclarativeBase):
+    pass
+
+class User(UserMixin, Base):
+    __tablename__ = 'user'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(200), nullable=False)
+    # TODO: make roles be a one-to-many relationship
+    # See https://github.com/maxcountryman/flask-login/issues/421
+    role: Mapped[Role] = mapped_column(nullable=False)
+    created_on: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
+    last_login: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
 
     def __init__(self, email, role, password):
         self.email = email
@@ -67,18 +66,15 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}'.format(self.email)
 
-class CompileRecord(db.Model):
-    __table_args__ = (db.UniqueConstraint('paperid', 'version', name='paper_version_ind'),)
-    id = db.Column(db.Integer, primary_key=True)
-    paperid = db.Column(db.String(32), nullable=False, index=True)
-    version = db.Column(db.Enum(Version,
-                                values_callable=lambda x: [str(v.value) for v in Version]),
-                        nullable=False,index=True)
-    task_status = db.Column(db.Enum(TaskStatus,
-                                    values_callable=lambda x: [str(s.value) for s in TaskStatus]),
-                            default=TaskStatus.PENDING.value)
-    started = db.Column(db.DateTime, index=False, nullable=False)
-    result = db.Column(db.String, nullable=True)
+class CompileRecord(Base):
+    __tablename__ = 'compile_record'
+    __table_args__ = (UniqueConstraint('paperid', 'version', name='paper_version_ind'),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    paperid: Mapped[str] = mapped_column(ForeignKey('paper_status.paperid', ondelete='CASCADE'), nullable=False, index=True)
+    version: Mapped[Version] = mapped_column(nullable=False, index=True)
+    task_status: Mapped[TaskStatus] = mapped_column(server_default = TaskStatus.PENDING.value)
+    started: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
+    result: Mapped[str] = mapped_column(Text, nullable=True)
 
 class DiscussionStatus(str, Enum):
     """Status of a copyedit discussion item."""
@@ -87,43 +83,74 @@ class DiscussionStatus(str, Enum):
     DECLINED = 'DECLINED'
     FIXED = 'FIXED'
 
-class Discussion(db.Model):
-    """This is similar to PaperComment in HotCRP. It is used for copyediting."""
-    id = db.Column(db.Integer, primary_key=True)
-    paperid = db.Column(db.String(32), nullable=False, index=True)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    created = db.Column(db.DateTime, index=False, nullable=False, default=func.now())
-    pageno = db.Column(db.Integer, nullable=True)
-    lineno = db.Column(db.Integer, nullable=True)
-    text = db.Column(db.Text, nullable=False)
-    reply = db.Column(db.Text, nullable=True) # from author.
-    status = db.Column(db.Enum(DiscussionStatus,
-                               values_callable=lambda x: [str(s.value) for s in DiscussionStatus]),
-                       default = DiscussionStatus.PENDING.value)
+class Discussion(Base):
+    __tablename__ = 'discussion'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    paperid: Mapped[str] = mapped_column(ForeignKey('paper_status.paperid', ondelete='CASCADE'), nullable=False)
+    creator_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    created: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=func.now())
+    pageno: Mapped[int] = mapped_column(Integer, nullable=True)
+    lineno: Mapped[int] = mapped_column(Integer, nullable=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    reply: Mapped[str] = mapped_column(Text, nullable=True) # from author
+    status: Mapped[DiscussionStatus] = mapped_column(default=DiscussionStatus.PENDING)
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-class PaperStatus(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    paperid = db.Column(db.String(32), nullable=False, unique=True, index=True)
-    venue = db.Column(db.String(32), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
-    submitted = db.Column(db.String(32), nullable=False)
-    accepted = db.Column(db.String(32), nullable=False)
-    status = db.Column(db.Enum(PaperStatusEnum,
-                               values_callable=lambda x: [str(s.value) for s in PaperStatusEnum]),
-                       default = PaperStatusEnum.PENDING.value)
+class PaperStatus(Base):
+    """Primary record for a paper. It may have compilations, discussion, etc associated with it."""
+    __tablename__ = 'paper_status'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    paperid: Mapped[str] = mapped_column(String(32), nullable = False, unique=True, index=True, comment='Assumed to be globally unique across all journals, volumes, and issues')
+    venue: Mapped[str] = mapped_column(String(32), nullable=False) # will be deprecated
+    email: Mapped[str] = mapped_column(String(50), nullable=False)
+    submitted: Mapped[str] = mapped_column(String(32), nullable=False)
+    accepted: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
+    issue_id: Mapped[int] = mapped_column(ForeignKey('issue.id'), nullable=False)
+    issue: Mapped['Issue'] = relationship(back_populates='papers')
 
-class LogEvent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    paperid = db.Column(db.String(32), db.ForeignKey('paper_status.paperid'), nullable=False)
-    dt = db.Column(db.DateTime, index=True, nullable=False)
-    action = db.Column(db.String(50), nullable=False) # free text field
+class LogEvent(Base):
+    __tablename__ = 'log_event'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    paperid: Mapped[str] = mapped_column(ForeignKey('paper_status.paperid', ondelete='CASCADE'), nullable=False)
+    dt: Mapped[datetime] = mapped_column(DateTime, index=True, nullable=False)
+    action: Mapped[str] = mapped_column(Text, nullable=False) # free text field
 
 def log_event(paperid, action):
     event = LogEvent(paperid=paperid,dt=datetime.now(),action=action)
     db.session.add(event)
     db.session.commit()
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+class Journal(Base):
+    __tablename__ = 'journal'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    ISSN: Mapped[str] = mapped_column(String(10), nullable=False)
+    DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
+    name: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    longname: Mapped[str] = mapped_column(Text)
+    volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
+    def __init__(self, data):
+        self.ISSN = data['ISSN']
+        self.name = data['name']
+        self.longname = data['longname']
+        self.DOI_PREFIX = data['DOI_PREFIX']
+
+class Volume(Base):
+    __tablename__ = 'volume'
+    __table_args__ = (UniqueConstraint('journal_id', 'name', name='journal_volume_ind'),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(32), comment='Usually the year')
+    journal_id: Mapped[int] = mapped_column(ForeignKey('journal.id', ondelete='CASCADE'), nullable=False)
+    journal: Mapped['Journal'] = relationship(back_populates='volumes')
+    issues: Mapped[List['Issue']] = relationship(back_populates='volume', cascade='all, delete-orphan')
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+class Issue(Base):
+    __tablename__ = 'issue'
+    __table_args__ = (UniqueConstraint('volume_id', 'name', name='volume_issue_ind'),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(32), comment='Usually number, e.g., 2')
+    volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
+    volume: Mapped['Volume'] = relationship(back_populates='issues')
+    papers: Mapped[List['PaperStatus']] = relationship(back_populates='issue')

@@ -2,6 +2,7 @@
 admin_required decorator on them. All routes should start with /admin."""
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
+from sqlalchemy import select
 from flask_login import login_required, current_user
 from flask_mail import Message
 import json
@@ -12,7 +13,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion
+from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -38,6 +39,8 @@ admin_bp = Blueprint('admin_file', __name__)
 def show_admin_home():
     papertree = {} # paperid -> version -> compilation
     errors = []
+    journals = db.session.execute(select(Journal)).scalars()
+    papers = db.session.execute(select(PaperStatus)).scalars()
     for paperpath in Path(app.config['DATA_DIR']).iterdir():
         versions = {}
         for v in paperpath.iterdir():
@@ -59,7 +62,9 @@ def show_admin_home():
     data = {'title': 'IACR CC Upload Admin Home',
             'errors': errors,
             'journal_name': app.config['SITE_SHORTNAME'],
-            'papers': papertree}
+            'papertree': papertree,
+            'papers': papers,
+            'journals': journals}
     return render_template('admin/home.html', **data)
 
 @admin_bp.route('/admin/view/<paperid>')
@@ -68,12 +73,12 @@ def show_admin_home():
 def show_admin_paper(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
-    sql = db.select(LogEvent).filter_by(paperid=paperid)
+    sql = select(LogEvent).filter_by(paperid=paperid)
     events = db.session.execute(sql).scalars().all()
     data = {'title': 'Viewing {}'.format(paperid),
             'paper': paper_status,
@@ -100,7 +105,7 @@ def user():
        may not signup themselves."""
     form = AdminUserForm()
     if form.validate_on_submit():
-        sql = db.select(User).filter_by(email=form.old_email.data)
+        sql = select(User).filter_by(email=form.old_email.data)
         user = db.session.execute(sql).scalar_one_or_none()
         # Legacy API: user = User.query.filter_by(email=form.old_email.data).first()
         if user:
@@ -123,7 +128,7 @@ def user():
                 db.session.add(user)
                 db.session.commit()
         else: # create a new user.
-            sql = db.select(User).filter_by(email=form.email.data)
+            sql = select(User).filter_by(email=form.email.data)
             existing_user = db.session.execute(sql).scalar_one_or_none()
             # Legacy API: existing_user = User.query.filter_by(email=form.email.data).first()
             if existing_user:
@@ -158,7 +163,7 @@ def user():
     args = request.args.to_dict()
     if args.get('id'):
         # in this case, edit an existing user.
-        sql = db.select(User).filter_by(id=args.get('id'))
+        sql = select(User).filter_by(id=args.get('id'))
         user = db.session.execute(sql).scalar_one_or_none()
         # Legacy API: user = User.query.filter_by(id=args.get('id')).first()
         if user:
@@ -180,7 +185,7 @@ def recover():
     """
     form = RecoverForm()
     if form.validate_on_submit():
-        sql = db.select(User).filter_by(email=form.email.data)
+        sql = select(User).filter_by(email=form.email.data)
         user = db.session.execute(sql).scalar_one_or_none()
         # Legacy API: user = User.query.filter_by(email=form.email.data).first()
         if not user:
@@ -213,7 +218,7 @@ def recover():
     if not email:
         flash('missing email parameter for /recover')
         return redirect(url_for('admin_bp.all_users'))
-    sql = db.select(User).filter_by(email=email)
+    sql = select(User).filter_by(email=email)
     user = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: user = User.query.filter_by(email=email).first()
     if not user:
@@ -228,7 +233,7 @@ def recover():
 def copyedit(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
@@ -249,7 +254,7 @@ def finish_copyedit():
     paperid = args.get('paperid')
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = db.select(PaperStatus).filter_by(paperid=paperid)
+    sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
@@ -288,7 +293,7 @@ def copyedit_home():
 def comments(paperid):
     if not validate_paperid(paperid):
         return jsonify([])
-    sql = db.select(Discussion).filter_by(paperid=paperid)
+    sql = select(Discussion).filter_by(paperid=paperid)
     notes = db.session.execute(sql).scalars().all()
     # notes = Discussion.query.filter(paperid==paperid).all()
     return jsonify([n.as_dict() for n in notes])
