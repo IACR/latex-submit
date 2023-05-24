@@ -131,11 +131,6 @@ def submit_version():
                       volume_id=volume.id)
         db.session.add(issue)
         db.session.commit()
-    print('journal')
-    print(journal.volumes)
-    print('volume')
-    print(volume.issues)
-    print(issue)
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
     paper_dir.mkdir(parents=True, exist_ok=True)
     sql = select(PaperStatus).filter_by(paperid=paperid)
@@ -180,11 +175,27 @@ def submit_version():
     version_dir.mkdir(parents=True)
     # Unzip the zip file into submitted_dir
     zip_path = version_dir / Path('all.zip')
+    tmpzip_path = version_dir / Path('tmp.zip')
     try:
-        request.files['zipfile'].save(zip_path)
+        request.files['zipfile'].save(tmpzip_path)
     except Exception as e:
         logging.error('Unable to save zip file: {}'.format(str(e)))
         form.zipfile.errors.append('unable to save zip file')
+        return render_template('submit.html', form=form)
+    # remove __MACOSX and .DS_Store detritus created from an apple filesystem.
+    try:
+        allzip= zipfile.ZipFile(zip_path, 'w')
+        with zipfile.ZipFile(tmpzip_path, 'r') as tmpzip:
+            for item in tmpzip.infolist():
+                buffer = tmpzip.read(item.filename)
+                filename = str(item.filename)
+                if filename != '__MACOSX' and filename != '.DS_Store':
+                    allzip.writestr(item, buffer)
+        allzip.close()
+        tmpzip_path.unlink()
+    except Exception as e:
+        logging.error('Unable to remove __MACOSX from zip file')
+        form.zipfile.errors.append('Unable to remove __MACOSX from zip file. Please rezip without this')
         return render_template('submit.html', form=form)
     input_dir = version_dir / Path('input')
     try:
@@ -418,7 +429,6 @@ def view_copyedit(paperid, auth):
         elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
             sql = select(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING.value)
             items = db.session.execute(sql).scalars().all()
-            print(items)
             data = {'paperid': paperid,
                     'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
                     'items': items,

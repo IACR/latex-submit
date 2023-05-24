@@ -181,7 +181,7 @@ class SubmitForm(FlaskForm):
                          choices=[('lualatex', 'lualatex'),
                                   ('pdflatex', 'pdflatex'),
                                   ('xelatex', 'xelatex')],
-                         default = 'lualatex')
+                         default = 'pdflatex')
     zipfile = FileField(id='zipfile',
                         name='zipfile',
                         validators=[FileRequired(), FileAllowed(['zip'])])
