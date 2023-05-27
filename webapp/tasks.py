@@ -65,7 +65,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             try:
                 latexlog = logfile.read_text(encoding='UTF-8')
             except Exception as e:
-                compilation.warning_log.append('latex log is not UTF-8')
+                compilation.warning_log.append('latex log is not UTF-8. This is caused by using pdflatex.')
                 try:
                     latexlog = logfile.read_text(encoding='iso-8859-1', errors='replace')
                 except Exception as ee:
