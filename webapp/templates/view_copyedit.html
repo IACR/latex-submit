@@ -6,62 +6,86 @@ This template is used to show the status of a compilation for copyedit
 #}
 {% block endOfHead %}
 {% include "view_header.html" %}
+<style>
+ nav#sitenav {
+   max-height:10vh;
+ }
+ div#pdf_viewer, div#discussion {
+   height: 85vh;
+ }
+ div#responses {
+   height:78vh;
+   overflow-y:scroll;
+ }
+ div[data-status="PENDING"] {
+   display:none;
+  }
+ div[data-status="WILLFIX"] {
+   background-color: #c0ffc0;
+  }
+ div[data-status="CLARIFY"] {
+   background-color: #f0c0f0;
+  }
+ div[data-status="DECLINED"] {
+   background-color: #fff3cd;
+ }
+</style>
 {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-3 px-md-4">
-<script>
- function replyTo(id) {
-   document.getElementById("reply-modal-location").innerText = document.getElementById('location-' + id).innerText;
-   document.getElementById("reply-modal-text").innerText = document.getElementById('text-' + id).innerText;
-   document.getElementById('replyId').value = id;
-   const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));
-   modal.show();
-  }
+  <script>
+   var statusValues = {{status_values|safe}};
+   function showReply(id, pageno, lineno, token) {
+     document.getElementById("modal-item-div").innerHTML = document.getElementById('item-div-' + id).innerHTML;
+     document.getElementById('replyId').value = id;
+     document.getElementById('token').value = token;
+     document.getElementById('reply-text').value = document.getElementById('reply-'+id).innerText;
+     let status = document.getElementById('item-'+id).dataset.status;
+     document.querySelectorAll('input[name="response"]').forEach((el) => {
+       el.checked = (el.id == status);
+     });
+     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));
+     modal.show();
+   }
 </script>
 <div class="row">
   <div class="col-8" id="pdf_viewer">
     <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
   </div>
-  <div class="col-4">
-    <div class="d-flex flex-column" style="height:70vh">
-      <h4 class="mt-2 text-center">Copy edit on {{paperid}}
-      </h4>
-      <p> Please reply to each item. You should revise your LaTeX
-        according to the instructions below, but try to confine your
-        changes to only these issues.  Once you respond to all items,
-        you will be able to submit a revised version using the button
-        below. You can use this page as a checklist for your revisions.
-      </p>
-    {% if warnings %}
-      {% for warning in warnings %}
-      <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show">
-        <div id="warning-text-{{loop.index}}">{{warning}}</div>
-        <div class="ms-3 d-flex flex-column align-items-end">
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
-          <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Request</button>
-        </div>
+  <div class="col-4" id="discussion">
+    <div class="d-flex flex-column">
+      <div class="d-flex my-2 align-items-center">Copy edit on {{paperid}}
+        <div class="ms-3 upload {% if not upload %}d-none{% endif %}" title="Upload final version"><a target="_blank" id="upload" class="btn btn-primary" href="{{upload}}">Upload final version</a></div>
       </div>
-      {% endfor %}
-      {% endif %}
-      <div class="list-group-discussion">
+      <div id="allowUpload" class="alert alert-success upload {% if not upload %}collapse{% endif %}">You may now upload your final version</div>
+      <p class="alert alert-info alert-dismissible fade show" role="alert"> Please
+        reply to each item below (use this page as a checklist to
+        update your LaTeX). Try to confine your changes to only these
+        issues.  Once you respond to all items, the button above will
+        allow you to upload the final version.
+        <button type="button" title="Answer all items below" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+      </p>
+      <div id="responses">
         {% for item in items %}
-        <alert class="alert list-group-item list-group-item-secondary fade show">
-          <div class="item p-3 d-flex justify-content-between">
-            <div>
-              <p id="location-{{item.id}}">Page {{item.pageno}}, line {{item.lineno}}</p>
-              <span id="text-{{item.id}}">{{item.text}}</span>
+        <div class="alert alert-secondary">
+          <div class="item pb-1 d-flex justify-content-between">
+            <div id="item-div-{{item.id}}">
+              <div>Page {{item.pageno}}, line {{item.lineno}}</div>
+              <span>{{item.text}}</span>
             </div>
             <div class="ps-2 d-flex flex-column align-items-center">
-              <button class="my-2 btn btn-warning" onclick="replyTo({{item.id}},{{item.pageno}},{{item.lineno}})" title="Reply to the copy editor">Reply</button>
-              <span id="check-{{item.id}}" class="d-none text-success mt-2">✔</span>
+              <button id="butt-{{item.id}}" class="mb-2 btn btn-sm
+                          {% if item.status.name == 'PENDING' %}btn-warning{% else %}btn-secondary{% endif %}"
+                      onclick="showReply({{item.id}},{{item.pageno}},{{item.lineno}}, '{{item.token}}')"
+                      title="Reply to the copy editor">{% if item.status.name == 'PENDING' %}Reply{% else %}Edit{% endif %}</button>
+{#              <span id="check-{{item.id}}" class="d-none text-success mt-2">✔</span>#}
             </div>
           </div>
-          <div class="d-none item p-3 bg-success-subtle" id="item-{{item.id}}"></div>
-        </alert>
+          <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{{item.reply}}</span></div>
+        </div>
         {% endfor %}
       </div>
     </div>
-    <button class="btn btn-outline-primary disabled">Upload final version</button>
   </div>
 </div>  
 <script>
@@ -96,13 +120,54 @@ This template is used to show the status of a compilation for copyedit
      setError('Please supply a reason below.');
      return;
    }
-   console.log(response, text);
-   let elem = document.getElementById('item-' + id);
-   elem.innerText = 'Your response: ' + text;
-   elem.classList.remove('d-none');
-   document.getElementById('check-' + id).classList.remove('d-none');
-   const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));
-   modal.hide();
+   let token = document.getElementById('token').value;
+   let data = {'id': id, 'token': token, 'reply': text, 'status': response};
+   console.log(data);
+   let url = '/respond_to_comment/{{paperid}}/' + id + '/' + token;
+   fetch(url, {
+     method: "POST",
+     mode: "cors",
+     cache: "no-cache",
+     headers: {
+       "Content-Type": "application/json",
+     },
+     redirect: "follow",
+     body: JSON.stringify(data)
+   }).then((response) => response.json()).then((res) => {
+     console.log(res);
+     if ('error' in res) {
+       setError(res['error'] + ' This is a bug.');
+       return;
+     }
+     let item = document.getElementById('item-' + id);
+     item.dataset.status = response;
+     document.getElementById('status-'+id).innerText = statusValues[response];
+     document.getElementById('reply-'+id).innerText = text;
+     {# document.getElementById('check-' + id).classList.remove('d-none');#}
+     let butt = document.getElementById('butt-'+id);
+     butt.innerText = 'Edit';
+     butt.classList.remove('btn-warning');
+     butt.classList.add('btn-secondary');
+     {# res['upload'] is sent once all items are answered. #}
+     if ('upload' in res) {
+       let link = document.getElementById('upload');
+       link.href = res['upload'];
+       document.querySelectorAll('.upload').forEach((el) => {
+         el.classList.remove('d-none');
+       });
+       window.scrollTo({
+         top: 0,
+         behavior: 'smooth'
+       });
+       setTimeout(() => {
+         const bsc = new bootstrap.Collapse('#allowUpload');
+         bsc.show();
+       }, 2000);
+       //link.scrollIntoView({'behavior': 'smooth'});
+     }
+     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));
+     modal.hide();
+   });
  }
 </script>
 <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
@@ -115,21 +180,19 @@ This template is used to show the status of a compilation for copyedit
       <div class="modal-body">
         <p>Original item:</p>
         <input type="hidden" id="replyId">
-        <div class="alert alert-secondary">
-          <p id="reply-modal-location"></p>
-          <span id="reply-modal-text"></span>
+        <input type="hidden" id="token">
+        <div id="modal-item-div" class="alert alert-secondary"></div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="response" id="WILLFIX" value="WILLFIX" onclick="setError('')">
+          <label class="form-check-label" for="WILLFIX">I will fix it</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="response" id="r-fixed" value="FIXED" onclick="setError('')">
-          <label class="form-check-label" for="r-fixed">I will fix it</label>
+          <input class="form-check-input" type="radio" name="response" id="DECLINED" value="DECLINED" onclick="setError('')">
+          <label class="form-check-label" for="DECLINED">I will not change it</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="response" id="r-decline" value="DECLINED" onclick="setError('')">
-          <label class="form-check-label" for="r-decline">I will not change it</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="response" id="r-clarify" value="CLARIFY" onclick="setError('')">
-          <label class="form-check-label" for="r-clafified">Need clarification</label>
+          <input class="form-check-input" type="radio" name="response" id="CLARIFY" value="CLARIFY" onclick="setError('')">
+          <label class="form-check-label" for="CLARIFIED">Need clarification</label>
         </div>
         <div id="error_msg" class="form-text text-danger d-none"></div>
         <textarea id="reply-text" name="text" class="mb-3 mt-2 form-control" placeholder="Enter text response if desired"></textarea>

@@ -78,10 +78,12 @@ class CompileRecord(Base):
 
 class DiscussionStatus(str, Enum):
     """Status of a copyedit discussion item."""
-    PENDING = 'PENDING'
-    CANCELLED = 'CANCELLED'
-    DECLINED = 'DECLINED'
-    FIXED = 'FIXED'
+    PENDING = 'Pending'
+    CANCELLED = 'Cancelled'
+    DECLINED = 'Declined'
+    CLARIFY = 'Clarify'
+    WILLFIX = 'Agreed to fix'
+    FIXED = 'Fixed'
 
 class Discussion(Base):
     __tablename__ = 'discussion'

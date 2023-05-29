@@ -9,6 +9,7 @@ from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 import shutil
 from sqlalchemy import select
+from sqlalchemy.sql import func
 import string
 from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
@@ -415,6 +416,7 @@ def compile_for_copyedit():
 
 @home_bp.route('/copyedit/<paperid>/<auth>', methods=['GET'])
 def view_copyedit(paperid, auth):
+    """View the feedback from the copyeditor."""
     if not validate_hmac(paperid, Version.COPYEDIT.value, '', '', auth):
         return render_template('message.html',
                                title='Invalid request',
@@ -427,12 +429,28 @@ def view_copyedit(paperid, auth):
                                    title='Your copy edit was submitted',
                                    message='You will receive an email when the copy editor finishes with your paper')
         elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
-            sql = select(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING.value)
-            items = db.session.execute(sql).scalars().all()
+            sql = select(Discussion).filter_by(paperid=paperid)
+            items = [item.as_dict() for item in db.session.execute(sql).scalars().all()]
+            responded_count = 0
+            for item in items:
+                item['token'] = create_hmac(paperid, item['text'], str(item['id']), '')
+                if item['status'] != DiscussionStatus.PENDING.value:
+                    responded_count += 1
             data = {'paperid': paperid,
+                    'status_values': {s.name: s.value for s in DiscussionStatus},
                     'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
                     'items': items,
-                    'final_url': url_for('home_bp.submit_version')}
+                    'upload': ''}
+            if responded_count == len(items):
+                data['upload'] = url_for('home_bp.submit_version',
+                                         paperid=paperid,
+                                         version=Version.FINAL.value,
+                                         submitted=paper_status.submitted,
+                                         accepted=paper_status.accepted,
+                                         auth=create_hmac(paperid,
+                                                          Version.FINAL.value,
+                                                          paper_status.submitted,
+                                                          paper_status.accepted))
             return render_template('view_copyedit.html', **data)
         else:
             # TODO: handle the other cases like SUBMITTED or PENDING.
@@ -443,6 +461,43 @@ def view_copyedit(paperid, auth):
         return render_template('message.html',
                                title='Unknown paper',
                                error='Unknown paper')
+
+@home_bp.route('/respond_to_comment/<paperid>/<itemid>/<auth>', methods=['POST'])
+def respond_to_comment(paperid, itemid, auth):
+    """Handle an ajax post of a response to a comment."""
+    data = request.json
+    try:
+        sql = select(Discussion).filter_by(id=itemid)
+        item = db.session.execute(sql).scalar_one_or_none()
+        if not item:
+            return jsonify({'error': 'Unknown item'})
+        # If the text has changed, it means someone edited it but the author
+        # has seen an old version.
+        if not validate_hmac(paperid, item.text, str(itemid), '', auth):
+            return jsonify({'error': 'Text has changed. Please reload'})
+        item.reply = data['reply']
+        item.status = data['status']
+        db.session.add(item)
+        db.session.commit()
+        response = item.as_dict()
+        response['confirm'] = True
+        sql = select(func.count()).select_from(Discussion).filter_by(paperid=paperid).filter_by(status=DiscussionStatus.PENDING.name)
+        count = db.session.scalar(sql)
+        if not count:
+            sql = select(PaperStatus).filter_by(paperid=paperid)
+            paper_status = db.session.execute(sql).scalar_one_or_none()
+            response['upload'] = url_for('home_bp.submit_version',
+                                         paperid=paperid,
+                                         version=Version.FINAL.value,
+                                         submitted=paper_status.submitted,
+                                         accepted=paper_status.accepted,
+                                         auth=create_hmac(paperid,
+                                                          Version.FINAL.value,
+                                                          paper_status.submitted,
+                                                          paper_status.accepted))
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 @home_bp.route('/tasks/<paperid>/<version>/<auth>', methods=['GET'])
 def get_status(paperid, version, auth):
