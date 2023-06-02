@@ -71,7 +71,7 @@ def run_latex(cmd, input_dirname, output_dirname):
             else:
                 file_path.chmod(0o644)
     # Remove any leftover files from LaTeX or latexmk runs by the author
-    for i in ['aux', 'out', 'bbl', 'pdf', 'blg', 'log', 'fls', 'fdb_latexmk']:
+    for i in ['aux', 'bcf', 'out', 'bbl', 'pdf', 'blg', 'log', 'fls', 'fdb_latexmk']:
         if Path(staging_dir, 'main.' + i).is_file():
             os.remove(str(staging_dir.absolute()) + '/main.' + i)
     # Remove any texmf.cnf
