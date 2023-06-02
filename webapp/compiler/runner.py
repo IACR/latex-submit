@@ -95,7 +95,7 @@ def run_latex(cmd, input_dirname, output_dirname):
         for filename in files:
             if filename.endswith(".tex"):
               curpath = os.path.join(root, filename)
-              with open(curpath, 'r', encoding='iso-8859-1', errors='replace') as file:
+              with open(curpath, 'r', encoding='utf-8', errors='replace') as file:
                   if '\\begin{thebibliography}' in file.read():
                       raise ValueError('Do not include \\begin{thebibliography} directly in your text file: ' + filename)
     client = docker.from_env()
