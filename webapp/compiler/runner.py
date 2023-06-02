@@ -88,6 +88,16 @@ def run_latex(cmd, input_dirname, output_dirname):
     if latexmkrc_file.is_file():
         warnings.append('File {} was removed before compiling'.format(latexmkrc_file.name))
         latexmkrc_file.unlink()
+    # Basic check if the authors inlined:
+    # \begin{thebibliography}
+    # in one of the .tex files recursively
+    for root, dirs, files in os.walk(staging_dir):
+        for filename in files:
+            if filename.endswith(".tex"):
+              curpath = os.path.join(root, filename)
+              with open(curpath, 'r', encoding='utf-8', errors='replace') as file:
+                  if '\\begin{thebibliography}' in file.read():
+                      raise ValueError('Do not include \\begin{thebibliography} directly in your text file: ' + filename)
     client = docker.from_env()
     try:
         # We mount the staging_dir as /data in the container.
@@ -134,7 +144,7 @@ if __name__ == '__main__':
     argparser.add_argument('--overwrite',
                            action='store_true')
     argparser.add_argument('--cmd',
-                           default='latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main')
+                           default='latexmk -g -pdf -pdflatex="pdflatex --disable-write18 --no-shell-escape" main')
     args = argparser.parse_args()
     output_dir = Path(args.output_dir)
     if output_dir.is_dir():
@@ -146,6 +156,4 @@ if __name__ == '__main__':
     print(json.dumps(run_latex(args.cmd,
                                args.input_dir,
                                args.output_dir), indent=2))
-
-
 
