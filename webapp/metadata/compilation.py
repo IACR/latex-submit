@@ -77,12 +77,18 @@ class Affiliation(BaseModel):
         description=('See https://ror.org/facts/ for format. The last two digits are supposed '
                      'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
                      'we do not implement validation on it.'))
+    department: str = Field(None,
+                            title='Department of affiliation',
+                            description='Vocabulary is unconstrained')
     street: str = Field(None,
                       title='Street of affiliation',
                       description='May be any string')
     city: str = Field(None,
                       title='City of affiliation',
                       description='May be any string')
+    state: str = Field(None,
+                       title='State or province',
+                       description='Vocabulary is unconstraind')
     country: str = Field(None,
                          title='Country of affiliation',
                          description='May be any string')
