@@ -53,11 +53,14 @@ This template is used to show the status of a compilation for copyedit
     <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
   </div>
   <div class="col-4" id="discussion">
-    <div class="d-flex flex-column">
-      <div class="d-flex my-2 align-items-center">Copy edit on {{paperid}}
-        <div class="ms-3 upload {% if not upload %}d-none{% endif %}" title="Upload final version"><a target="_blank" id="upload" class="btn btn-primary" href="{{upload}}">Upload final version</a></div>
+    <div class="d-flex flex-column align-items-center">
+      <h4 class="text-center my-2">Copy edit on {{paperid}}</h4>
+      <div id="allowUpload" class="alert alert-success upload {% if not upload %}collapse{% endif %}">
+        <div class="row align-items-center">
+          <div class="col-6">You may now upload your final version</div>
+          <div class="col-6"><a target="_blank" id="upload" class="btn btn-primary" href="{{upload}}">Upload final version</a></div>
+        </div>
       </div>
-      <div id="allowUpload" class="alert alert-success upload {% if not upload %}collapse{% endif %}">You may now upload your final version</div>
       <p class="alert alert-info alert-dismissible fade show" role="alert"> Please
         reply to each item below (use this page as a checklist to
         update your LaTeX). Try to confine your changes to only these
@@ -81,7 +84,7 @@ This template is used to show the status of a compilation for copyedit
 {#              <span id="check-{{item.id}}" class="d-none text-success mt-2">✔</span>#}
             </div>
           </div>
-          <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{{item.reply}}</span></div>
+          <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span></div>
         </div>
         {% endfor %}
       </div>
@@ -162,7 +165,7 @@ This template is used to show the status of a compilation for copyedit
        setTimeout(() => {
          const bsc = new bootstrap.Collapse('#allowUpload');
          bsc.show();
-       }, 2000);
+       }, 1000);
        //link.scrollIntoView({'behavior': 'smooth'});
      }
      const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('replyModal'));

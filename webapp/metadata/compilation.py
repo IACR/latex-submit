@@ -77,12 +77,18 @@ class Affiliation(BaseModel):
         description=('See https://ror.org/facts/ for format. The last two digits are supposed '
                      'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
                      'we do not implement validation on it.'))
+    department: str = Field(None,
+                            title='department of affiliation',
+                            description='May be any string')
     street: str = Field(None,
-                      title='Street of affiliation',
-                      description='May be any string')
+                        title='Street of affiliation',
+                        description='May be any string')
     city: str = Field(None,
                       title='City of affiliation',
                       description='May be any string')
+    state: str = Field(None,
+                       title='State or province',
+                       description='May be any string')
     country: str = Field(None,
                          title='Country of affiliation',
                          description='May be any string')
@@ -174,7 +180,6 @@ class VersionEnum(StrEnum):
     FINAL = 'final'
     SUBMISSION = 'submission'
     PREPRINT = 'preprint'
-
 
 class Citation(BaseModel):
     ptype: str = Field(None,
@@ -375,7 +380,7 @@ dt_regex = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
 
 class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
-                                          title='Globally unique paper ID derived from venue and id in review system',
+                                          title='Globally unique paper ID constructed in review system',
                                           description='ID must be globally unique.')
     venue: constr(min_length=3) = Field(...,
                                         title='The venue for the publication',

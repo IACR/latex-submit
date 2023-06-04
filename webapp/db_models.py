@@ -104,7 +104,10 @@ class PaperStatus(Base):
     __tablename__ = 'paper_status'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     paperid: Mapped[str] = mapped_column(String(32), nullable = False, unique=True, index=True, comment='Assumed to be globally unique across all journals, volumes, and issues')
-    venue: Mapped[str] = mapped_column(String(32), nullable=False) # will be deprecated
+    # For convenience we keep this instead of using issue.volume.journal.name.
+    # It's possible that we could end up with inconsistent keys if a paper is shifted from
+    # one journal to another, but that's unlikely.
+    journal: Mapped[str] = mapped_column(ForeignKey('journal.key'), nullable=False)
     email: Mapped[str] = mapped_column(String(50), nullable=False)
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -129,13 +132,13 @@ class Journal(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     ISSN: Mapped[str] = mapped_column(String(10), nullable=False)
     DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
-    name: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
-    longname: Mapped[str] = mapped_column(Text)
+    key: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(Text)
     volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
     def __init__(self, data):
         self.ISSN = data['ISSN']
+        self.key = data['key']
         self.name = data['name']
-        self.longname = data['longname']
         self.DOI_PREFIX = data['DOI_PREFIX']
 
 class Volume(Base):

@@ -30,8 +30,8 @@
   </thead>
   <tbody>
     {% for journal in journals %}
+      <td>{{journal.key}}</td>
       <td>{{journal.name}}</td>
-      <td>{{journal.longname}}</td>
       <td>{{journal.ISSN}}</td>
       <td>{{journal.DOI_PREFIX}}</td>
       <td>{{journal.volumes|length}} volumes</td>

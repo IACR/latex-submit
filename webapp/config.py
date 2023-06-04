@@ -23,26 +23,26 @@ class Config:
     TESTING = False
     JOURNALS = [
         {
-            'name': 'cic',
-            'longname': 'IACR Communications in Cryptology',
+            'key': 'cic',
+            'name': 'IACR Communications in Cryptology',
             'ISSN': 'XXXX-YYYY',
             'DOI_PREFIX': '10.1729'
         },
         {
-            'name': 'tosc',
-            'longname': 'IACR Transactions on Symmetric Cryptology',
+            'key': 'tosc',
+            'name': 'IACR Transactions on Symmetric Cryptology',
             'ISSN': '2519-173X',
             'DOI_PREFIX': '10.46586'
         },
         {
-            'name': 'tches',
-            'longname': 'IACR Transactions on Cryptographic Hardware and Embedded Systems',
+            'key': 'tches',
+            'name': 'IACR Transactions on Cryptographic Hardware and Embedded Systems',
             'ISSN': '2569-2925',
             'DOI_PREFIX': '10.45686'
         },
         { # This will not go into production
-            'name': 'lncs',
-            'longname': 'Lecture Notes in Computer Science',
+            'key': 'lncs',
+            'name': 'Lecture Notes in Computer Science',
             'ISSN': '1611-3349',
             'DOI_PREFIX': '10.1007'
         },

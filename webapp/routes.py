@@ -17,7 +17,7 @@ from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, F
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
-from .forms import SubmitForm, CompileForCopyEditForm
+from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
 from werkzeug.datastructures import MultiDict
 import logging
 
@@ -111,9 +111,9 @@ def submit_version():
                                                           form.auth.data))
         form.auth.errors.append('Validation failed')
         return render_template('submit.html', form=form)
-    # check that the journal, volume, and issue exist.
-    journal_id = args.get('venue')
-    journal = db.session.execute(select(Journal).filter_by(name=journal_id)).scalar_one_or_none()
+    # Ensure that the journal, volume, and issue exist.
+    journal_id = args.get('journal')
+    journal = db.session.execute(select(Journal).filter_by(key=journal_id)).scalar_one_or_none()
     if not journal:
         return render_template('message.html',
                                title='Unknown journal {}'.format(journal_id),
@@ -139,7 +139,7 @@ def submit_version():
     # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         paper_status = PaperStatus(paperid=paperid,
-                                   venue=args.get('venue'),
+                                   journal=journal_id,
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
@@ -217,7 +217,7 @@ def submit_version():
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
                         'email': args.get('email'),
-                        'venue': args.get('venue'),
+                        'venue': args.get('journal'),
                         'submitted': submitted,
                         'accepted': accepted,
                         'compiled': now,
@@ -364,10 +364,10 @@ def compile_for_copyedit():
     copyedit_comprec.started = now
     copyedit_comprec.task_status = TaskStatus.PENDING
     compilation = Compilation(**{'paperid': paperid,
+                                 'venue': paper_status.journal,
                                  'status': CompileStatus.COMPILING,
                                  'version': Version.COPYEDIT.value,
                                  'email': version_compilation.email,
-                                 'venue': version_compilation.venue,
                                  'submitted': version_compilation.submitted,
                                  'accepted': version_compilation.accepted,
                                  'compiled': now,
@@ -414,6 +414,41 @@ def compile_for_copyedit():
     return render_template('running.html', **data)
 
 
+@home_bp.route('/final_review', methods=['POST'])
+def final_review():
+    form = NotifyFinalForm()
+    if not form.validate_on_submit():
+        logging.error('final review validation failed {}:{}:{}'.format(form.paperid.data,
+                                                                       form.version.data,
+                                                                       form.auth.data))
+        form.auth.errors.append('Validation failed')
+        return render_template('message.html',
+                               title='Please go back and try again',
+                               error='Final review valbidation failed. This is a bug')
+    paperid = form.paperid.data
+    sql = select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    if not paper_status:
+        return render_template('message.html',
+                               title='Missing status',
+                               error='Paper status does not exist. This is a bug')
+    paper_status.status = PaperStatusEnum.FINAL_SUBMITTED
+    db.session.add(paper_status)
+    db.session.commit()
+    # Notify the copy editor.
+    msg = Message('Paper {} is ready for final review'.format(paperid),
+                  sender=app.config['EDITOR_EMAILS'],
+                  recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
+    final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
+    msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
+    mail.send(msg)
+    if 'TESTING' in app.config:
+        print(msg.body)
+    return render_template('message.html',
+                           title='Your paper will be reviewed',
+                           message='You will receive an email when the final review of your paper is completed.')
+
+
 @home_bp.route('/copyedit/<paperid>/<auth>', methods=['GET'])
 def view_copyedit(paperid, auth):
     """View the feedback from the copyeditor."""
@@ -447,6 +482,8 @@ def view_copyedit(paperid, auth):
                                          version=Version.FINAL.value,
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
+                                         email=paper_status.email,
+                                         journal=paper_status.journal,
                                          auth=create_hmac(paperid,
                                                           Version.FINAL.value,
                                                           paper_status.submitted,
@@ -491,6 +528,8 @@ def respond_to_comment(paperid, itemid, auth):
                                          version=Version.FINAL.value,
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
+                                         email=paper_status.email,
+                                         journal=paper_status.journal,
                                          auth=create_hmac(paperid,
                                                           Version.FINAL.value,
                                                           paper_status.submitted,
@@ -600,9 +639,6 @@ def show_pdf(paperid,version, auth):
 # the error log compile_error.html
 # if iacrcc, then show iacrcc_success.html
 # if not iacrcc then show a generic one without metadata. generic_success.html
-
-# We decide whether to show the "submit final" button based on whether
-# exit_code ==0 and compilation.error_log is empty.
 @home_bp.route('/view/<paperid>/<version>/<auth>', methods=['GET'])
 def view_results(paperid, version, auth):
     """Note: in this view, auth is computed from paperid, version, '', ''."""
@@ -662,13 +698,25 @@ def view_results(paperid, version, auth):
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('compile_fail.html', **data)
-    if comp.venue == 'cic' and version == Version.CANDIDATE.value:
-        formdata = MultiDict({'email': comp.email,
-                              'version': Version.CANDIDATE.value,
-                              'paperid': comp.paperid,
-                              'auth': create_hmac(comp.paperid, version, '', comp.email)})
-        form = CompileForCopyEditForm(formdata=formdata)
-        data['form'] = form
+    if comp.venue == 'cic': # special handling for this journal.
+        if version == Version.CANDIDATE.value:
+            formdata = MultiDict({'email': comp.email,
+                                  'version': Version.CANDIDATE.value,
+                                  'paperid': comp.paperid,
+                                  'auth': create_hmac(comp.paperid, version, '', comp.email)})
+            form = CompileForCopyEditForm(formdata=formdata)
+            data['form'] = form
+            data['next_action'] = 'copy editing'
+        else: # version == Version.FINAL.value
+            formdata = MultiDict({'paperid': comp.paperid,
+                                  'email': comp.email,
+                                  'auth': create_hmac(comp.paperid,
+                                                      Version.FINAL.value,
+                                                      comp.email,
+                                                      '')})
+            form = NotifyFinalForm(formdata=formdata)
+            data['form'] = form
+            data['next_action'] = 'final review'
         return render_template('view_iacrcc.html', **data)
     return render_template('view_generic.html', **data)
 

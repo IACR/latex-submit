@@ -10,11 +10,16 @@ author:
   affil: 3,2,1
 affiliation:
   name: University of California, Santa Barbara
+  state: California
   ror: 02t274463
 affiliation:
   name: University of Antartica
 affiliation:
   name: Bo{\u g}azi{\c c}i University
+  street: Road to nowhere
+  department: Department of Mathematics
+  country: Turkey
+  city: Bo{\u g}azi{\c c}i
 version: final
 title: Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester\ at 30°C
   subtitle: 

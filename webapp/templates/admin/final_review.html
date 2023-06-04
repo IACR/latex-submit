@@ -12,7 +12,7 @@
    max-height:70vh;
    overflow-y:scroll;
  }
- ul#myTab .nav-item button.active, #tabContent {
+ ul.nav .nav-item button.active, .tab-content {
    background-color: #f0f0f0;
  }
  alert.list-group-item {
@@ -22,8 +22,47 @@
  alert.list-group-item.show {
    opacity: 1;
  }
-
+ /* for diffs. Some CSS is added with javascript. */
+ td {
+   padding-left: 5px;
+   padding-right: 5px;
+ }
+ h5.filename {
+   padding: 5px 5px 5px 20px;
+   background-color: #f0d0d0;
+ }
+ th.diff_header {
+   background-color: #e0e0e0;
+   padding: 5px 5px 5px 20px;
+ }
+ div[data-status="PENDING"] {
+   display:none;
+  }
+ div[data-status="WILLFIX"] {
+   background-color: #c0ffc0;
+  }
+ div[data-status="CLARIFY"] {
+   background-color: #f0c0f0;
+  }
+ div[data-status="DECLINED"] {
+   background-color: #fff3cd;
+ }
+ .resizer {
+    background-color: #a0f0a0;/* #cbd5e0;*/
+    cursor: ew-resize;
+    width: 6px;
+    border-left: 1px solid #888;
+    border-right: 1px solid #888;
+ }
+ /* these are resizable. */
+ .left-column {
+   width: 75%;
+ }
+ .right-column {
+   width: 25%;
+ }
 </style>
+<script src="/js/resize.js"></script>
 {# this template is used for generating notes from javascript. #}
 <script id="item-template" type="text/template">
   <alert class="alert list-group-item list-group-item-secondary fade show" id="item-<% id %>">
@@ -160,83 +199,113 @@
 </li>
 {% endblock %}
 {% block content %}
-  <main id="adminContent" class="container-fluid px-md-4">
-<div class="row">
-  <div class="col-8" id="pdf_viewer">
-    <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
-  </div>
-  <div class="col-4 px-0">
-    <div class="d-flex flex-column" style="height:90vh;">
-      <p>
-        <strong class="my-2 text-center">Copy edit on {{paper.paperid}}</strong><br>
-        Status: {{paper.status.value}}, Venue: {{paper.venue}}, author email: {{paper.email}}
-      </p>
-      {#  tabs for discussion and warnings from compilation #}
+<main id="adminContent" class="container-fluid px-md-4">
+  <div class="d-flex">
+    <div class="resizable left-column" style="height:90vh;">
+      <ul class="nav nav-tabs align-items-end" id="reviewTabs" role="tablist">
+        <div class="nav-text me-5"><h2 class="mb-2">Final copy edit check for {{paper.paperid}}</h2></div>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="pdfs-tab" data-bs-toggle="tab" data-bs-target="#pdfs" type="button" role="tab" aria-controls="pdfs" aria-selected="true">PDFs</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="diffs-tab" data-bs-toggle="tab" data-bs-target="#diffs" type="button" role="tab" aria-controls="diffs" aria-selected="false">Diffs</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab" aria-controls="logs" aria-selected="false">Log</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="reviewTabsContent">
+        <div class="tab-pane fade show active" id="pdfs" role="tabpanel" aria-labelledby="pdfs-tab" tabindex="0">
+          <div class="row" style="height:80vh;">
+            <div class="col-6">
+              <h4 class="mt-2 text-center">Original</h4>
+              <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_copyedit_auth)}}#view=fitH">
+            </div>
+            <div class="col-6">
+              <h4 class="mt-2 text-center">Final</h4>
+              <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=fitH">
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="diffs" role="tabpanel" aria-labelledby="diffs-tab" tabindex="0">
+          <h4 class="p-2 mb-0">Differences are shown only for tex files.</h4>
+          {% for name, value in diffs.items() %}
+          <h5 class="filename">{{name}}</h5>
+          {{value|safe}}
+          {% endfor %}
+        </div>
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab" tabindex="0">
+          <pre>{{log}}</pre>
+        </div>
+      </div>
+    </div>
+    <div class="resizer"></div>
+    <div class="resizable ps-3 right-column">
+      <div class="d-flex flex-column" style="height:90vh;">
+        <p>Status: {{paper.status.value}}, Venue: {{paper.journal}}, author email: {{paper.email}}</p>
+        <p class="alert alert-info alert-dismissible fade show mb-0" role="alert">
+          The author has now responded to your original
+          requests. Unless they have introduced a new problem or
+          failed to respond adequately to your requests, you should
+          approve this for publication.
+          <button type="button" title="Dismiss" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </p>
+        <div class="row">
+          <div class="col-6 text-center">
+            <form METHOD="post" action="{{url_for('admin_file.approve_final', paperid=paperid)}}">
+              <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
+              <button class="my-4 btn btn-success" type="submit">Approve for publishing</button>
+            </form>
+          </div>
+          <div class="col-6 text-center">
+            <form METHOD="post" action="{#{{url_for('admin_file.request_more_changes', paperid=paperid)}}#}">
+              <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
+              <button class="my-4 btn btn-warning" type="submit" title="Still to be implemented. Use email?">Request more changes</button>
+            </form>
+          </div>
+        </div>
+        {#  tabs for discussion and warnings from compilation #}
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Your feedback</button>
+          <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Responses</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="warning-tab" data-bs-toggle="tab" data-bs-target="#warning" type="button" role="tab" aria-controls="warning" aria-selected="false">Compile warnings</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false">Compile log</button>
+          <button class="nav-link" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false">Warnings</button>
         </li>
       </ul>
       {# tabs to be shown #}
       <div id="tabContent" class="tab-content p-3">
         <div class="tab-pane fade show active" id="feedback" role="tabpanel" aria-labelledby="feedback-tab" tabindex="0">
-          <input type="hidden" id="paperid" value="{{paper.paperid}}">
-          <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
-          <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
-          <div class="row">
-            <div class="col-6">
-              <label for="pageno" class="form-label">Page number</label>
-              <input id="pageno" name="pageno" required type="number" class="form-control" placeholder="Page number is required">
-            </div>
-            <div class="col-6">
-              <label for="lineno" class="form-label">Line number</label>
-              <input id="lineno" name="lineno" required type="number" class="form-control" placeholder="Line number is required">
-            </div>
-            <div class="col-12">
-              <label for="text" class="form-label mt-3">Note to author</label>
-            </div>
-            <div class="col-12">
-              <textarea id="text" name="text" class="form-control" placeholder="Enter text instructions for the author"></textarea>
-              {#<input id="text" name="text" type="text" class="form-control" required>#}
-            </div>
-          </div>
-          <div id="error_msg" class="text-danger d-none"></div>
-          <button type="submit" class="mt-3 btn btn-primary" onclick="addComment()">Add comment</button>
           <div id="discussion" class="list-group mt-3 discussionTabs">
+            {% for item in discussion %}
+            <div class="alert alert-secondary">
+              <div id="item-div-{{item.id}}" class="mb-2">
+                <div>Page {{item.pageno}}, line {{item.lineno}}</div>
+                <span>{{item.text}}</span>
+              </div>
+              <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">
+                Response:  <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span>
+              </div>
+            </div>                
+            {% endfor %}
           </div>
-          <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
-            <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
-            <button class="my-4 btn btn-success" type="submit">Finish and send to author(s)</button>
-          </form>
         </div>
-        <div class="tab-pane fade" id="warning" role="tabpanel" aria-labelledby="warning-tab" tabindex="0">
+        <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
           <p>Authors have already seen these, but apparently
             ignored them. You can request them to fix individual items.
           </p>
           <div class="list-group discussionTabs">
             {% if warnings %}
             {% for warning in warnings %}
-            <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show">
-              <div id="warning-text-{{loop.index}}">{{warning}}</div>
-              <div class="ms-3 d-flex flex-column align-items-end">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
-                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Include</button>
-              </div>
+            <div id="warning-{{loop.index}}" class="alert alert-warning alert-dismissible fade show">
+              {{warning}}
+              <button type="button" title="Dismiss" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
             {% else %}
             <div class="alert alert-info">There were no warnings from the compilation.</div>
             {% endif %}
           </div>
-        </div>
-        <div class="tab-pane fade" id="log" role="tabpanel" aria-labelled-by="log-tab" tabindex="0">
-          <pre>{{log}}</pre>
         </div>
       </div>
     </div>
@@ -348,7 +417,6 @@
   </div>
 </div>
 <script>
- document.getElementById('pdf_viewer').scrollIntoView({behavior: "smooth"});
  fetch('/admin/comments/{{paper.paperid}}', {
    method: "GET",
    cache: "no-cache",
@@ -360,6 +428,9 @@
    data.forEach(d => {
      appendComment(d['id'], d['pageno'], d['lineno'], d['text']);
    });
+ });
+ document.querySelectorAll('td a').forEach((el) => {
+   el.parentElement.nextElementSibling.nextElementSibling.style.backgroundColor='#e0c0e0';
  });
 
 </script>

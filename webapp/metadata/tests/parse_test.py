@@ -26,6 +26,10 @@ def test_meta1():
     assert meta.authors[0].orcid == '0000-0003-1010-8157'
     assert meta.authors[1].orcid == None
     assert meta.authors[2].orcid == None
+    assert meta.affiliations[0].state == 'California'
+    assert meta.affiliations[2].city == 'Boğaziçi'
+    assert meta.affiliations[2].street == 'Road to nowhere'
+    assert meta.affiliations[2].department == 'Department of Mathematics'
 
 def test_meta2():
     tfile = Path('testdata/test2.meta').read_text(encoding='UTF-8')

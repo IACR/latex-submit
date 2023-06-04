@@ -130,11 +130,11 @@ class SubmitForm(FlaskForm):
                           validators=[InputRequired('version field is required'),
                                       ValidVersion()],
                           default=Version.CANDIDATE.value)
-    journal = HiddenField(id='journal',
+    journal = SelectField(id='journal',
                           name='journal',
-                          # TODO: figure out what is acceptable
-                          validators=[InputRequired('journal is required'),
-                                      AnyOf([j['name'] for j in app.config['JOURNALS']])],
+                          choices = [(j['key'], j['name']) for j in app.config['JOURNALS']],
+                          validators=[InputRequired('Journal is required'),
+                                      AnyOf([j['key'] for j in app.config['JOURNALS']])],
                           # TODO remove default value below
                           default='cic')
     volume = HiddenField(id='volume',
@@ -145,15 +145,6 @@ class SubmitForm(FlaskForm):
                         name='issue',
                         default=2,
                         validators=[maxmin_check(name='issue',min=1)])
-    venue = SelectField(label='Select a venue. At present only cic is fully supported',
-                        id='venue',
-                        name='venue',
-                        choices=[('cic', 'IACR Communications in Cryptology'),
-                                 ('tosc', 'IACR Transactions on Symmetric Cryptology (partially supported)'),
-                                 ('tches', 'IACR Transactions on Cryptographic Hardware and Embedded Systems (partially supported)'),
-                                 ('lncs', 'Any LNCS proceedings (partially supported)')],
-                        default = 'cic',
-                        validators=[InputRequired('venue field is required')])
     submitted = HiddenField(id='submitted',
                             name='submitted',
                             validators=[InputRequired('Submission date is required'),
@@ -170,11 +161,6 @@ class SubmitForm(FlaskForm):
     email = EmailField(id='email',
                        name='email',
                        validators=[InputRequired(), Email()])
-    # NOTE: A relatively new version of wtforms allows choices to be a
-    # a list of triples in order to set the 'disabled' attribute on a choice.
-    # We do not rely upon this, using javascript in the browser to
-    # disable some fields upon load. We later validate combination of
-    # engine and venue in the validate() method.
     engine = SelectField(label='LaTeX engine to use',
                          id='engine',
                          name='engine',
@@ -200,6 +186,38 @@ class SubmitForm(FlaskForm):
             return False
         return self.check_auth()
 
+class NotifyFinalForm(FlaskForm):
+    """Form to notify copy editor that final version is ready."""
+    paperid = HiddenField(id='paperid',
+                          name='paperid',
+                          validators=[InputRequired('paper id is required'),
+                                      ValidPaperId()])
+    version = HiddenField(id='version',
+                          name='version',
+                          validators=[InputRequired('version field is required'),
+                                      ValidVersion()],
+                          default=Version.FINAL.value)
+    auth = HiddenField(id='auth',
+                       name='auth',
+                       validators = [InputRequired('auth field is required')])
+    email = HiddenField(id='email',
+                        name='email',
+                        validators=[InputRequired(), Email()])
+    submit = SubmitField('Submit final version')
+    def validate(self, extra_validators=None):
+        if not super(FlaskForm, self).validate():
+            logging.warning('failed to validate: ' + str(self.errors))
+            return False
+        if (self.version.data != Version.FINAL.value):
+            logging.warning('NotifyFinalForm has wrong version: {}'.format(version.data))
+            return False
+        return validate_hmac(self.paperid.data,
+                             Version.FINAL.value,
+                             self.email.data,
+                             '',
+                             self.auth.data)
+
+
 class CompileForCopyEditForm(FlaskForm):
     """This is a simple form submitted by the author to send their
     candidate version or final version to the copy editor. The auth field
@@ -217,9 +235,6 @@ class CompileForCopyEditForm(FlaskForm):
                                          self.version.data,
                                          '',
                                          self.email.data)
-            logging.warning('set auth to ' + self.auth.data)
-        else:
-            logging.warning('got auth of ' + self.auth.data)
     paperid = HiddenField(label='Paper ID',
                           id='paperid',
                           name='paperid',

@@ -27,16 +27,17 @@ This template is used to show the status of a compilation for iacrcc.cls
         <li>Check any warnings below</li>
         <li>Check the <a href="#metadata">metadata</a> below</li>
         <li>Once you have checked the PDF, warnings, and metadata, you can submit it
-          for copy editing.
+          for {{next_action}} with the button at the bottom of this page.
         </li>
       </ol>
     </div>
     {% include "compilation.html" %}
     <div class="alert alert-info mt-3">
-      If you are satisfied with your paper and your metadata, you can submit it for
-      copy editing. This will recompile a version with line numbers added and send it
-      to the copy editor. <span class="text-danger">Once you do this, you can no longer upload a
-      new version until copy editing is finished.</span>
+      If you are satisfied with your paper and your metadata, you can
+      submit it for {{next_action}}. This will {% if
+      version=='CANDIDATE' %}recompile a version with line numbers
+      added and {% endif %}send it to the copy editor. <span class="text-danger">Once you do this, you can no longer upload a
+      new version until the next review phase is completed.</span>
       <br><br>
     {% if form.errors %}
       {% for field_name, field_errors in form.errors|dictsort if field_errors %}
@@ -47,7 +48,13 @@ This template is used to show the status of a compilation for iacrcc.cls
          {% endfor %}
       {% endfor %}
     {% endif %}
-    <form method="POST" action="{{url_for('home_bp.compile_for_copyedit')}}" enctype="multipart/form-data">
+          <form method="POST"
+                {% if version=='candidate' %}
+                action="{{url_for('home_bp.compile_for_copyedit')}}"
+                {% else %}
+                action="{{url_for('home_bp.final_review')}}"
+                {% endif %}
+                enctype="multipart/form-data">
       {{ form.csrf_token }}
       {% if form.auth.errors %}
         {% for msg in form.auth.errors %}

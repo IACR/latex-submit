@@ -1,83 +1,85 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="mainContent" class="container px-3 px-md-4">
-<nav class="mt-4">
-  <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <button class="nav-link active" id="nav-form-tab" data-bs-toggle="tab" data-bs-target="#nav-form"
-	    type="button" role="tab" aria-controls="nav-form" aria-selected="true">Submission form</button>
-    <button class="nav-link" id="nav-help-tab" data-bs-toggle="tab" data-bs-target="#nav-help"
-	    type="button" role="tab" aria-controls="nav-help" aria-selected="false">Help</button>
-    <button class="nav-link" id="nav-packages-tab" data-bs-toggle="tab" data-bs-target="#nav-packages"
-	    type="button" role="tab" aria-controls="nav-packages" aria-selected="false">LaTeX packages</button>
-  </div>
-</nav>
-<div class="tab-content" id="nav-tabContent" style="background-color:#ffffff;">
-  <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
-    <div class="row">
-      <div class="col-6">
-	<p class="alert alert-info">
-          Papers submitted to the IACR Communications in Cryptology will be required to use the
-	  <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
-	  the present time we also support uploads for other publishing venues, but the main purpose
-	  of this site is to support a new generation of LaTeX document classes.
-        </p>
-      </div>
-      <div class="col-6">
-        <p class="alert alert-warning">
-	  Warning: this site is for testing purposes only. Ordinarily a submission would need
-	  to be authenticated as accepted by the review process. You can submit anything you
-          like as a test right now. Only the admins will see your submission, but we have
-          a sense of humor.
-        </p>
-      </div>
+  <nav class="mt-4">
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <button class="nav-link active" id="nav-form-tab" data-bs-toggle="tab" data-bs-target="#nav-form"
+	      type="button" role="tab" aria-controls="nav-form" aria-selected="true">Submission form</button>
+      <button class="nav-link" id="nav-help-tab" data-bs-toggle="tab" data-bs-target="#nav-help"
+	      type="button" role="tab" aria-controls="nav-help" aria-selected="false">Help</button>
+      <button class="nav-link" id="nav-packages-tab" data-bs-toggle="tab" data-bs-target="#nav-packages"
+	      type="button" role="tab" aria-controls="nav-packages" aria-selected="false">LaTeX packages</button>
     </div>
-    <div class="alert alert-light w-75 mx-auto">
-      <strong>Instructions:</strong> Use this form to upload the final version of your paper. All fields
-      are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
-      for hints on how to avoid problems.
-    </div>
-    {% if form.errors %}
+  </nav>
+  <div class="tab-content" id="nav-tabContent" style="background-color:#ffffff;">
+    <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
+      <div class="row">
+        <div class="col-6">
+          {% if form.version.data == 'final' %}
+          <p class="alert alert-success">
+	    You are about to submit your final version, which should incorporate changes requested
+            by the copy editor. Once you finalize this, it will go back to the copy editor for a
+            final check.
+          </p>
+          {% else %}
+          <p class="alert alert-warning">
+	    Warning: this site is for testing purposes only. Ordinarily a submission would need
+	    to be authenticated as accepted by the review process. You can submit anything you
+            like as a test right now. Only the admins will see your submission, but we have
+            a sense of humor.
+          </p>
+        </div>
+        <div class="col-6">
+	  <p class="alert alert-info">
+            Papers submitted to the IACR Communications in Cryptology will be required to use the
+	    <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
+	    the present time we also support uploads for other publishing venues, but the main purpose
+	    of this site is to support a new generation of LaTeX document classes.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="alert alert-light w-75 mx-auto">
+        <strong>Instructions:</strong> Use this form to upload the final version of your paper. All fields
+        are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
+        for hints on how to avoid problems.
+      </div>
+      {% if form.errors %}
       {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-        {% for error in field_errors %}
-          <div class="alert alert-danger">
-            {{ form[field_name].label }}: {{ error }}
-          </div>
-         {% endfor %}
+      {% for error in field_errors %}
+      <div class="alert alert-danger">
+        {{ form[field_name].label }}: {{ error }}
+      </div>
       {% endfor %}
-    {% endif %}
-    <form method="POST" action="{{url_for('home_bp.submit_version')}}" enctype="multipart/form-data">
-      {{ form.csrf_token }}
-      {% if form.auth.errors %}
+      {% endfor %}
+      {% endif %}
+      <form method="POST" action="{{url_for('home_bp.submit_version')}}" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        {% if form.auth.errors %}
         {% for msg in form.auth.errors %}
         <div class="alert alert-danger">{{ msg }}</div>
         {% endfor %}
-      {% endif %}
-      {{ form.auth }}
-      {% if form.version.errors %}
+        {% endif %}
+        {{ form.auth }}
+        {% if form.version.errors %}
         {% for msg in form.version.errors %}
         <div class="alert alert-danger">{{ msg }}</div>
         {% endfor %}
-      {% endif %}
-      {{ form.version }}
-      {# TODO: pick up submitted and accepted and email from URL #}
-      {% if form.submitted.errors %}
+        {% endif %}
+        {{ form.version }}
+        {# TODO: pick up submitted and accepted and email from URL #}
+        {% if form.submitted.errors %}
         {% for msg in form.submitted.errors %}
         <div class="alert alert-danger">{{ msg }}</div>
         {% endfor %}
-      {% endif %}
-      {{ form.submitted }}
-      {% if form.accepted.errors %}
+        {% endif %}
+        {{ form.submitted }}
+        {% if form.accepted.errors %}
         {% for msg in form.accepted.errors %}
         <div class="alert alert-danger">{{ msg }}</div>
         {% endfor %}
-      {% endif %}
-      {{ form.accepted }}
-        {% if form.journal.errors %}
-        {% for msg in form.journal.errors %}
-        <div class="alert alert-danger">{{ msg }}</div>
-        {% endfor %}
         {% endif %}
-        {{ form.journal }}
+        {{ form.accepted }}
         {% if form.volume.errors %}
         {% for msg in form.volume.errors %}
         <div class="form-text text-danger">{{msg}}</div>
@@ -90,166 +92,166 @@
         {% endfor %}
         {% endif %}
         {{ form.issue }}
-      <div class="form-group">
-        <label for="venue" class="form-label">Select a venue. At present only <span class="text-monospace">iacrcc</span> is fully supported.</label>
-        <div class="row align-items-center">
-          <div class="col-6">
-            {% if form.venue.errors %}
-              {% for msg in form.venue.errors %}
-                <div class="alert alert-danger">{{ msg }}</div>
+        <div class="form-group">
+          <label for="venue" class="form-label">Select a Journal. At present only <span class="text-monospace">CiC with iacrcc</span> is fully supported.</label>
+          <div class="row align-items-center">
+            <div class="col-6">
+              {% if form.journal.errors %}
+              {% for msg in form.journal.errors %}
+              <div class="alert alert-danger">{{ msg }}</div>
               {% endfor %}
-            {% endif %}
-            {{ form.venue(class_='form-select', onchange='updateEngines(this)') }}
-          </div>
-          <div class="col-6">
-            <div class="clsfile" id="cic">use <i-mono>documentclass iacrcc</i-mono></div>
-            <div class="clsfile d-none" id="tosc">use <i-mono>documentclass iacrtrans</i-mono></div>
-            <div class="clsfile d-none" id="tches">use <i-mono>documentclass iacrtrans</i-mono></div>
-            <div class="clsfile d-none" id="asiacrypt">use <i-mono>documentclass llncs</i-mono></div>
-            <div class="clsfile d-none" id="crypto">use <i-mono>documentclass llncs</i-mono></div>
-            <div class="clsfile d-none" id="eurocrypt">use <i-mono>documentclass llncs</i-mono></div>
-            <div class="clsfile d-none" id="pkc">use <i-mono>documentclass llncs</i-mono></div>
-            <div class="clsfile d-none" id="tcc">use <i-mono>documentclass llncs</i-mono></div>
+              {% endif %}
+              {{ form.journal(class_='form-select', onchange='updateEngines(this)') }}
+            </div>
+            <div class="col-6">
+              <div class="clsfile" id="cic">use <i-mono>documentclass iacrcc</i-mono></div>
+              <div class="clsfile d-none" id="tosc">use <i-mono>documentclass iacrtrans</i-mono></div>
+              <div class="clsfile d-none" id="tches">use <i-mono>documentclass iacrtrans</i-mono></div>
+              <div class="clsfile d-none" id="asiacrypt">use <i-mono>documentclass llncs</i-mono></div>
+              <div class="clsfile d-none" id="crypto">use <i-mono>documentclass llncs</i-mono></div>
+              <div class="clsfile d-none" id="eurocrypt">use <i-mono>documentclass llncs</i-mono></div>
+              <div class="clsfile d-none" id="pkc">use <i-mono>documentclass llncs</i-mono></div>
+              <div class="clsfile d-none" id="tcc">use <i-mono>documentclass llncs</i-mono></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="form-group mt-4">
-        {% if form.email.errors %}
+        <div class="form-group mt-4">
+          {% if form.email.errors %}
           {% for msg in form.email.errors %}
-            <div class="alert alert-danger">{{ msg }}</div>
+          <div class="alert alert-danger">{{ msg }}</div>
           {% endfor %}
-        {% endif %}
-        <label for="email" class="form-label">Your email address (required)</label>
-        {{form.email(class_='form-control w-50', placeholder='email of submitting author')}}
-      </div>
-      <div class="form-group mt-4">
-        {% if form.engine.errors %}
+          {% endif %}
+          <label for="email" class="form-label">Your email address (required)</label>
+          {{form.email(class_='form-control w-50', placeholder='email of submitting author')}}
+        </div>
+        <div class="form-group mt-4">
+          {% if form.engine.errors %}
           {% for msg in form.engine.errors %}
-            <div class="alert alert-danger">{{ msg }}</div>
+          <div class="alert alert-danger">{{ msg }}</div>
           {% endfor %}
-        {% endif %}
-        <label for="engine" class="form-label">LaTeX engine to use</label>
-        {{ form.engine(class_='form-select w-50') }}
-      </div>
-      <div class="form-group mt-4">
-        {% if form.paperid.errors %}
+          {% endif %}
+          <label for="engine" class="form-label">LaTeX engine to use</label>
+          {{ form.engine(class_='form-select w-50') }}
+        </div>
+        <div class="form-group mt-4">
+          {% if form.paperid.errors %}
           {% for msg in form.paperid.errors %}
-            <div class="alert alert-danger">{{ msg }}</div>
+          <div class="alert alert-danger">{{ msg }}</div>
           {% endfor %}
-        {% endif %}
-        <label for="paperid" class="form-label">Paper ID</label>
-        {{ form.paperid(class_='form-control w-50', placeholder='paper ID', pattern='[-a-zA-Z0-9]{7,}') }}
-      </div>
-      <div class="form-group mt-4">
-        <label for="zipfile" class="form-label">Zip file with all
-          <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
-          source files required to produce your paper. You do not need to upload
-          the <span class="text-monospace">iacrcc.cls</span> file.
-          The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> file should be named
-          <i-mono>main.tex</i-mono>. Subdirectories are acceptable within the zip file,
-          but the    <i-mono>main.tex</i-mono> file should be at the top level.
-          <a href="#" onclick="showHelp();return false;">See the
-          Help tab</a> for more complete instructions here.
-        </label>
-        {% if form.zipfile.errors %}
+          {% endif %}
+          <label for="paperid" class="form-label">Paper ID</label>
+          {{ form.paperid(class_='form-control w-50', placeholder='paper ID', pattern='[-a-zA-Z0-9]{7,}') }}
+        </div>
+        <div class="form-group mt-4">
+          <label for="zipfile" class="form-label">Zip file with all
+            <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
+            source files required to produce your paper. You do not need to upload
+            the <span class="text-monospace">iacrcc.cls</span> file.
+            The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> file should be named
+            <i-mono>main.tex</i-mono>. Subdirectories are acceptable within the zip file,
+            but the    <i-mono>main.tex</i-mono> file should be at the top level.
+            <a href="#" onclick="showHelp();return false;">See the
+              Help tab</a> for more complete instructions here.
+          </label>
+          {% if form.zipfile.errors %}
           {% for msg in form.zipfile.errors %}
           <div class="alert alert-danger">{{ msg }}</div>
           {% endfor %}
-        {% endif %}
-        {{ form.zipfile(class_='form-control w-50', accept='.zip') }}
-      </div>
-      {{ form.submit(class_='mt-5 btn btn-primary') }}
-    </form>
-  </div>
-  <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
-    <h3>How to prepare your paper</h3>
-    <ol>
-      <li>Your paper should be written in LaTeX using
-	the <i-mono>iacrcc</i-mono> document class. This may
-	be <a href="/iacrcc">downloaded here</a>. If you start with something else
-	like <i-mono>article</i-mono> or <i-mono>llncs</i-mono>, the <i-mono>iacrcc</i-mono>
-	document class will require you to change your preamble somewhat. See
-	the <a href="/iacrcc">documentation</a>
-	on <i-mono>iacrcc</i-mono>.</li>
-      <li>You should prepare a zip file containing all files required to prepare your
-      paper, including bibtex files and external figure	graphics files.</li>
-      <li>Your main LaTeX file must be at the root of your submission
-      and must be named <i-mono>main.tex</i-mono>.</li>
-      <li>If you choose to use a LaTeX package, make sure it is
-	<a href="#" onclick="showPackages();return false;">supported</a>.
-	Avoid using unusual fonts - this is a big source of potential problems.</li>
-      <li>Some files will be removed before processing, so do not include:
-	<ul>
-	  <li><i-mono>main.aux</i-mono></li>
-	  <li><i-mono>.bbl</i-mono> files</li>
-	  <li><i-mono>.sty</i-mono> files</li>
-	  <li><i-mono>.cls</i-mono> files</li>
-	  <li><i-mono>latexmkrc</i-mono> files</li>
-	</ul>
-      </li>
-      <li>Before you upload your files, make sure it compiles on your system using the line:
-	<blockquote>
-	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
-	</blockquote>
-      </li>
-    </ol>
-    <h3 id="figures">Guidance for included graphics</h3>
-    <p>
-      If you require graphics, we recommend using the graphics or
-      graphicx LaTeX packages.  We support only png, jpg, and gif
-      formats for included graphics
-      (not <i-mono>PDF</i-mono>, <i-mono>eps</i-mono>,
-      or <i-mono>svg</i-mono>).
-      <i-mono>svg</i-mono> files are not supported because
-      the <i-mono>svg</i-mono> package relies upon shell escapes and features of
-      pdftex. You should convert <i-mono>svg</i-mono> files to a supported format.
-    </p>
-    <h3 id="figures">Guidance for references</h3>
-    <p>
-      We require authors to upload their bibtex files with
-      bibliographic information for their references. You may use
-      either bibtex or biblatex/biber (our system autodetects
-      this). Do not rely upon uploading <i-mono>.bbl</i-mono> files;
-      they will not be used.
-    </p>
-    <p>
-      We recommend using <a href="https://github.com/cryptobib/export"
-      target="_blank">cryptobib</a>. You can reduce the size of your
-      uploaded bibtex files using
-      the <a href="https://ctan.math.utah.edu/ctan/tex-archive/biblio/bibtex/utils/bibexport/bibexport.pdf"
-      target="_blank">bibexport</a> utility that is included with
-      texlive to export only the bibtex entries that you actually
-      \cite. 
-    </p>
-    <p>
-      We <strong>strongly</strong> urge that you include DOIs for all
-      references.  Some people have grown accustomed to omitting them
-      due to page limits in legacy publications, but this forum has no
-      such limits and DOIs are important for giving proper citation.
-      Your bibtex entries may include both a DOI field and a URL field
-      if you wish to cite two different versions (e.g., the official
-      publication and an eprint version).
-    </p>
-{#    <div class="text-danger">
-      <p>
-	NOTE to Joppe: It might be nice if we could link to both the official
-      version of a paper and the eprint/arxiv version of a paper in the same citation.
-      Unfortunately bibtex predates preprint servers by a few decades, and there are no
-      standard ways to include them. We could modify <i-mono>iacrcc.bst</i-mono>
-      to show links to both, but users of biblatex wouldn't benefit. There are
-      several ways that people typically provide links to papers:
+          {% endif %}
+          {{ form.zipfile(class_='form-control w-50', accept='.zip') }}
+        </div>
+        {{ form.submit(class_='mt-5 btn btn-primary') }}
+      </form>
+    </div>
+    <div class="tab-pane fade p-3" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab">
+      <h3>How to prepare your paper</h3>
       <ol>
-	<li>the DOI field, which is well defined (but should not include
-	  https://doi.org/). Unfortunately many of these are behind paywalls.
-	</li>
-	<li>the URL field, which may contain the DOI link or some other link.</li>
-	<li>the ee field used to be exported by DBLP. ee is a nonstandard extension for
-	  "electronic edition"</li>
-	<li>the NOTE field with <i-mono>\url{}</i-mono></li>
-	<li>the <i-mono>eprint</i-mono> field suggested by
-	  <a href="https://arxiv.org/help/hypertex/bibstyles">arxiv</a>.
-	  In this case we would use
-	  <pre>
+        <li>Your paper should be written in LaTeX using
+	  the <i-mono>iacrcc</i-mono> document class. This may
+	  be <a href="/iacrcc">downloaded here</a>. If you start with something else
+	  like <i-mono>article</i-mono> or <i-mono>llncs</i-mono>, the <i-mono>iacrcc</i-mono>
+	  document class will require you to change your preamble somewhat. See
+	  the <a href="/iacrcc">documentation</a>
+	  on <i-mono>iacrcc</i-mono>.</li>
+        <li>You should prepare a zip file containing all files required to prepare your
+          paper, including bibtex files and external figure	graphics files.</li>
+        <li>Your main LaTeX file must be at the root of your submission
+          and must be named <i-mono>main.tex</i-mono>.</li>
+        <li>If you choose to use a LaTeX package, make sure it is
+	  <a href="#" onclick="showPackages();return false;">supported</a>.
+	  Avoid using unusual fonts - this is a big source of potential problems.</li>
+        <li>Some files will be removed before processing, so do not include:
+	  <ul>
+	    <li><i-mono>main.aux</i-mono></li>
+	    <li><i-mono>.bbl</i-mono> files</li>
+	    <li><i-mono>.sty</i-mono> files</li>
+	    <li><i-mono>.cls</i-mono> files</li>
+	    <li><i-mono>latexmkrc</i-mono> files</li>
+	  </ul>
+        </li>
+        <li>Before you upload your files, make sure it compiles on your system using the line:
+	  <blockquote>
+	    <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+	  </blockquote>
+        </li>
+      </ol>
+      <h3 id="figures">Guidance for included graphics</h3>
+      <p>
+        If you require graphics, we recommend using the graphics or
+        graphicx LaTeX packages.  We support only png, jpg, and gif
+        formats for included graphics
+        (not <i-mono>PDF</i-mono>, <i-mono>eps</i-mono>,
+        or <i-mono>svg</i-mono>).
+        <i-mono>svg</i-mono> files are not supported because
+        the <i-mono>svg</i-mono> package relies upon shell escapes and features of
+        pdftex. You should convert <i-mono>svg</i-mono> files to a supported format.
+      </p>
+      <h3 id="figures">Guidance for references</h3>
+      <p>
+        We require authors to upload their bibtex files with
+        bibliographic information for their references. You may use
+        either bibtex or biblatex/biber (our system autodetects
+        this). Do not rely upon uploading <i-mono>.bbl</i-mono> files;
+        they will not be used.
+      </p>
+      <p>
+        We recommend using <a href="https://github.com/cryptobib/export"
+                              target="_blank">cryptobib</a>. You can reduce the size of your
+        uploaded bibtex files using
+        the <a href="https://ctan.math.utah.edu/ctan/tex-archive/biblio/bibtex/utils/bibexport/bibexport.pdf"
+               target="_blank">bibexport</a> utility that is included with
+        texlive to export only the bibtex entries that you actually
+        \cite. 
+      </p>
+      <p>
+        We <strong>strongly</strong> urge that you include DOIs for all
+        references.  Some people have grown accustomed to omitting them
+        due to page limits in legacy publications, but this forum has no
+        such limits and DOIs are important for giving proper citation.
+        Your bibtex entries may include both a DOI field and a URL field
+        if you wish to cite two different versions (e.g., the official
+        publication and an eprint version).
+      </p>
+      {#    <div class="text-danger">
+        <p>
+	  NOTE to Joppe: It might be nice if we could link to both the official
+          version of a paper and the eprint/arxiv version of a paper in the same citation.
+          Unfortunately bibtex predates preprint servers by a few decades, and there are no
+          standard ways to include them. We could modify <i-mono>iacrcc.bst</i-mono>
+          to show links to both, but users of biblatex wouldn't benefit. There are
+          several ways that people typically provide links to papers:
+          <ol>
+	    <li>the DOI field, which is well defined (but should not include
+	      https://doi.org/). Unfortunately many of these are behind paywalls.
+	    </li>
+	    <li>the URL field, which may contain the DOI link or some other link.</li>
+	    <li>the ee field used to be exported by DBLP. ee is a nonstandard extension for
+	      "electronic edition"</li>
+	    <li>the NOTE field with <i-mono>\url{}</i-mono></li>
+	    <li>the <i-mono>eprint</i-mono> field suggested by
+	      <a href="https://arxiv.org/help/hypertex/bibstyles">arxiv</a>.
+	      In this case we would use
+	      <pre>
 	    @inproceedings{example,
                title  = {Example title},
                author = {Fester Bestertester},
@@ -257,127 +259,127 @@
                eprint = {2022/724},
                archivePrefix = {IACReprint}
 	    }
-	  </pre>
-	  Ideally this would produce a bibliographic reference with both hyperlinks
-	  https://doi.org/10.1007/978-3-031-17234-2_16 and https://eprint.iacr.org/2022/724.
-	</li>
-      </ol>
+	      </pre>
+	      Ideally this would produce a bibliographic reference with both hyperlinks
+	      https://doi.org/10.1007/978-3-031-17234-2_16 and https://eprint.iacr.org/2022/724.
+	    </li>
+          </ol>
+        </p>
+      </div>
+      #}
+      <h3>System overview</h3>
+      <p>
+        In order to keep the cost of publishing low, the IACR
+        Communications in Cryptology uses an automatic submission system
+        for final versions of accepted papers.  It is important that
+        authors adhere to the requirements. Submissions are required to
+        be prepared in LaTeX using the <a target="_blank"
+                                          href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
+        document class. This document style is designed to provide a
+        consistent appearance for articles in the journal, but more
+        importantly, it is designed to perform automatic processing
+        of metadata required for indexing and registration of DOIs.
       </p>
-</div>
-#}
-    <h3>System overview</h3>
-    <p>
-      In order to keep the cost of publishing low, the IACR
-      Communications in Cryptology uses an automatic submission system
-      for final versions of accepted papers.  It is important that
-      authors adhere to the requirements. Submissions are required to
-      be prepared in LaTeX using the <a target="_blank"
-      href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
-      document class. This document style is designed to provide a
-      consistent appearance for articles in the journal, but more
-      importantly, it is designed to perform automatic processing
-      of metadata required for indexing and registration of DOIs.
-    </p>
-    <p>
-      This system is based on lualatex and latexmk (see below), but older
-      compilers like pdflatex still work. We recommend using lualatex
-      because it has better support for UTF-8.
-    </p>
-    <p>
-      In order to conserve resources, this system is currently based
-      on the texlive 2022 "medium" distribution of LaTeX, plus a large
-      number number of additional packages.  The resulting system
-      supports the vast majority of popular LaTeX packages, but it is
-      possible that we are missing LaTeX packages that you desire. If
-      this is the case, please let us know at
-      latex-admin@iacr.org. Do not
-      upload <i-mono>.sty</i-mono> or <i-mono>.cls</i-mono> files with
-      your paper (they will be removed before compilation).
-    </p>
-    <p>Compilation in our system is currently performed using
-      <blockquote>
-	<i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
-      </blockquote>
-    </p>
-    <p>
-      This is designed to prevent attacks on the
-      system from hostile code (it is <a target="_blank"
-      href="https://arxiv.org/abs/2102.00856">generally unsafe</a> to
-      accept LaTeX sources from a third party). We run lualatex in a
-      docker sandbox, and we explicitly blacklist some packages
-      because they either invoke \write18 or the os packages from lua.
-    </p>
-    <p>
-      If you wish to fully replicate our system, you can set up docker
-      on your system and use
-      our <a href="https://github.com/IACR/latex-submit/webapp/compiler/runner.py"><i-code>runner.py</i-code></a>.
-      That is a fair amount of work to set up, because it requires
-      docker to be installed. As an alternative, you can simply start
-      from <i-code>texlive2022</i-code> and add the packages listed in
-      the Dockerfile. {# DO NOT USE pdflatex; use lualatex instead.#}
-    </p>
+      <p>
+        This system is based on lualatex and latexmk (see below), but older
+        compilers like pdflatex still work. We recommend using lualatex
+        because it has better support for UTF-8.
+      </p>
+      <p>
+        In order to conserve resources, this system is currently based
+        on the texlive 2022 "medium" distribution of LaTeX, plus a large
+        number number of additional packages.  The resulting system
+        supports the vast majority of popular LaTeX packages, but it is
+        possible that we are missing LaTeX packages that you desire. If
+        this is the case, please let us know at
+        latex-admin@iacr.org. Do not
+        upload <i-mono>.sty</i-mono> or <i-mono>.cls</i-mono> files with
+        your paper (they will be removed before compilation).
+      </p>
+      <p>Compilation in our system is currently performed using
+        <blockquote>
+	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+        </blockquote>
+      </p>
+      <p>
+        This is designed to prevent attacks on the
+        system from hostile code (it is <a target="_blank"
+                                           href="https://arxiv.org/abs/2102.00856">generally unsafe</a> to
+        accept LaTeX sources from a third party). We run lualatex in a
+        docker sandbox, and we explicitly blacklist some packages
+        because they either invoke \write18 or the os packages from lua.
+      </p>
+      <p>
+        If you wish to fully replicate our system, you can set up docker
+        on your system and use
+        our <a href="https://github.com/IACR/latex-submit/webapp/compiler/runner.py"><i-code>runner.py</i-code></a>.
+        That is a fair amount of work to set up, because it requires
+        docker to be installed. As an alternative, you can simply start
+        from <i-code>texlive2022</i-code> and add the packages listed in
+        the Dockerfile. {# DO NOT USE pdflatex; use lualatex instead.#}
+      </p>
+    </div>
+    <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
+      <h3>Which LaTeX packages are allowed?</h3>
+      <p>
+        Due to resource constraints, our system does not load <i>every</i>
+        LaTeX package. The packages below are installed on the system, but beware
+        that <a href="#" onclick="showUnsupported();return false;">some packages will not work properly</a>
+        in a sandboxed system like this. Note also that our system uses lualatex, and
+        some packages are known to only work in pdflatex. Avoid those.
+      </p>
+      <p>
+        Below we list both supported and <a href="#"
+                                            onclick="showUnsupported();return false;">unsupported
+        packages</a>.  If you know of a package that you'd like to have
+        added, please send email
+        to <span class="text-monospace">latex-admin</span><i-mono>@iacr.org</i-mono>.
+      </p>
+      {% include "installed.html" %}
+      {% include "unsupported.html" %}
+    </div>
   </div>
-  <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
-    <h3>Which LaTeX packages are allowed?</h3>
-    <p>
-      Due to resource constraints, our system does not load <i>every</i>
-      LaTeX package. The packages below are installed on the system, but beware
-      that <a href="#" onclick="showUnsupported();return false;">some packages will not work properly</a>
-      in a sandboxed system like this. Note also that our system uses lualatex, and
-      some packages are known to only work in pdflatex. Avoid those.
-    </p>
-    <p>
-      Below we list both supported and <a href="#"
-      onclick="showUnsupported();return false;">unsupported
-      packages</a>.  If you know of a package that you'd like to have
-      added, please send email
-      to <span class="text-monospace">latex-admin</span><i-mono>@iacr.org</i-mono>.
-    </p>
-    {% include "installed.html" %}
-    {% include "unsupported.html" %}
-  </div>
-</div>
 
-<script>
- var engineSelect = document.getElementById('engine');
- function updateEngines(sel) {
-   document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
-   document.querySelectorAll('#engine option').forEach(el => {
-     el.disabled = false;
-     el.text = el.value;
-   });
-   let value = sel.value;
-   document.getElementById(value).classList.remove('d-none');
-   return;
-   if (value == 'cic') {
-     engineSelect.value = 'lualatex';
+  <script>
+   var engineSelect = document.getElementById('engine');
+   function updateEngines(sel) {
+     document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
      document.querySelectorAll('#engine option').forEach(el => {
-       if (el.value != 'lualatex') {
-         el.disabled = true;
-         el.text = el.value + ' (disabled)'
-       } else {
-         el.selected = true;
-         el.text = el.value + ' (required)'
-       }
+       el.disabled = false;
+       el.text = el.value;
      });
+     let value = sel.value;
+     document.getElementById(value).classList.remove('d-none');
+     return;
+     if (value == 'cic') {
+       engineSelect.value = 'lualatex';
+       document.querySelectorAll('#engine option').forEach(el => {
+         if (el.value != 'lualatex') {
+           el.disabled = true;
+           el.text = el.value + ' (disabled)'
+         } else {
+           el.selected = true;
+           el.text = el.value + ' (required)'
+         }
+       });
+     }
    }
- }
- const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
+   const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
 
- function showHelp() {
-   bootstrap.Tab.getOrCreateInstance(document.getElementById('nav-help-tab')).show();
- }
+   function showHelp() {
+     bootstrap.Tab.getOrCreateInstance(document.getElementById('nav-help-tab')).show();
+   }
 
-  function showPackages() {
-      packagesButton = document.getElementById('nav-packages-tab');
-      bootstrap.Tab.getOrCreateInstance(packagesButton).show();
- }
+   function showPackages() {
+     packagesButton = document.getElementById('nav-packages-tab');
+     bootstrap.Tab.getOrCreateInstance(packagesButton).show();
+   }
 
- function showUnsupported() {
-   showPackages();
-   document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
- }
- updateEngines(document.getElementById('venue'));
-</script>
+   function showUnsupported() {
+     showPackages();
+     document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
+   }
+   updateEngines(document.getElementById('journal'));
+  </script>
 </main>
 {% endblock %} {# content #}

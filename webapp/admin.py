@@ -1,5 +1,6 @@
 """These routes are for admin only, and therefoer have the
 admin_required decorator on them. All routes should start with /admin."""
+from difflib import HtmlDiff
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from sqlalchemy import select
@@ -242,9 +243,47 @@ def copyedit(paperid):
     compilation = Compilation.parse_file(comp_path)
     data = {'title': 'Viewing {}'.format(paperid),
             'warnings': compilation.warning_log,
+            'log': compilation.log,
             'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
             'paper': paper_status}
     return render_template('admin/copyedit.html', **data)
+
+@admin_bp.route('/admin/approve_final/<paperid>', methods=['POST'])
+@login_required
+@admin_required
+def approve_final(paperid):
+    """Called when the final version is approved."""
+    return admin_message('This isn\'t finished yet')
+
+@admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])
+@login_required
+@admin_required
+def final_review(paperid):
+    if not validate_paperid(paperid):
+        return admin_message('Invalid paperid: {}'.format(paperid))
+    sql = select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    if not paper_status:
+        return admin_message('Unknown paper: {}'.format(paperid))
+    candidate_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
+    final_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value)
+    candidate_lines = (candidate_path / Path('output') / Path('main.tex')).read_text(encoding='UTF-8').splitlines()
+    final_lines = (final_path / Path('output') / Path('main.tex')).read_text(encoding='UTF-8').splitlines()
+    htmldiff = HtmlDiff(tabsize=2)
+    compilation = Compilation.parse_file(final_path / Path('compilation.json'))
+    sql = select(Discussion).filter_by(paperid=paperid)
+    items = db.session.execute(sql).scalars().all()
+    diffs = {'main.tex': htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5)}
+    data = {'title': 'Final review on paper # {}'.format(paperid),
+            'warnings': compilation.warning_log,
+            'log': compilation.log,
+            'discussion': items,
+            'pdf_copyedit_auth': create_hmac(paperid, 'copyedit', '', ''),
+            'pdf_final_auth': create_hmac(paperid, 'final', '', ''),
+            'diffs': diffs,
+            'paper': paper_status}
+    return render_template('admin/final_review.html', **data)
 
 @admin_bp.route('/admin/finish_copyedit', methods=['POST'])
 @login_required
