@@ -1,0 +1,16 @@
+{#
+=================================================================
+This template is used to show messages to users. The data should
+contain title and either message or error or both. Error is shown
+in red.
+=================================================================
+#}
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<main id="adminContent" class="container-fluid px-md-4">
+
+<div class="alert alert-warning">
+  {{msg|safe}}
+</div>
+</main>
+{% endblock %}

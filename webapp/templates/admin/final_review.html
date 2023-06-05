@@ -48,9 +48,9 @@
    background-color: #fff3cd;
  }
  .resizer {
-    background-color: #a0f0a0;/* #cbd5e0;*/
+    background-color: #cbd5e0;
     cursor: ew-resize;
-    width: 6px;
+    width: 4px;
     border-left: 1px solid #888;
     border-right: 1px solid #888;
  }
@@ -215,13 +215,14 @@
         </li>
       </ul>
       <div class="tab-content" id="reviewTabsContent">
-        <div class="tab-pane fade show active" id="pdfs" role="tabpanel" aria-labelledby="pdfs-tab" tabindex="0">
-          <div class="row" style="height:80vh;">
-            <div class="col-6">
+        <div class="tab-pane fade show active pe-2" id="pdfs" role="tabpanel" aria-labelledby="pdfs-tab" tabindex="0">
+          <div class="d-flex w-100" style="height:80vh;">
+            <div style="width:50%">
               <h4 class="mt-2 text-center">Original</h4>
               <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_copyedit_auth)}}#view=fitH">
             </div>
-            <div class="col-6">
+            <div class="resizer mx-2"></div>
+            <div style="width:50%;">
               <h4 class="mt-2 text-center">Final</h4>
               <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=fitH">
             </div>
@@ -417,18 +418,6 @@
   </div>
 </div>
 <script>
- fetch('/admin/comments/{{paper.paperid}}', {
-   method: "GET",
-   cache: "no-cache",
-   headers: {
-     "Content-Type": "application/json"
-   }
- }).then((response) => response.json()).then((data) => {
-   console.dir(data);
-   data.forEach(d => {
-     appendComment(d['id'], d['pageno'], d['lineno'], d['text']);
-   });
- });
  document.querySelectorAll('td a').forEach((el) => {
    el.parentElement.nextElementSibling.nextElementSibling.style.backgroundColor='#e0c0e0';
  });

@@ -29,8 +29,8 @@ def admin_required(f):
             return redirect('/')
     return wrap
 
-def admin_message(data):
-    return app.jinja_env.get_template('admin/message.html').render(data)
+def admin_message(msg):
+    return app.jinja_env.get_template('admin/message.html').render({'msg': msg})
 
 admin_bp = Blueprint('admin_file', __name__)
 
