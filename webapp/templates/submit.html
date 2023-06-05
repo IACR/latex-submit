@@ -101,7 +101,7 @@
               <div class="alert alert-danger">{{ msg }}</div>
               {% endfor %}
               {% endif %}
-              {{ form.journal(class_='form-select', onchange='updateEngines(this)') }}
+              {{ form.journal(class_='form-select') }}
             </div>
             <div class="col-6">
               <div class="clsfile" id="cic">use <i-mono>documentclass iacrcc</i-mono></div>
@@ -191,7 +191,8 @@
         </li>
         <li>Before you upload your files, make sure it compiles on your system using the line:
 	  <blockquote>
-	    <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+	    {# <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono> #}
+            <i-mono>latexmk -g -pdf -pdflatex="pdflatex --no-shell-escape" main</i-mono>
 	  </blockquote>
         </li>
       </ol>
@@ -281,11 +282,6 @@
         of metadata required for indexing and registration of DOIs.
       </p>
       <p>
-        This system is based on lualatex and latexmk (see below), but older
-        compilers like pdflatex still work. We recommend using lualatex
-        because it has better support for UTF-8.
-      </p>
-      <p>
         In order to conserve resources, this system is currently based
         on the texlive 2022 "medium" distribution of LaTeX, plus a large
         number number of additional packages.  The resulting system
@@ -298,14 +294,14 @@
       </p>
       <p>Compilation in our system is currently performed using
         <blockquote>
-	  <i-mono>latexmk -g -pdflua -lualatex="lualatex --safer --nosocket --no-shell-escape" main</i-mono>
+          <i-mono>latexmk -g -pdf -pdflatex="pdflatex --no-shell-escape" main</i-mono
         </blockquote>
       </p>
       <p>
         This is designed to prevent attacks on the
         system from hostile code (it is <a target="_blank"
                                            href="https://arxiv.org/abs/2102.00856">generally unsafe</a> to
-        accept LaTeX sources from a third party). We run lualatex in a
+        accept LaTeX sources from a third party). We run latex in a
         docker sandbox, and we explicitly blacklist some packages
         because they either invoke \write18 or the os packages from lua.
       </p>
@@ -316,7 +312,7 @@
         That is a fair amount of work to set up, because it requires
         docker to be installed. As an alternative, you can simply start
         from <i-code>texlive2022</i-code> and add the packages listed in
-        the Dockerfile. {# DO NOT USE pdflatex; use lualatex instead.#}
+        the Dockerfile.
       </p>
     </div>
     <div class="tab-pane fade p-3" id="nav-packages" role="tabpanel" aria-labelledby="nav-packages-tab">
@@ -325,8 +321,7 @@
         Due to resource constraints, our system does not load <i>every</i>
         LaTeX package. The packages below are installed on the system, but beware
         that <a href="#" onclick="showUnsupported();return false;">some packages will not work properly</a>
-        in a sandboxed system like this. Note also that our system uses lualatex, and
-        some packages are known to only work in pdflatex. Avoid those.
+        in a sandboxed system like this.
       </p>
       <p>
         Below we list both supported and <a href="#"
@@ -342,28 +337,6 @@
 
   <script>
    var engineSelect = document.getElementById('engine');
-   function updateEngines(sel) {
-     document.querySelectorAll('.clsfile').forEach(el => el.classList.add('d-none'));
-     document.querySelectorAll('#engine option').forEach(el => {
-       el.disabled = false;
-       el.text = el.value;
-     });
-     let value = sel.value;
-     document.getElementById(value).classList.remove('d-none');
-     return;
-     if (value == 'cic') {
-       engineSelect.value = 'lualatex';
-       document.querySelectorAll('#engine option').forEach(el => {
-         if (el.value != 'lualatex') {
-           el.disabled = true;
-           el.text = el.value + ' (disabled)'
-         } else {
-           el.selected = true;
-           el.text = el.value + ' (required)'
-         }
-       });
-     }
-   }
    const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
 
    function showHelp() {
@@ -379,7 +352,6 @@
      showPackages();
      document.getElementById('unsupported').scrollIntoView({behavior: "smooth"});
    }
-   updateEngines(document.getElementById('journal'));
   </script>
 </main>
 {% endblock %} {# content #}
