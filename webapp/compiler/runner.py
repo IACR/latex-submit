@@ -63,7 +63,7 @@ def run_latex(cmd, input_dirname, output_dirname):
         for filename in filenames:
             file_path = Path(os.path.join(dirpath, filename))
             # remove any .sty files, since they can conflict with installed packages.
-            if file_path.name.endswith('.cls'):
+            if file_path.name.endswith('.cls') or file_path.name.endswith('.bst'):
                 warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
             elif file_path.name.endswith('.sty'):
