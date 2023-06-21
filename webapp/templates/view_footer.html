@@ -1,4 +1,5 @@
 {# this is included in endOfPage for anything containing the compilation log #}
+<script src="/js/resize.js"><script>
 <script>
   MathJax = {
      tex: {
@@ -7,11 +8,8 @@
        processEnvironments: false
      }
    };
-  </script>
-  
-  <script>
    console.log('marking')
    var instance = new Mark("pre#latexLog");
    instance.markRegExp(/LaTeX Warning/, {'accuracy': 'exact'});
    instance.markRegExp(/Error:|Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
-  </script>
+</script>

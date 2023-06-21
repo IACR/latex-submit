@@ -61,6 +61,12 @@
  .right-column {
    width: 25%;
  }
+ /* Reduce the font size for side-by-side diffs on small screens */
+ @media only screen and (max-width: 1100px) {
+   div#diffs {
+     font-size: .75rem;
+   }
+ }
 </style>
 <script src="/js/resize.js"></script>
 {# this template is used for generating notes from javascript. #}
@@ -201,7 +207,7 @@
 {% block content %}
 <main id="adminContent" class="container-fluid px-md-4">
   <div class="d-flex">
-    <div class="resizable left-column" style="height:90vh;">
+    <div class="resizable left-column" style="height:90vh;overflow-y:scroll;">
       <ul class="nav nav-tabs align-items-end" id="reviewTabs" role="tablist">
         <div class="nav-text me-5"><h2 class="mb-2">Final copy edit check for {{paper.paperid}}</h2></div>
         <li class="nav-item" role="presentation">

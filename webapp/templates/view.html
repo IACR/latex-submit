@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{#
+========================================================================
+This template is used to show the status of a compilation for iacrcc.cls
+========================================================================
+#}
+{% block endOfHead %}
+{% include "view_header.html" %}
+<style>
+  .lognav {
+    color : #0d6efd;
+  }
+ .lognav:hover {
+    cursor: pointer;
+ }
+ div.sourcecode {
+   overflow-y: scroll;
+   max-height:80vh;
+   font-family:monospace;
+ }
+</style>
+<script>
+ var sources = {
+   {% for el in comp.output_tree.children recursive %}"{{el.name}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=el.name)}}",
+   {% if el.children %}{{ loop(el.children) }}{% endif %}
+   {% endfor %}
+ };
+ function showSource(el) {
+   console.dir(el);
+   let filename = el.dataset.filepath;
+   if (filename in sources) {
+     console.log('found source: ' + sources[filename]);
+     fetch(sources[filename])
+       .then(response => response.text())
+       .then(data => {
+         document.getElementById('nav-source').innerHTML = data;
+         const sourceTab = document.querySelector('button[data-bs-target="#nav-source"]')
+         bootstrap.Tab.getOrCreateInstance(sourceTab).show()
+         if ('filepath_line' in el.dataset) {
+           let id = 'sourceline-' + String(el.dataset.filepath_line);
+           console.log(id);
+           let line = document.getElementById(id);
+           if (line) {
+             line.scrollIntoView({behavior: 'smooth'});
+           } else {
+             console.log('no line element');
+           }
+         } else {
+           console.log('no line number')
+         }
+       })
+   } else {
+     console.log('source not found');
+   }
+ }
+
+ function showPage(pageno) {
+   let iframe = document.getElementById('pdfiframe');
+   pdfurl = iframe.src;
+   iframe.src = pdfurl.split('#')[0] + '#page=' + pageno;
+   iframe.contentDocument.location.reload(true);
+   const pdfTab = document.querySelector('button[data-bs-target="#nav-pdf"]')
+   bootstrap.Tab.getOrCreateInstance(pdfTab).show()
+ }
+ function showLogLine(line) {
+   const logTab = document.querySelector('button[data-bs-target="#nav-log"]')
+   bootstrap.Tab.getOrCreateInstance(logTab).show()
+   document.getElementById('logline-' + line).scrollIntoView({behavior: 'smooth'});
+ }
+ function showWhere(elem) {
+   let data = elem.dataset;
+   if ('pageno' in data) {
+     console.log('page is ' + data.pageno);
+     let pdfTab = document.getElementById('nav-pdf');
+     if (pdfTab) {
+       let embed = pdfTab.children[0];
+       console.log('old embedUrl is ' + embed.src);
+       let embedUrl = embed.src.split('#')[0] + '#page=' + data.pageno;
+       console.log('new embedUrl is ' + embedUrl);
+       embed.src = embedUrl;
+       embed.contentDocument.location.reload(true);
+     }
+   }
+   console.log(elem);
+ }
+ function showMeta() {
+   const metaTab = document.querySelector('button[data-bs-target="#nav-meta"]')
+   bootstrap.Tab.getOrCreateInstance(metaTab).show()
+}   
+</script>
+{% endblock %}
+{% block content %}
+<main id="mainContent" class="container-fluid px-3 px-md-4">
+<div id="splitView" class="d-flex w-100">
+  <div class="left-column">
+    <a class="btn btn-primary my-3" href="{{url_for('home_bp.show_submit_version', paperid=paperid,version=version,auth=auth,email=comp.email,venue=comp.venue.value,submitted=comp.submitted,accepted=comp.accepted)}}">You may still resubmit your paper</a>
+    <div class="alert alert-success">
+      Congratulations - your paper was compiled. The next steps are:
+      <ol>
+        <li>Check any warnings below. Some of them have context to help you understand them.</li>
+        <li><a href="{{pdf}}" target="_blank">check your PDF</a> to make sure it looks ok.</li>
+        <li>Check the <a href="#" onclick="showMeta()">metadata</a> in the tab on the right</li>
+        <li>Once you have checked the PDF, warnings, and metadata, you can submit it
+          for {{next_action}} with the button at the bottom of the metadata tab.
+        </li>
+      </ol>
+    </div>
+    <div>
+      {% if comp.error_log %}
+      {% for err in comp.error_log %}
+      <h5>Errors:</h5>
+      <div class="error_log_entry" data-error_type="{{err.error_type.name}}"
+           {% if err.logline %}
+           data-logline="{{err.logline}}"
+           {% endif %}
+           {% if err.pageno %}
+           data-pageno="{{err.pageno}}"
+           {% endif %}
+           {% if filepath %}
+           data-filepath="{{err.filepath}}"
+           {% endif %}
+           {% if filepath_line %}
+           data-filepath_line="{{err.filepath_line}}"
+           {% endif %}
+      >{{err.text}}{% if err.help %}<br>{{ err.help }}{% endif %}</div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    <h5>Warnings:</h5>
+    <div>
+      {% if comp.warning_log %}
+      {% for err in comp.warning_log %}
+      <div class="warning_log_entry"
+           data-error_type="{{err.error_type.name}}"
+           {% if err.logline %}
+           data-logline="{{err.logline}}"
+           {% endif %}
+           {% if err.pageno %}
+           data-pageno="{{err.pageno}}"
+           {% endif %}
+           {% if filepath %}
+           data-filepath="{{err.filepath}}"
+           {% endif %}
+           {% if filepath_line %}
+           data-filepath_line="{{err.filepath_line}}"
+           {% endif %}>
+        {{err.text}}{% if err.help %}<br><span class="lognav">{{ err.help }}</span>{% endif %}<br>
+        <div class="row">
+          {% if err.filepath %}
+          {% if err.filepath.startswith('/usr/') %}
+          {% set filepath = err.filepath.split('/')[-1] %}
+          {% else %}
+          {% set filepath = err.filepath %}
+          {% endif %}
+          {% endif %}
+          <div class="col-3">
+            {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page ≈ {{err.pageno}}</span>{% endif %}
+          </div>
+          <div class="col-3">
+            {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to long line"> Log line {{err.logline}}</span>{% endif %}
+          </div>
+
+          <div class="col-6">
+            {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
+                                   {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
+                                   class="lognav" title="Show source file">{{filepath}}
+               {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      No warnings
+      {% endif %}
+    </div>
+  </div>
+  <div class="resizer"></div>
+  <div class="right-column">
+    <nav class="mt-3">
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
+                type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
+        {% if pdf %}
+        <button class="nav-link" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf"
+                type="button" role="tab" aria-controls="nav-pdf" aria-selected="false">PDF</button>
+        {% endif %}
+        <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source"
+                type="button" role="tab" aria-controls="nav-source" aria-selected="false">Inputs</button>
+        <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
+                type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
+      </div>
+    </nav>
+    <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
+      <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" style="overflow-y: scroll;max-height:80vh;font-family:monospace;">
+        {% for line in loglines %}
+        <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
+        {% endfor %}
+        {# <pre id="latexLog">{{latexlog}}</pre>#}
+      </div>
+      {% if pdf %}
+      <div class="tab-pane fade show p-3" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">
+        {#        <embed width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#page=2">#}
+        <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#page=2"></iframe>
+      </div>
+      {% endif %}
+      <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
+        <div class="ms-3">
+          {% if comp.output_tree %}
+          Input files used for running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
+          <ul>
+            {% for el in comp.output_tree.children recursive %}
+            <li>{{el.name}}
+              {% if el.children %}<ul style="list-style: '-';">
+              {{ loop(el.children) }}</a></ul>{% endif %}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+      <div class="tab-pane fade show p-3" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
+        <h3 class="ms-3">Extracted metadata</h3>
+        <p class="alert alert-warning">
+          Metadata extraction only works for iacrcc class. For other document classes, authors will
+          be required to fill out an elaborate form to supply author information, affiliations, etc.
+        </p>
+        <h3 id="metadata">Metadata</h3>
+        <p class="alert alert-info w-75">
+          NOTE: it is important to ensure the accuracy of your metadata, since we use it for
+          generating the HTML page, registering the DOI, and registering it with multiple
+          indexing services. If something is wrong or missing, then you should correct it in the
+          LaTeX source and submit it again. We will not publish email addresses.
+        </p>
+        <div class="mx-3">
+          <div class="elem" id="paperid"><div class="elem_title">paper id:</div> {{comp.paperid}}</div>
+          <div class="elem" id="venue"><div class="elem_title">venue:</div> {{comp.venue.name}}</div>
+          <div class="elem" id="paper_title"><div class="elem_title">Title:</div> {{comp.meta.title}}</div>
+          <div class="elem" id="abstract"><div class="elem_title">Abstract:</div><div class="w-50">{{comp.meta.abstract}}</div></div>
+          <div class="elem" id="error_log" style="background-color:red;">
+          </div>
+          <h5>Authors</h5>
+          <div class="list-group">
+            {% for author in comp.meta.authors %}
+            <div class="author list-group-item">
+              <div class="d-flex author_name"><div class="elem_title">name:</div> {{author.name}}</div>
+              <div class="d-flex author_surname"><div class="elem_title">surname:</div> {{author.surname}}</div>
+              <div class="d-flex author_email"><div class="elem_title">email:</div> {{author.email}}</div>
+              <div class="d-flex author_orcid"><div class="elem_title">orcid:</div>
+                {% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None</span>{% endif %}</div>
+              <div class="d-flex"><div class="elem_title">Affiliations:</div>
+                {% if author.affiliations %}
+                <div class="list-group">
+                  {% for affil in author.affiliations %}
+                  <div class="affiliation list-group-item">
+                    {% set aff=comp.meta.affiliations[affil-1] %}
+                    <div class="elem"><div class="elem_title">name:</div> {{aff.name}}</div>
+                    <div class="elem"><div class="elem_title">ROR:</div> {% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None</a>{% endif %}</div>
+                      <div class="elem"><div class="elem_title">Street:</div> {{aff.street}}</div>
+                      <div class="elem"><div class="elem_title">City:</div> {{aff.city}}</div>
+                      <div class="elem"><div class="elem_title">Post code:</div> {{aff.postcode}}</div>
+                      <div class="elem"><div class="elem_title">Country:</div> {{aff.country}}</div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <span class="text-danger">None</a>
+                  {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        <table class="table ms-3 mt-2 table-bordered">
+          <tbody>
+            <tr>
+              <th>Date compiled:</th>
+              <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+            </tr>
+            <tr>
+              <th>Compilation time:</th>
+              <td>{{comp.compile_time}} seconds</td>
+            </tr>
+            <tr>
+              <th>Return code from latexmk:</th>
+              <td>{{comp.exit_code}}</td>
+            </tr>
+          </tbody>
+        </table>
+          <div class="elem" id="status"><div class="elem_title">status:</div> {{comp.status.value}}</div>
+          {#  <div class="elem" id="exit_code"><div class="elem_title">exit code:</div> {{comp.exit_code}}</div>#}
+          <div class="elem" id="email"><div class="elem_title">email:</div> {{comp.email}}</div>
+          <div class="elem" id="submitted"><div class="elem_title">submitted:</div> {{comp.submitted}}</div>
+          <div class="elem" id="accepted"><div class="elem_title">accepted:</div> {{comp.accepted}}</div>
+          <div class="elem" id="compiled"><div class="elem_title">compiled:</div> {{comp.compiled}}</div>
+          <div class="elem" id="compile_time"><div class="elem_title">compile_time:</div> {{comp.compile_time}} seconds</div>
+          <div class="elem" id="doi"><div class="elem_title">DOI:</div> {{comp.meta.doi}}</div>
+          <div class="elem" id="zipfile"><div class="elem_title">zip filename:</div> {{comp.zipfilename}}</div>
+        </div>
+        <div class="alert alert-info mt-3">
+          If you are satisfied with your paper and your metadata, you can
+          submit it for {{next_action}}. This will {% if
+          version=='CANDIDATE' %}recompile a version with line numbers
+          added and {% endif %}send it to the copy editor. <span class="text-danger">Once you do this, you can no longer upload a
+          new version until the next review phase is completed.</span>
+          <br><br>
+          {% if form.errors %}
+          {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+          {% for error in field_errors %}
+          <div class="alert alert-danger">
+            {{ form[field_name].label }}: {{ error }}
+          </div>
+          {% endfor %}
+          {% endfor %}
+          {% endif %}
+          <form method="POST"
+                {% if version=='candidate' %}
+                action="{{url_for('home_bp.compile_for_copyedit')}}"
+                {% else %}
+                action="{{url_for('home_bp.final_review')}}"
+                {% endif %}
+                enctype="multipart/form-data">
+            {{ form.csrf_token }}
+            {% if form.auth.errors %}
+            {% for msg in form.auth.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {{ form.auth }}
+            {% if form.version.errors %}
+            {% for msg in form.version.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {{ form.version }}
+            {% if form.email.errors %}
+            {% for msg in form.email.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {{form.email}}
+            {% if form.paperid.errors %}
+            {% for msg in form.paperid.errors %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {{ form.paperid }}
+            {{ form.submit(class_='mt-1 btn btn-primary') }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %} {# content #}
+{% block endOfPage %}
+{% include "view_footer.html" %}
+{% endblock %}
+

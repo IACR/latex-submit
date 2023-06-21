@@ -378,6 +378,57 @@ FileTree.update_forward_refs()
 # A retricted form of ISO date format.
 dt_regex = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
 
+# The type can be used to guide decisions by authors and copy editors.
+# Errors almost certainly need attention, but warnings are a judgement
+# call.
+class ErrorType(StrEnum):
+    METADATA_ERROR = 'metadata error'
+    METADATA_WARNING = 'metadata warning'
+    LATEX_ERROR = 'Latex error'
+    REFERENCE_ERROR = 'reference error'
+    DUPLICATE_LABEL = 'duplicate label'
+    LATEX_WARNING = 'Latex warning'
+    OVERFULL_HBOX = 'overfull hbox'
+    UNDERFULL_HBOX = 'underfull hbox'
+    OVERFULL_VBOX = 'overfull vbox'
+    UNDERFULL_VBOX = 'underfull vbox'
+    SERVER_WARNING = 'server warning' # produced by the server and not LaTeX itself.
+    SERVER_ERROR = 'server error' # produced by the server and not LaTeX itself.
+
+
+class CompileError(BaseModel):
+    error_type: ErrorType = Field(...,
+                                  title='type of error',
+                                  description='This tells you which fields should be populated')
+    text: str = Field(...,
+                      title = 'Description of problem',
+                      description = 'Textual description of problem for author. A required field.')
+    logline: int = Field(...,
+                         title='Line in log where it occurs',
+                         description='This is the start of where the error occurs, but there may be lines after it.')
+    package: str = Field(None,
+                         title='LaTeX package name',
+                         description='Populated when we find it. Not required')
+    pageno: int = Field(0,
+                        title = 'Page number in PDF',
+                        description = 'Page number where problem appears. May required.')
+    pdf_line: int = Field(0,
+                          title = 'Line number in PDF',
+                          description = 'Line number in copyedit version. Not required.')
+    filepath: str = Field(None,
+                          title='path to LaTeX file',
+                          description = 'Location of LaTeX error or warning. Not required.')
+    filepath_line: int = Field(0,
+                               title = 'Line number location for LaTeX warning',
+                               description = 'Line number in filepath where LaTeX warning occurred. Not required.')
+    severity: float = Field(0,
+                            title='Severity of overfull or underfull hbox or vbox.',
+                            description='For overfull boxes, it is the size in pts. For underfull boxes it is badness.')
+    help: str = Field(None,
+                      title='Help for authors',
+                      description='The parser may have more to say about an error')
+
+
 class Compilation(BaseModel):
     paperid: constr(min_length=3) = Field(...,
                                           title='Globally unique paper ID constructed in review system',
@@ -408,12 +459,12 @@ class Compilation(BaseModel):
     log: str = Field(None,
                      title='Log from running latexmk',
                      description='Will be absent until latex is attempted.')
-    error_log: List[str] = Field(...,
-                                 title='Error messages if some step failed',
-                                 description='Used in the UI if necessary. See status')
-    warning_log: List[str] = Field(...,
-                                   title='Warning messages',
-                                   description='May be used to warn author of overfull hbox, missing DOI in bibtex, etc')
+    error_log: List[CompileError] = Field(...,
+                                          title='Error messages if some step failed',
+                                          description='Used in the UI if necessary. See status')
+    warning_log: List[CompileError] = Field(...,
+                                            title='Warning messages',
+                                            description='May be used to warn author of overfull hbox, missing DOI in bibtex, etc')
     exit_code: int = Field(-1,
                             title='Exit code from running latexmk',
                             description='These are not well defined.')

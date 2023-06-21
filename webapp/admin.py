@@ -268,13 +268,31 @@ def final_review(paperid):
         return admin_message('Unknown paper: {}'.format(paperid))
     candidate_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
     final_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value)
-    candidate_lines = (candidate_path / Path('output') / Path('main.tex')).read_text(encoding='UTF-8').splitlines()
-    final_lines = (final_path / Path('output') / Path('main.tex')).read_text(encoding='UTF-8').splitlines()
-    htmldiff = HtmlDiff(tabsize=2)
+    diffs = {}
+    candidate_tex_files = list(candidate_path.glob('output/**/*.tex'))
+    candidate_tex_files.extend(list(candidate_path.glob('output/**/*.sty')))
+    candidate_output = candidate_path / Path('output')
+    candidate_file_map = {str(path.relative_to(candidate_output)): path for path in candidate_tex_files}
+    final_tex_files = list(final_path.glob('output/**/*.tex'))
+    final_tex_files.extend(list(final_path.glob('output/**/*.sty')))
+    final_output = final_path / Path('output')
+    final_file_map = {str(path.relative_to(final_output)): path for path in final_tex_files}
+    for filename, file in candidate_file_map.items():
+        final_file = final_file_map.get(filename)
+        if final_file:
+            candidate_lines = file.read_text(encoding='UTF-8').splitlines()
+            final_lines = final_file.read_text(encoding='UTF-8').splitlines()
+            if candidate_lines != final_lines:
+                htmldiff = HtmlDiff(tabsize=2)
+                diffs[filename] = htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5)
+            del final_file_map[filename]
+        else:
+            diffs[filename] = 'File was removed'
+    for filename, file in final_file_map.items():
+        diffs[filename] = 'File is new'
     compilation = Compilation.parse_file(final_path / Path('compilation.json'))
     sql = select(Discussion).filter_by(paperid=paperid)
     items = db.session.execute(sql).scalars().all()
-    diffs = {'main.tex': htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5)}
     data = {'title': 'Final review on paper # {}'.format(paperid),
             'warnings': compilation.warning_log,
             'log': compilation.log,

@@ -21,9 +21,9 @@ from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
 from werkzeug.datastructures import MultiDict
 import logging
 
-ENGINES = {'lualatex': 'latexmk -g -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
-           'pdflatex': 'latexmk -g -pdf -pdflatex="pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape" main',
-           'xelatex': 'latexmk -g -pdfxe -xelatex="xelatex -interaction=nonstopmode -file-line-error -no-shell-escape" main'}
+ENGINES = {'lualatex': 'latexmk -g -recorder -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
+           'pdflatex': 'latexmk -g -recorder -pdf -pdflatex="pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape" main',
+           'xelatex': 'latexmk -g -recorder -pdfxe -xelatex="xelatex -interaction=nonstopmode -file-line-error -no-shell-escape" main'}
 
 home_bp = Blueprint('home_bp',
                     __name__,
@@ -635,10 +635,11 @@ def show_pdf(paperid,version, auth):
                            title='Unable to retrieve file {}'.format(str(pdf_path.absolute())),
                            error='Unknown file. This is a bug')
     
-# when a paper fails to compile or has nonempty error_log, show just
-# the error log compile_error.html
-# if iacrcc, then show iacrcc_success.html
-# if not iacrcc then show a generic one without metadata. generic_success.html
+"""
+View the results of a compilation. We use a different template for iacrcc.cls,
+because this provides better tracking in the log for which file is currently
+being processed.
+"""
 @home_bp.route('/view/<paperid>/<version>/<auth>', methods=['GET'])
 def view_results(paperid, version, auth):
     """Note: in this view, auth is computed from paperid, version, '', ''."""
@@ -661,7 +662,8 @@ def view_results(paperid, version, auth):
                                error='Unknown paper. Try resubmitting.')
     data = {'title': 'Results from compilation',
             'paperid': paperid,
-            'version': version}
+            'version': version,
+            'source_auth': auth}
     try:
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
@@ -690,6 +692,7 @@ def view_results(paperid, version, auth):
     if log_file.is_file():
         try:
             data['latexlog'] = log_file.read_text(encoding='UTF-8')
+            data['loglines'] = data['latexlog'].splitlines()
         except Exception as e:
             logging.error('Unable to read log file as UTF-8: {}'.format(paperid))
             # If pdflatex is used, then it can sometimes create a log file that is not
@@ -717,8 +720,39 @@ def view_results(paperid, version, auth):
             form = NotifyFinalForm(formdata=formdata)
             data['form'] = form
             data['next_action'] = 'final review'
-        return render_template('view_iacrcc.html', **data)
+        return render_template('view.html', **data)
     return render_template('view_generic.html', **data)
+
+"""
+This provides an HTML fragment showing the source file with line numbers.
+"""
+@home_bp.route('/source/<paperid>/<version>/<auth>/<filename>', methods=['GET'])
+def view_source(paperid, version, auth, filename):
+    """Note: in this view, auth is computed from paperid, version, '', ''."""
+    if not validate_paperid(paperid):
+        return render_template('message.html',
+                               title='Unable to retrieve file',
+                               error='paperid is invalid')
+    if not validate_version(version):
+        return render_template('message.html',
+                               title='Invalid version',
+                               error='Invalid version')
+    if not validate_hmac(paperid, version, '', '', auth):
+        return render_template('message.html',
+                               title = 'Invalid hmac',
+                               error = 'Invalid hmac')
+    source_file = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('output') / Path(filename)
+    if not source_file.is_file():
+        return render_template('message.html',
+                               title='Unknown file',
+                               error='Unknown file.')
+    try:
+        data = {'lines': source_file.read_text(encoding='UTF-8', errors='replace').splitlines()}
+    except Exception as e:
+        return render_template('message.html',
+                               title='Unable to display file',
+                               error='Unable to display file: ' + str(e))
+    return render_template('view_source.html', **data)
 
 # TODO: add /<hmac> to the end
 @home_bp.route('/output/<paperid>/<version>', methods=['GET'])

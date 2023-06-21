@@ -1,0 +1,60 @@
+LaTeX Warning: Float too large for page by 24.14032pt on input line 187.
+LaTeX Warning: Command \i invalid in math mode on input line 468.
+LaTeX Warning: Citation `gram' on page  undefined on input line 51.
+LaTeX Warning: Reference `fig:nanogram' on page  undefined on input line 634.
+LaTeX Warning: Command \; invalid in math mode on input line 53.
+LaTeX Warning: Hyper reference `func:mpc' on page 15 undefined on input line 24.
+LaTeX Warning: Label `sec:hashed@cref' multiply defined.
+LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: File `fig/orcid.pdf' not found on input line 142.
+LaTeX Warning: Empty bibliography on input line 85.
+LaTeX Warning: Hyper reference `def:HVZK' on page 11 undefined on input line 84
+LaTeX Warning: There were undefined references.
+LaTeX Warning: Writing or overwriting file `./main.bib'.
+Package amsmath Warning: Foreign command \atopwithdelims;
+Package Babel Warning: The package option `english' should not be used
+Package biblatex Warning: Using fall-back BibTeX(8) backend:
+Package inputenc Warning: inputenc package ignored with utf8 based engines.
+pdfTeX warning (ext4): destination with the same identifier (name{ALG@line.1})
+pdfTeX warning (ext4): destination with the same identifier (name{figure.1.1}) has been already used, duplicate ignored
+LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <0.7> not available
+pdfTeX warning: pdflatex: dangling objects discarded, no output file produced.
+pdfTeX warning: pdflatex (file ./figures/lat_sign.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+! Package inputenc Error: Invalid UTF-8 byte "80.
+! Package inputenc Error: Invalid UTF-8 byte sequence.
+! Package inputenc Error: Unicode character ϵ (U+03F5)
+! LaTeX Error: Command \proof already defined.
+! LaTeX Error: \begin{center} on input line 2 ended by \end{pcvstack}.
+! LaTeX Error: \begin{itemize} on input line 158 ended by \end{cases*}.
+! LaTeX Error: \begin{document} ended by \end{theorem}.
+! LaTeX Error: \caption outside float.
+! LaTeX Error: Environment theorem undefined.
+! LaTeX Error: File `abstract.tex' not found.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+! LaTeX Error: The font size command \normalsize is not defined:
+! Missing number, treated as zero.
+! Class iacrcc Error:
+! Undefined control sequence.
+! Corrupted NFSS tables.
+! Display math should end with $$.
+! Extra alignment tab has been changed to \cr.
+! Extra }, or forgotten $.
+! Text line contains an invalid character.
+Overfull \hbox (66.0729pt too wide) in paragraph at lines 1--5 
+Underfull \hbox (badness 2753) in paragraph at lines 255--259
+Underfull \vbox (badness 1102) has occurred while \output is active []
+Overfull \vbox (3.77666pt too high) has occurred while \output is active []
+Overfull \hbox (6.0729pt too wide) in paragraph at lines 1--5 
+! LaTeX Error: Command \@Opargbegintheorem undefined.
+Missing character: There is no f in font nullfont!
+Missing character: There is no ’ (U+2019) in font cmr9!
+## From here on we don't recognize these as errors. We may capture these later.
+look up `weird error' in the index to The TeXbook.)
+Warning:missing_file:algorithmicx Can't find package algorithmicx
+Warning:not_parsed:ATOM.POSTSUBSCRIPT>RELOP MathParser failed to match rule 'Anything'
+
+warning  (pdf backend): unreferenced destination with name 'Hfootnote.1'
+Error:undefined:\algocf@linesnumbered The token T_CS[\algocf@linesnumbered] is not defined.
+Error:undefined:{ssmall} The environment {ssmall} is not defined.
+Error:unexpected:\caption Use of \caption outside any known float

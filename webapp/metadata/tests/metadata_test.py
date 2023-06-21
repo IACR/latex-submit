@@ -28,6 +28,9 @@ within comment environment.
 You may still~\\footnote{Go bye bye} use percentages like 10\\% of the content.
 We remove \\todo{this is a removable todo} and \\todo[inline]{so is this} but
 the last one is not removed because arxiv_latex_cleaner does not recognize it.
+\\iffalse
+This is also false so should be removed.
+\\fi
 """
     output = clean_abstract(input)
     print(output)
@@ -43,6 +46,7 @@ the last one is not removed because arxiv_latex_cleaner does not recognize it.
     assert 'removable' not in output
     # We might wish to catch this in the future.
     assert 'so is this' in output
+    assert 'false' not in output
 
 def _test_bibtex_entry(case):
     output_path = Path('testdata/bibtex/{}'.format(case))
