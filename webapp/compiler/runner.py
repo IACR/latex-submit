@@ -67,7 +67,7 @@ def run_latex(cmd, input_dirname, output_dirname):
                 warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
             elif file_path.name.endswith('.sty'):
-                warnings.append('Style file {} may result in copy editing problems if you violate the journal style.'.format(file_path.name))
+                warnings.append('You should not upload style files. Style file {} may result in copy editing problems if you violate the journal style.'.format(file_path.name))
             else:
                 file_path.chmod(0o644)
     # Remove any leftover files from LaTeX or latexmk runs by the author
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     argparser.add_argument('--overwrite',
                            action='store_true')
     argparser.add_argument('--cmd',
-                           default='latexmk -g -pdf -pdflatex="pdflatex --disable-write18 --no-shell-escape" main')
+                           default='latexmk -g -recorder -pdf -pdflatex="pdflatex --disable-write18 --no-shell-escape" main')
     args = argparser.parse_args()
     output_dir = Path(args.output_dir)
     if output_dir.is_dir():

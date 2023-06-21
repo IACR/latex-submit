@@ -36,11 +36,12 @@ paperid is unique.
 import re
 import string
 
+from .compilation import CompileError, ErrorType
 _prefix = '10.1729' # Any chance we can get a vanity prefix?
 
 # _alphabet used for both paperid and DOI suffix.
 # If you change the alphabet, make sure get_doi still works.
-_alphabet = '-.' + string.digits + string.ascii_lowercase
+_alphabet = '-' + string.digits + string.ascii_lowercase
 
 def validate_paperid(paperid):
     if re.match(r'^[-\.a-z0-9]+$', paperid):

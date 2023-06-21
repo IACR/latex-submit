@@ -93,6 +93,8 @@ class Discussion(Base):
     created: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=func.now())
     pageno: Mapped[int] = mapped_column(Integer, nullable=True)
     lineno: Mapped[int] = mapped_column(Integer, nullable=True)
+    source_file: Mapped[str] = mapped_column(Text, nullable=True)
+    source_lineno: Mapped[int] = mapped_column(Integer, nullable=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     reply: Mapped[str] = mapped_column(Text, nullable=True) # from author
     status: Mapped[DiscussionStatus] = mapped_column(default=DiscussionStatus.PENDING)
