@@ -700,7 +700,7 @@ def view_results(paperid, version, auth):
             # see https://github.com/IACR/latex-submit/issues/26
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
-        return render_template('compile_fail.html', **data)
+        return render_template('view.html', **data)
     if comp.venue == 'cic': # special handling for this journal.
         if version == Version.CANDIDATE.value:
             formdata = MultiDict({'email': comp.email,
