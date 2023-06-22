@@ -268,3 +268,8 @@ def test_file_stack():
     parser.parse_file(Path('testdata/logs/iacrtrans.log'))
     assert len(parser.opened_files) == 1
     
+def test_undefined_control():
+    parser = LatexLogParser()
+    parser.parse_file(Path('testdata/logs/undefined_control.log'))
+    assert len(parser.errors) == 1
+
