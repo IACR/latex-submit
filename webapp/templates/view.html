@@ -42,6 +42,10 @@ This template is used to show the status of a compilation for iacrcc.cls
            let line = document.getElementById(id);
            if (line) {
              line.scrollIntoView({behavior: 'smooth'});
+             document.querySelectorAll('div.highlight_log_line').forEach((el) => {
+               el.classList.remove('highlight_log_line');
+             });
+             line.classList.add('highlight_log_line');
            } else {
              console.log('no line element');
            }
@@ -65,7 +69,12 @@ This template is used to show the status of a compilation for iacrcc.cls
  function showLogLine(line) {
    const logTab = document.querySelector('button[data-bs-target="#nav-log"]')
    bootstrap.Tab.getOrCreateInstance(logTab).show()
-   document.getElementById('logline-' + line).scrollIntoView({behavior: 'smooth'});
+   let logline = document.getElementById('logline-' + line);
+   logline.scrollIntoView({behavior: 'smooth'});
+   document.querySelectorAll('div.highlight_log_line').forEach((el) => {
+     el.classList.remove('highlight_log_line');
+   });
+   logline.classList.add('highlight_log_line');
  }
  function showWhere(elem) {
    let data = elem.dataset;
@@ -95,7 +104,7 @@ This template is used to show the status of a compilation for iacrcc.cls
     <div class="left-column">
       <a class="btn btn-primary my-3" href="{{url_for('home_bp.show_submit_version', paperid=paperid,version=version,auth=auth,email=comp.email,venue=comp.venue.value,submitted=comp.submitted,accepted=comp.accepted)}}">You may still resubmit your paper</a>
       {% if comp.error_log %}
-      <div class="alert alert-danger">
+      <div class="border border-danger p-3 mb-3 border-3 rounded">
         Unfortunately the compilation of your paper has encountered errors.
       </div>
       <div class="mb-3">

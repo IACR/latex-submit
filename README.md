@@ -40,7 +40,7 @@ class are processed, the metadata from the paper is automatically extracted.
 This project has a submodule from IACR/latex in order to import
 `iacrcc.cls`. In order to pull this in, use
 ```
-git submodule update --init --recursive
+git submodule update --init --recursive --remote
 ```
 This also pulls in `cryptobib` since IACR/latex depends on it.
 
