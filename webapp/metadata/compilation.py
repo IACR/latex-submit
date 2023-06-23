@@ -355,26 +355,6 @@ class Meta(BaseModel):
             return False
         return True
         
-class FileTree(BaseModel):
-    """Used in the UI to display the file tree in output."""
-    name: str = Field(...,
-                      title='Name of node',
-                      description='Name of file or directory')
-    children: List['FileTree'] = Field(None)
-    def from_path(dirpath):
-        ft = FileTree(name=dirpath.name, children=[])
-        for dir in sorted(dirpath.iterdir()):
-            child = FileTree(name=dir.name)
-            if dir.is_dir():
-                child.children = FileTree.from_path(dir).children
-            else:
-                child.children = []
-            ft.children.append(child)
-        return ft
-
-
-FileTree.update_forward_refs()
-
 # A retricted form of ISO date format.
 dt_regex = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
 
@@ -474,9 +454,9 @@ class Compilation(BaseModel):
     meta: Meta = Field(None,
                        title='Parsed metadata',
                        description='Present once status passes COMPILATION_SUCCESS')
-    output_tree: FileTree = Field(None,
-                                  title='Directory tree of output',
-                                  description='Simple tree representation')
+    output_files: List[str] = Field([],
+                                    title='List of file paths in output directory',
+                                    description='Paths are relative to the output directory')
     
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.meta_parse import clean_abstract, check_bibtex
-from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, FileTree, CompileError, ErrorType
+from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType
 from .log_parser import LatexLogParser
 from .db_models import CompileRecord, TaskStatus
 
@@ -76,7 +76,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             compilation = Compilation.parse_raw(comprec.result)
             compilation.compile_time = execution_time
             compilation.log = output.get('log', 'no log')
-            compilation.output_tree = FileTree.from_path(output_path)
+            compilation.output_files = sorted([str(p.relative_to(str(output_path))) for p in output_path.rglob('*')])
             for warning in output.get('warnings', []):
                 compilation.warning_log.append(ErrorType.SERVER_WARNING,
                                                logline=0,

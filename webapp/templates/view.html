@@ -21,8 +21,8 @@ This template is used to show the status of a compilation for iacrcc.cls
 </style>
 <script>
  var sources = {
-   {% for el in comp.output_tree.children recursive %}"{{el.name}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=el.name)}}",
-   {% if el.children %}{{ loop(el.children) }}{% endif %}
+   {% for f in comp.output_files %}
+   "{{f}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=f)}}",
    {% endfor %}
  };
  function showSource(el) {
@@ -98,7 +98,7 @@ This template is used to show the status of a compilation for iacrcc.cls
       <div class="alert alert-danger">
         Unfortunately the compilation of your paper has encountered errors.
       </div>
-      <div>
+      <div class="mb-3">
         <h5>Errors:</h5>
         {% for err in comp.error_log %}
         <div class="error_log_entry" data-error_type="{{err.error_type.name}}"
@@ -114,7 +114,7 @@ This template is used to show the status of a compilation for iacrcc.cls
              {% if filepath_line %}
              data-filepath_line="{{err.filepath_line}}"
              {% endif %}
-        >{{err.text}}{% if err.help %}<br><span class="lognav">{{ err.help }}</span>{% endif %}
+        >{{err.text}}{% if err.help %}<br><span class="lognav">{{ err.help|safe}}</span>{% endif %}
           <div class="row">
             {% if err.filepath %}
             {% if err.filepath.startswith('/usr/') %}
@@ -228,13 +228,11 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endif %}
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
           <div class="ms-3">
-            {% if comp.output_tree %}
-            Input files used for running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
+            {% if comp.output_files %}
+            Output files from running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
             <ul>
-              {% for el in comp.output_tree.children recursive %}
-              <li>{{el.name}}
-                {% if el.children %}<ul style="list-style: '-';">
-                {{ loop(el.children) }}</a></ul>{% endif %}</li>
+              {% for f in comp.output_files %}
+              <li>{{f}}</li>
               {% endfor %}
             </ul>
             {% endif %}

@@ -13,7 +13,7 @@ from sqlalchemy.sql import func
 import string
 from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum, FileTree
+from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
@@ -681,7 +681,7 @@ def view_results(paperid, version, auth):
                                title='Paper was not compiled',
                                error='Paper was not compiled: no directory {}. This is a bug that should not exist any more.'.format(str(output_path)))
     output_dir = paper_path / Path('output')
-    comp.output_tree = FileTree.from_path(output_dir)
+    comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*')])
     pdf_file = output_path / Path('main.pdf')
     meta_file = output_path / Path('main.meta')
     log_file = output_path / Path('main.log')
@@ -726,8 +726,8 @@ def view_results(paperid, version, auth):
 """
 This provides an HTML fragment showing the source file with line numbers.
 """
-@home_bp.route('/source/<paperid>/<version>/<auth>/<filename>', methods=['GET'])
-def view_source(paperid, version, auth, filename):
+@home_bp.route('/source/<paperid>/<version>/<auth>', methods=['GET'])
+def view_source(paperid, version, auth):
     """Note: in this view, auth is computed from paperid, version, '', ''."""
     if not validate_paperid(paperid):
         return render_template('message.html',
@@ -741,6 +741,11 @@ def view_source(paperid, version, auth, filename):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
+    filename = request.args.to_dict().get('filename')
+    if not filename:
+        return render_template('message.html',
+                               title='Missing filename',
+                               error='Missing filename parameter')
     source_file = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('output') / Path(filename)
     if not source_file.is_file():
         return render_template('message.html',

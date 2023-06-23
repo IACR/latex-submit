@@ -3,16 +3,10 @@ from pathlib import Path
 import pytest
 import sys
 sys.path.insert(0, '../')
-from compilation import Compilation, FileTree, CompileStatus
+from compilation import Compilation, CompileStatus
 from meta_parse import clean_abstract, check_bibtex
 import datetime
 from pathlib import Path
-
-def test_filetree():
-    comp = Compilation.parse_raw(Path('testdata/compilation.json').read_text(encoding='UTF-8'))
-    comp.output_tree = FileTree.from_path(Path('testdata/bibtex'))
-    assert comp.output_tree.name == 'bibtex'
-    assert len(comp.output_tree.children) == 2
 
 def test_clean_abstract():
     input = """This is an abstract
