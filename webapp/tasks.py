@@ -61,10 +61,10 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             output = runner.run_latex(cmd, input_path, output_path)
             # The contract is that output may contain exit_code, log, and
             # an array of warnings.
-            output['errors'] = []
             end_time = time.time()
             execution_time = round(end_time - start_time, 2)
         except Exception as e:
+            logging.error('Exception running latex: ' + str(e))
             output['errors'].append('Exception running latex: ' + str(e))
             task_status = TaskStatus.FAILED_EXCEPTION
         json_file = Path(paper_path) / Path('compilation.json')
@@ -72,15 +72,16 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
         comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
         try:
             if not comprec:
+                logging.error('no CompileRecord for {}'.format(paperid))
                 raise Exception('no CompileRecord')
             compilation = Compilation.parse_raw(comprec.result)
             compilation.compile_time = execution_time
             compilation.log = output.get('log', 'no log')
             compilation.output_files = sorted([str(p.relative_to(str(output_path))) for p in output_path.rglob('*')])
             for warning in output.get('warnings', []):
-                compilation.warning_log.append(ErrorType.SERVER_WARNING,
-                                               logline=0,
-                                               text=warning)
+                compilation.warning_log.append(CompileError(error_type=ErrorType.SERVER_WARNING,
+                                                            logline=0,
+                                                            text=warning))
             for error in output.get('errors', []):
                 compilation.error_log.append(CompileError(error_type=ErrorType.SERVER_ERROR,
                                                           logline=0,
@@ -184,7 +185,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
         db.session.commit()
         task_queue.pop(task_key, None)
     except Exception as e:
-        logging.fatal('ERROR in task: {}'.format(str(e)))
+        logging.error('ERROR in task: {}'.format(str(e)))
         print(e)
     return output.get('errors', [])
 

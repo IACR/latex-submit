@@ -720,8 +720,17 @@ def view_results(paperid, version, auth):
             form = NotifyFinalForm(formdata=formdata)
             data['form'] = form
             data['next_action'] = 'final review'
-        return render_template('view.html', **data)
-    return render_template('view_generic.html', **data)
+    else:
+        formdata = MultiDict({'paperid': comp.paperid,
+                              'email': comp.email,
+                              'auth': create_hmac(comp.paperid,
+                                                  Version.FINAL.value,
+                                                  comp.email,
+                                                  '')})
+        form = NotifyFinalForm(formdata=formdata)
+        data['form'] = form
+        data['next_action'] = 'final publication'
+    return render_template('view.html', **data)
 
 """
 This provides an HTML fragment showing the source file with line numbers.

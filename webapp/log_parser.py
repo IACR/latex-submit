@@ -143,7 +143,9 @@ class LatexLogParser:
         try:
             logstr = path.read_text(encoding='UTF-8', errors='replace')
         except Exception as e:
-            self.errors.append(CompileError(text='log file is not UTF-8'))
+            self.errors.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+                                            logline=0,
+                                            text='log file is not UTF-8'))
             logstr = path.read_text(encoding='UTF-8', errors='replace')
         return self.parse_lines(logstr.splitlines(), debug)
 

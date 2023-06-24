@@ -7,6 +7,10 @@ from pylatexenc.latex2text import LatexNodes2Text
 from arxiv_latex_cleaner import arxiv_latex_cleaner
 from pybtex.database import parse_string, BibliographyData, BibliographyDataError
 import pybtex.errors
+try:
+    from .compilation import CompileError, ErrorType
+except Exception as e:
+    from compilation import CompileError, ErrorType
 
 from pathlib import Path
 import re
@@ -158,7 +162,7 @@ def check_bib_entry(key, entry):
             if '/' in field:
                 alts = field.split('/')
                 if alts[0] not in entry.fields and alts[1] not in entry.fields:
-                    errors.append('bibtex entry {} requires {} field or {} field'.format(key, alts[0], alts[1]))
+                    errors.append('bibtex entry {} should have {} field or {} field'.format(key, alts[0], alts[1]))
             else:
                 if field not in entry.fields:
                     errors.append('bibtex entry {} requires {} field'.format(key, field))
@@ -169,9 +173,11 @@ def check_bibtex(output_path, compilation):
     try:
         aux_file = Path(output_path) / Path('main.aux')
         if not aux_file.is_file():
-            compilation.error_log.append('Missing aux file')
+            compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
+                                                      logline=0,
+                                                      text='Missing aux file'))
             return
-        aux_lines = aux_file.read_text(encoding='UTF-8').splitlines()
+        aux_lines = aux_file.read_text(encoding='UTF-8', errors='replace').splitlines()
         # These identify the occurrences of \cite in the document. All
         # should have references.
         citation_pat = re.compile(r'\\citation{([^}]+)}')
@@ -181,7 +187,8 @@ def check_bibtex(output_path, compilation):
         for line in aux_lines:
             res = citation_pat.search(line)
             if res and res.group(1):
-                cite_keys.add(res.group(1))
+                for key in res.group(1).split(','):
+                    cite_keys.add(key)
             res = bibfile_pat.search(line)
             if res and res.group(1):
                 bibfiles.extend([b+'.bib' for b in res.group(1).split(',')])
@@ -201,16 +208,26 @@ def check_bibtex(output_path, compilation):
         used_entries = {}
         for key in cite_keys:
             if key not in bibdata.entries:
-                compilation.error_log.append('missing reference {}'.format(key))
+                compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
+                                                          logline=0,
+                                                          text='missing reference {}'.format(key)))
             else:
                 used_entries[key] = bibdata.entries.get(key)
         for key, entry in used_entries.items():
             try:
-                compilation.warning_log.extend(check_bib_entry(key, entry))
+                warnings = check_bib_entry(key, entry)
+                for warning in warnings:
+                    compilation.warning_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+                                                                logline=0,
+                                                                text=warning))
             except Exception as e:
-                compilation.warning_log.append('error checking bibtex entry {}: {}. This may be a bug.'.format(key, str(e)))
+                compilation.warning_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+                                                            logline=0,
+                                                            text='error checking bibtex entry {}: {}. This may be a bug.'.format(key, str(e))))
     except Exception as e:
-        compilation.error_log.append('Error checking for bibtex problems: {}. This may be a bug'.format(str(e)))
+        compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+                                                  logline=0,
+                                                  text='Error checking for bibtex problems: {}. This may be a bug'.format(str(e))))
 
 def clean_abstract(text):
     """Remove comments, todos, \begin{comment} from abstract."""
