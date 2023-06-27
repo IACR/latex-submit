@@ -77,7 +77,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             compilation = Compilation.parse_raw(comprec.result)
             compilation.compile_time = execution_time
             compilation.log = output.get('log', 'no log')
-            compilation.output_files = sorted([str(p.relative_to(str(output_path))) for p in output_path.rglob('*')])
+            compilation.output_files = sorted([str(p.relative_to(str(output_path))) for p in output_path.rglob('*') if p.is_file()])
             for warning in output.get('warnings', []):
                 compilation.warning_log.append(CompileError(error_type=ErrorType.SERVER_WARNING,
                                                             logline=0,

@@ -239,13 +239,22 @@ def copyedit(paperid):
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
-    comp_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value) / Path('compilation.json')
+    paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
+    input_dir = paper_path / Path('input')
+    input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
+    comp_path = paper_path / Path('compilation.json')
     compilation = Compilation.parse_file(comp_path)
     data = {'title': 'Viewing {}'.format(paperid),
+            'comp': compilation,
+            'input_files': input_files,
+            'version': Version.CANDIDATE.value,
             'warnings': compilation.warning_log,
-            'log': compilation.log,
+            'source_auth': create_hmac(paperid, Version.CANDIDATE.value, '', ''),
             'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
             'paper': paper_status}
+    log_file = paper_path / Path('output') / Path('main.log')
+    latexlog = log_file.read_text(encoding='UTF-8', errors='replace')
+    data['loglines'] = latexlog.splitlines()
     return render_template('admin/copyedit.html', **data)
 
 @admin_bp.route('/admin/approve_final/<paperid>', methods=['POST'])
@@ -374,6 +383,10 @@ def comment():
                            pageno=data['pageno'],
                            lineno=data['lineno'],
                            text=data['text'])
+            if 'source_file' in data:
+                d.source_file = data['source_file']
+            if 'source_lineno' in data:
+                d.source_lineno = data['source_lineno']
             db.session.add(d)
             db.session.commit()
             return jsonify(d.as_dict())

@@ -118,3 +118,10 @@ button.nav-link {
 img.eyes {
     width: 1.5rem;
 }
+ .resizer {
+    background-color: #cbd5e0;
+    cursor: ew-resize;
+    width: 4px;
+    border-left: 1px solid #888;
+    border-right: 1px solid #888;
+ }

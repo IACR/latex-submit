@@ -78,12 +78,12 @@ class CompileRecord(Base):
 
 class DiscussionStatus(str, Enum):
     """Status of a copyedit discussion item."""
-    PENDING = 'Pending'
-    CANCELLED = 'Cancelled'
-    DECLINED = 'Declined'
-    CLARIFY = 'Clarify'
-    WILLFIX = 'Agreed to fix'
-    FIXED = 'Fixed'
+    PENDING = 'Pending'     # unanswered
+    CANCELLED = 'Cancelled' # cancelled by creator
+    DECLINED = 'Declined'   # declined by author
+    CLARIFY = 'Clarify'     # clarification requested
+    WILLFIX = 'Agreed to fix' # agreed to by author
+    FIXED = 'Fixed'         # confirmed to be fixed
 
 class Discussion(Base):
     __tablename__ = 'discussion'
@@ -92,7 +92,8 @@ class Discussion(Base):
     creator_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     created: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=func.now())
     pageno: Mapped[int] = mapped_column(Integer, nullable=True)
-    lineno: Mapped[int] = mapped_column(Integer, nullable=True)
+    lineno: Mapped[int] = mapped_column(Integer, nullable=True) # line number in pdf
+    logline: Mapped[int] = mapped_column(Integer, nullable=True) # line number in main.log
     source_file: Mapped[str] = mapped_column(Text, nullable=True)
     source_lineno: Mapped[int] = mapped_column(Integer, nullable=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)

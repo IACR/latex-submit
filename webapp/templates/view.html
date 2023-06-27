@@ -18,6 +18,11 @@ This template is used to show the status of a compilation for iacrcc.cls
    max-height:80vh;
    font-family:monospace;
  }
+ div#nav-log {
+   overflow-y: scroll;
+   max-height:80vh;
+   font-family:monospace;
+ }
 </style>
 <script>
  var sources = {
@@ -25,79 +30,9 @@ This template is used to show the status of a compilation for iacrcc.cls
    "{{f}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=f)}}",
    {% endfor %}
  };
- function showSource(el) {
-   console.dir(el);
-   let filename = el.dataset.filepath;
-   if (filename in sources) {
-     console.log('found source: ' + sources[filename]);
-     fetch(sources[filename])
-       .then(response => response.text())
-       .then(data => {
-         document.getElementById('nav-source').innerHTML = data;
-         const sourceTab = document.querySelector('button[data-bs-target="#nav-source"]')
-         bootstrap.Tab.getOrCreateInstance(sourceTab).show()
-         if ('filepath_line' in el.dataset) {
-           let id = 'sourceline-' + String(el.dataset.filepath_line);
-           console.log(id);
-           let line = document.getElementById(id);
-           if (line) {
-             line.scrollIntoView({behavior: 'smooth'});
-             document.querySelectorAll('div.highlight_log_line').forEach((el) => {
-               el.classList.remove('highlight_log_line');
-             });
-             line.classList.add('highlight_log_line');
-           } else {
-             console.log('no line element');
-           }
-         } else {
-           console.log('no line number')
-         }
-       })
-   } else {
-     console.log('source not found');
-   }
- }
-
- function showPage(pageno) {
-   let iframe = document.getElementById('pdfiframe');
-   pdfurl = iframe.src;
-   iframe.src = pdfurl.split('#')[0] + '#page=' + pageno;
-   iframe.contentDocument.location.reload(true);
-   const pdfTab = document.querySelector('button[data-bs-target="#nav-pdf"]')
-   bootstrap.Tab.getOrCreateInstance(pdfTab).show()
- }
- function showLogLine(line) {
-   const logTab = document.querySelector('button[data-bs-target="#nav-log"]')
-   bootstrap.Tab.getOrCreateInstance(logTab).show()
-   let logline = document.getElementById('logline-' + line);
-   logline.scrollIntoView({behavior: 'smooth'});
-   document.querySelectorAll('div.highlight_log_line').forEach((el) => {
-     el.classList.remove('highlight_log_line');
-   });
-   logline.classList.add('highlight_log_line');
- }
- function showWhere(elem) {
-   let data = elem.dataset;
-   if ('pageno' in data) {
-     console.log('page is ' + data.pageno);
-     let pdfTab = document.getElementById('nav-pdf');
-     if (pdfTab) {
-       let embed = pdfTab.children[0];
-       console.log('old embedUrl is ' + embed.src);
-       let embedUrl = embed.src.split('#')[0] + '#page=' + data.pageno;
-       console.log('new embedUrl is ' + embedUrl);
-       embed.src = embedUrl;
-       embed.contentDocument.location.reload(true);
-     }
-   }
-   console.log(elem);
- }
- function showMeta() {
-   const metaTab = document.querySelector('button[data-bs-target="#nav-meta"]')
-   bootstrap.Tab.getOrCreateInstance(metaTab).show()
-}   
-</script>
-{% endblock %}
+ </script>
+ <script src="/js/nav.js"></script>
+ {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
   <div id="splitView" class="d-flex w-100">
@@ -133,7 +68,7 @@ This template is used to show the status of a compilation for iacrcc.cls
             {% endif %}
             {% endif %}
             <div class="col-4">
-              {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to long line"> Log line {{err.logline}}</span>{% endif %}
+              {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
             </div>
             <div class="col-4">
               {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page ≈{{err.pageno}}</span>{% endif %}
@@ -223,11 +158,10 @@ This template is used to show the status of a compilation for iacrcc.cls
         </div>
       </nav>
       <div class="tab-content pt-3" id="nav-tabContent" style="background-color:#ffffff;">
-        <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" style="overflow-y: scroll;max-height:80vh;font-family:monospace;">
+        <div class="tab-pane fade show active p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
           {% for line in loglines %}
           <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
           {% endfor %}
-          {# <pre id="latexLog">{{latexlog}}</pre>#}
         </div>
         {% if pdf %}
         <div class="tab-pane fade show p-3" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">

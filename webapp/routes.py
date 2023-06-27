@@ -681,7 +681,7 @@ def view_results(paperid, version, auth):
                                title='Paper was not compiled',
                                error='Paper was not compiled: no directory {}. This is a bug that should not exist any more.'.format(str(output_path)))
     output_dir = paper_path / Path('output')
-    comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*')])
+    comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*') if p.is_file()])
     pdf_file = output_path / Path('main.pdf')
     meta_file = output_path / Path('main.meta')
     log_file = output_path / Path('main.log')
@@ -691,7 +691,7 @@ def view_results(paperid, version, auth):
         data['pdf'] = get_pdf_url(paperid, version)
     if log_file.is_file():
         try:
-            data['latexlog'] = log_file.read_text(encoding='UTF-8')
+            data['latexlog'] = log_file.read_text(encoding='UTF-8', errors='replace')
             data['loglines'] = data['latexlog'].splitlines()
         except Exception as e:
             logging.error('Unable to read log file as UTF-8: {}'.format(paperid))
@@ -750,22 +750,26 @@ def view_source(paperid, version, auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version)
+    input_dir = paper_dir / Path('input')
+    input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     filename = request.args.to_dict().get('filename')
     if not filename:
-        return render_template('message.html',
-                               title='Missing filename',
-                               error='Missing filename parameter')
-    source_file = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('output') / Path(filename)
-    if not source_file.is_file():
-        return render_template('message.html',
-                               title='Unknown file',
-                               error='Unknown file.')
-    try:
-        data = {'lines': source_file.read_text(encoding='UTF-8', errors='replace').splitlines()}
-    except Exception as e:
-        return render_template('message.html',
-                               title='Unable to display file',
-                               error='Unable to display file: ' + str(e))
+        data = {'input_files': input_files}
+        print(json.dumps(data,indent=2))
+    else:
+        source_file = paper_dir / Path('output') / Path(filename)
+        if not source_file.is_file():
+            return render_template('message.html',
+                                   title='Missing filename',
+                                   error='Missing filename parameter')
+        else:
+            try:
+                data = {'lines': source_file.read_text(encoding='UTF-8', errors='replace').splitlines()}
+            except Exception as e:
+                return render_template('message.html',
+                                       title='Unable to display file',
+                                       error='Unable to display file: ' + str(e))
     return render_template('view_source.html', **data)
 
 # TODO: add /<hmac> to the end
