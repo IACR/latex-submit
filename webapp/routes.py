@@ -213,6 +213,16 @@ def submit_version():
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
         return render_template('submit.html', form=form)
+    # Check that none of the latex files use \begin{thebibliography}, because that would
+    # bypass our bibliography style. The LaTeX runner will automatically remove main.bbl
+    # later on.
+    for f in input_dir.rglob('*'):
+        if f.is_file() and f.name.endswith('.tex'):
+            txt = f.read_text(encoding='utf-8', errors='replace')
+            if '\\begin{thebibliography}' in txt:
+                log_event(paperid, 'LaTeX file with thebibligraphy in it')
+                form.zipfile.errors.append('Your latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex.')
+                return render_template('submit.html', form=form)
     command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
