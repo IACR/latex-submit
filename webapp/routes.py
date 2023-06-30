@@ -136,7 +136,9 @@ def submit_version():
     paper_dir.mkdir(parents=True, exist_ok=True)
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
-    # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    # send_mail keeps track of whether we should send an email to the author. This only
+    # happens on the first upload of each version.
+    send_mail = False
     if not paper_status:
         paper_status = PaperStatus(paperid=paperid,
                                    journal=journal_id,
@@ -147,6 +149,7 @@ def submit_version():
                                    status=PaperStatusEnum.PENDING.value)
         db.session.add(paper_status)
         db.session.commit()
+        send_mail = True
     # check that submission is allowed.
     if paper_status.status == PaperStatusEnum.EDIT_PENDING:
         return render_template('message.html',
@@ -167,6 +170,7 @@ def submit_version():
     if (paper_status.status == PaperStatusEnum.EDIT_FINISHED or
         paper_status.status == PaperStatusEnum.FINAL_SUBMITTED):
         # TODO: check that discussion items are finished
+        send_mail = True
         version = Version.FINAL.value
     log_event(paperid, 'Upload of zip file for {}'.format(version))
     version_dir = paper_dir / Path(version)
@@ -270,16 +274,17 @@ def submit_version():
                                            paperid,
                                            version,
                                            task_key)
-    msg = Message('Paper {} was submitted'.format(paperid),
-                  sender=app.config['EDITOR_EMAILS'],
-                  recipients=['iacrcc@digicrime.com']) # for testing
     paper_url = url_for('home_bp.view_results',
                         paperid=paperid,
                         version=version,
                         auth=create_hmac(paperid, version, '', ''),
                         _external=True)
-    msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
-    mail.send(msg)
+    if send_mail:
+        msg = Message('Paper {} was submitted'.format(paperid),
+                      sender=app.config['EDITOR_EMAILS'],
+                      recipients=['iacrcc@digicrime.com']) # for testing
+        msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
+        mail.send(msg)
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',
             'status_url': status_url,
