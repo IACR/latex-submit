@@ -65,6 +65,12 @@ filepatt = 'iacrcc:'
 
 warning_re = re.compile(r"^((?:La|pdf)TeX|Package|Class)(?: (\w+))? [wW]arning:?(.+)$")
 error_re = re.compile(r'^(?:! ((?:La|pdf)TeX|Package|Class)(?: (\w+))? [eE]rror(?: \(([\\]?\w+)\))?: (.*)|! (.*))')
+# For some reason the LaTeX developers were not satisfied with
+# \PackageWarning and \PackageError because they wanted
+# internationalization. For this reason they defined additional macros
+# like \msg_error and \msg_fatal for packages in latex3. They produce
+# different patterns and are used by many packages like fontspec.
+l3msg_re = re.compile(r'^([^:]+):([0-9]+):(?:( Critical| Fatal)? Package) (\w+) (Error|Warning)')
 
 # regular expression to find page numbers. Since we use totpages, it sets
 # \count1 equal to \count0 so that page numbers are recorded as [2.2]
@@ -222,53 +228,62 @@ class LatexLogParser:
                         if m:
                             error.filepath_line = int(m.group('line'))
                     else:
-                        m = error_re.search(line)
+                        m = l3msg_re.search(line)
                         if m:
                             error = self._create_error(ErrorType.LATEX_ERROR,
                                                        line,
                                                        lineno)
+                            error.filepath = m.group(1)
+                            error.filepath_line = m.group(2)
+                            error.package = m.group(4)
                         else:
-                            m = badbox_re.search(line)
+                            m = error_re.search(line)
                             if m:
-                                typ = m.group(1) # Over or Under
-                                direction = m.group(2) # h or v
-                                if typ == 'Over':
-                                    if direction == 'h':
-                                        start = m.group(5)
-                                        if not start:
-                                            start = m.group(7)
-                                        error = self._create_error(ErrorType.OVERFULL_HBOX,
-                                                                   line,
-                                                                   lineno)
-                                        error.filepath_line = int(start)
-                                    elif direction == 'v':
-                                        error = self._create_error(ErrorType.OVERFULL_VBOX,
-                                                                   line,
-                                                                   lineno)
-                                    error.severity = float(m.group(4))
-                                else: # underfull
-                                    if direction == 'h':
-                                        error = self._create_error(ErrorType.UNDERFULL_HBOX,
-                                                                   line,
-                                                                   lineno)
-                                    else:
-                                        error = self._create_error(ErrorType.UNDERFULL_VBOX,
-                                                                   line,
-                                                                   lineno)
-                                    error.severity = float(m.group(3))
+                                error = self._create_error(ErrorType.LATEX_ERROR,
+                                                           line,
+                                                           lineno)
                             else:
-                                m = missing_char_re.search(line)
+                                m = badbox_re.search(line)
                                 if m:
-                                    error = self._create_error(ErrorType.LATEX_WARNING,
-                                                               line,
-                                                               lineno)
+                                    typ = m.group(1) # Over or Under
+                                    direction = m.group(2) # h or v
+                                    if typ == 'Over':
+                                        if direction == 'h':
+                                            start = m.group(5)
+                                            if not start:
+                                                start = m.group(7)
+                                            error = self._create_error(ErrorType.OVERFULL_HBOX,
+                                                                       line,
+                                                                       lineno)
+                                            error.filepath_line = int(start)
+                                        elif direction == 'v':
+                                            error = self._create_error(ErrorType.OVERFULL_VBOX,
+                                                                       line,
+                                                                       lineno)
+                                        error.severity = float(m.group(4))
+                                    else: # underfull
+                                        if direction == 'h':
+                                            error = self._create_error(ErrorType.UNDERFULL_HBOX,
+                                                                       line,
+                                                                       lineno)
+                                        else:
+                                            error = self._create_error(ErrorType.UNDERFULL_VBOX,
+                                                                       line,
+                                                                       lineno)
+                                        error.severity = float(m.group(3))
                                 else:
-                                    m = end_occurred_inside_re.match(line)
+                                    m = missing_char_re.search(line)
                                     if m:
                                         error = self._create_error(ErrorType.LATEX_WARNING,
                                                                    line,
                                                                    lineno)
-                                        error.help = 'It appears that you have unbalanced groups in your LaTeX code.'
+                                    else:
+                                        m = end_occurred_inside_re.match(line)
+                                        if m:
+                                            error = self._create_error(ErrorType.LATEX_WARNING,
+                                                                       line,
+                                                                       lineno)
+                                            error.help = 'It appears that you have unbalanced groups in your LaTeX code.'
 
             line = ''
             lineno = i + 1

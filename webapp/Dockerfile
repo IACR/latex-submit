@@ -5,7 +5,7 @@ ARG SRCFILES=no
 ARG SCHEME=medium
 
 RUN apt-get update -q \
-    && apt-get install -qy build-essential wget libfontconfig1 \
+    && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TexLive

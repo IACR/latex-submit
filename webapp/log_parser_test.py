@@ -2,7 +2,7 @@ from collections import Counter
 from pathlib import Path
 import pytest
 import sys
-from .log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re
+from .log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re, l3msg_re
 from .metadata.compilation import ErrorType
 
 def test_overfull():
@@ -273,3 +273,14 @@ def test_undefined_control():
     parser.parse_file(Path('testdata/logs/undefined_control.log'))
     assert len(parser.errors) == 1
 
+def test_fontspec_error():
+    parser = LatexLogParser()
+    for line in Path('testdata/logs/fontawesome.log2').read_text(encoding='utf-8').splitlines():
+        m = l3msg_re.search(line)
+        assert len(m.groups()) == 5
+    parser = LatexLogParser()
+    parser.parse_file(Path('testdata/logs/fontawesome.log2'))
+    assert len(parser.errors) == 3
+    parser = LatexLogParser()
+    parser.parse_file(Path('testdata/logs/fontawesome'))
+    assert len(parser.errors) == 48
