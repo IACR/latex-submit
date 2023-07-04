@@ -216,7 +216,7 @@
      }
      if ('logline' in el.dataset) {
        document.getElementById('logline').value = el.dataset.logline;
-       document.getElementById(
+     }
      document.getElementById('text').value = 'Please fix: ' + document.getElementById('warning-text-' + index).innerText;
      setErrorMessage('Please supply a page number and line number. Other fields are optional.');
      const firstTab = document.querySelector('#myTab li:first-child button');
@@ -370,7 +370,7 @@
                     {% endif %}
                   </div>
                   <div class="">
-              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page ≈{{err.pageno}}</span>{% endif %}
+              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
                   </div>
                   <div class="text-end">
                     {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
