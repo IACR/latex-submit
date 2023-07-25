@@ -10,7 +10,7 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.meta_parse import clean_abstract, check_bibtex
+from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType
 from .log_parser import LatexLogParser
 from .db_models import CompileRecord, TaskStatus
@@ -86,7 +86,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                 compilation.error_log.append(CompileError(error_type=ErrorType.SERVER_ERROR,
                                                           logline=0,
                                                           text=error))
-            logfile = Path(output_path) / 'main.log'
+            logfile = output_path / 'main.log'
             if logfile.is_file():
                 # Note: the class_file will be updated when it runs.
                 logparser = LatexLogParser(main_file='main.tex', class_file='iacrcc.cls')
@@ -108,9 +108,11 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             elif compilation.venue != 'cic':
                 compilation.status = CompileStatus.COMPILATION_SUCCESS
             if compilation.status != CompileStatus.COMPILATION_FAILED:
+                extract_bibtex(output_path, compilation)
+                check_bibtex(compilation)
                 if compilation.venue == 'cic':
                     # Look for stuff we need for iacrcc.
-                    metafile = Path(output_path) / Path('main.meta')
+                    metafile = output_path / Path('main.meta')
                     if metafile.is_file():
                         try:
                             metastr = metafile.read_text(encoding='UTF-8')
@@ -160,8 +162,6 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                         compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                   logline=0,
                                                                   text='No metadata file. Are you sure you used iacrcc?'))
-                else: # not cic, so check references from bibtex and .aux.
-                    res = check_bibtex(output_path, compilation)
             # This is a legacy to attempt to fix issue #12. I gave up and
             # made it dependent on the value in the database, but we still
             # store the compilation.json file.

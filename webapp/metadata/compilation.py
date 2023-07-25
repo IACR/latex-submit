@@ -181,91 +181,6 @@ class VersionEnum(StrEnum):
     SUBMISSION = 'submission'
     PREPRINT = 'preprint'
 
-class Citation(BaseModel):
-    ptype: str = Field(None,
-                       title='BibTeX publication type',
-                       description='Article, inproceedings, etc.')
-    authors: str = Field(None,
-                         title='BibTeX-style author list as a string',
-                         description='Authors are joined with \\and')
-    authorlist: List[AuthorName] = Field(...,
-                                         title='Parsed list of author names',
-                                         description='Parsed from authors string.')
-    address: str = Field(None,
-                         title='BibTeX field address of conference or publisher',
-                         description='Unclear semantics.')
-    booktitle: str = Field(None,
-                           title='BibTeX booktitle field',
-                           description='For inproceedings or incollection')
-    chapter: str = Field(None,
-                         title='BibTeX chapter field',
-                         description='For inbook or incollection')
-    doi: str = Field(None,
-                     title='DOI field',
-                     description='Not a URL')
-    edition: str = Field(None,
-                         title='BibTeX edition field',
-                         description='For inbook, book, incollection, manual')
-    editor: str = Field(None,
-                        title='BibTeX editor field',
-                        description='Is not parsed to separate differen entries')
-    howpublished: str = Field(None,
-                              title='BibTeX howpublished field',
-                              description='May contain anything.')
-    institution: str = Field(None,
-                             title='BibTeX institution field',
-                             description='Often used for tech report or misc type')
-    isbn: str = Field(None,
-                      title='BibTeX isbn field',
-                      description='May be present for books')
-    issn: str = Field(None,
-                      title='BibTeX issn field',
-                      description='May be present for article to indicate journal ISSN')
-    journal: str = Field(None,
-                         title='BibTeX journal field',
-                         description='Should be present for article type')
-    key: str = Field(None,
-                     title='BibTeX key field',
-                     description='No clear semantics, but used for sorting')
-    month: str = Field(None,
-                       title='BibTeX month field',
-                       description='Often a three-letter abbreviation, e.g., Jun')
-    note: str = Field(None,
-                      title='BibTeX note field',
-                      description='No clear semantics.')
-    number: str = Field(None,
-                        title='BibTeX number field',
-                        description='Unclear semantics. May not be a number.')
-    organization: str = Field(None,
-                        title='BibTeX organization field',
-                        description='Often used for techreport or manual.')
-    pages: str = Field(None,
-                       title='BibTeX pages field',
-                       description='A page range, e.g., 5--7')
-    publisher: str = Field(None,
-                       title='BibTeX publisher field',
-                       description='Name of publisher')
-    school: str = Field(None,
-                        title='BibTeX school field',
-                        description='Institution for a thesis')
-    series: str = Field(None,
-                        title='BibTeX series field',
-                        description='Series for books, e.g., LNCS')
-    title: str = Field(None,
-                       title='BibTeX title field',
-                       description='Title of article, book, etc.')
-    url: AnyUrl = Field(None,
-                        title='BibTeX url field',
-                        description='May not be official')
-    volume: str = Field(None,
-                        title='BibTeX volume field',
-                        description='Often present in article')
-    year: conint(ge=1000,le=9999) = Field(None,
-                                          title='BibTeX year field',
-                                          description='Should be 4-digit integer')
-    class Config:
-        extra = Extra.ignore
-
 class Meta(BaseModel):
     """Metadata encoded in LaTeX files using iacrcc.cls."""
     schema_version: SchemaVersion = Field(default=SchemaVersion.VERSION1,
@@ -303,9 +218,6 @@ class Meta(BaseModel):
                                  description='When a paper is submitted, a license must be chosen. This field is required.')
 
 
-    citations: List[Citation] = Field(...,
-                                      title='List of references',
-                                      description='Derived from BibTeX')
     class Config:
         """$schema specifies the JSON schema version; not the version of this object."""
         schema_extra = {
@@ -457,6 +369,9 @@ class Compilation(BaseModel):
     output_files: List[str] = Field([],
                                     title='List of file paths in output directory',
                                     description='Paths are relative to the output directory')
+    bibtex: str = Field(None,
+                        title='BibTeX entries that are cited',
+                        description='List of references cited from the paper in BibTeX format. These are not guaranteed to be valid, but are what the author supplied.')
     
 
 if __name__ == '__main__':

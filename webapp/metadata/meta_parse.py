@@ -5,15 +5,22 @@ Library for handling output meta file from compiling latex.
 from nameparser import HumanName
 from pylatexenc.latex2text import LatexNodes2Text
 from arxiv_latex_cleaner import arxiv_latex_cleaner
-from pybtex.database import parse_string, BibliographyData, BibliographyDataError
+from pybtex.database import parse_string, BibliographyData, BibliographyDataError, Entry
 import pybtex.errors
+import random
+import string
+import tempfile
+import xml.etree.ElementTree as ET
+
 try:
-    from .compilation import CompileError, ErrorType
+    from .compilation import CompileError, ErrorType, Compilation
 except Exception as e:
-    from compilation import CompileError, ErrorType
+    from compilation import CompileError, ErrorType, Compilation
 
 from pathlib import Path
+import os
 import re
+import subprocess
 
 def get_key_val(line):
     """If line has form key: value, then return key, value."""
@@ -149,7 +156,7 @@ _required_fields = {
     "techreport": ["author", "title", "institution", "year/date"],
 }
 
-def check_bib_entry(key, entry):
+def check_bib_entry(key: str, entry: Entry):
     errors = []
     if entry.persons:
         for k in entry.persons:
@@ -168,52 +175,18 @@ def check_bib_entry(key, entry):
                     errors.append('bibtex entry {} requires {} field'.format(key, field))
     return errors
 
-def check_bibtex(output_path, compilation):
-    """Check aux and bibtex files for invalid references."""
+def check_bibtex(compilation: Compilation):
+    """Check aux and bibtex files for invalid references, and add
+       CompileErrors to compilation."""
+    if not compilation.bibtex:
+        compilation.error_log.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+                                                  logline=0,
+                                                  text='No bibtex extracted'))
+        return
     try:
-        aux_file = Path(output_path) / Path('main.aux')
-        if not aux_file.is_file():
-            compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
-                                                      logline=0,
-                                                      text='Missing aux file'))
-            return
-        aux_lines = aux_file.read_text(encoding='UTF-8', errors='replace').splitlines()
-        # These identify the occurrences of \cite in the document. All
-        # should have references.
-        citation_pat = re.compile(r'\\citation{([^}]+)}')
-        bibfile_pat = re.compile(r'\\bibdata{([^}]+)}')
-        cite_keys = set()
-        bibfiles = []
-        for line in aux_lines:
-            res = citation_pat.search(line)
-            if res and res.group(1):
-                for key in res.group(1).split(','):
-                    cite_keys.add(key)
-            res = bibfile_pat.search(line)
-            if res and res.group(1):
-                bibfiles.extend([b+'.bib' for b in res.group(1).split(',')])
-        # now read all of the bibtex files and grab the entries for
-        # these keys. We merge them all into a single database since
-        # each file must be parsed separately. See
-        # https://github.com/sciunto-org/python-bibtexparser/issues/186
-        # bibdatabase = bibtexparser.bibdatabase.BibDatabase()
-        # parser = bibtexparser.bparser.BibTexParser()
-        # parser.interpolate_strings = False
         pybtex.errors.set_strict_mode(False)
-        bibstring = ''
-        for bibfile in bibfiles:
-            bib_path = Path(output_path) / Path(bibfile)
-            bibstring += '\n' + bib_path.read_text(encoding='UTF-8')
-        bibdata = parse_string(bibstring, 'bibtex')
-        used_entries = {}
-        for key in cite_keys:
-            if key not in bibdata.entries:
-                compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
-                                                          logline=0,
-                                                          text='missing reference {}'.format(key)))
-            else:
-                used_entries[key] = bibdata.entries.get(key)
-        for key, entry in used_entries.items():
+        bibdata = parse_string(compilation.bibtex, 'bibtex')
+        for key, entry in bibdata.items():
             try:
                 warnings = check_bib_entry(key, entry)
                 for warning in warnings:
@@ -228,6 +201,75 @@ def check_bibtex(output_path, compilation):
         compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
                                                   logline=0,
                                                   text='Error checking for bibtex problems: {}. This may be a bug'.format(str(e))))
+
+def extract_bibtex(output_path: Path, compilation: Compilation):
+    """This is used to populate the bibtex field of compilation.
+     This implementation uses bibexport, which is only supported
+     under bibtex (not biber). In order to overcome this, we create a
+     temporary aux file that can be processed by bibexport. An
+     alternative implementation could be built by parsing the aux
+     file to extract the \bibcite entries, and then use pybtex or
+     another parser to parse the bibtex files and extract the
+     entries. We chose to use bibexport because it is the fastest and
+     most reliable parser of bibtex.
+    """
+    try:
+        auxfilename = 'main.aux'
+        aux_file = output_path / Path('main.aux')
+        if not aux_file.is_file():
+            compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
+                                                      logline=0,
+                                                      text='Missing aux file'))
+            return
+        bcf_file = output_path / Path('main.bcf')
+        if bcf_file.is_file():
+            # In this case the author used biblatex/biber, so we
+            # create a temporary auxfile to use for bibexport.
+            cite_keys = set()
+            bibsources = []
+            tree = ET.parse(str(bcf_file))
+            root = tree.getroot()
+            for child in root.iter('{https://sourceforge.net/projects/biblatex}citekey'):
+                cite_keys.add(child.text)
+            for child in root.iter('{https://sourceforge.net/projects/biblatex}datasource'):
+                bibsources.append(child.text)
+            bibsources = ','.join([a[:-4] for a in bibsources])
+            auxfilename = 'tmp_' + ''.join(random.choices(string.ascii_uppercase, k=10)) + '.aux'
+            aux_file = output_path / Path(auxfilename)
+            cite_keys = list(cite_keys)
+            tmpauxlines = ['\\citation{' + key + '}' for key in cite_keys]
+            tmpauxlines.append('\\bibstyle{plain}')
+            tmpauxlines.append('\\bibdata{' + bibsources + '}')
+            tmpauxlines.extend(['\\bibcite{' + cite_keys[i] + '}{' + str(i) + '}' for i in range(len(cite_keys))])
+            tmpauxcontents = '\n'.join(tmpauxlines) + '\n'
+            aux_file.write_text(tmpauxcontents, encoding='UTF-8', errors='replace')
+        with tempfile.TemporaryDirectory(dir='.') as tmpdir:
+            bibfile = tmpdir / Path('main.bib')
+            args = ['bibexport', '-o', str(bibfile.resolve()), auxfilename]
+            process = subprocess.run(args,
+                                     cwd=output_path.resolve(),
+                                     encoding='UTF-8',
+                                     errors='replace',
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT)
+            if auxfilename != 'main.aux':
+                aux_file.unlink()
+            if process.returncode:
+                compilation.error_log.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+                                                          logline=0,
+                                                          text='Error in bibexport {}:{}'.format(process.returncode,
+                                                                                                 process.stdout)))
+            if bibfile.is_file():
+                compilation.bibtex = bibfile.read_text(encoding='UTF-8', errors='replace')
+            else:
+                compilation.error_log.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+                                                          logline=0,
+                                                          text='No output from bibexport: {}'.format(process.stdout)))
+    except Exception as e:
+        compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+                                                  logline=0,
+                                                  text='Error checking for bibtex problems: {}. This may be a bug'.format(str(e))))
+
 
 def clean_abstract(text):
     """Remove comments, todos, \begin{comment} from abstract."""
