@@ -47,7 +47,6 @@ RUN useradd -ms /bin/bash texlive
 # so it can write to the staging directory.
 USER texlive:33
 COPY metadata/latex/iacrcc/iacrcc.cls /home/texlive/texmf/tex/latex/iacrcc/iacrcc.cls
-COPY metadata/latex/iacrcc/iacrcc.bst /home/texlive/texmf/bibtex/bst/iacrcc/iacrcc.bst
 COPY metadata/iacrtrans/CC-by.pdf /home/texlive/texmf/tex/latex/iacrcc/CC-by.pdf
 COPY metadata/iacrtrans/iacrtrans.cls /home/texlive/texmf/tex/latex/iacrcc/iacrtrans.cls
 COPY metadata/iacrtrans/settings.tosc.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tosc.tex
