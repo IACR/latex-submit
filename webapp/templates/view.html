@@ -182,10 +182,12 @@ This template is used to show the status of a compilation for iacrcc.cls
           </div>
         </div>
         <div class="tab-pane fade show p-3" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
+          {% if not comp.meta %}
           <p class="alert alert-warning">
             Metadata extraction only works for iacrcc class. For other document classes, authors will
             be required to fill out an elaborate form to supply author information, affiliations, etc.
           </p>
+          {% endif %}
           <h3 id="metadata">Metadata</h3>
           <p class="alert alert-info w-75">
             NOTE: it is important to ensure the accuracy of your metadata, since we use it for
@@ -195,12 +197,12 @@ This template is used to show the status of a compilation for iacrcc.cls
           </p>
           <div class="mx-3">
             <div class="elem" id="paperid"><div class="elem_title">paper id:</div> {{comp.paperid}}</div>
-            <div class="elem" id="venue"><div class="elem_title">venue:</div> {{comp.venue.name}}</div>
+            <div class="elem" id="venue"><div class="elem_title">venue:</div> {{comp.venue}}</div>
             <div class="elem" id="paper_title"><div class="elem_title">Title:</div> {{comp.meta.title}}</div>
             <div class="elem" id="abstract"><div class="elem_title">Abstract:</div><div class="w-50">{{comp.meta.abstract}}</div></div>
             <div class="elem" id="error_log" style="background-color:red;">
             </div>
-            <h5>Authors</h5>
+            <h5 class="mt-3">Authors</h5>
             <div class="list-group">
               {% for author in comp.meta.authors %}
               <div class="author list-group-item">

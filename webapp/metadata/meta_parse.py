@@ -186,7 +186,7 @@ def check_bibtex(compilation: Compilation):
     try:
         pybtex.errors.set_strict_mode(False)
         bibdata = parse_string(compilation.bibtex, 'bibtex')
-        for key, entry in bibdata.items():
+        for key, entry in bibdata.entries.items():
             try:
                 warnings = check_bib_entry(key, entry)
                 for warning in warnings:
