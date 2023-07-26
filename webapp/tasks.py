@@ -115,7 +115,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                     metafile = output_path / Path('main.meta')
                     if metafile.is_file():
                         try:
-                            metastr = metafile.read_text(encoding='UTF-8')
+                            metastr = metafile.read_text(encoding='UTF-8', errors='replace')
                             data = meta_parse.parse_meta(metastr)
                             # Check to see if references have DOIs.
                             for citation in data.get('citations'):
@@ -130,7 +130,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                                                                           logline=0,
                                                                           text='An abstract is required.'))
                             else:
-                                data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8'))
+                                data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8', errors='replace'))
                             compilation.meta = Meta(**data)
                             # Check authors to see if they have ORCID and affiliations.
                             for author in compilation.meta.authors:
