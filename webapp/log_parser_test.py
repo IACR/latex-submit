@@ -143,30 +143,30 @@ def test_no_citations():
     counter = Counter()
     for e in parser.errors:
         counter.update([e.error_type])
-    assert len(parser.errors) == 219
+    assert len(parser.errors) == 216
     assert len(counter) == 5
     assert counter[ErrorType.REFERENCE_ERROR] == 185
-    assert counter[ErrorType.LATEX_WARNING] == 17
+    assert counter[ErrorType.LATEX_WARNING] == 14
     assert counter[ErrorType.OVERFULL_HBOX] == 5
     assert counter[ErrorType.UNDERFULL_HBOX] == 7
     assert counter[ErrorType.UNDERFULL_VBOX] == 5
     assert parser.errors[52].pageno == 7
     assert parser.errors[52].filepath == 'RelatedWork.tex'
-    assert parser.errors[202].filepath == 'opti.tex'
-    assert parser.errors[202].filepath_line == 49
-    assert parser.errors[202].logline == 2321
+    assert parser.errors[202].filepath == 'Experiments.tex'
+    assert parser.errors[202].filepath_line == 11
+    assert parser.errors[202].logline == 2336
 
-    assert parser.errors[152].error_type == ErrorType.OVERFULL_HBOX
-    assert parser.errors[152].logline == 2087
-    assert parser.errors[152].filepath == 'FRand.tex'
-    assert parser.errors[152].filepath_line == 72
-    assert parser.errors[152].severity == 28.24112
+    assert parser.errors[149].error_type == ErrorType.OVERFULL_HBOX
+    assert parser.errors[149].logline == 2087
+    assert parser.errors[149].filepath == 'FRand.tex'
+    assert parser.errors[149].filepath_line == 72
+    assert parser.errors[149].severity == 28.24112
     
-    assert parser.errors[202].error_type == ErrorType.REFERENCE_ERROR
-    assert parser.errors[215].logline == 2409
-    assert parser.errors[215].pageno == 52
-    assert parser.errors[215].filepath == 'Experiments.tex'
-    assert parser.errors[215].filepath_line == 211
+    assert parser.errors[212].error_type == ErrorType.REFERENCE_ERROR
+    assert parser.errors[212].logline == 2409
+    assert parser.errors[212].pageno == 52
+    assert parser.errors[212].filepath == 'Experiments.tex'
+    assert parser.errors[212].filepath_line == 211
     
 def test_working():
     parser = LatexLogParser(wrap_len=2000)
@@ -176,26 +176,25 @@ def test_working():
     counter = Counter()
     for e in parser.errors:
         counter.update([e.error_type])
-    assert len(parser.errors) == 53
+    assert len(parser.errors) == 31
     assert len(counter) == 4
-    assert counter[ErrorType.LATEX_WARNING] == 34
+    assert counter[ErrorType.LATEX_WARNING] == 12
     assert counter[ErrorType.UNDERFULL_VBOX] == 8
     assert counter[ErrorType.OVERFULL_VBOX] == 0
     assert counter[ErrorType.OVERFULL_HBOX] == 4
+    assert parser.errors[19].text == 'Overfull \\hbox (19.71275pt too wide) in paragraph at lines 246--247'
+    assert parser.errors[19].package == None
+    assert parser.errors[19].filepath == 'Relay.tex'
+    assert parser.errors[19].filepath_line == 246
+    assert parser.errors[19].logline == 1637
+    assert parser.errors[19].pageno == 23
 
-    assert parser.errors[22].text == 'Overfull \\hbox (19.71275pt too wide) in paragraph at lines 246--247'
-    assert parser.errors[22].package == None
-    assert parser.errors[22].filepath == 'Relay.tex'
-    assert parser.errors[22].filepath_line == 246
-    assert parser.errors[22].logline == 1637
-    assert parser.errors[22].pageno == 23
-
-    assert parser.errors[29].text == 'Package hyperref Warning: Token not allowed in a PDF string (Unicode):'
-    assert parser.errors[29].package == 'hyperref'
-    assert parser.errors[29].filepath == 'FRand.tex'
-    assert parser.errors[29].filepath_line == 0
-    assert parser.errors[29].logline == 1686
-    assert parser.errors[29].pageno == 27
+    assert parser.errors[30].text == '(\\end occurred inside a group at level 6)'
+    assert parser.errors[30].package == None
+    assert parser.errors[30].filepath == None
+    assert parser.errors[30].filepath_line == 0
+    assert parser.errors[30].logline == 1916
+    assert parser.errors[30].pageno == 57
     
 def test_working79():
     parser = LatexLogParser(wrap_len=79)
@@ -205,31 +204,31 @@ def test_working79():
     counter = Counter()
     for e in parser.errors:
         counter.update([e.error_type])
-    assert len(parser.errors) == 53
+    assert len(parser.errors) == 31
     assert len(counter) == 4
-    assert counter[ErrorType.LATEX_WARNING] == 34
+    assert counter[ErrorType.LATEX_WARNING] == 12
     assert counter[ErrorType.UNDERFULL_VBOX] == 8
     assert counter[ErrorType.OVERFULL_VBOX] == 0
     assert counter[ErrorType.OVERFULL_HBOX] == 4
 
-    assert parser.errors[22].text == 'Overfull \\hbox (19.71275pt too wide) in paragraph at lines 246--247'
-    assert parser.errors[22].package == None
-    assert parser.errors[22].filepath == 'Relay.tex'
-    assert parser.errors[22].filepath_line == 246
-    assert parser.errors[22].logline == 2244
-    assert parser.errors[22].pageno == 23
+    assert parser.errors[19].text == 'Overfull \\hbox (19.71275pt too wide) in paragraph at lines 246--247'
+    assert parser.errors[19].package == None
+    assert parser.errors[19].filepath == 'Relay.tex'
+    assert parser.errors[19].filepath_line == 246
+    assert parser.errors[19].logline == 2244
+    assert parser.errors[19].pageno == 23
 
-    assert parser.errors[29].text == 'Package hyperref Warning: Token not allowed in a PDF string (Unicode):'
-    assert parser.errors[29].package == 'hyperref'
-    assert parser.errors[29].filepath == 'FRand.tex'
-    assert parser.errors[29].filepath_line == 0
-    assert parser.errors[29].logline == 2296
-    assert parser.errors[29].pageno == 27
+    assert parser.errors[14].text == 'Package amsfonts Warning: Obsolete command \\bold; \\mathbf should be used instead on input line 56.'
+    assert parser.errors[14].package == 'amsfonts'
+    assert parser.errors[14].filepath == 'Shamir.tex'
+    assert parser.errors[14].filepath_line == 56
+    assert parser.errors[14].logline == 2163
+    assert parser.errors[14].pageno == 11
 
-    assert parser.errors[49].text == r'Overfull \hbox (81.72266pt too wide) in paragraph at lines 54--67'
-    assert parser.errors[49].logline == 2462
-    assert parser.errors[49].severity == 81.72266
-    assert parser.errors[49].filepath_line == 54
+    assert parser.errors[27].text == r'Overfull \hbox (81.72266pt too wide) in paragraph at lines 54--67'
+    assert parser.errors[27].logline == 2462
+    assert parser.errors[27].severity == 81.72266
+    assert parser.errors[27].filepath_line == 54
     
 def test_iacrdoc():
     parser = LatexLogParser(wrap_len=79)
@@ -241,12 +240,12 @@ def test_iacrdoc():
     for e in parser.errors:
         type_counter.update([e.error_type])
         package_counter.update([e.package])
-    assert len(parser.errors) == 42
-    assert len(type_counter) == 2
-    assert type_counter[ErrorType.LATEX_WARNING] == 40
+    assert len(parser.errors) == 2
+    assert len(type_counter) == 1
     assert type_counter[ErrorType.OVERFULL_HBOX] == 2
-    assert len(package_counter) == 2
-    assert package_counter['hyperref'] == 38
+    print(package_counter)
+    assert len(package_counter) == 1
+    assert package_counter['hyperref'] == 0
 
 def test_lualatex():
     parser = LatexLogParser(wrap_len=79)
@@ -258,10 +257,10 @@ def test_lualatex():
     for e in parser.errors:
         type_counter.update([e.error_type])
         package_counter.update([e.package])
-    assert len(parser.errors) == 56
+    assert len(parser.errors) == 18
     assert len(type_counter) == 3
-    assert len(package_counter) == 3
-    assert package_counter['hyperref'] == 36
+    assert len(package_counter) == 2
+    assert package_counter['hyperref'] == 0
     
 def test_file_stack():
     parser = LatexLogParser(wrap_len=200)
@@ -283,4 +282,4 @@ def test_fontspec_error():
     assert len(parser.errors) == 3
     parser = LatexLogParser()
     parser.parse_file(Path('testdata/logs/fontawesome'))
-    assert len(parser.errors) == 48
+    assert len(parser.errors) == 36

@@ -129,6 +129,19 @@ class LatexLogParser:
         # currfile.sty, but apparently neither is required.
         self.opened_files = [main_file] #, class_file] # , 'currfile.sty']
 
+    def error_ignored(self, error):
+        """We have chosen to ignore some errors as they are unhelpful.
+           hyperref mostly complains about mathematics in section headings,
+           but we deem these unimportant. sectsty.sty complains about
+           redefinition of \\underline, but we don't use that in section
+           headings.
+        """
+        if error.filepath and error.filepath.endswith('sectsty.sty'):
+            return True
+        if error.package and error.package == 'hyperref':
+            return True
+        return False
+
     def current_file(self):
         if len(self.opened_files):
             return self.opened_files[-1]
@@ -287,7 +300,7 @@ class LatexLogParser:
 
             line = ''
             lineno = i + 1
-            if error:
+            if error and not self.error_ignored(error):
                 self.errors.append(error)
                 if debug:
                     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
