@@ -80,9 +80,9 @@ This template is used to show search on fundreg.
   <h2>Metadata search</h2>
   <p class="mt-2">
     This is designed to help you locate identifiers for the macros
-    <i-mono>\affiliation</i-mono> and <i-mono>\addfunding</i-mono> in
+    <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> in
     <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>.
-    ROR IDs are intended for use in <i-mono>\affiliation</i-mono>.
+    ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono>.
     FUNDREG identifiers are intended for <i-mono>\addfunding</i-mono>, but you may
     also use ROR IDs if you received funding as a visitor.
     Search is performed as you type. <a href="#helpModal" data-bs-toggle="modal">Help</a>
@@ -132,17 +132,17 @@ This template is used to show search on fundreg.
 <p>
   For an affiliation:<button id="bibcopy" class="ms-3 btn btn-sm btn-secondary"
                                         aria-label="Copy to clipboard"
-                                        onclick="copyMetadata('bibcopy', 'latexaffiliation')">Copy \affiliation to clipboard</button>
+                                        onclick="copyMetadata('bibcopy', 'latexaffiliation')">Copy \addaffiliation to clipboard</button>
 </p>
 <pre id="latexaffiliation" class="mt-2 py-2">
-\affiliation[ror        = {{item.source_id}},
-             onclick    = {optional url},
-             department = {optional department},
-             street     = {optional street address},
-             city       = {optional city},
-             state      = {optional state or region},
-             postcode   = {optional postal code},
-             country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+\addaffiliation[ror        = {{item.source_id}},
+                onclick    = {optional url},
+                department = {optional department},
+                street     = {optional street address},
+                city       = {optional city},
+                state      = {optional state or region},
+                postcode   = {optional postal code},
+                country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
 </pre>
 <p class="mt-4">
   To cite funding as a visitor: <button id="fundingcopy" class="ms-3 btn btn-sm btn-secondary"
@@ -321,11 +321,11 @@ This template is used to show search on fundreg.
       </div>
       <div class="modal-body">
         <p>
-          The <i-mono>\addfunding</i-mono> and <i-mono>\affiliation</i-mono> macros in
+          The <i-mono>\addfunding</i-mono> and <i-mono>\addaffiliation</i-mono> macros in
           <i-mono>iacrcc.cls</i-mono> can use IDs that globally identify organizations.
         </p>
         <p>
-          The <i-mono>\affiliation</i-mono> macro expects an ID from the
+          The <i-mono>\addaffiliation</i-mono> macro expects an ID from the
           <a href="https://ror.org/" target="_blank">Research Organization Registry</a> (ROR).
           Not every organization will have such an ID, but there are
           now 102,000 organizations that have been registered.
