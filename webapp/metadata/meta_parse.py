@@ -162,6 +162,10 @@ def check_bib_entry(key: str, entry: Entry):
         for k in entry.persons:
             entry.fields[k] = entry.persons[k]
     typ = entry.type.lower()
+    if 'title' in entry.fields:
+        title = entry.fields['title']
+    else:
+        title = 'Unknown title'
     if typ not in _required_fields:
         errors.append('unrecognized bibtex type for {}: @{}'.format(key, typ))
     else:
@@ -169,10 +173,15 @@ def check_bib_entry(key: str, entry: Entry):
             if '/' in field:
                 alts = field.split('/')
                 if alts[0] not in entry.fields and alts[1] not in entry.fields:
-                    errors.append('bibtex entry {} should have {} field or {} field'.format(key, alts[0], alts[1]))
+                    errors.append('bibtex entry {} ({}) should have {} field or {} field'.format(key,
+                                                                                                 title,
+                                                                                                 alts[0],
+                                                                                                 alts[1]))
             else:
                 if field not in entry.fields:
-                    errors.append('bibtex entry {} requires {} field'.format(key, field))
+                    errors.append('bibtex entry {} ({}) requires {} field'.format(key,
+                                                                                  title,
+                                                                                  field))
     return errors
 
 def check_bibtex(compilation: Compilation):

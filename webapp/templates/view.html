@@ -207,7 +207,7 @@ This template is used to show the status of a compilation for iacrcc.cls
               {% for author in comp.meta.authors %}
               <div class="author list-group-item">
                 <div class="d-flex author_name"><div class="elem_title">name:</div> {{author.name}}</div>
-                <div class="d-flex author_surname"><div class="elem_title">surname:</div> {{author.surname}}</div>
+                <div class="d-flex author_surname"><div class="elem_title">surname:</div>{% if author.surname %}{{author.surname}}{% else %}<span class="text-danger">None</span>{% endif %}</div>
                 <div class="d-flex author_email"><div class="elem_title">email:</div> {{author.email}}</div>
                 <div class="d-flex author_orcid"><div class="elem_title">orcid:</div>
                   {% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None</span>{% endif %}</div>

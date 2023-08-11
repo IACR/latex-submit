@@ -439,7 +439,7 @@ def final_review():
         form.auth.errors.append('Validation failed')
         return render_template('message.html',
                                title='Please go back and try again',
-                               error='Final review valbidation failed. This is a bug')
+                               error='Final review validation failed. This is a bug')
     paperid = form.paperid.data
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()

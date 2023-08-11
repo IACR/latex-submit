@@ -7,3 +7,5 @@ flask-login
 sqlalchemy
 arxiv-latex-cleaner
 pybtex
+pandas
+country-converter

@@ -67,7 +67,7 @@ def run_latex(cmd, input_dirname, output_dirname):
                 warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
             elif file_path.name.endswith('.sty'):
-                warnings.append('You should not upload style files. Style file {} may result in copy editing problems if you violate the journal style.'.format(file_path.name))
+                warnings.append('You should avoid uploading style files. Style file {} may result in copy editing problems if you violate the journal style.'.format(file_path.name))
             else:
                 file_path.chmod(0o644)
     # Remove any leftover files from LaTeX or latexmk runs by the author

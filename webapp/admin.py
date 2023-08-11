@@ -289,8 +289,8 @@ def final_review(paperid):
     for filename, file in candidate_file_map.items():
         final_file = final_file_map.get(filename)
         if final_file:
-            candidate_lines = file.read_text(encoding='UTF-8').splitlines()
-            final_lines = final_file.read_text(encoding='UTF-8').splitlines()
+            candidate_lines = file.read_text(encoding='UTF-8', errors='replace').splitlines()
+            final_lines = final_file.read_text(encoding='UTF-8', errors='replace').splitlines()
             if candidate_lines != final_lines:
                 htmldiff = HtmlDiff(tabsize=2)
                 diffs[filename] = htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5)

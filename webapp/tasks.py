@@ -102,9 +102,9 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             compilation.exit_code = output.get('exit_code', -1)
             if compilation.exit_code != 0:
                 compilation.status = CompileStatus.COMPILATION_FAILED
-                compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_ERROR,
-                                                          logline=0,
-                                                          text='Exit code of {} means that the compilation failed'.format(compilation.exit_code)))
+                compilation.error_log.insert(0, CompileError(error_type=ErrorType.LATEX_ERROR,
+                                                             logline=0,
+                                                             text='Exit code of {} because the compilation failed'.format(compilation.exit_code)))
             elif compilation.venue != 'cic':
                 compilation.status = CompileStatus.COMPILATION_SUCCESS
             if compilation.status != CompileStatus.COMPILATION_FAILED:
