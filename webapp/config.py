@@ -18,7 +18,8 @@ class Config:
     DATA_DIR = 'webapp/data'
     SITE_NAME = 'IACR Publishing Portal'
     SITE_SHORTNAME = 'IACR CiC'
-    JOURNAL_NAME = 'IACR Communications in Cryptology'
+    PUBLISHER_NAME = 'International Association for Cryptologic Research'
+    CROSSREF_PUBLISHER_EMAIL = 'crossref@iacr.org'
     USERS = None
     TESTING = False
     JOURNALS = [
@@ -40,7 +41,7 @@ class Config:
             'ISSN': '2569-2925',
             'DOI_PREFIX': '10.45686'
         },
-        { # This will not go into production
+        {
             'key': 'lncs',
             'name': 'Lecture Notes in Computer Science',
             'ISSN': '1611-3349',

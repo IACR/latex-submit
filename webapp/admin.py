@@ -14,7 +14,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal
+from .metadata.db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -331,7 +331,7 @@ def finish_copyedit():
     msg = Message('Copy editing was finished on your paper',
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[paper_status.email])
-    maildata = {'journal_name': app.config['JOURNAL_NAME'],
+    maildata = {'journal_name': app.config['SITE_NAME'],
                 'paperid': paperid,
                 'numitems': numitems,
                 'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),

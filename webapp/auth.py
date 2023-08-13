@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Blueprint, flash, abort, redirect, request, render_template, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 #from . import User
-from .db_models import User, Role
+from .metadata.db_models import User, Role
 from . import db, login_manager, validate_hmac
 from .forms import LoginForm, PasswordForm
 from urllib.parse import urlparse, urljoin

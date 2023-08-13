@@ -2,14 +2,16 @@
 This defines the database models for SQLAlchemy in 2.0 style.
 """
 from datetime import datetime
-from .metadata.compilation import PaperStatusEnum
+try:
+    from .compilation import PaperStatusEnum
+except:
+    from compilation import PaperStatusEnum
 from enum import Enum
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Integer, String, Text, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from . import db
 from typing import List, Optional
 
 class Role(str, Enum):
@@ -125,7 +127,7 @@ class LogEvent(Base):
     dt: Mapped[datetime] = mapped_column(DateTime, index=True, nullable=False)
     action: Mapped[str] = mapped_column(Text, nullable=False) # free text field
 
-def log_event(paperid, action):
+def log_event(db, paperid, action):
     event = LogEvent(paperid=paperid,dt=datetime.now(),action=action)
     db.session.add(event)
     db.session.commit()

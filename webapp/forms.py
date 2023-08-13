@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
 from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField
-from .db_models import Role, validate_version, Version
+from .metadata.db_models import Role, validate_version, Version
 from .metadata import validate_paperid
 from .metadata.compilation import dt_regex
 import random, string # TODO - remove this

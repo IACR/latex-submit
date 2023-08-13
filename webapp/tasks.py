@@ -13,7 +13,7 @@ from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType
 from .log_parser import LatexLogParser
-from .db_models import CompileRecord, TaskStatus
+from .metadata.db_models import CompileRecord, TaskStatus
 
 
 def is_fatal(err):

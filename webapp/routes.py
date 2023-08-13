@@ -11,7 +11,7 @@ import shutil
 from sqlalchemy import select
 from sqlalchemy.sql import func
 import string
-from .db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
+from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum
 from .metadata import validate_paperid, get_doi
@@ -98,7 +98,7 @@ def submit_version():
     now = datetime.datetime.now()
     form = SubmitForm()
     if task_queue.get(task_key):
-        log_event(paperid, 'Attempt to resubmit while compiling')
+        log_event(db, paperid, 'Attempt to resubmit while compiling')
         msg = 'Already running {}:{}'.format(form.paperid.data,
                                              form.version.data)
         logging.warning(msg)
@@ -172,7 +172,7 @@ def submit_version():
         # TODO: check that discussion items are finished
         send_mail = True
         version = Version.FINAL.value
-    log_event(paperid, 'Upload of zip file for {}'.format(version))
+    log_event(db, paperid, 'Upload of zip file for {}'.format(version))
     version_dir = paper_dir / Path(version)
     # This blows everything away for the version.
     if version_dir.is_dir():
@@ -208,12 +208,12 @@ def submit_version():
         zip_file.extractall(input_dir)
     except Exception as e:
         logging.error('Unable to extract from zip file: {}'.format(str(e)))
-        log_event(paperid, 'Zip file could not be unzipped')
+        log_event(db, paperid, 'Zip file could not be unzipped')
         form.zipfile.errors.append('Unable to extract from zip file: {}'.format(str(e)))
         return render_template('submit.html', form=form)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
-        log_event(paperid, 'Zip file did not have main.tex at top level')
+        log_event(db, paperid, 'Zip file did not have main.tex at top level')
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
         return render_template('submit.html', form=form)
@@ -224,7 +224,7 @@ def submit_version():
         if f.is_file() and f.name.endswith('.tex'):
             txt = f.read_text(encoding='utf-8', errors='replace')
             if '\\begin{thebibliography}' in txt:
-                log_event(paperid, 'LaTeX file with thebibligraphy in it')
+                log_event(db, paperid, 'LaTeX file with thebibligraphy in it')
                 form.zipfile.errors.append('Your latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex.')
                 return render_template('submit.html', form=form)
     command = ENGINES.get(args.get('engine'))
@@ -256,7 +256,7 @@ def submit_version():
     receivedDate = datetime.datetime.strptime(submitted[:10],'%Y-%m-%d')
     acceptedDate = datetime.datetime.strptime(accepted[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
-    metadata = '\\def\\IACR@DOI{' + get_doi(paperid) + '}\n'
+    metadata = '\\def\\IACR@DOI{' + get_doi(journal.DOI_PREFIX, paperid) + '}\n'
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
@@ -330,7 +330,7 @@ def compile_for_copyedit():
                                error = 'Paper was already sent for copy editing.')
     task_key = paper_key(paperid, Version.COPYEDIT.value)
     if task_queue.get(task_key):
-        log_event(paperid, 'Attempt to resubmit while compiling')
+        log_event(db, paperid, 'Attempt to resubmit while compiling')
         msg = 'Already running {}:{}'.format(form.paperid.data,
                                              Version.COPYEDIT.value)
         logging.warning(msg)
@@ -357,7 +357,7 @@ def compile_for_copyedit():
     paper_status.status = PaperStatusEnum.EDIT_PENDING
     db.session.add(paper_status)
     db.session.commit()
-    log_event(paperid, 'Paper {} submitted for copy edit'.format(paperid))
+    log_event(db, paperid, 'Paper {} submitted for copy edit'.format(paperid))
     copyedit_dir = paper_dir / Path(Version.COPYEDIT.value)
     if copyedit_dir.is_dir():
         shutil.rmtree(copyedit_dir)

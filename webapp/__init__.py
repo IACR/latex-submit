@@ -83,7 +83,7 @@ def create_app(config):
     def shutdown_session(ex):
         db.session.remove()
     app.teardown_request(shutdown_session)
-    from webapp.db_models import Base, User, Journal
+    from webapp.metadata.db_models import Base, User, Journal
     Base.query = db.session.query_property()
     # Create database tables if they don't already exist.
     Base.metadata.create_all(bind=db.engine)
