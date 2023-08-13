@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+    xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+    xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+    <head>
+        <doi_batch_id>test.x</doi_batch_id>
+        <timestamp>2021010100000000</timestamp>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+        <registrant>Society of Metadata Idealists</registrant>
+    </head>
+    <body>
+        <posted_content type="preprint">
+            <group_title>Metadata Quality</group_title>
+            <contributors>
+                <person_name sequence="first" contributor_role="author">
+                    <given_name>Minerva</given_name>
+                    <surname>Housecat</surname>
+                    <affiliations>
+                        <institution>
+                            <institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+                        </institution>
+                        <institution>
+                            <institution_name>Secret Society of Non-registered Societies</institution_name>
+                            <institution_acronym>SSocNoRegS</institution_acronym>
+                            <institution_place>Roswell, NM, USA</institution_place>
+                        </institution>
+                    </affiliations>
+                    <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+                </person_name>
+                <person_name sequence="additional" contributor_role="author">
+                    <given_name>Josiah</given_name>
+                    <surname>Carberry</surname>
+                    <affiliations>
+                        <institution>
+                            <institution_id type="ror">https://ror.org/05gq02987</institution_id>
+                        </institution>
+                    </affiliations>
+                    <ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+                </person_name>
+            </contributors>
+            <titles>
+                <title> When your best metadata isn't good enough: working with an imperfect specification </title>
+                <original_language_title language="fr">Quand vos meilleures métadonnées ne suffisent pas: travailler avec une spécification imparfaite</original_language_title>
+            </titles>
+            <posted_date>
+                <month>01</month>
+                <day>13</day>
+                <year>2018</year>
+            </posted_date>            
+            <acceptance_date>
+                <month>02</month>
+                <day>13</day>
+                <year>2018</year>
+            </acceptance_date>  
+            <institution>
+                <institution_name>Crossref</institution_name>
+                <institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+                <institution_id type="isni">https://www.isni.org/0000000405062673</institution_id>
+                <institution_id type="wikidata">https://www.wikidata.org/entity/Q5188229</institution_id>
+                
+                <institution_acronym>CR</institution_acronym>
+                <institution_place>Lynnfield, MA</institution_place>
+                <institution_department>Feline Outreach</institution_department>
+            </institution>
+            <institution>
+                <institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+            </institution>
+            <institution>
+                <institution_name>Society of Metadata Idealists</institution_name>
+            </institution>
+            <item_number>XYZ-879JFIWERJKJLFJDSL-????</item_number>
+            <fr:program name="fundref">
+                <fr:assertion name="fundgroup">
+                    <fr:assertion name="funder_name"> National Science Foundation
+                        <fr:assertion name="funder_identifier"
+                            >100000001</fr:assertion>
+                    </fr:assertion>
+                    <fr:assertion name="award_number">CHE-1152342</fr:assertion>
+                </fr:assertion>
+            </fr:program>
+            <program xmlns="http://www.crossref.org/AccessIndicators.xsd">
+                <free_to_read start_date="2016-01-01"/>
+                <license_ref>http://example.org/license_page.html</license_ref>
+            </program>
+           
+            <program xmlns="http://www.crossref.org/relations.xsd">
+                <related_item>
+                    <intra_work_relation relationship-type="isPreprintOf" identifier-type="doi">10.32013/12345678</intra_work_relation>
+                </related_item>
+            </program>
+            
+            <doi_data>
+                <doi>10.32013/gRUKLJA</doi>
+                <resource>https://www.crossref.org/xml-samples/</resource>
+            </doi_data>
+            <citation_list>
+                <citation key="ref1">
+                    <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/12345678 </unstructured_citation>
+                    <doi>10.32013/12345678</doi>
+                </citation>
+                <citation key="ref2">
+                    <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). Quand vos meilleures métadonnées ne suffisent pas: travailler avec une spécification imparfaite. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/4859104 </unstructured_citation>
+                    <doi>10.32013/4859104</doi>
+                </citation>
+                <citation key="ref3">
+                    <doi>10.32013/s4947892</doi>
+                </citation>
+                <citation key="ref4">
+                    <unstructured_citation>Surname, B. (2009). Obese Cat Care. Crossref. https://doi.org/10.32013/9min5ys </unstructured_citation>
+                    <doi>10.32013/9min5ys</doi>
+                </citation>
+                <citation key="ref5">
+                    <unstructured_citation>Carberry, J. (2018, November 23). The importance of good examples. Crossref LIVE18. Crossref LIVE18. https://doi.org/10.32013/aubagie </unstructured_citation>
+                    <doi>10.32013/aubagie</doi>
+                </citation>
+                <citation key="ref6">
+                    <unstructured_citation>Housecat, M., &amp;, J. (2019). Are black cats better than other cats: a very comprehensive study. In Obese Cat Care (pp. 2–47). Crossref. https://doi.org/10.32013/cqy34fj
+                    </unstructured_citation>
+                    <doi>10.32013/cqy34fj</doi>
+                </citation>
+                <citation key="ref7">
+                    <unstructured_citation>Foisey, H., &amp; Housecat, M. (n.d.). Examining metadata practices across dissertation depositors. Society of Psychoceramics. https://doi.org/10.32013/go7be8 </unstructured_citation>
+                    <doi>10.32013/go7be8</doi>
+                </citation>
+                <citation key="ref8">
+                    <unstructured_citation>Housecat, M., &amp;, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Society of Psychoceramics. https://doi.org/10.32013/gruklja
+                    </unstructured_citation>
+                    <doi>10.32013/gruklja</doi>
+                </citation>
+                <citation key="ref9">
+                    <unstructured_citation>Feeney, P. (2019). Really bad metadata [Data set]. In Metadata Quality Analysis. Society of Psychoceramics. https://doi.org/10.32013/woygbn8 </unstructured_citation>
+                    <doi>10.32013/woygbn8</doi>
+                </citation>
+                <citation key="ref10">
+                    <unstructured_citation>Figure 1: Best practices by industry. (n.d.). Society of Psychoceramics. https://doi.org/10.32013/tm9b6mw
+                    </unstructured_citation>
+                    <doi>10.32013/tm9b6mw</doi>
+                </citation>
+            </citation_list>
+        </posted_content>
+    </body>
+</doi_batch>

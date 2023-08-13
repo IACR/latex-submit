@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+	xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+	<head>
+		<doi_batch_id>test.x</doi_batch_id>
+		<timestamp>2021010100000000</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<database>
+			<database_metadata language="en">
+				<titles><title>Crossref Datasets</title></titles>
+				<institution>
+					<institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+					<institution_id type="isni">https://www.isni.org/0000000405062673</institution_id>
+					<institution_id type="wikidata">https://www.wikidata.org/entity/Q5188229</institution_id>
+					<institution_department>Feline Outreach</institution_department>
+				</institution>
+				<institution>
+					<institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+				</institution>
+				<institution>
+					<institution_name>Society of Metadata Idealists</institution_name>
+				</institution>
+				<doi_data>
+					<doi>10.32013/-92iYfI</doi>
+					<resource>https://www.crossref.org/xml-samples</resource>
+				</doi_data>
+			</database_metadata>
+			<dataset dataset_type="collection">
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Minerva</given_name>
+						<surname>Housecat</surname>
+						<affiliations>
+							<institution>
+								<institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+								<institution_id type="isni">https://www.isni.org/0000000405062673</institution_id>
+								<institution_id type="wikidata">https://www.wikidata.org/entity/Q5188229</institution_id>
+								<institution_department>Feline Outreach</institution_department>
+							</institution>
+						</affiliations>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+					</person_name>
+				</contributors>
+				<titles><title>Tissue-specific expression patterns of nuclear receptors</title></titles>
+				<database_date>
+					<creation_date>
+						<month>10</month>
+						<day>10</day>
+						<year>2020</year>
+					</creation_date>
+					<publication_date>
+						<month>10</month>
+						<day>10</day>
+						<year>2020</year>
+					</publication_date>
+					<update_date>
+						<month>10</month>
+						<day>10</day>
+						<year>2020</year>
+					</update_date>
+				</database_date>
+				<publisher_item>
+					<item_number item_number_type="veryimportant">3333333</item_number>
+				</publisher_item>
+				<description language="en">This description will be expanded later</description>
+				<format mime_type="text/html"/>
+				<archive_locations>
+					<archive name="Portico"/>
+					<archive name="CLOCKSS"/>
+					<archive name="DWT"/>
+					<archive name="Internet Archive"/>
+					<archive name="KB"/>
+					<archive name="LOCKSS"/>
+				</archive_locations>
+				<doi_data>
+					<doi>10.32013/NP6QoBh</doi>
+					<resource>https://www.crossref.org/xml-samples</resource>
+				</doi_data>
+			</dataset>
+			<dataset dataset_type="collection">
+				<contributors>
+					<person_name contributor_role="author" sequence="first">
+						<given_name>R</given_name><surname>Evans</surname>
+					</person_name>
+				</contributors>
+				<titles><title>Circadian expression patterns of nuclear receptors</title></titles>
+				<doi_data>
+					<doi>10.32013/Qi-8hfR</doi>
+					<resource>https://www.crossref.org/xml-samples</resource>
+				</doi_data>
+			</dataset>
+
+		</database>
+	</body>
+</doi_batch>

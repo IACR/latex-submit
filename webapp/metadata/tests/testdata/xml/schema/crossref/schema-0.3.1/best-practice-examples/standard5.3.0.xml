@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+	xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+	<head>
+		<doi_batch_id>test.x</doi_batch_id>
+		<timestamp>2021010100000000</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<standard>
+			<standard_metadata language="en">
+				<contributors>
+					<organization sequence="first" contributor_role="author">Crossref Standards TWG</organization>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Minerva</given_name>
+						<surname>Housecat</surname>
+						<affiliations>
+							<institution>
+								<institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+								<institution_department>Feline Outreach</institution_department>
+							</institution>
+							<institution>
+								<institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+							</institution>
+						</affiliations>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+					</person_name>
+				</contributors>
+				<titles>
+					<title>A basic example of a standard</title>
+				</titles>
+				<designators>
+					<std_as_published>
+						<std_designator>CR 1234</std_designator>
+					</std_as_published>
+				</designators>
+				<approval_date>
+					<month>04</month>
+					<day>17</day>
+					<year>1995</year>
+				</approval_date>
+				<publisher>
+					<publisher_name>Crossref</publisher_name>
+					<publisher_place>Bethesda, MD</publisher_place>
+				</publisher>
+				<standards_body>
+					<standards_body_name>Crossref</standards_body_name>
+					<standards_body_acronym>CRABC</standards_body_acronym>
+				</standards_body>
+				<publisher_item>
+					<item_number item_number_type="designation">12083</item_number>
+				</publisher_item>
+				<doi_data>
+					<doi>10.32013/j.fJdkK</doi>
+					<resource>https://www.crossref.org/xml-samples</resource>
+				</doi_data>
+			</standard_metadata>
+		</standard>
+	</body>
+</doi_batch>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 ../../schemas/crossref5.3.0.xsd"
+    xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+    xmlns:fr="http://www.crossref.org/fundref.xsd" version="5.3.0" xmlns:mml="http://www.w3.org/1998/Math/MathML">
+    <head>
+        <doi_batch_id>test.x</doi_batch_id>
+        <timestamp>2021010100000000</timestamp>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+        <registrant>Society of Metadata Idealists</registrant>
+    </head>
+    <body>
+        <journal>
+            <journal_metadata language="en" reference_distribution_opts="any">
+                <full_title>Journal of Crossref Test Data that will be used for testing but not best practices</full_title>
+                <abbrev_title>JOCTD</abbrev_title>
+                <issn media_type="electronic">1942-4027</issn>
+                <issn media_type="print">2165-848X</issn>
+                <issn media_type="print">0956-4039</issn>
+                <issn media_type="print">1015-7948</issn>
+                <issn media_type="electronic">2200-3053</issn>
+                <issn media_type="print">0959-6232</issn>
+                <coden>xyIUB8</coden>
+
+                <archive_locations>
+                    <archive name="Portico"/>
+                    <archive name="CLOCKSS"/>
+                    <archive name="DWT"/>
+                    <archive name="Internet Archive"/>
+                    <archive name="KB"/>
+                    <archive name="LOCKSS"/>
+                </archive_locations>
+                <doi_data>
+                    <doi>10.32013/ScF8aU8</doi>
+                    <timestamp>2021010100000000</timestamp>
+                    <resource content_version="vor" mime_type="multipart/digest"
+                        >https://www.crossref.org/xml-samples</resource>
+
+  
+                </doi_data>
+            </journal_metadata>
+            <journal_issue>
+                <!-- contributors and title are mostly relevant for special issues that have guest editors -->
+                <contributors>
+                    <person_name sequence="first" contributor_role="editor">
+                        <given_name>Violet</given_name>
+                        <surname>Wolf</surname>
+                        <suffix>IIIIVX</suffix>
+                        <affiliations>
+                            <institution>
+                                <institution_id type="ror">https://ror.org/05gq02987</institution_id>
+                            </institution>
+                        </affiliations>
+                    </person_name>
+                    <anonymous sequence="first" contributor_role="author"/>
+                </contributors>
+                <titles>
+                    <title>Very Special Issue</title> </titles>
+                <publication_date media_type="online">
+                    <month>07</month>
+                    <day>07</day>
+                    <year>2021</year>
+                </publication_date>
+                <publication_date media_type="print">
+                    <month>34</month>
+                    <day>07</day>
+                    <year>2021</year>
+                </publication_date>
+                <publication_date media_type="other">
+                    <month>07</month>
+                    <day>07</day>
+                    <year>2021</year>
+                </publication_date>
+                <journal_volume>
+                    <volume>4</volume>
+                    
+                    <archive_locations>
+                        <archive name="Portico"/>
+                        <archive name="CLOCKSS"/>
+                        <archive name="DWT"/>
+                        <archive name="Internet Archive"/>
+                        <archive name="KB"/>
+                        <archive name="LOCKSS"/>
+                    </archive_locations>
+                    <doi_data>
+                        <doi>10.32013/U.4fAZy4</doi>
+                        <resource>https://gitlab.com/crossref/schema</resource>
+                    </doi_data>
+                </journal_volume>
+                <issue>1</issue>
+                <archive_locations>
+                    <archive name="Portico"/>
+                    <archive name="CLOCKSS"/>
+                    <archive name="DWT"/>
+                    <archive name="Internet Archive"/>
+                    <archive name="KB"/>
+                    <archive name="LOCKSS"/>
+                </archive_locations>
+                <doi_data>
+                    <doi>10.32013/B2Y7qLJ</doi>
+                    <resource>https://gitlab.com/crossref/schema</resource>
+                </doi_data>
+            </journal_issue>
+        </journal>        
+    </body>
+</doi_batch>

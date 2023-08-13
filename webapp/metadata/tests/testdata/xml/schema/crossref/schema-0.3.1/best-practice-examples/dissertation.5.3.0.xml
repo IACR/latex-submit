@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+  xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+  xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML"
+  version="5.3.0">
+  <head>
+    <doi_batch_id>test.x</doi_batch_id>
+    <timestamp>2021010100000000</timestamp>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+    <registrant>Society of Metadata Idealists</registrant>
+  </head>
+  <body>
+  <dissertation publication_type="full_text" language="en" >
+    <contributors>
+      <person_name sequence="first" contributor_role="editor">
+        <given_name>Moxie-Crimefighter!</given_name>
+        <surname>Chewbacca</surname>
+        <suffix>IIIIVX</suffix>
+        <affiliations>
+          <institution>
+            <institution_id type="ror">https://ror.org/01bj3aw27</institution_id>
+            <institution_id type="isni">https://www.isni.org/0000000123423717</institution_id>
+          </institution>
+          <institution>
+            <institution_id type="ror">https://ror.org/05gq02987</institution_id>
+          </institution>
+        </affiliations>
+      </person_name>    
+      <anonymous sequence="first" contributor_role="author"/>
+    </contributors>
+    <titles>
+      <title>Examining metadata practices across dissertation depositors</title>
+    </titles>
+    <jats:abstract>
+      <jats:p xml:lang="fr">Meilleures pratiques agiles, leadership éclairé impact collectif impact investir dans les familles. Et égalité des chances vibrante, la, narration les métadonnées de synergie sont un défi sans précédent pour B-corp. Entreprise la philanthropie cultive l’impact et la situation actuelle; livre blanc en collaboration consommation entrepreneur des villes collaboratives inclusives. Parse empower mouvements de communautés ciblés; radical; résultats de problèmes d'entreprise sociale la philanthropie du big data.</jats:p>
+    </jats:abstract>
+    <jats:abstract>
+      <jats:p xml:lang="en">Agile best practices, thought leadership collective impact impact investing to families. And equal opportunity vibrant, the, storytelling synergy metadata matters B-corp unprecedented challenge. Venture philanthropy cultivate impact, state of play; white paper collaborative consumption entrepreneur collaborative cities inclusive. Parse empower communities movements targeted; radical; social enterprise issue outcomes big data venture philanthropy. </jats:p>
+    </jats:abstract>
+    <approval_date>
+      <month>01</month>
+      <day>31</day>
+      <year>2015</year>
+    </approval_date>
+    <institution>
+      <institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+      <institution_id type="isni">https://www.isni.org/0000000405062673</institution_id>
+      <institution_id type="wikidata">https://www.wikidata.org/entity/Q5188229</institution_id>
+      <institution_department>Feline Outreach</institution_department>
+   </institution>
+    <institution>
+      <institution_id type="ror">https://ror.org/04fa4r544</institution_id>
+      <institution_id type="isni">https://www.isni.org/0000000446638501</institution_id>
+      <institution_id type="wikidata">https://www.wikidata.org/entity/Q19861084</institution_id>
+    </institution>  
+    <degree>MLIS</degree>
+    <doi_data>
+      <doi>10.32013/GO7BE8</doi>
+      <resource>https://www.crossref.org/xml-samples/</resource>
+    </doi_data>
+    <citation_list>
+      <citation key="ref1">
+        <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/12345678 </unstructured_citation>
+        <doi>10.32013/12345678</doi>
+      </citation>
+      <citation key="ref2">
+        <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). Quand vos meilleures métadonnées ne suffisent pas: travailler avec une spécification imparfaite. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/4859104 </unstructured_citation>
+        <doi>10.32013/4859104</doi>
+      </citation>
+      <citation key="ref3">
+        <doi>10.32013/s4947892</doi>
+      </citation>
+      <citation key="ref4">
+        <unstructured_citation>Surname, B. (2009). Obese Cat Care. Crossref. https://doi.org/10.32013/9min5ys </unstructured_citation>
+        <doi>10.32013/9min5ys</doi>
+      </citation>
+      <citation key="ref5">
+        <unstructured_citation>Carberry, J. (2018, November 23). The importance of good examples. Crossref LIVE18. Crossref LIVE18. https://doi.org/10.32013/aubagie </unstructured_citation>
+        <doi>10.32013/aubagie</doi>
+      </citation>
+      <citation key="ref6">
+        <unstructured_citation>Housecat, M., &amp;, J. (2019). Are black cats better than other cats: a very comprehensive study. In Obese Cat Care (pp. 2–47). Crossref. https://doi.org/10.32013/cqy34fj
+        </unstructured_citation>
+        <doi>10.32013/cqy34fj</doi>
+      </citation>
+      <citation key="ref7">
+        <unstructured_citation>Foisey, H., &amp; Housecat, M. (n.d.). Examining metadata practices across dissertation depositors. Society of Psychoceramics. https://doi.org/10.32013/go7be8 </unstructured_citation>
+        <doi>10.32013/go7be8</doi>
+      </citation>
+      <citation key="ref8">
+        <unstructured_citation>Housecat, M., &amp;, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Society of Psychoceramics. https://doi.org/10.32013/gruklja
+        </unstructured_citation>
+        <doi>10.32013/gruklja</doi>
+      </citation>
+      <citation key="ref9">
+        <unstructured_citation>Feeney, P. (2019). Really bad metadata [Data set]. In Metadata Quality Analysis. Society of Psychoceramics. https://doi.org/10.32013/woygbn8 </unstructured_citation>
+        <doi>10.32013/woygbn8</doi>
+      </citation>
+      <citation key="ref10">
+        <unstructured_citation>Figure 1: Best practices by industry. (n.d.). Society of Psychoceramics. https://doi.org/10.32013/tm9b6mw
+        </unstructured_citation>
+        <doi>10.32013/tm9b6mw</doi>
+      </citation>
+    </citation_list>
+  </dissertation>
+</body>
+</doi_batch>

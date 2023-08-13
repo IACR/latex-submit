@@ -1,0 +1,19 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<query_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.crossref.org/qschema/2.0"
+  xsi:schemaLocation="http://www.crossref.org/qschema/2.0 http://www.crossref.org/schemas/crossref_query_input2.0.xsd">
+<head>
+   <email_address>pfeeney@crossref.org</email_address>
+   <doi_batch_id>test</doi_batch_id>
+</head>
+<body>
+  <query key="default">
+    <doi>10.1107/s1600536814013208</doi>
+  </query>
+    <query list-components="false" expanded-results="true" key="expanded">
+    <doi>10.1107/s1600536814013208</doi>
+  </query>
+    <query list-components="true" expanded-results="true" key="expanded-with-components">
+    <doi>10.1107/s1600536814013208</doi>
+  </query>
+</body>
+</query_batch>

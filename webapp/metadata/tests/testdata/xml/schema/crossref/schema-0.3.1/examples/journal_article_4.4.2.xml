@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/4.4.2 https://www.crossref.org/schemas/crossref4.4.2.xsd"
+ xmlns="http://www.crossref.org/schema/4.4.2" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+ xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.4.2">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<timestamp>20190430133711</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<journal>
+			<journal_metadata language="en">
+				<full_title>Journal of Metadata Perfection</full_title>
+				<abbrev_title>JOMPer</abbrev_title>
+				<doi_data>
+					<doi>10.32013/487529</doi>
+					<resource>https://www.crossref.org/jomper</resource>
+				</doi_data>
+			</journal_metadata>
+			<journal_issue>
+				<publication_date media_type="online">
+					<month>08</month>
+					<day>13</day>
+					<year>2008</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>08</month>
+					<day>14</day>
+					<year>2008</year>
+				</publication_date>
+				<journal_volume>
+					<volume>5</volume>
+				</journal_volume>
+				<issue>11</issue>
+			</journal_issue>
+			<journal_article publication_type="full_text">
+				<titles>
+					<title> When your best metadata isn't good enough: working with an imperfect specification </title>
+					<original_language_title language="fr">Quand vos meilleures métadonnées ne
+						suffisent pas: travailler avec une spécification
+						imparfaite</original_language_title>
+				</titles>
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Minerva</given_name>
+						<surname>Housecat</surname>
+						<affiliation>Crossref University</affiliation>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+					</person_name>
+					<person_name sequence="additional" contributor_role="author">
+						<given_name>Josiah</given_name>
+						<surname>Carberry</surname>
+						<affiliation>Brown University</affiliation>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+					</person_name>
+				</contributors>
+				<jats:abstract>
+					<jats:p>Agile best practices, thought leadership collective impact impact
+						investing to families. And equal opportunity vibrant, the, storytelling
+						synergy metadata matters B-corp unprecedented challenge. Venture
+						philanthropy cultivate impact, state of play; white paper collaborative
+						consumption entrepreneur collaborative cities inclusive. Parse empower
+						communities movements targeted; radical; social enterprise issue outcomes
+						big data venture philanthropy. </jats:p>
+				</jats:abstract>
+				<publication_date media_type="online">
+					<month>08</month>
+					<day>13</day>
+					<year>2018</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>08</month>
+					<day>14</day>
+					<year>2018</year>
+				</publication_date>
+				<acceptance_date>
+					<month>05</month>
+					<day>21</day>
+					<year>2018</year>
+				</acceptance_date>
+				<pages>
+					<first_page>1</first_page>
+					<last_page>3</last_page>
+				</pages>
+				<publisher_item>
+					<item_number item_number_type="article_number">2347854-0</item_number>
+				</publisher_item>
+				<crossmark>
+					<crossmark_version>1</crossmark_version>
+					<crossmark_policy>10.32013/hK7vasW</crossmark_policy>
+					<custom_metadata>
+						<assertion name="received" label="Received" group_name="publication_history"
+							group_label="Publication History" order="0">2012-07-24</assertion>
+						<assertion name="accepted" label="Accepted" group_name="publication_history"
+							group_label="Publication History" order="1">2012-08-29</assertion>
+						<fr:program name="fundref">
+							<fr:assertion name="fundgroup">
+								<fr:assertion name="funder_name"> National Science Foundation
+										<fr:assertion name="funder_identifier"
+										>100000001</fr:assertion>
+								</fr:assertion>
+								<fr:assertion name="award_number">CHE-1152342</fr:assertion>
+							</fr:assertion>
+						</fr:program>
+						<program xmlns="http://www.crossref.org/AccessIndicators.xsd">
+							<free_to_read/>
+							<license_ref applies_to="vor" start_date="2008-08-13"
+								>http://creativecommons.org/licenses/by/3.0/deed.en_US</license_ref>
+						</program>
+						<program xmlns="http://www.crossref.org/clinicaltrials.xsd">
+							<clinical-trial-number registry="10.18810/isrctn">isrctn12345</clinical-trial-number>
+						</program>
+					</custom_metadata>
+				</crossmark>
+				<program xmlns="http://www.crossref.org/relations.xsd">
+					<related_item>
+						<description>French language version</description>
+						<intra_work_relation relationship-type="isTranslationOf"
+							identifier-type="doi">10.32013/4859104</intra_work_relation>
+					</related_item>
+				</program>
+				<archive_locations>
+					<archive name="CLOCKSS"/>
+					<archive name="Internet Archive"/>
+					<archive name="Portico"/>
+					<archive name="KB"/>
+				</archive_locations>
+				<doi_data>
+					<doi>10.32013/12345678</doi>
+					<resource content_version="vor">https://www.crossref.org/xml-samples/</resource>
+					<collection property="crawler-based">
+						<item crawler="iParadigms">
+							<resource>https://www.crossref.org/faqs.html</resource>
+						</item>
+					</collection>
+					<collection property="text-mining">
+						<item>
+							<resource content_version="vor" mime_type="text/xml"
+								>https://www.crossref.org/example.xml</resource>
+						</item>
+					</collection>
+					<collection property="link-header">
+						<item link_header_relationship="dul">
+							<resource>http://www.crossref.org/exampleDULendpoint</resource>
+						</item>
+					</collection>
+				</doi_data>
+				<citation_list>
+					<citation key="ref1">
+						<doi>10.1101/144147</doi>
+						<unstructured_citation>BioSharing: Harnessing Metadata Standards For The
+							Data Commons. Susanna-Assunta Sansone, Alejandra Gonzalez-Beltran,
+							Philippe Rocca-Serra, PeterMcQuilton, Massimiliano Izzo, Allyson Lister,
+							Milo Thurston. bioRxiv 144147</unstructured_citation>
+					</citation>
+					<citation key="ref2">
+						<doi>10.1515/jdis-2017-0012</doi>
+						<unstructured_citation>Greenberg, J. (2017). Big Metadata, Smart Metadata,
+							and Metadata Capital: Toward Greater Synergy Between Data Science and
+							Metadata, Journal of Data and Information Science, 2(3), 19-36.
+						</unstructured_citation>
+					</citation>
+					<citation key="ref3">
+						<doi>10.32013/s4947892</doi>
+					</citation>
+					<citation key="ref4">
+						<doi>10.1108/LHTN-12-2016-0059</doi>
+						<unstructured_citation>Jung ran Park, Yuji Tosaka, (2017) “Emerging
+							information standards and technologies: cataloging and metadata
+							professionals’ perspectives", Library Hi Tech News, Vol. 34 Issue: 4,
+							pp.22-26</unstructured_citation>
+					</citation>
+					<citation key="ref5">
+						<journal_title>Information Technology and Libraries</journal_title>
+						<author>Park</author>
+						<volume>29</volume>
+						<issue>3</issue>
+						<first_page>104</first_page>
+						<cYear>2010</cYear>
+						<doi>10.6017/ital.v29i3.3136</doi>
+						<article_title>Metadata creation practices in digital repositories and collections: Schemata, selection criteria, and interoperability</article_title>
+					</citation>
+					<citation key="ref6">
+						<unstructured_citation>Riley, J. (2017). Understanding metadata.
+							Bethesda,MD: NISO Press.</unstructured_citation>
+					</citation>
+				</citation_list>
+			</journal_article>
+			<journal_article publication_type="full_text">
+				<titles>
+					<title>Best practices for best practices</title>
+					<original_language_title language="fr"> </original_language_title>
+				</titles>
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Minerva</given_name>
+						<surname>Housecat</surname>
+						<affiliation>Crossref University</affiliation>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+					</person_name>
+					<person_name sequence="additional" contributor_role="author">
+						<given_name>Josiah</given_name>
+						<surname>Carberry</surname>
+						<affiliation>Brown University</affiliation>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+					</person_name>
+				</contributors>
+				<jats:abstract>
+					<jats:p>Parse empower communities movements targeted; radical; social enterprise issue outcomes
+						big data venture philanthropy. Venture
+						philanthropy cultivate impact, state of play; white paper collaborative
+						consumption entrepreneur collaborative cities inclusive. Agile best practices, thought leadership collective impact impact
+						investing to families. And equal opportunity vibrant, the, storytelling
+						synergy metadata matters B-corp unprecedented challenge. </jats:p>
+				</jats:abstract>
+				<publication_date media_type="online">
+					<month>08</month>
+					<day>13</day>
+					<year>2018</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>08</month>
+					<day>14</day>
+					<year>2018</year>
+				</publication_date>
+				<acceptance_date>
+					<month>05</month>
+					<day>21</day>
+					<year>2018</year>
+				</acceptance_date>
+				<pages>
+					<first_page>4</first_page>
+					<last_page>8</last_page>
+				</pages>
+				<publisher_item>
+					<item_number item_number_type="article_number">2347856-a</item_number>
+				</publisher_item>
+						<fr:program name="fundref">
+							<fr:assertion name="fundgroup">
+								<fr:assertion name="funder_name"> National Science Foundation
+									<fr:assertion name="funder_identifier"
+										>100000001</fr:assertion>
+								</fr:assertion>
+								<fr:assertion name="award_number">CHE-1152342</fr:assertion>
+							</fr:assertion>
+						</fr:program>
+						<program xmlns="http://www.crossref.org/AccessIndicators.xsd">
+							<free_to_read/>
+							<license_ref applies_to="vor" start_date="2008-08-13"
+								>http://creativecommons.org/licenses/by/3.0/deed.en_US</license_ref>
+						</program>
+				<archive_locations>
+					<archive name="CLOCKSS"/>
+					<archive name="Internet Archive"/>
+					<archive name="Portico"/>
+					<archive name="KB"/>
+				</archive_locations>
+				<doi_data>
+					<doi>10.32013/y2uGhyC</doi>
+					<resource>https://www.crossref.org/xml-samples/</resource>
+					<collection property="crawler-based">
+						<item crawler="iParadigms">
+							<resource>https://www.crossref.org/faqs.html</resource>
+						</item>
+					</collection>
+					<collection property="text-mining">
+						<item>
+							<resource content_version="vor" mime_type="text/xml"
+								>https://www.crossref.org/example.xml</resource>
+						</item>
+					</collection>
+					<collection property="link-header">
+						<item link_header_relationship="dul">
+							<resource>http://www.crossref.org/exampleDULendpoint</resource>
+						</item>
+					</collection>
+				</doi_data>
+				<citation_list>
+					<citation key="ref1">
+						<doi>10.1101/144147</doi>
+						<unstructured_citation>BioSharing: Harnessing Metadata Standards For The
+							Data Commons. Susanna-Assunta Sansone, Alejandra Gonzalez-Beltran,
+							Philippe Rocca-Serra, PeterMcQuilton, Massimiliano Izzo, Allyson Lister,
+							Milo Thurston. bioRxiv 144147</unstructured_citation>
+					</citation>
+					<citation key="ref2">
+						<doi>10.1515/jdis-2017-0012</doi>
+						<unstructured_citation>Greenberg, J. (2017). Big Metadata, Smart Metadata,
+							and Metadata Capital: Toward Greater Synergy Between Data Science and
+							Metadata, Journal of Data and Information Science, 2(3), 19-36.
+						</unstructured_citation>
+					</citation>
+					<citation key="ref3">
+						<doi>10.32013/s4947892</doi>
+					</citation>
+					<citation key="ref4">
+						<doi>10.1108/LHTN-12-2016-0059</doi>
+						<unstructured_citation>Jung ran Park, Yuji Tosaka, (2017) “Emerging
+							information standards and technologies: cataloging and metadata
+							professionals’ perspectives", Library Hi Tech News, Vol. 34 Issue: 4,
+							pp.22-26</unstructured_citation>
+					</citation>
+					<citation key="ref5">
+						<journal_title>Information Technology and Libraries</journal_title>
+						<author>Park</author>
+						<volume>29</volume>
+						<issue>3</issue>
+						<first_page>104</first_page>
+						<cYear>2010</cYear>
+						<doi>10.6017/ital.v29i3.3136</doi>
+						<article_title>Metadata creation practices in digital repositories and collections: Schemata, selection criteria, and interoperability</article_title>
+					</citation>
+					<citation key="ref6">
+						<unstructured_citation>Riley, J. (2017). Understanding metadata.
+							Bethesda,MD: NISO Press.</unstructured_citation>
+					</citation>
+				</citation_list>
+				<component_list>
+					<component parent_relation="isPartOf">
+						<titles><title>Figure 1: Best practices by industry</title></titles>
+						<description>A list of best practices by industry</description>
+						<format mime_type="image/jpeg" />
+						<doi_data>
+							<doi>10.32013/TM9b6MW</doi>
+							<resource>https://www.crossref.org/xml-samples/</resource>
+						</doi_data>
+					</component>
+					<component parent_relation="isPartOf">
+						<titles><title>Table 1: Impact of best practices over time</title></titles>
+						<format mime_type="text/plain" />
+						<doi_data>
+							<doi>10.32013/KKFKsCy</doi>
+							<resource>https://www.crossref.org/xml-samples/</resource>
+						</doi_data>
+					</component>
+				</component_list>
+			</journal_article>
+
+		</journal>
+	</body>
+</doi_batch>

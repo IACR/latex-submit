@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 https://www.crossref.org/schemas/crossref4.8.0.xsd"
+	xmlns="http://www.crossref.org/schema/4.8.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.8.0">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<timestamp>20190430133609</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<sa_component parent_doi="10.32013/y2uGhyC">
+			<component_list>
+				<component parent_relation="isPartOf">
+				<titles><title>Figure 1: Best practices by industry</title></titles>
+				<description>A list of best practices by industry</description>
+				<format mime_type="image/jpeg" />
+					<doi_data>
+						<doi>10.32013/TM9b6MW</doi>
+						<resource>https://www.crossref.org/xml-samples/</resource>
+					</doi_data>
+				</component>
+				<component parent_relation="isPartOf">
+					<titles><title>Table 1: Impact of best practices over time</title></titles>
+					<format mime_type="text/plain" />
+					<doi_data>
+						<doi>10.32013/KKFKsCy</doi>
+						<resource>https://www.crossref.org/xml-samples/</resource>
+					</doi_data>
+				</component>
+				
+			</component_list>
+</sa_component>
+	</body>
+</doi_batch>

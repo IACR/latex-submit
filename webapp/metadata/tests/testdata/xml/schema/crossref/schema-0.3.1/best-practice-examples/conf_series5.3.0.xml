@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+  xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+  xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+  <head>
+    <doi_batch_id>test.x</doi_batch_id>
+    <timestamp>2021010100000000</timestamp>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+    <registrant>Society of Metadata Idealists</registrant>
+  </head>
+  <body>
+<conference>
+<event_metadata>
+  <conference_name>Crossref LIVE18</conference_name>
+  <conference_theme>How good is your metadata?</conference_theme>
+  <conference_acronym>LIVE</conference_acronym>
+  <conference_sponsor>Crossref Fan Club</conference_sponsor>
+  <conference_number>18</conference_number>
+  <conference_location>Toronto, ON</conference_location>
+  <conference_date start_day="12" start_month="11" start_year="2018" end_day="14" end_month="11" end_year="2018">Nov. 13-14, 2018</conference_date>
+</event_metadata>
+<proceedings_series_metadata>
+<series_metadata>
+  <contributors>
+    <person_name sequence="first" contributor_role="chair">
+      <given_name>Minerva</given_name>
+      <surname>Housecat</surname>
+      <affiliations>
+        <institution>
+          <institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+        </institution>
+      </affiliations>
+      <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+    </person_name>
+  </contributors>
+<titles><title>Crossref LIVE Example Proceedings</title></titles>
+  <issn>2169-2750</issn>
+  <archive_locations>
+    <archive name="CLOCKSS"/>
+    <archive name="Internet Archive"/>
+    <archive name="Portico"/>
+    <archive name="KB"/>
+  </archive_locations>
+  <doi_data>
+    <doi>10.32013/XSdXses</doi>
+    <resource>https://www.crossref.org/xml-samples/</resource>
+  </doi_data>
+</series_metadata>
+  <proceedings_title>Crossref LIVE18</proceedings_title>
+  <volume>1</volume>
+  <proceedings_subject>Crossref</proceedings_subject>
+  <publisher>
+    <publisher_name>Crossref</publisher_name>
+    <publisher_place>Boston</publisher_place>
+  </publisher>
+  <publication_date media_type='online'>
+    <month>11</month>
+    <day>23</day>
+    <year>2018</year>
+  </publication_date>
+<noisbn reason="simple_series"/>
+  <doi_data>
+    <doi>10.32013/scicF9L</doi>
+    <resource>https://www.crossref.org/xml-samples/</resource>
+  </doi_data>
+</proceedings_series_metadata>
+<conference_paper language="en" publication_type="full_text">
+    <contributors>
+    <person_name sequence="first" contributor_role="author">
+      <given_name>Josiah</given_name>
+      <surname>Carberry</surname>
+      <affiliations>
+        <institution>
+          <institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+        </institution>
+      </affiliations>
+      <ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+    </person_name>
+    </contributors>
+    <titles>
+      <title>The importance of good examples</title>
+      <original_language_title language="es">
+        La importancia de los buenos ejemplos</original_language_title>
+    </titles>
+    <jats:abstract><jats:p>The implications of ambimorphic archetypes have been far-reaching and pervasive. After years of natural research into consistent hashing, we argue the simulation of public-private key pairs, which embodies the confirmed principles of theory. Such a hypothesis might seem perverse but is derived from known results. Our focus in this paper is not on whether the well-known knowledge-based algorithm for the emulation of checksums by Herbert Simon runs in &#952;( n ) time, but rather on exploring a semantic tool for harnessing telephony. </jats:p></jats:abstract>
+    <publication_date media_type='online'>
+      <month>11</month>
+      <day>23</day>
+      <year>2018</year>
+    </publication_date>
+    <acceptance_date>
+      <month>10</month>
+      <day>20</day>
+      <year>2018</year>
+    </acceptance_date>
+    <publisher_item>
+      <item_number item_number_type="article_number">LIVE18-201</item_number>
+    </publisher_item>
+    <crossmark>
+      <crossmark_version>1</crossmark_version>
+      <crossmark_policy>10.32013/hK7vasW</crossmark_policy>
+      
+      <custom_metadata>
+        <assertion name="received" label="Received" group_name="publication_history" group_label="Publication History" order="0">2012-07-24</assertion>
+        <assertion name="accepted" label="Accepted" group_name="publication_history" group_label="Publication History" order="1">2012-08-29</assertion>
+        <assertion name="published" label="Published" group_name="publication_history" group_label="Publication History" order="2">2012-09-10</assertion>
+        <fr:program name="fundref">
+          <fr:assertion name="fundgroup">
+            <fr:assertion name="funder_name">
+              National Science Foundation
+              <fr:assertion name="funder_identifier">100000001</fr:assertion>
+            </fr:assertion>
+            <fr:assertion name="award_number">CHE-1152342</fr:assertion>
+          </fr:assertion>
+        </fr:program>
+      </custom_metadata>
+    </crossmark>
+    <archive_locations>
+      <archive name="CLOCKSS"/>
+      <archive name="Internet Archive"/>
+      <archive name="Portico"/>
+      <archive name="KB"/>
+    </archive_locations>
+    <doi_data>
+      <doi>10.32013/auBagie</doi>
+      <resource>https://www.crossref.org/xml-samples/</resource>
+      <collection property="crawler-based">
+        <item crawler="iParadigms">
+          <resource>https://www.crossref.org/faqs.html</resource>
+        </item>
+      </collection>
+      <collection property="text-mining">
+        <item>
+          <resource content_version="vor" mime_type="text/xml"
+            >https://www.crossref.org/example.xml</resource>
+        </item>
+      </collection>
+      <collection property="link-header">
+        <item link_header_relationship="dul">
+          <resource>http://www.crossref.org/exampleDULendpoint</resource>
+        </item>
+      </collection>
+    </doi_data>
+  <citation_list>
+    <citation key="ref1">
+      <doi>10.32013/r7py5MH</doi>
+    </citation>
+    <citation key="ref2">
+      <doi>10.32013/U8OyJ5X</doi>
+    </citation>
+    <citation key="ref3">
+      <doi>10.32013/nqGDdQr</doi>
+    </citation>
+    <citation key="ref4">
+      <doi>10.32013/o8VRnUO</doi>
+    </citation>
+    <citation key="ref5">
+      <doi>10.32013/En10keK</doi>
+    </citation>
+    <citation key="ref6">
+      <doi>10.32013/OAqGNhe</doi>
+    </citation>
+    <citation key="ref7">
+      <doi>10.32013/iMleOZB</doi>
+    </citation>
+    <citation key="ref8">
+      <doi>10.32013/kQZhpJi</doi>
+    </citation>
+  </citation_list>
+  </conference_paper>
+  
+</conference>
+</body>
+</doi_batch>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<doi_batch version="4.4.2" xmlns="http://www.crossref.org/doi_resources_schema/4.4.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/doi_resources_schema/4.4.2 http://www.crossref.org/schemas/doi_resources4.4.2.xsd">
+    <head>
+        <doi_batch_id>arg_123_954</doi_batch_id>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+    </head>
+    <body> 
+        <doi_resources> 
+            <doi>10.32013/12345678</doi> 
+            <!--as-crawled URLs are inserted into the doi_resources element using a collection-->
+            <collection property="crawler-based"> 
+                <item crawler="iParadigms"> 
+                    <resource>http://www.crossref.org/xml-examples/crawl.xml</resource> <!--the URL that will be crawled-->
+                </item>
+            </collection>
+        </doi_resources> 
+        <doi_resources> 
+            <doi>10.32013/nqGDdQr</doi> 
+            <collection property="crawler-based"> 
+                <item crawler="iParadigms"> 
+                    <resource>http://www.crossref.org/xml-examples/crawl.xml</resource> <!--the URL that will be crawled-->
+                </item>
+            </collection>
+        </doi_resources> 
+    </body> 
+</doi_batch>
+

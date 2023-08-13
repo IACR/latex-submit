@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 https://www.crossref.org/schemas/crossref4.8.0.xsd"
+  xmlns="http://www.crossref.org/schema/4.8.0"
+  xmlns:ai="http://www.crossref.org/AccessIndicators.xsd" xmlns:rel="http://www.crossref.org/relations.xsd" version="4.8.0">
+  <head>
+    <doi_batch_id>20170808</doi_batch_id>
+    <timestamp>20190717101010</timestamp>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+    <registrant>Crossref</registrant>
+  </head>
+  <body>
+    <peer_review stage="pre-publication" type="editor-report" revision-round="1"
+      recommendation="accept" language="en">
+      <contributors>
+        <person_name contributor_role="editor" sequence="first">
+          <given_name>Josiah</given_name>
+          <surname>Carberry</surname>
+          <affiliation>Brown University</affiliation>
+          <ORCID authenticated="true">http://orcid.org/0000-0002-1825-0097</ORCID>
+        </person_name>
+      </contributors>
+      <titles>
+        <title>Review: When your best metadata isn't good enough: working with an imperfect specification</title>
+      </titles>
+      <review_date>
+        <month>02</month>
+        <day>19</day>
+        <year>2008</year>
+      </review_date>
+      <competing_interest_statement> There were no competing
+        interests</competing_interest_statement>
+      <running_number>ED1</running_number>
+      <ai:program name="AccessIndicators">
+        <ai:free_to_read start_date="2012-05-06"/>
+        <ai:license_ref applies_to="vor" start_date="2012-05-06"
+          >http://www.crossref.org/license</ai:license_ref>
+      </ai:program>
+      <rel:program xmlns="http://www.crossref.org/relations.xsd">
+        <rel:related_item>
+          <rel:description>When your best metadata isn't good enough: working with an imperfect specification</rel:description>
+          <rel:inter_work_relation relationship-type="isReviewOf" identifier-type="doi"
+            >10.32013/12345678</rel:inter_work_relation>
+        </rel:related_item>
+      </rel:program>
+
+      <doi_data>
+        <doi>10.32013/PT4HwwS</doi>
+        <resource>https://www.crossref.org/xml-samples/</resource>
+      </doi_data>
+    </peer_review>
+  </body>
+</doi_batch>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+	xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+	<head>
+		<doi_batch_id>test.x</doi_batch_id>
+		<timestamp>2021010100000000</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<report-paper>
+			<report-paper_metadata language = "en">
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Minerva</given_name>
+						<surname>Housecat</surname>
+						<affiliations>
+							<institution>
+								<institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+								<institution_department>Feline Outreach</institution_department>
+							</institution>
+						</affiliations>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+					</person_name>
+				</contributors>
+				<titles>
+					<title>Title Sludge Handling System Conceptual Design Document</title>
+				</titles>
+				<edition_number>0</edition_number>
+				<publication_date media_type = "online">
+					<month>03</month>
+					<day>03</day>
+					<year>2001</year>
+				</publication_date>
+				<publisher>
+					<publisher_name>Office of Scientific and Technical Information</publisher_name>
+					<publisher_place>Washington, DC</publisher_place>
+				</publisher>
+				<institution>
+					<institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+				</institution>
+				<publisher_item>
+					<identifier id_type="report-number">abc123</identifier>
+				</publisher_item>
+				<contract_number>AC06-96RL13200</contract_number>
+				<doi_data>
+					<doi>10.32013/tkQ96E0</doi>
+					<resource>https://www.crossref.org/xml-samples</resource>
+				</doi_data>
+			</report-paper_metadata>
+		</report-paper>
+	</body>
+</doi_batch>

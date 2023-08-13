@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<doi_batch version="4.4.2" xmlns="http://www.crossref.org/doi_resources_schema/4.4.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/doi_resources_schema/4.4.2 doi_resources4.4.2.xsd">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+	</head>
+	<body>
+		<doi_resources> 
+			<doi>10.32013/12345678</doi>
+			<collection property="text-mining"> 
+				<item> 
+					<resource>http://www.crossref.org/pubdate1</resource> 
+				</item> 
+			</collection>
+		</doi_resources>
+		<doi_resources> 
+			<doi>10.32013/nqGDdQr</doi> 
+			<collection property="text-mining"> 
+				<item> 
+					<resource>http://www.crossref.org/pubdate1</resource> 
+				</item> 
+			</collection> 
+		</doi_resources>
+		<lic_ref_data>
+			<doi>10.32013/12345678</doi>
+			<program name="AccessIndicators" xmlns="http://www.crossref.org/AccessIndicators.xsd">
+				<free_to_read/>
+				<license_ref applies_to="vor" start_date="2011-01-11">http://www.crossref.org/vor-license</license_ref>
+				<license_ref applies_to="am" start_date="2012-01-11">http://www.crossref.org/am-license</license_ref>
+				<license_ref applies_to="tdm" start_date="2012-01-11">http://www.crossref.org/tdm-license</license_ref>
+			</program>
+		</lic_ref_data>
+		<lic_ref_data>
+			<doi>10.32013/nqGDdQr</doi>
+			<program name="AccessIndicators" xmlns="http://www.crossref.org/AccessIndicators.xsd">
+				<free_to_read/>
+				<license_ref applies_to="vor" start_date="2011-01-11"
+					>http://www.crossref.org/vor-license</license_ref>
+				<license_ref applies_to="am" start_date="2012-01-11"
+					>http://www.crossref.org/am-license</license_ref>
+				<license_ref applies_to="tdm" start_date="2012-01-11">http://www.crossref.org/tdm-license</license_ref>
+			</program>
+		</lic_ref_data>
+		
+	</body>
+</doi_batch>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+    xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+    xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+    <head>
+        <doi_batch_id>test.x</doi_batch_id>
+        <timestamp>2021010100000000</timestamp>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+        <registrant>Society of Metadata Idealists</registrant>
+    </head>
+    <body>
+        <peer_review stage="pre-publication" revision-round="1" recommendation="accept">
+            <contributors>
+                <person_name contributor_role="reviewer" sequence="first">
+                    <given_name>Wilson</given_name>
+                    <surname>Smith</surname>
+                    <affiliations>
+                        <institution>
+                            <institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+                            <institution_id type="isni">https://www.isni.org/0000000405062673</institution_id>
+                            <institution_id type="wikidata">https://www.wikidata.org/entity/Q5188229</institution_id>
+                            <institution_department>Feline Outreach</institution_department>
+                        </institution>
+                        <institution>
+                            <institution_id type="ror">https://ror.org/01bj3aw27</institution_id>
+                        </institution>
+                    </affiliations>
+                </person_name>
+            </contributors>
+            <titles>
+                <title>Review: Treatment of plaque psoriasis with an ointment formulation of the Januskinase inhibitor, tofacitinib: a Phase 2b randomized clinical trial. V1</title>
+            </titles>
+            <review_date>
+                <month>08</month>
+                <day>19</day>
+                <year>2016</year>
+            </review_date>
+            <institution>
+                <institution_id type="ror">https://ror.org/02twcfp32</institution_id>
+            </institution>
+
+            <competing_interest_statement> There were no competing interests</competing_interest_statement>
+            <running_number>RC1 </running_number>
+            <program xmlns="http://www.crossref.org/relations.xsd">
+                <related_item>
+                    <description>Referee report of Treatment of plaque psoriasis with an ointment formulation of the Janus kinase inhibitor, tofacitinib: a Phase 2b randomized clinical trial</description>
+                    <inter_work_relation relationship-type="isReviewOf" identifier-type="doi"
+                        >10.32013/12345678</inter_work_relation>
+                </related_item>
+            </program>
+            <doi_data>
+                <doi>10.32013/uzzXUo4</doi>
+                <resource>https://www.crossref.org/xml-samples</resource>
+            </doi_data>
+        </peer_review>
+    </body>
+</doi_batch>

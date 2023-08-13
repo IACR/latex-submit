@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd"
+  xmlns="http://www.crossref.org/schema/5.3.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+  xmlns:fr="http://www.crossref.org/fundref.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="5.3.0">
+  <head>
+    <doi_batch_id>test.x</doi_batch_id>
+    <timestamp>2021010100000000</timestamp>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+    <registrant>Society of Metadata Idealists</registrant>
+  </head>
+  <body>
+    <book book_type="edited_book">
+      <book_set_metadata language="en">
+        <set_metadata>
+          <titles>
+            <title>Sample Set Title</title>
+          </titles>
+          <noisbn reason="simple_series"/>
+          <contributors>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Minerva</given_name>
+              <surname>Housecat</surname>
+              <affiliations>
+                <institution>
+                  <institution_name>Northeast Cat Coalition</institution_name>
+                </institution>
+                <institution>
+                  <institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+                </institution>
+              </affiliations>
+              <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>Josiah</given_name>
+              <surname>Carberry</surname>
+              <affiliations>
+                <institution>
+                  <institution_id type="ror">https://ror.org/05gq02987</institution_id>
+                </institution>
+              </affiliations>
+              <ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+            </person_name>
+          </contributors>
+          <part_number>33-6</part_number>
+          <doi_data>
+            <doi>10.32013/iPdqRAp</doi>
+            <resource>https://www.crossref.org/xml-samples</resource>
+          </doi_data>
+        </set_metadata>
+        <titles>
+          <title>Sample Volume Title</title>
+        </titles>
+        <volume>1</volume>
+        <edition_number>2</edition_number>
+        <publication_date media_type="print">
+          <year>2007</year>
+        </publication_date>
+        <noisbn reason="simple_series"/>
+        <publisher>
+          <publisher_name>Sample Publisher</publisher_name>
+        </publisher>
+        <doi_data>
+          <doi>10.32013/4AvssJK</doi>
+          <resource>https://www.crossref.org/xml-samples</resource>
+        </doi_data>
+      </book_set_metadata>
+      <content_item component_type="chapter" publication_type="full_text" language="en">
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Minerva</given_name>
+            <surname>Housecat</surname>
+            <affiliations>
+              <institution>
+                <institution_name>Northeast Cat Coalition</institution_name>
+              </institution>
+              <institution>
+                <institution_id type="ror">https://ror.org/05bp8ka05</institution_id>
+              </institution>
+            </affiliations>
+            <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+          </person_name>
+        </contributors>
+        <titles>
+          <title>This is a chapter title </title>
+        </titles>
+        <jats:abstract><jats:p>Throughout history, black cats have been interacting with the universe via psionic wave oscillations. Felinekind has nothing to lose. Reality has always been full of lifeforms whose brains are engulfed in inspiration.</jats:p></jats:abstract>
+        <component_number>I</component_number>
+        <publication_date>
+          <month>02</month>
+          <day>15</day>
+          <year>2019</year>
+        </publication_date>
+        <pages>
+          <first_page>2</first_page>
+          <last_page>47</last_page>
+        </pages>
+        <archive_locations>
+          <archive name="CLOCKSS"/>
+          <archive name="Internet Archive"/>
+          <archive name="Portico"/>
+          <archive name="KB"/>
+        </archive_locations>
+        <doi_data>
+          <doi>10.32013/GMP2WvT</doi>
+          <resource>https://www.crossref.org/xml-samples/</resource>
+        </doi_data>
+        <citation_list>
+          <citation key="ref1">
+            <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/12345678 </unstructured_citation>
+            <doi>10.32013/12345678</doi>
+          </citation>
+          <citation key="ref2">
+            <unstructured_citation>Housecat, M., &amp; Carberry, J. (2018). Quand vos meilleures métadonnées ne suffisent pas: travailler avec une spécification imparfaite. Journal of Metadata Perfection, 5(11), 1–3. https://doi.org/10.32013/4859104 </unstructured_citation>
+            <doi>10.32013/4859104</doi>
+          </citation>
+          <citation key="ref3">
+            <doi>10.32013/s4947892</doi>
+          </citation>
+          <citation key="ref4">
+            <unstructured_citation>Surname, B. (2009). Obese Cat Care. Crossref. https://doi.org/10.32013/9min5ys </unstructured_citation>
+            <doi>10.32013/9min5ys</doi>
+          </citation>
+          <citation key="ref5">
+            <unstructured_citation>Carberry, J. (2018, November 23). The importance of good examples. Crossref LIVE18. Crossref LIVE18. https://doi.org/10.32013/aubagie </unstructured_citation>
+            <doi>10.32013/aubagie</doi>
+          </citation>
+          <citation key="ref6">
+            <unstructured_citation>Housecat, M., &amp;, J. (2019). Are black cats better than other cats: a very comprehensive study. In Obese Cat Care (pp. 2–47). Crossref. https://doi.org/10.32013/cqy34fj
+            </unstructured_citation>
+            <doi>10.32013/cqy34fj</doi>
+          </citation>
+          <citation key="ref7">
+            <unstructured_citation>Foisey, H., &amp; Housecat, M. (n.d.). Examining metadata practices across dissertation depositors. Society of Psychoceramics. https://doi.org/10.32013/go7be8 </unstructured_citation>
+            <doi>10.32013/go7be8</doi>
+          </citation>
+          <citation key="ref8">
+            <unstructured_citation>Housecat, M., &amp;, J. (2018). When your best metadata isn’t good enough: working with an imperfect specification. Society of Psychoceramics. https://doi.org/10.32013/gruklja
+            </unstructured_citation>
+            <doi>10.32013/gruklja</doi>
+          </citation>
+          <citation key="ref9">
+            <unstructured_citation>Feeney, P. (2019). Really bad metadata [Data set]. In Metadata Quality Analysis. Society of Psychoceramics. https://doi.org/10.32013/woygbn8 </unstructured_citation>
+            <doi>10.32013/woygbn8</doi>
+          </citation>
+          <citation key="ref10">
+            <unstructured_citation>Figure 1: Best practices by industry. (n.d.). Society of Psychoceramics. https://doi.org/10.32013/tm9b6mw
+            </unstructured_citation>
+            <doi>10.32013/tm9b6mw</doi>
+          </citation>
+        </citation_list>
+      </content_item>
+    </book>
+  </body>
+</doi_batch>

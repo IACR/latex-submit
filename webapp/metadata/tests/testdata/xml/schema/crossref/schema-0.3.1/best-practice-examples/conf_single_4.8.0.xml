@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 https://www.crossref.org/schemas/crossref4.8.0.xsd"
+	xmlns="http://www.crossref.org/schema/4.8.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.8.0">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<timestamp>20190430133609</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+<body>
+	<conference>
+		<contributors>
+			<person_name sequence="first" contributor_role="chair">
+				<given_name>Elvira</given_name>
+				<surname>Drolbman</surname>
+			</person_name>
+			<person_name sequence="additional" contributor_role="chair">
+				<given_name>Raynor</given_name>
+				<surname>Splenguckle</surname>
+			</person_name>
+			<person_name sequence="additional" contributor_role="chair">
+				<given_name>Imogene</given_name>
+				<surname>Troghman</surname>
+			</person_name>
+		</contributors>
+		<event_metadata>
+			<conference_name>5th QXR Annual Symposium</conference_name>
+			<conference_theme>Metadata Quality</conference_theme>
+			<conference_acronym>QXRV</conference_acronym>
+			<conference_sponsor> </conference_sponsor>
+			<conference_number>5</conference_number>
+			<conference_location>Paris, France</conference_location>
+			<conference_date start_month="01" start_year="2017" start_day="15"  end_year="2017" end_month="01" end_day="17" />
+		</event_metadata>
+		<proceedings_metadata language="en">
+			<proceedings_title>Proceedings of the 5th QXR Annual Symposium</proceedings_title>
+			<proceedings_subject>Metadata</proceedings_subject>
+			<publisher>
+				<publisher_name>Crossref Press</publisher_name>
+				<publisher_place>Boston</publisher_place>
+			</publisher>
+			<publication_date media_type="online">
+				<month>01</month>
+				<day>23</day>
+				<year>2017</year>
+			</publication_date>
+				<publication_date media_type="print">
+					<month>02</month>
+					<day>03</day>
+					<year>2017</year>
+				</publication_date>
+			
+			<noisbn reason="simple_series"/>
+			<doi_data>
+				<doi>10.32013/BwMgAA2</doi>
+				<resource>https://www.crossref.org/xml-samples/</resource>
+			</doi_data>
+		</proceedings_metadata>
+		<conference_paper publication_type="full_text">
+			<contributors>
+				<person_name sequence="first" contributor_role="author">
+					<given_name>Minerva</given_name>
+					<surname>Housecat</surname>
+					<affiliation>Crossref University</affiliation>
+					<ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+				</person_name>
+				<person_name sequence="additional" contributor_role="author">
+					<given_name>Josiah</given_name>
+					<surname>Carberry</surname>
+					<affiliation>Brown University</affiliation>
+					<ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+				</person_name>
+			</contributors>
+			<titles>
+				<title>Advocacy and Means of Production: Reproducing the Disenfranchised in Metadata Quality</title>
+			</titles>
+			<publication_date media_type="online">
+				<month>01</month>
+				<day>20</day>
+				<year>2017</year>
+			</publication_date>
+			<pages>
+				<first_page>1</first_page>
+				<last_page>14</last_page>
+			</pages>
+			<doi_data>
+				<doi>10.32013/TM9b6MW</doi>
+				<resource>https://www.crossref.org/xml-samples/</resource>
+			</doi_data>
+			<citation_list>
+				<citation key="ref1">
+					<doi>10.32013/r7py5MH</doi>
+				</citation>
+				<citation key="ref2">
+					<doi>10.32013/U8OyJ5X</doi>
+				</citation>
+				<citation key="ref3">
+					<doi>10.32013/nqGDdQr</doi>
+				</citation>
+				<citation key="ref4">
+					<doi>10.32013/o8VRnUO</doi>
+				</citation>
+				<citation key="ref5">
+					<doi>10.32013/En10keK</doi>
+				</citation>
+				<citation key="ref6">
+					<doi>10.32013/OAqGNhe</doi>
+				</citation>
+				<citation key="ref7">
+					<doi>10.32013/iMleOZB</doi>
+				</citation>
+				<citation key="ref8">
+					<doi>10.32013/kQZhpJi</doi>
+				</citation>
+			</citation_list>
+		</conference_paper>
+		</conference>
+	</body>
+</doi_batch>

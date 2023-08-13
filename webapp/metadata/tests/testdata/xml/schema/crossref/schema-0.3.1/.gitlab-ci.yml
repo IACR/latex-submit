@@ -1,0 +1,12 @@
+stages:
+  - validation
+
+validate:
+  stage: validation
+  image: python:3.6
+  script:
+    - pip3 install yapf
+    - yapf -d -r .
+    - pip3 install -r automation/requirements.txt
+    - python3 automation/check.py
+

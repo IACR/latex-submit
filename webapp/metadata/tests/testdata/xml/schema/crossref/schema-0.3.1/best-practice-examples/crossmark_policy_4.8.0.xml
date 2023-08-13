@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch version="4.8.0" xmlns="http://www.crossref.org/schema/4.8.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 http://www.crossref.org/schema/deposit/crossref4.8.0.xsd">
+    <head>
+        <doi_batch_id>arg_123_954</doi_batch_id>
+        <timestamp>20190430133610</timestamp>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+        <registrant>Society of Metadata Idealists</registrant>
+    </head>
+    <body>
+        <database>
+            <database_metadata language="en">
+                <titles>
+                    <title>Society of Metadata Idealists Crossmark Policy Statement</title>
+                </titles>
+                <doi_data>
+                    <doi>10.32013/hK7vasW</doi>
+                    <resource>https://www.crossref.org/samplepage</resource>
+                </doi_data>
+            </database_metadata>
+        </database>
+    </body>
+</doi_batch>

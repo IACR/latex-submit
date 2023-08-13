@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 https://www.crossref.org/schemas/crossref4.8.0.xsd"
+	xmlns="http://www.crossref.org/schema/4.8.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.8.0">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<timestamp>20190430133609</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<journal>
+			<journal_metadata language="en">
+				<full_title>Journal of Metadata Perfection</full_title>
+				<abbrev_title>JOMPer</abbrev_title>
+				<issn media_type="electronic">0264-3561</issn>
+				<doi_data>
+					<doi>10.32013/487529</doi>
+					<resource>https://www.crossref.org/jomper</resource>
+				</doi_data>
+			</journal_metadata>
+			<journal_issue>
+				<publication_date media_type="online">
+					<month>10</month><day>11</day><year>2011</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>10</month><day>11</day><year>2011</year>
+				</publication_date>
+				<journal_volume>
+					<volume>8</volume>
+				</journal_volume>
+				<issue>11</issue>
+			</journal_issue>
+			<journal_article publication_type="full_text">
+				<titles>
+					<title>The Impact of Interactive Epistemologies on Cryptography</title>
+				</titles>
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Josiah</given_name>
+						<surname>Carberry</surname>
+					</person_name>
+				</contributors>
+				<publication_date media_type="online">
+					<month>10</month><day>11</day><year>2011</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>10</month><day>11</day><year>2011</year>
+				</publication_date>
+				<pages>
+					<first_page>1</first_page>
+					<last_page>3</last_page>
+				</pages>
+				<publisher_item>
+					<item_number item_number_type="sequence-number">1</item_number>
+				</publisher_item>
+				<doi_data>
+					<doi>10.32013/En10keK</doi>
+					<resource>https://www.crossref.org/xml-samples/</resource>
+				</doi_data>
+			</journal_article>
+		</journal>
+	</body>
+</doi_batch>

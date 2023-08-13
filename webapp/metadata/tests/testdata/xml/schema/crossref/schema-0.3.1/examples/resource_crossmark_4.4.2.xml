@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<doi_batch version="4.4.2" xmlns="http://www.crossref.org/doi_resources_schema/4.4.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/doi_resources_schema/4.4.2 doi_resources4.4.2.xsd">
+    <head>
+        <doi_batch_id>arg_123_954</doi_batch_id>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>pfeeney@crossref.org</email_address>
+        </depositor>
+    </head>
+    <body> 
+        <crossmark_data>
+            <!--the DOI being updated with CrossMark metadata-->
+            <doi>10.32013/12345678</doi>
+            
+            <!--CrossMark metadata-->
+            <crossmark>
+                <crossmark_version>1</crossmark_version>
+                <crossmark_policy>10.32013/hK7vasW</crossmark_policy>
+                <custom_metadata>
+                    <assertion name="received" label="Received" group_name="publication_history"
+                        group_label="Publication History" order="0">2012-07-24</assertion>
+                    <assertion name="accepted" label="Accepted" group_name="publication_history"
+                        group_label="Publication History" order="1">2012-08-29</assertion>
+                    <program name="fundref" xmlns="http://www.crossref.org/fundref.xsd">
+                        <assertion name="fundgroup">
+                            <assertion name="funder_name"> National Science Foundation
+                                <assertion name="funder_identifier"
+                                    >100000001</assertion>
+                            </assertion>
+                            <assertion name="funder_identifier">CHE-1152342</assertion>
+                        </assertion>
+                    </program>
+                    <program xmlns="http://www.crossref.org/AccessIndicators.xsd">
+                        <free_to_read/>
+                        <license_ref applies_to="vor" start_date="2008-08-13"
+                            >http://creativecommons.org/licenses/by/3.0/deed.en_US</license_ref>
+                    </program>
+                </custom_metadata>
+            </crossmark>
+        </crossmark_data>
+    </body> 
+</doi_batch>
+

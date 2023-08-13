@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns="http://www.crossref.org/grant_id/0.0.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.crossref.org/grant_id/0.0.1 https://www.crossref.org/schemas/grant_id0.0.1.xsd">
+    <head>
+        <doi_batch_id>batch_000001</doi_batch_id>
+        <timestamp>20180102030456</timestamp>
+        <depositor>
+            <depositor_name>Crossref</depositor_name>
+            <email_address>support@crossref.org</email_address>
+        </depositor>
+        <registrant>Crossref</registrant>
+    </head>
+    <body>
+        <grant>
+            <project>
+                <project-title xml:lang="en">Improving Metadata using cats as motivators</project-title>
+                <project-title xml:lang="pt">
+                    Melhorando Metadados usando gatos como motivadores</project-title>
+                <investigators>
+                    <person role="lead_investigator">
+                        <givenName>Minerva</givenName>
+                        <familyName>Reuland</familyName>
+                        <alternateName>Minnie Cat</alternateName>
+                        <affiliation>
+                            <institution>University of Crossref</institution>
+                        </affiliation>
+                        <ORCID>https://orcid.org/0000-0002-4011-3590</ORCID>
+                    </person>
+                </investigators>
+                <description xml:lang="en">This is an example of a project description or abstract. Multiple descriptions may be supplied to accommodate different description or abstract types, or to provide descriptions in multiple languages.</description>
+                <description xml:lang="pt">Este é um exemplo de uma descrição ou resumo do projeto. Várias descrições podem ser fornecidas para acomodar diferentes descrições ou tipos abstratos, ou para fornecer descrições em vários idiomas.</description>
+                <award_amount currency="USD">24.50</award_amount>
+                <funding amount="24.50" currency="USD" funding-percentage="100"
+                    funding-type="equipment">
+                    <funder-name>Wellcome Trust</funder-name>
+                    <funder-id>https://doi.org/10.13039/100004440</funder-id>
+                    <funding-scheme>Sofa Lending Programme</funding-scheme>
+                </funding>
+                <award-dates start-date="2018-01-05" end-date="2023-02-01"/>
+            </project>
+            <award-number>CR-001x</award-number>
+            <doi_data>
+                <doi>10.1000/letsgogrants</doi>
+                <resource>https://www.crossref.org/blog/wellcome-explains-the-benefits-of-developing-an-open-and-global-grant-identifier/</resource>
+            </doi_data>
+        </grant>
+    </body>
+</doi_batch>

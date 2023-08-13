@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 https://www.crossref.org/schemas/crossref4.8.0.xsd"
+	xmlns="http://www.crossref.org/schema/4.8.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+	xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.8.0">
+	<head>
+		<doi_batch_id>arg_123_954</doi_batch_id>
+		<timestamp>20190430133609</timestamp>
+		<depositor>
+			<depositor_name>Crossref</depositor_name>
+			<email_address>pfeeney@crossref.org</email_address>
+		</depositor>
+		<registrant>Society of Metadata Idealists</registrant>
+	</head>
+	<body>
+		<journal>
+			<journal_metadata language="en">
+				<full_title>Journal of Metadata Perfection</full_title>
+				<abbrev_title>JOMPer</abbrev_title>
+				<issn media_type="electronic">0264-3561</issn>
+				<doi_data>
+					<doi>10.32013/487529</doi>
+					<resource>https://www.crossref.org/jomper</resource>
+				</doi_data>
+			</journal_metadata>
+			<journal_issue>
+				<publication_date media_type="online">
+					<month>08</month>
+					<day>13</day>
+					<year>2008</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>08</month>
+					<day>14</day>
+					<year>2008</year>
+				</publication_date>
+				<journal_volume>
+					<volume>5</volume>
+				</journal_volume>
+				<issue>11</issue>
+			</journal_issue>
+			<journal_article publication_type="full_text">
+				<titles>
+					<title>
+						Toward a Unified Theory of High-Energy Metaphysics: Silly String Theory
+					</title>
+				</titles>
+				<contributors>
+					<person_name sequence="first" contributor_role="author">
+						<given_name>Josiah</given_name>
+						<surname>Carberry</surname>
+						<ORCID authenticated="true">https://orcid.org/0000-0002-1825-0097</ORCID>
+					</person_name>
+				</contributors>
+				<publication_date media_type="online">
+					<month>08</month>
+					<day>13</day>
+					<year>2008</year>
+				</publication_date>
+				<publication_date media_type="print">
+					<month>08</month>
+					<day>14</day>
+					<year>2008</year>
+				</publication_date>
+				<pages>
+					<first_page>1</first_page>
+					<last_page>3</last_page>
+				</pages>
+				<publisher_item>
+					<item_number item_number_type="sequence-number">1</item_number>
+				</publisher_item>
+				<crossmark>
+					<crossmark_version>1</crossmark_version>
+					<crossmark_policy>10.32013/hK7vasW</crossmark_policy>
+
+					<custom_metadata>
+						<assertion name="received" label="Received" group_name="publication_history" group_label="Publication History" order="0">2012-07-24</assertion>
+						<assertion name="accepted" label="Accepted" group_name="publication_history" group_label="Publication History" order="1">2012-08-29</assertion>
+						<assertion name="published" label="Published" group_name="publication_history" group_label="Publication History" order="2">2012-09-10</assertion>
+						<fr:program name="fundref">
+							<fr:assertion name="fundgroup">
+								<fr:assertion name="funder_name">
+									National Science Foundation
+									<fr:assertion name="funder_identifier">100000001</fr:assertion>
+								</fr:assertion>
+								<fr:assertion name="award_number">CHE-1152342</fr:assertion>
+							</fr:assertion>
+							<fr:assertion name="fundgroup">
+								<fr:assertion name="funder_name">
+									Basic Energy Sciences, Office of Science, U.S. Department of Energy
+									<fr:assertion name="funder_identifier">100006151</fr:assertion>
+								</fr:assertion>
+								<fr:assertion name="award_number">DE-SC0001091</fr:assertion>
+							</fr:assertion>
+						</fr:program>
+					</custom_metadata>
+				</crossmark>
+				<doi_data>
+					<doi>10.32013/iMleOZB</doi>
+					<resource>https://www.crossref.org/xml-samples/</resource>
+				</doi_data>
+			</journal_article>
+		</journal>
+	</body>
+</doi_batch>

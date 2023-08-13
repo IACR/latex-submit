@@ -194,6 +194,9 @@ class Meta(BaseModel):
     DOI: Optional[str] = Field(None,
                                title='The DOI of the official publication',
                                description='This should always be shown if it exists')
+    URL: Optional[str] = Field(None,
+                               title='The permanent URL assigned to the paper after publication.',
+                               description='This should remain permanent.')
     authors: conlist(Author, min_items=1) = Field(...,
                                                   title='List of authors of the paper',
                                                   description='Affiliations are specified externally.')

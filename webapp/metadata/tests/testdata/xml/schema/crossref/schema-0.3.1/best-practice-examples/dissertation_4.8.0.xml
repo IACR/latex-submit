@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.crossref.org/schema/4.8.0 http://www.crossref.org/schemas/crossref4.8.0.xsd"
+ xmlns="http://www.crossref.org/schema/4.8.0" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+ xmlns:fr="http://www.crossref.org/fundref.xsd" version="4.8.0">
+  <head>
+    <doi_batch_id>arg_123_954</doi_batch_id>
+    <timestamp>20190430133610</timestamp>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+    <registrant>Society of Metadata Idealists</registrant>
+  </head>
+<body>
+  <!-- a dissertation with multiple authors -->
+  <dissertation publication_type="full_text" language="en" >
+    <contributors>
+    <person_name contributor_role="author" sequence="first">
+      <given_name>Helga</given_name>
+      <surname>Foisey</surname>
+    </person_name>
+    <person_name contributor_role="author" sequence="additional">
+      <given_name>Minerva</given_name>
+      <surname>Housecat</surname>
+      <affiliation>Crossref University</affiliation>
+      <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+    </person_name>
+    </contributors>
+    <titles>
+      <title>Examining metadata practices across dissertation depositors</title>
+    </titles>
+    <approval_date>
+      <month>01</month>
+      <day>31</day>
+      <year>2015</year>
+    </approval_date>
+    <institution>
+      <institution_name>University of Crossref</institution_name>
+    </institution>
+    <degree>MLIS</degree>
+    <doi_data>
+      <doi>10.32013/GO7BE8</doi>
+      <resource>https://www.crossref.org/xml-samples/</resource>
+    </doi_data>
+    <citation_list>
+      <citation key="ref1">
+        <doi>10.1101/144147</doi>
+        <unstructured_citation>BioSharing: Harnessing Metadata Standards For The
+          Data Commons. Susanna-Assunta Sansone, Alejandra Gonzalez-Beltran,
+          Philippe Rocca-Serra, PeterMcQuilton, Massimiliano Izzo, Allyson Lister,
+          Milo Thurston. bioRxiv 144147</unstructured_citation>
+      </citation>
+      <citation key="ref2">
+        <doi>10.1515/jdis-2017-0012</doi>
+        <unstructured_citation>Greenberg, J. (2017). Big Metadata, Smart Metadata,
+          and Metadata Capital: Toward Greater Synergy Between Data Science and
+          Metadata, Journal of Data and Information Science, 2(3), 19-36.
+        </unstructured_citation>
+      </citation>
+      <citation key="ref3">
+        <doi>10.32013/s4947892</doi>
+      </citation>
+      <citation key="ref4">
+        <doi>10.1108/LHTN-12-2016-0059</doi>
+        <unstructured_citation>Jung ran Park, Yuji Tosaka, (2017) “Emerging
+          information standards and technologies: cataloging and metadata
+          professionals’ perspectives", Library Hi Tech News, Vol. 34 Issue: 4,
+          pp.22-26</unstructured_citation>
+      </citation>
+      <citation key="ref5">
+        <journal_title>Information Technology and Libraries</journal_title>
+        <author>Park</author>
+        <volume>29</volume>
+        <issue>3</issue>
+        <first_page>104</first_page>
+        <cYear>2010</cYear>
+        <doi>10.6017/ital.v29i3.3136</doi>
+        <article_title>Metadata creation practices in digital repositories and collections: Schemata, selection criteria, and interoperability</article_title>
+      </citation>
+      <citation key="ref6">
+        <unstructured_citation>Riley, J. (2017). Understanding metadata.
+          Bethesda,MD: NISO Press.</unstructured_citation>
+      </citation>
+    </citation_list>
+  </dissertation>
+  <!-- a dissertation with a single author -->
+  <dissertation publication_type="full_text" language="en" >
+    <contributors>
+      <person_name contributor_role="author" sequence="additional">
+        <given_name>Minerva</given_name>
+        <surname>Housecat</surname>
+        <affiliation>Crossref University</affiliation>
+        <ORCID authenticated="true">https://orcid.org/0000-0002-4011-3590</ORCID>
+      </person_name>
+    </contributors>
+    <titles>
+      <title>A further examination of metadata practices across dissertation depositors</title>
+    </titles>
+    <approval_date>
+      <month>01</month>
+      <day>31</day>
+      <year>2019</year>
+    </approval_date>
+    <institution>
+      <institution_name>University of Crossref</institution_name>
+    </institution>
+    <degree>MLIS</degree>
+    <doi_data>
+      <doi>10.32013/HGB98U-F</doi>
+      <resource>https://www.crossref.org/xml-samples/</resource>
+    </doi_data>
+    <citation_list>
+      <citation key="ref1">
+        <doi>10.1101/144147</doi>
+        <unstructured_citation>BioSharing: Harnessing Metadata Standards For The
+          Data Commons. Susanna-Assunta Sansone, Alejandra Gonzalez-Beltran,
+          Philippe Rocca-Serra, PeterMcQuilton, Massimiliano Izzo, Allyson Lister,
+          Milo Thurston. bioRxiv 144147</unstructured_citation>
+      </citation>
+      <citation key="ref2">
+        <doi>10.1515/jdis-2017-0012</doi>
+        <unstructured_citation>Greenberg, J. (2017). Big Metadata, Smart Metadata,
+          and Metadata Capital: Toward Greater Synergy Between Data Science and
+          Metadata, Journal of Data and Information Science, 2(3), 19-36.
+        </unstructured_citation>
+      </citation>
+      <citation key="ref3">
+        <doi>10.32013/s4947892</doi>
+      </citation>
+      <citation key="ref4">
+        <doi>10.1108/LHTN-12-2016-0059</doi>
+        <unstructured_citation>Jung ran Park, Yuji Tosaka, (2017) “Emerging
+          information standards and technologies: cataloging and metadata
+          professionals’ perspectives", Library Hi Tech News, Vol. 34 Issue: 4,
+          pp.22-26</unstructured_citation>
+      </citation>
+      <citation key="ref5">
+        <journal_title>Information Technology and Libraries</journal_title>
+        <author>Park</author>
+        <volume>29</volume>
+        <issue>3</issue>
+        <first_page>104</first_page>
+        <cYear>2010</cYear>
+        <doi>10.6017/ital.v29i3.3136</doi>
+        <article_title>Metadata creation practices in digital repositories and collections: Schemata, selection criteria, and interoperability</article_title>
+      </citation>
+      <citation key="ref6">
+        <unstructured_citation>Riley, J. (2017). Understanding metadata.
+          Bethesda,MD: NISO Press.</unstructured_citation>
+      </citation>
+      <citation key="ref6">
+        <doi>10.32013/GO7BE8</doi>
+      </citation>
+    </citation_list>
+  </dissertation>
+</body>
+</doi_batch>

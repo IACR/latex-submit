@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<doi_batch version="4.4.2" xmlns="http://www.crossref.org/doi_resources_schema/4.4.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.crossref.org/doi_resources_schema/4.4.2 http://www.crossref.org/schemas/doi_resources4.4.2.xsd">
+  <head>
+    <doi_batch_id>arg_123_954</doi_batch_id>
+    <depositor>
+      <depositor_name>Crossref</depositor_name>
+      <email_address>pfeeney@crossref.org</email_address>
+    </depositor>
+  </head>
+  <body>
+    <doi_citations>
+      <!--  ******* The DOI of the article that contains the citations *******   -->
+      <doi>10.32013/y2uGhyC</doi> 
+      <citation_list>
+        <!-- ****** The metadata for one of the citations in the above article ***** -->
+        <citation key="ref1">
+          <journal_title>Current Opinion in Oncology</journal_title> 
+          <author>Chauncey</author> 
+          <volume>13</volume> 
+          <first_page>21</first_page> 
+          <cYear>2001</cYear> 
+        </citation>
+        <!-- ****** Or, if we know the DOI of the cited article we can use it directly ***** -->
+        <citation key="ref2">
+          <doi>10.5555/small_md_0001</doi>
+        </citation>
+        <!-- ******* an unstructured citation from the article being deposited​ ******* -->
+    <citation key="ref=3">
+      <unstructured_citation>Clow GD, McKay CP, Simmons Jr. GM, and Wharton RA, Jr. 1988. Climatological observations and           predicted sublimation rates at Lake Hoare, Antarctica. Journal of Climate 1:715-728.</unstructured_citation>
+</citation>
+      </citation_list>
+    </doi_citations>
+   </body>
+</doi_batch>
