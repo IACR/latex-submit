@@ -1,1 +1,2 @@
+@BIBINPUTS = (".","/home/texlive/texmf/tex/latex/iacrcc");
 $pdf_mode = 4;

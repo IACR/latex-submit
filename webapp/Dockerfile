@@ -5,7 +5,7 @@ ARG SRCFILES=no
 ARG SCHEME=medium
 
 RUN apt-get update -q \
-    && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome \
+    && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TexLive
@@ -23,7 +23,7 @@ RUN echo "Building with documentation: $DOCFILES" && \
 
 ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
-ENV BIBINPUTS="/home/texlive/texmf/tex/latex/iacrcc"
+ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 
 # Install latex packages
 # NOTE: minted requires a shell escape, and is not supported.
