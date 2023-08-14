@@ -23,7 +23,7 @@ RUN echo "Building with documentation: $DOCFILES" && \
 
 ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
-ENV BIBINPUTS="${BIBINPUTS}:/home/texlive/texmf/tex/latex/iacrcc/cryptobib"
+ENV BIBINPUTS="/home/texlive/texmf/tex/latex/iacrcc"
 
 # Install latex packages
 # NOTE: minted requires a shell escape, and is not supported.
