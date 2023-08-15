@@ -23,6 +23,7 @@ def test_meta1():
     assert len(meta.authors) == 3
     assert meta.authors[0].email == 'alice@wonderland.com'
     assert meta.authors[0].name == 'Alice Accomplished'
+    assert meta.authors[0].surname == 'Accomplished'
     assert meta.authors[0].orcid == '0000-0003-1010-8157'
     assert meta.authors[1].orcid == None
     assert meta.authors[2].orcid == None
