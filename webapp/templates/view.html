@@ -18,7 +18,7 @@ This template is used to show the status of a compilation for iacrcc.cls
    max-height:80vh;
    font-family:monospace;
  }
- div#nav-log {
+ div#nav-log,  div#latexmk-log {
    overflow-y: scroll;
    max-height:80vh;
    font-family:monospace;
@@ -146,7 +146,9 @@ This template is used to show the status of a compilation for iacrcc.cls
       <nav class="mt-3">
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
           <button class="nav-link active" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
-                  type="button" role="tab" aria-controls="nav-log" aria-selected="true">Compilation log</button>
+                  type="button" role="tab" aria-controls="nav-log" aria-selected="true">LaTeX log</button>
+          <button class="nav-link" id="latexmk-log-tab" data-bs-toggle="tab" data-bs-target="#latexmk-log"
+                  type="button" role="tab" aria-controls="latexmk-log" aria-selected="false">Compilation log</button>
           {% if pdf %}
           <button class="nav-link" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf"
                   type="button" role="tab" aria-controls="nav-pdf" aria-selected="false">PDF</button>
@@ -162,6 +164,11 @@ This template is used to show the status of a compilation for iacrcc.cls
           {% for line in loglines %}
           <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
           {% endfor %}
+        </div>
+        <div class="tab-pane fade show p-3" id="latexmk-log" role="tabpanel" aria-labelledby="latexmk-log-tab">
+          <pre>
+         {{comp.log}}
+          </pre>
         </div>
         {% if pdf %}
         <div class="tab-pane fade show p-3" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">
