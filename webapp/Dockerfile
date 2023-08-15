@@ -34,7 +34,7 @@ RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj v
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
-RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile
+RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile nomencl
 
 # people use pdfpages to bypass uploading LaTeX.
 # RUN tlmgr remove pdfpages pdfjam

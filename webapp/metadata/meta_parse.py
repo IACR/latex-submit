@@ -252,7 +252,7 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
             tmpauxlines.extend(['\\bibcite{' + cite_keys[i] + '}{' + str(i) + '}' for i in range(len(cite_keys))])
             tmpauxcontents = '\n'.join(tmpauxlines) + '\n'
             aux_file.write_text(tmpauxcontents, encoding='UTF-8', errors='replace')
-        with tempfile.TemporaryDirectory(dir='.') as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             bibfile = tmpdir / Path('main.bib')
             args = ['bibexport', '-o', str(bibfile.resolve()), auxfilename]
             process = subprocess.run(args,
@@ -277,7 +277,7 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
     except Exception as e:
         compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
                                                   logline=0,
-                                                  text='Error checking for bibtex problems: {}. This may be a bug'.format(str(e))))
+                                                  text='Error checking in extract_bibtex: {}. This may be a bug'.format(str(e))))
 
 
 def clean_abstract(text):
