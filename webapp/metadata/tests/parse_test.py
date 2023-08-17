@@ -14,16 +14,17 @@ def test_meta1():
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'final'
+    print(data)
     with pytest.raises(ValueError):
         meta = Meta(**data)
     data['authors'][0]['email'] = 'alice@wonderland.com'
     meta = Meta(**data)
     assert meta.title == 'Thoughts about "binary" functions on $GF(p)$ by Fester Bestertester at 30°C'
-    assert len(meta.citations) == 12
     assert len(meta.authors) == 3
     assert meta.authors[0].email == 'alice@wonderland.com'
     assert meta.authors[0].name == 'Alice Accomplished'
-    assert meta.authors[0].surname == 'Accomplished'
+    print(meta.authors[0])
+    assert meta.authors[0].familyName == 'Accomplished'
     assert meta.authors[0].orcid == '0000-0003-1010-8157'
     assert meta.authors[1].orcid == None
     assert meta.authors[2].orcid == None
@@ -39,7 +40,6 @@ def test_meta2():
     data['version'] = 'preprint'
     meta = Meta(**data)
     assert meta.title == 'How to Use the IACR Communications in Cryptology Class'
-    assert len(meta.citations) == 6
     assert len(meta.authors) == 2
     assert meta.authors[0].email == 'joppe.bos@nxp.com'
     assert meta.authors[0].name == 'Joppe W. Bos'
@@ -63,7 +63,6 @@ def test_meta3():
     data['version'] = 'submission'
     meta = Meta(**data)
     assert meta.title == 'Another example with biblatex'
-    assert len(meta.citations) == 79
     assert len(meta.authors) == 1
     assert meta.authors[0].email == 'nobody@example.com'
     assert meta.authors[0].name == 'Fester Bestertester'
@@ -77,7 +76,6 @@ def test_meta4():
     data['abstract'] = 'We added an abstract'
     meta = Meta(**data)
     assert meta.title == 'How not to use the IACR Communications in Cryptology Clåss'
-    assert len(meta.citations) == 0
     assert len(meta.authors) == 2
     assert meta.authors[0].email == 'joppe.bos@nxp.com'
     assert meta.authors[0].name == 'Joppe W. Bös'

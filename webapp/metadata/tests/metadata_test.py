@@ -1,12 +1,15 @@
 import json
 from pathlib import Path
 import pytest
+import random
 import sys
 sys.path.insert(0, '../')
 from compilation import Compilation, CompileStatus
 from meta_parse import clean_abstract, check_bibtex
 import datetime
 from pathlib import Path
+sys.path.insert(0, '../../')
+from metadata import _alphabet, _scramble, _unscramble
 
 def test_clean_abstract():
     input = """This is an abstract
@@ -54,14 +57,49 @@ def _test_bibtex_entry(case):
                         'command': 'dummy command',
                         'error_log': [],
                         'warning_log': [],
+                        'bibtex': output_path.read_text(encoding='UTF-8'),
                         'zipfilename': 'submit.zip'}
     compilation = Compilation(**compilation_data)
-    check_bibtex(output_path, compilation)
+    check_bibtex(compilation)
     return compilation
 
 def test_bibtex():
-    compilation = _test_bibtex_entry('ex1')
-    assert len(compilation.warning_log) == 34
-    compilation = _test_bibtex_entry('cryptobib')
-    print(json.dumps(compilation.error_log, indent=2))
-    assert len(compilation.warning_log) == 1574
+    output_path = Path('testdata/bibtex/ex1/bibitem.bib')
+    compilation_data = {'paperid': 'abcdefg',
+                        'status': CompileStatus.COMPILING,
+                        'email': 'foo@example.com',
+                        'venue': 'eurocrypt',
+                        'submitted': '2023-01-02 01:02:03',
+                        'accepted': '2023-01-03 01:02:55',
+                        'compiled': datetime.datetime.now(),
+                        'command': 'dummy command',
+                        'error_log': [],
+                        'warning_log': [],
+                        'bibtex': output_path.read_text(encoding='UTF-8'),
+                        'zipfilename': 'submit.zip'}
+    compilation = Compilation(**compilation_data)
+    check_bibtex(compilation)
+    assert len(compilation.warning_log) == 56
+    output_path = Path('testdata/bibtex/cryptobib/bibexport.bib')
+    compilation_data = {'paperid': 'abcdefg',
+                        'status': CompileStatus.COMPILING,
+                        'email': 'foo@example.com',
+                        'venue': 'eurocrypt',
+                        'submitted': '2023-01-02 01:02:03',
+                        'accepted': '2023-01-03 01:02:55',
+                        'compiled': datetime.datetime.now(),
+                        'command': 'dummy command',
+                        'error_log': [],
+                        'warning_log': [],
+                        'bibtex': output_path.read_text(encoding='UTF-8'),
+                        'zipfilename': 'submit.zip'}
+    compilation = Compilation(**compilation_data)
+    check_bibtex(compilation)
+    assert len(compilation.warning_log) == 1665
+    assert len(compilation.error_log) == 0
+
+def test_scramble():
+    for l in range(3, 12):
+        for i in range(100):
+            id = ''.join(random.choices(_alphabet, k=l))
+            assert _unscramble(_scramble(id)) == id
