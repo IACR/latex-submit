@@ -71,7 +71,7 @@ This template is used to show the status of a compilation for iacrcc.cls
               {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
             </div>
             <div class="col-4">
-              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page ≈{{err.pageno}}</span>{% endif %}
+              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
             </div>
             <div class="col-4">
               {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
@@ -127,7 +127,7 @@ This template is used to show the status of a compilation for iacrcc.cls
               {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to long line"> Log line {{err.logline}}</span>{% endif %}
             </div>
             <div class="col-4">
-              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page ≈{{err.pageno}}</span>{% endif %}
+              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
             </div>
             <div class="col-4">
               {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
