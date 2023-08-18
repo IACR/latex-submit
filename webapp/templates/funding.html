@@ -350,6 +350,23 @@ This template is used to show search on fundreg.
     </div>
   </div>
 </div>
+<script>
+ window.addEventListener('load', (event) => {
+   const queryString = window.location.search;
+   if (queryString) {
+     const urlParams = new URLSearchParams(queryString);
+     const query = urlParams.get('textq');
+     if (query) {
+       textinput.value = query;
+       if (urlParams.get('ror')) {
+         sourceinput.value = 'ror';
+       }
+       doSearch();
+     }
+   }
+ });
+</script>
+
 </main>
 {% endblock %} {# end of content #}
 
