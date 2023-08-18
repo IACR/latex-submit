@@ -117,12 +117,6 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                         try:
                             metastr = metafile.read_text(encoding='UTF-8', errors='replace')
                             data = meta_parse.parse_meta(metastr)
-                            # Check to see if references have DOIs.
-                            for citation in data.get('citations'):
-                                if citation.get('ptype') in ['article', 'book', 'inproceedings'] and 'doi' not in citation:
-                                    compilation.warning_log.append(CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                logline=0,
-                                                                                text='missing DOI on reference: {}: "{}". It is important to include DOIs when available.'.format(citation.get('id'), citation.get('title', ''))))
                             abstract_file = Path(output_path) / Path('main.abstract')
                             if not abstract_file.is_file():
                                 compilation.status = CompileStatus.MISSING_ABSTRACT
