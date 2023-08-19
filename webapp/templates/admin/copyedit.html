@@ -71,7 +71,7 @@
         <div class="d-flex justify-content-between">
           <div>{{#if logline}}<span onclick="showLogLine({{logline}})" class="lognav" title="Scroll to log line">Log line {{logline}}</span>{{/if}}
           </div>
-          <div>{{#if pageno}}<span onclick="showPage({{pageno}})" class="lognav" title="Scroll to PDF page {{pageno}}">PDF page ≈{{pageno}}</span>{{/if}}
+          <div>{{#if pageno}}<span onclick="showPage({{pageno}})" class="lognav" title="Scroll to PDF page {{pageno}}">PDF page &ge;{{pageno}}</span>{{/if}}
           </div>
           <div class="text-end">{{#if source_file}}<span data-filepath="{{source_file}}" onclick="showSource(this)"
              {{#if source_lineno}}data-filepath_line="{{source_lineno}}" {{/if}}
