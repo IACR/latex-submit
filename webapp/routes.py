@@ -1,4 +1,5 @@
 import datetime
+import random
 from io import BytesIO
 from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for
 from flask import current_app as app
@@ -42,6 +43,7 @@ def home():
 
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
+    random.seed(datetime.datetime.now())
     form = SubmitForm(formdata=request.args)
     # We only perform partial validation on the GET request to make sure that
     # the auth token is valid.
@@ -64,11 +66,12 @@ def show_submit_version():
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    logging.error('Paper id is ' + paperid)
     if paper_status:
         if (paper_status.status != PaperStatusEnum.PENDING.value and
             paper_status.status != PaperStatusEnum.EDIT_FINISHED.value):
             return render_template('message.html',
-                                   title='This submission is not authorized.',
+                                   title='This submission is invalid.',
                                    error='The paper should not be in this state: {}'.format(paper_status.status.value))
         elif (paper_status.status == PaperStatusEnum.EDIT_FINISHED.value and
               form.version.data != Version.FINAL.value):
