@@ -127,7 +127,7 @@ def _add_jats_citation(index: int, ref_list: ET.Element, entry: Entry):
 def _add_crossref_citation(index: int, citation_list: ET.Element, entry: Entry):
     citation = ET.SubElement(citation_list, 'citation', attrib={'key': 'ref{}'.format(index)})
     if 'issn' in entry.fields:
-        ET.SubElement(citation, 'issn').text = entry.fields['issn']
+        ET.SubElement(citation, 'issn', attrib={'media_type': 'electronic'}).text = entry.fields['issn']
     if entry.persons and 'author' in entry.persons:
         # Strangely only one author is accepted, even though the schema says minOccurs=0 and
         # has no maxOccurs.
@@ -169,7 +169,7 @@ def get_jats(comp: Compilation) -> ET.Element:
     ET.SubElement(journal_meta, 'journal-id', attrib={'journal-id-type': 'publisher'}).text = 'IACR CiC'
     ET.SubElement(ET.SubElement(journal_meta, 'journal-title-group'),
                   'abbrev-journal-title').text = 'IACR Communications in Cryptology'
-    ET.SubElement(journal_meta, 'issn').text = '1234.abcd'
+    ET.SubElement(journal_meta, 'issn', attrib={'publication-format': 'electronic'}).text = '1234.abcd'
     ET.SubElement(ET.SubElement(journal_meta, 'publisher'), 'publisher-name').text = 'International Association for Cryptologic Research'
     article_meta = ET.SubElement(front, 'article-meta')
     ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'publisher-id'}).text = '2022/197'
@@ -355,7 +355,7 @@ def get_crossref(batchid: str,
     journal_metadata = ET.SubElement(journal_elem, 'journal_metadata', attrib={'language': 'en',
                                                                                'reference_distribution_opts': 'any'})
     ET.SubElement(journal_metadata, 'full_title').text = journal.name
-    ET.SubElement(journal_metadata, 'issn', attrib={'media_type': 'electronic'}).text = journal.ISSN
+    ET.SubElement(journal_metadata, 'issn', attrib={'media_type': 'electronic'}).text = journal.EISSN
     # TOD: The Journal needs a DOI as well as the article?
     for comp in compilations:
         _add_crossref_article_meta(comp, journal_elem)
@@ -401,7 +401,7 @@ if __name__ == '__main__':
     except Exception as e:
         print('error in jats:' + str(e))
         print(schema.error_log)
-    journal = Journal({'ISSN': '1234-5678',
+    journal = Journal({'EISSN': '1234-5678',
                        'key': 'testkey',
                        'name': 'Test Journal',
                        'DOI_PREFIX': '10.1729'})

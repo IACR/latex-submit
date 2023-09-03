@@ -94,6 +94,10 @@ def submit_version():
     version = args.get('version', Version.CANDIDATE.value)
     accepted = args.get('accepted', '')
     submitted = args.get('submitted', '')
+    if not paperid:
+        return render_template('message.html',
+                               title='Missing parameter',
+                               error='Missing parameter')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
     form = SubmitForm()
@@ -257,6 +261,7 @@ def submit_version():
     acceptedDate = datetime.datetime.strptime(accepted[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
     metadata = '\\def\\IACR@DOI{' + get_doi(journal.DOI_PREFIX, paperid) + '}\n'
+    metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
