@@ -23,7 +23,7 @@
     <tr>
       <th>key</th>
       <th>name</th>
-      <th>ISSN</th>
+      <th>EISSN</th>
       <th>DOI prefix</th>
       <th>volumes</th>
     </tr>
@@ -32,7 +32,7 @@
     {% for journal in journals %}
       <td>{{journal.key}}</td>
       <td>{{journal.name}}</td>
-      <td>{{journal.ISSN}}</td>
+      <td>{{journal.EISSN}}</td>
       <td>{{journal.DOI_PREFIX}}</td>
       <td>{{journal.volumes|length}} volumes</td>
     </tr>

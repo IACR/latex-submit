@@ -135,13 +135,13 @@ def log_event(db, paperid, action):
 class Journal(Base):
     __tablename__ = 'journal'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    ISSN: Mapped[str] = mapped_column(String(10), nullable=False)
+    EISSN: Mapped[str] = mapped_column(String(10), nullable=False)
     DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
     key: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(Text)
     volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
     def __init__(self, data):
-        self.ISSN = data['ISSN']
+        self.EISSN = data['EISSN']
         self.key = data['key']
         self.name = data['name']
         self.DOI_PREFIX = data['DOI_PREFIX']

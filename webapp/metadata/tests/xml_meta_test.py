@@ -68,7 +68,7 @@ def test_crossref_creation1():
     json_file = Path('testdata/xml/compilation1.json')
     compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8', errors='replace'))
     compilation.meta.URL = 'https://example.com/crossref'
-    journal = Journal({'ISSN': '1234-5678',
+    journal = Journal({'EISSN': '1234-5678',
                        'key': 'testkey',
                        'name': 'Test Journal',
                        'DOI_PREFIX': '10.1729'})
