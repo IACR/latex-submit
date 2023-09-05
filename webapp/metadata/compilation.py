@@ -2,7 +2,7 @@
 The metadata should eventually appear here if the LaTeX class is
 used properly.
 """
-
+import json
 from pydantic import BaseModel, Field, EmailStr, Extra, constr, conint, conlist, validator, root_validator, validate_model, AnyUrl
 from typing import List, Optional, Union, Literal
 from typing_extensions import Annotated
@@ -250,9 +250,9 @@ class Meta(BaseModel):
         if authorcount_withemail == 0:
             raise ValueError('At least one author must have an email.')
         for author in values['authors']:
-            if 'affiliations' in author:
-                for aff_index in author['affiliations']:
-                    if aff_index not in range(num_affiliations):
+            if author.affiliations:
+                for aff_index in author.affiliations:
+                    if aff_index not in range(1, 1+num_affiliations):
                         raise ValueError('Affiliation index {} out of range {}'.format(aff_index, num_affiliations))
         return values
 

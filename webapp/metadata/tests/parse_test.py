@@ -97,3 +97,11 @@ def test_meta4():
     assert meta.funders[2].ror == None
     assert meta.funders[2].fundref == '517622'
     assert meta.funders[2].grantid == '57821-3'
+
+def test_meta5():
+    tfile = Path('testdata/test5.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
+    data['abstract'] = 'We added an abstract'
+    # This is invalid because an index for affiliation is out of range.
+    with pytest.raises(ValueError):
+        meta = Meta(**data)
