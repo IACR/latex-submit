@@ -78,6 +78,10 @@ This template is used to show search on fundreg.
 <main id="mainContent" class="container px-3 px-md-4">
 <div class="container mt-3">
   <h2>Metadata search</h2>
+  <p class="alert alert-info">
+    Crossref and ROR have <a href="https://ror.org/blog/2023-09-07-open-funder-registry-transition-ror-cross-post/" target="_blank">announced plans</a> to merge the ROR registry with the FUNDREG registry. For this reason we recommend
+    using ROR identifiers in funding information going forward.
+  </p>
   <p class="mt-2">
     This is designed to help you locate identifiers for the macros
     <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> in
@@ -105,7 +109,7 @@ This template is used to show search on fundreg.
           <div class="col-sm-3">
             <select onchange="doSearch()" id="source" class="form-select form-select-lg" aria-label="Default select example">
               <option value="all">Funding agencies</option>
-              <option value="ror">Affiliations</option>
+              <option value="ror" selected>Affiliations</option>
             </select>
           </div>
         </div>
