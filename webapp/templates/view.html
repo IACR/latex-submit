@@ -240,6 +240,8 @@ This template is used to show the status of a compilation for iacrcc.cls
               </div>
               {% endfor %}
             </div>
+            <h5 class="mt-3">Bibliography</h5>
+            <div class="elem" id="bibtex">{% if comp.bibtex %}<pre>{{comp.bibtex}}</pre>{% else %}<span class="text-danger">None</span>{% endif %}</div>
             <table class="table ms-3 mt-2 table-bordered">
               <tbody>
                 <tr>
