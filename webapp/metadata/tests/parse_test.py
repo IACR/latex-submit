@@ -100,8 +100,25 @@ def test_meta4():
 
 def test_meta5():
     tfile = Path('testdata/test5.meta').read_text(encoding='UTF-8')
+    with pytest.raises(ValueError):
+        # This is invalid because an index for affiliation is out of range.
+        data = parse_meta(tfile)
+
+def test_meta6():
+    tfile = Path('testdata/test6.meta').read_text(encoding='UTF-8')
+    with pytest.raises(ValueError):
+        # This is invalid because an index for affiliation is out of range.
+        data = parse_meta(tfile)
+
+def test_meta7():
+    ## This one has affil: 1, 2
+    tfile = Path('testdata/test7.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'We added an abstract'
-    # This is invalid because an index for affiliation is out of range.
-    with pytest.raises(ValueError):
-        meta = Meta(**data)
+    meta = Meta(**data)
+    assert len(meta.authors) == 2
+    assert len(meta.authors[0].affiliations) == 1
+    assert len(meta.authors[1].affiliations) == 2
+    assert meta.authors[1].affiliations[0] == 1
+    assert meta.authors[1].affiliations[1] == 2
+    assert len(meta.affiliations) == 2

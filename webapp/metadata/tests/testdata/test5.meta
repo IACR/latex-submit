@@ -5,7 +5,7 @@ author:
   orcid: 0000-0003-1010-8157
 author:
   name: Kevin S. McCurley
-  affil: 2, 3
+  affil: 2,3
   email: test2@digicrime.com
   orcid: 0000-0001-7890-5430
 affiliation:
@@ -15,9 +15,6 @@ affiliation:
   city: Leuven
   postcode: 3001
   country: Belgium
-affiliation:
-  name: Self
-  country: Elbonia
 affiliation:
   name: Center for the Study of Idiocy
   country: Freedonia

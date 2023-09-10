@@ -130,7 +130,8 @@ def _add_crossref_citation(index: int, citation_list: ET.Element, entry: Entry):
         ET.SubElement(citation, 'issn', attrib={'media_type': 'electronic'}).text = entry.fields['issn']
     if entry.persons and 'author' in entry.persons:
         # Strangely only one author is accepted, even though the schema says minOccurs=0 and
-        # has no maxOccurs.
+        # has no maxOccurs. The documentation https://data.crossref.org/reports/help/schema_doc/5.3.1/index.html
+        # says that it should be the first author.
         ET.SubElement(citation, 'author').text = str(entry.persons['author'][0])
     if 'journal' in entry.fields:
         ET.SubElement(citation, 'journal_title').text = entry.fields['journal']
