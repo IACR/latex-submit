@@ -120,7 +120,7 @@ def submit_version():
         return render_template('submit.html', form=form)
     # Ensure that the journal, volume, and issue exist.
     journal_id = args.get('journal')
-    journal = db.session.execute(select(Journal).filter_by(key=journal_id)).scalar_one_or_none()
+    journal = db.session.execute(select(Journal).filter_by(acronym=journal_id)).scalar_one_or_none()
     if not journal:
         return render_template('message.html',
                                title='Unknown journal {}'.format(journal_id),
@@ -148,11 +148,10 @@ def submit_version():
     send_mail = False
     if not paper_status:
         paper_status = PaperStatus(paperid=paperid,
-                                   journal=journal_id,
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
-                                   issue_id=int(args.get('issue')),
+                                   issue_id=issue.id,
                                    status=PaperStatusEnum.PENDING.value)
         db.session.add(paper_status)
         db.session.commit()

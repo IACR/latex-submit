@@ -151,22 +151,76 @@ continue to upload a `final` version until the copy editor is satisfied.
 Once they are satisfied, the `final` version is frozen and used to
 produce the published paper.
 
-### Database schema
+### Data model and database schema
 
-The database is used to store relational data about journals, volumes,
-issues, papers, versions, discussion, users, and log events. The
-schema is subject to change, but is currently shown below. This was
-generated with
+A relational database is used to store relational data about journals, volumes,
+issues, papers, versions, compilations, discussion, users, and log events.
+There are various ways to understand the schema:
+1. through the SQLAlchemy specification in the `webapp/metadata/db_models.py`
+file. This is complicated by the fact that SQLAlchemy went through a major breaking
+change in version 2.0, so many tools no longer work.
+2. through the mysql schema for tables that are generated.
+3. through a visual representation
+
+From a high level point of view, there are journals, which contain
+volumes, which contain issues, which contain papers. The main class
+for a paper is the `PaperStatus`, which stores the most recent
+information related to the paper. A paper may have different versions
+(`candidate`, `copyedit`, or `final`), and for each version we store
+information about the latest compilation of that version in the
+`CompileRecord`. Thus for each paper there may be multiple
+`CompileRecords` so we can compare what the author submitted
+originally (the `candidate`) vs what the copy editor saw (the
+`copyedit` version`) vs what the author uploaded after seeing their
+copy editor feedback (the `final` version).
+
+A visualization of the schema in sqlite can be created with
 ```
 eralchemy -i 'sqlite:///db.sqlite' -o db_erd.dot
 ```
-followed by post-processing on the dot file.
+followed by post-processing on the dot file. Another view is provided
+by mysql Workbench below.
 
-![workflow](db_erd.svg).
+![workflow](schema.svg).
 
-### Authentication in URLs
+This makes the hierarchy obvious:
+```
+Journal -> Volume -> Issue -> Paper
+```
+Papers than have multiple `CompileRecord`, `LogEvent`, and `Discussion`
+objects associated with them. The `result` field in `CompileRecord` is
+the JSON serialization of the `Compilation` object.
 
-As mentioned previously, when the author is referred to /submit, there
+### Usage for conferences
+This system is designed for journals, but computer science typically
+uses a conference model of publication. That can be mapped into the data
+model of this system in various ways, such as:
+1. journal: ACM KDD
+2. volume: year
+3. issue: track (e.g., industry track vs research track vs invited talks).
+
+This is a clumsy mapping, but at least it breaks things down in a
+hierarchy.  For conferences that don't have multiple tracks, they
+might have only a single issue. For conferences that occur multiple
+times per year, they might have one volume per conference rather than
+one volume per year. Alternatively, they could use year and use issue
+to represent each individual conference. The mapping needs to be
+selected in a way that best represents the hierarchy.
+
+Alternatively, we could use this hierarchy:
+1. journal: LNCS
+2. volume: TCC
+3. issue: year
+
+The mapping is arbitrary, but keep in mind that a journal needs an EISSN.
+Another contraint is that administrative or copy editor access control
+must be decided at the level of a journal or volume or issue (this is TBD).
+
+### Authentication
+
+#### Authors
+
+When the author is referred to /submit, there
 will be URL paramters that are authenticated with an hmac using a key
 shared between the review system and this server. Thereafer the user
 is supplied with URLs of the form
@@ -179,6 +233,16 @@ An author is free to share these URLs with other authors so that we do
 not require authors to login on the site. This may change in the future,
 because there is now authentication on the site to restrict access to
 the `/admin` section of the site.
+
+Authors do not typically receive accounts on the system - they supply an email
+address and receive notifications to that address. Views of their results
+are authenticated in HMACS that are embedded into the URLs.
+
+#### Admin and copy editor authentication
+
+Administrators and copy editors receive accounts on the system and have
+to login with a username/password. The access control is yet TBD, and for
+the moment there is just one class of user.
 
 ### The compilation process
 
@@ -217,7 +281,7 @@ Installation is as follows (TODO: review this):
 python3 -m pip install flask
 python3 -m pip install flask-mail
 python3 -m pip install flask-login
-python3 -m pip install Flask-SQLAlchemy
+python3 -m pip install sqlalchemy
 python3 -m pip install flask-WTF
 python3 -m pip install docker
 python3 -m pip install arxiv-latex-cleaner

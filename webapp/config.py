@@ -24,25 +24,25 @@ class Config:
     TESTING = False
     JOURNALS = [
         {
-            'key': 'cic',
+            'acronym': 'cic',
             'name': 'IACR Communications in Cryptology',
             'EISSN': 'XXXX-YYYY',
             'DOI_PREFIX': '10.1729'
         },
         {
-            'key': 'tosc',
+            'acronym': 'tosc',
             'name': 'IACR Transactions on Symmetric Cryptology',
             'EISSN': '2519-173X',
             'DOI_PREFIX': '10.46586'
         },
         {
-            'key': 'tches',
+            'acronym': 'tches',
             'name': 'IACR Transactions on Cryptographic Hardware and Embedded Systems',
             'EISSN': '2569-2925',
             'DOI_PREFIX': '10.45686'
         },
         {
-            'key': 'lncs',
+            'acronym': 'lncs',
             'name': 'Lecture Notes in Computer Science',
             'EISSN': '1611-3349',
             'DOI_PREFIX': '10.1007'
@@ -51,6 +51,7 @@ class Config:
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
     XAPIAN_DB_PATH = '/var/www/wsgi/latex-submit/webapp/fundreg/xapian.db'
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     

@@ -132,9 +132,9 @@ class SubmitForm(FlaskForm):
                           default=Version.CANDIDATE.value)
     journal = SelectField(id='journal',
                           name='journal',
-                          choices = [(j['key'], j['name']) for j in app.config['JOURNALS']],
+                          choices = [(j['acronym'], j['name']) for j in app.config['JOURNALS']],
                           validators=[InputRequired('Journal is required'),
-                                      AnyOf([j['key'] for j in app.config['JOURNALS']])],
+                                      AnyOf([j['acronym'] for j in app.config['JOURNALS']])],
                           # TODO remove default value below
                           default='cic')
     volume = HiddenField(id='volume',
