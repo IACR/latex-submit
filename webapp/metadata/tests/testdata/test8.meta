@@ -1,0 +1,42 @@
+license: CC-by
+author:
+  name: Ittai Abraham
+  surname: Abraham
+  affil: 1
+author:
+  name: Philipp Jovanovic
+  surname: Jovanovic
+  affil: 2
+author:
+  name: Mary Maller
+  surname: Maller
+  affil: 3
+author:
+  name: Sarah Meiklejohn
+  surname: Meiklejohn
+  affil: 2,4
+author:
+  name: Gilad Stern
+  surname: Stern
+  affil: 5
+  email: foo@example.com
+affiliation:
+  name: Intel Labs
+  country: USA
+affiliation:
+  name: University College London
+  country: United Kingdom
+affiliation:
+  name: Ethereum Foundation
+  country: USA
+affiliation:
+  name: PQShield
+  country: Canada
+affiliation:
+  name: Google
+  country: USA
+affiliation:
+  name: The Hebrew University of Jerusalem
+  country: Israel
+version: final
+title: Bingo: Adaptivity and Asynchrony in Verifiable Secret Sharing and Distributed Key Generation

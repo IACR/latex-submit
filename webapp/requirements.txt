@@ -1,6 +1,7 @@
 flask
 flask_mail
 flask_limiter
+pydantic>=2.0
 python-dotenv
 flask-wtf
 flask-login

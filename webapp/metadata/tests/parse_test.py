@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import sys
 sys.path.insert(0, '../')
-from compilation import Meta
+from compilation import Meta, LicenseEnum
 sys.path.insert(0, '../latex/iacrcc/parser')
 from meta_parse import parse_meta
 
@@ -14,7 +14,9 @@ def test_meta1():
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'final'
-    print(data)
+    assert 'license' in data
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
+    print('test data=', data)
     with pytest.raises(ValueError):
         meta = Meta(**data)
     data['authors'][0]['email'] = 'alice@wonderland.com'
@@ -23,7 +25,7 @@ def test_meta1():
     assert len(meta.authors) == 3
     assert meta.authors[0].email == 'alice@wonderland.com'
     assert meta.authors[0].name == 'Alice Accomplished'
-    print(meta.authors[0])
+    print('meta.authors[0]=', meta.authors[0])
     assert meta.authors[0].familyName == 'Accomplished'
     assert meta.authors[0].orcid == '0000-0003-1010-8157'
     assert meta.authors[1].orcid == None
@@ -38,6 +40,7 @@ def test_meta2():
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'preprint'
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
     meta = Meta(**data)
     assert meta.title == 'How to Use the IACR Communications in Cryptology Class'
     assert len(meta.authors) == 2
@@ -61,6 +64,7 @@ def test_meta3():
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'submission'
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
     meta = Meta(**data)
     assert meta.title == 'Another example with biblatex'
     assert len(meta.authors) == 1
@@ -74,6 +78,7 @@ def test_meta4():
     tfile = Path('testdata/test4.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'We added an abstract'
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
     meta = Meta(**data)
     assert meta.title == 'How not to use the IACR Communications in Cryptology Clåss'
     assert len(meta.authors) == 2
@@ -115,6 +120,7 @@ def test_meta7():
     tfile = Path('testdata/test7.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'We added an abstract'
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
     meta = Meta(**data)
     assert len(meta.authors) == 2
     assert len(meta.authors[0].affiliations) == 1
@@ -122,3 +128,11 @@ def test_meta7():
     assert meta.authors[1].affiliations[0] == 1
     assert meta.authors[1].affiliations[1] == 2
     assert len(meta.affiliations) == 2
+
+def test_meta8():
+    tfile = Path('testdata/test8.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
+    print(data)
+    data['abstract'] = 'We added an abstract'
+    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
+    meta = Meta(**data)

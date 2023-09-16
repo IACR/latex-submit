@@ -3,8 +3,8 @@ The metadata should eventually appear here if the LaTeX class is
 used properly.
 """
 import json
-from pydantic import BaseModel, Field, EmailStr, Extra, constr, conint, conlist, validator, root_validator, validate_model, AnyUrl
-from typing import List, Optional, Union, Literal
+from pydantic import model_validator, StringConstraints, ConfigDict, BaseModel, Field, EmailStr, AnyUrl, PositiveInt
+from typing import List, Optional
 from typing_extensions import Annotated
 
 import packaging.version
@@ -49,99 +49,88 @@ class CompileStatus(StrEnum):
     DOI_FAILED = 'doi_failed' # registration of DOI failed
     PUBLISHED = 'published' # approved by executive editor
 
-class Funder(BaseModel, extra=Extra.forbid):
-    name: constr(min_length=3) = Field(...,
-                                       title='Name of organization',
-                                       description = 'Only requirement is minimum length of three characters')
-    ror: constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$') = Field(
-        None,
-        title='ROR ID of institution',
-        description=('See https://ror.org/facts/ for format. The last two digits are supposed '
-                     'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
-                     'we do not implement validation on it.'))
-    fundref: constr(min_length=3) = Field(None,
-                                          title = 'Optional fundreg id',
-                                          description = 'ID from Crossref Funder registry')
-    country: constr(min_length=2) = Field(None,
-                                          title='Country of organization',
-                                          description=' Any identifier is acceptable')
-    grantid: str = Field(None,
-                         title = 'Grant ID from funding agency',
-                         description = 'This optional field can be any string')
+_ror_pattern = '^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$'
+
+class Funder(BaseModel, extra='forbid'):
+    name: Annotated[str, StringConstraints(min_length=3)] = Field(title='Name of organization',
+                                                                  description = 'Only requirement is minimum length of three characters')
+    ror: Optional[str] = Field(default=None,
+                               pattern=_ror_pattern,
+                               title='ROR ID of institution',
+                               description=('See https://ror.org/facts/ for format. The last two digits are supposed '
+                                            'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
+                                            'we do not implement validation on it.'))
+    fundref: Optional[Annotated[str, StringConstraints(min_length=3)]
+                      ] = Field(default=None,
+                                title = 'Optional fundreg id',
+                                description = 'ID from Crossref Funder registry. ror is preferred now.')
+    country: Optional[Annotated[str, StringConstraints(min_length=2)]
+                      ] = Field(default=None,
+                                title='Country of organization',
+                                description=' Any identifier is acceptable')
+    grantid: Optional[str] = Field(default=None,
+                                   title = 'Grant ID from funding agency',
+                                   description = 'This optional field can be any string')
 
 class Affiliation(BaseModel):
-    name: constr(min_length=3)
-    ror: constr(regex='^0[0-9a-zA-HJKMNP-Z]{6}[0-9]{2}$') = Field(
-        None,
-        title='ROR ID of institution',
-        description=('See https://ror.org/facts/ for format. The last two digits are supposed '
-                     'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
-                     'we do not implement validation on it.'))
-    department: str = Field(None,
-                            title='department of affiliation',
-                            description='May be any string')
-    street: str = Field(None,
-                        title='Street of affiliation',
-                        description='May be any string')
-    city: str = Field(None,
-                      title='City of affiliation',
-                      description='May be any string')
-    state: str = Field(None,
-                       title='State or province',
-                       description='May be any string')
-    country: str = Field(None,
-                         title='Country of affiliation',
-                         description='May be any string')
-    postcode: str = Field(None,
-                         title='Postal code of affiliation',
-                         description='May be any string')
-
-    class Config:
-        title = 'Affiliation for a paper',
-        validate_all = True
-        validate_assignment = True
-        extra = Extra.forbid
+    name: Annotated[str, StringConstraints(min_length=3)]
+    ror: Optional[Annotated[str, StringConstraints(pattern=_ror_pattern)]
+                  ] = Field(default=None,
+                            title='ROR ID of institution',
+                            description=('See https://ror.org/facts/ for format. The last two digits are supposed '
+                                         'to be a checksum based on ISO/IEC 7064, but since that is proprietary '
+                                         'we do not implement validation on it.'))
+    department: Optional[str] = Field(default=None,
+                                      title='department of affiliation',
+                                      description='May be any string')
+    street: Optional[str] = Field(default=None,
+                                  title='Street of affiliation',
+                                  description='May be any string')
+    city: Optional[str] = Field(default=None,
+                                title='City of affiliation',
+                                description='May be any string')
+    state: Optional[str] = Field(default=None,
+                                 title='State or province',
+                                 description='May be any string')
+    country: Optional[Annotated[str, StringConstraints(min_length=2)]
+                      ] = Field(default=None,
+                                title='Country of affiliation',
+                                description='May be any string')
+    postcode: Optional[str] = Field(default=None,
+                                    title='Postal code of affiliation',
+                                    description='May be any string')
+    model_config = ConfigDict(title='Affiliation for a paper', validate_default=True, validate_assignment=True, extra="forbid")
 
 class AuthorName(BaseModel):
     name: str = Field(...,
                       title='Full name of author',
                       description=('Preferred format is "First Last", but see '
                                    'https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/'))
-    familyName: Optional[str] = Field(None,
+    familyName: Optional[str] = Field(default=None,
                                       title='Family name or surname',
                                       description='Captured upon submission. Both Datacite and Crossref use these.')
 
 class Author(AuthorName):
-    email: EmailStr = Field(None,
-                            title='Email address of this author',
-                            description='Authors may not have them')
-    orcid: Optional[constr(regex=r'^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$')] = Field(None,
-                                                                                          title='ORCID ID',
-                                                                                          description='Must have the form dddd-dddd-dddd-dddd')
-    affiliations: List[int] = Field(...,
-                                    title='List of indices into affiliations array',
-                                    description='This references affiliations from an external array of Affiliation objects in Paper.')
-
-    class Config:
-        title = 'Author model for Paper'
-        validate_all = True
-        validate_assignment = True
+    email: Optional[EmailStr] = Field(default=None,
+                                      title='Email address of this author',
+                                      description='Authors may not have them')
+    orcid: Optional[Annotated[str, StringConstraints(pattern=r'^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$')]
+                    ] = Field(default=None,
+                              title='ORCID ID',
+                              description='Has the form xxxx-xxxx-xxxx-xxxx')
+    affiliations: Optional[List[PositiveInt]] = Field(default=None,
+                                                      title='List of 1-based indices into affiliations array',
+                                                      description='This references affiliations from an external array of Affiliation objects in Paper.')
+    model_config = ConfigDict(title='Author model for Paper', validate_default=True, validate_assignment=True)
 
 class License(BaseModel):
-    name: str = Field(...,
-                      title='Commonly used external identifier, e.g., "CC BY"',
-                      description='This is a commonly used identifier but may have a version with it.',
-                      allow_mutation=False)
-    label: str = Field(...,
-                       title='A more descriptive name like "Creative Commons Attribution"',
-                       description='These have no predefined vocabulary',
-                       allow_mutation=False)
-    reference: str = Field(...,
-                           title='Location of a definition for the license',
-                           description='An example is https://creativecommons.org/licenses/by/4.0/',
-                           allow_mutation=False)
-    class Config:
-        validate_assignment = True
+    name: str = Field(title='Commonly used external identifier, e.g., "CC BY"',
+                      description='This is a commonly used identifier but may have a version with it.')
+    label: str = Field(title='A more descriptive name like "Creative Commons Attribution"',
+                       description='These have no predefined vocabulary')
+    reference: str = Field(title='Location of a definition for the license',
+                           description='An example is https://creativecommons.org/licenses/by/4.0/')
+    model_config = ConfigDict(validate_assignment=True, frozen=True)
 
 
 class LicenseEnum(Enum):
@@ -168,12 +157,13 @@ class LicenseEnum(Enum):
                   label='No rights reserved',
                   reference='https://creativecommons.org/publicdomain/zero/1.0/')
     @classmethod
-    def from_str(cls, val):
-        """Convert string to enum value."""
+    def license_from_iacrcc(cls, val):
+        """Convert iacrcc license key to an enum value."""
+        key = 'CC' + val[2:].replace('-', '_').upper()
         for e in cls:
-            if e.name == val:
-                return e
-        return None
+            if e.name == key:
+                return e.value.model_dump()
+        raise ValueError('Unknown license key {}'.format(key))
 
 class VersionEnum(StrEnum):
     """Values from documentclass[version=<version>]."""
@@ -188,88 +178,55 @@ class Meta(BaseModel):
                                           description=('The schema is serialized to disk, so that future versions can migrate '
                                                        'data to new schemas. Not to be confused with the version of json schema '
                                                        'specified in $schema.'))
-    version: VersionEnum = Field(...,
-                                 title='Version used in documentclass[version=...]',
+    version: VersionEnum = Field(title='Version used in documentclass[version=...]',
                                  description='Should be final.')
-    DOI: Optional[str] = Field(None,
+    DOI: Optional[str] = Field(default=None,
                                title='The DOI of the official publication',
-                               description='This should always be shown if it exists')
-    URL: Optional[str] = Field(None,
+                               description='Omits any URL resolver part.')
+    URL: Optional[str] = Field(default=None,
                                title='The permanent URL assigned to the paper after publication.',
                                description='This should remain permanent.')
-    authors: conlist(Author, min_items=1) = Field(...,
-                                                  title='List of authors of the paper',
-                                                  description='Affiliations are specified externally.')
-    affiliations: List[Affiliation] = Field(None,
+    authors: List[Author] = Field(...,
+                                  min_length=1,
+                                  title='List of authors of the paper',
+                                  description='Affiliations are linked from authors individually.')
+    affiliations: List[Affiliation] = Field(default=[],
                                             title='List of affiliations for all authors.')
-    funders: List[Funder] = Field(None,
+    funders: List[Funder] = Field(default=[],
                                   title='List of funding agencies')
-    keywords: List[str] = Field(None,
+    keywords: List[str] = Field(default=[],
                                 title='Author-supplied keywords',
                                 description='This is pretty useless, but is preserved for posterity')
-    title: constr(min_length=1) = Field(...,
+    title: Annotated[str, StringConstraints(min_length=1)] = Field(...,
                                         title='Title of paper',
                                         description='May contain LaTeX or HTML entities')
-    subtitle: str = Field(None,
-                          title='Subtitle of paper',
-                          description='May contain LaTeX or HTML entities')
+    subtitle: Optional[str] = Field(default=None,
+                                    title='Subtitle of paper',
+                                    description='May contain LaTeX or HTML entities')
     abstract: str = Field(...,
                           title='Abstract of paper',
                           description='This is an abstract of the paper. May contain minimal LaTeX but should not contain HTML.')
-    license: LicenseEnum = Field(LicenseEnum.CC_BY,
-                                 title='License granted by authors',
-                                 description='When a paper is submitted, a license must be chosen. This field is required.')
+    license: License = Field(...,
+                             title='License granted by authors',
+                             description='When a paper is submitted, a license must be chosen. This field is required.')
+    model_config = ConfigDict(json_schema_extra={
+        '$schema': 'http://json-schema.org/draft-07/schema#'
+    }, validate_default=True, validate_assignment=True, use_enum_values=True, extra="ignore")
 
-
-    class Config:
-        """$schema specifies the JSON schema version; not the version of this object."""
-        schema_extra = {
-            '$schema': 'http://json-schema.org/draft-07/schema#'
-        }
-        validate_all = True
-        validate_assignment = True
-        extra = Extra.ignore
-
-    @root_validator()
-    @classmethod
-    def root_validate(cls, values):
-        """Validate field dependencies. If not withdrawn, then authors should be non-empty."""
-        if 'schema_version' not in values:
-            raise ValueError('missing schema_version')
-        if 'abstract' not in values:
-            raise ValueError('Missing abstract')
-        ver = values['schema_version']
-        if 'authors' not in values or not values['authors']:
-            raise ValueError('Paper must contain authors')
-        if len(values['authors']) == 0:
-            raise ValueError('Authors must be nonempty')
-        if 'affiliations' not in values:
-            raise ValueError('Paper must contain affiliations')
-        num_affiliations = len(values['affiliations'])
-        authorcount_withemail = sum(1 for a in values['authors'] if a.email)
+    @model_validator(mode='after')
+    def check_authors(self) -> 'Meta':
+        """Validate field inter-dependencies."""
+        authorcount_withemail = sum(1 for a in self.authors if a.email)
         if authorcount_withemail == 0:
             raise ValueError('At least one author must have an email.')
-        for author in values['authors']:
+        last_affiliation_index = 1 + len(self.affiliations)
+        for author in self.authors:
             if author.affiliations:
                 for aff_index in author.affiliations:
-                    if aff_index not in range(1, 1+num_affiliations):
-                        raise ValueError('Affiliation index {} out of range {}'.format(aff_index, num_affiliations))
-        return values
+                    if aff_index not in range(1, last_affiliation_index):
+                        raise ValueError('Affiliation index {} out of range 1-{}'.format(aff_index, last_affiliation_index))
+        return self
 
-    def is_valid(self):
-        """Called to validate the data, in case it was constructed with construct().
-
-           It's possible to bypass validation in pydantic using construct(), but this
-           is a way to validate a model via a function rather than a constructor.
-           We should only use this in tests, because it depends on some semi-documented 
-           behavior of pydantic introduced in v0.26, namely that validate_model returns
-           a triple (Tuple[Dict[str, Any], Set[str], Optional[ValidationError]])
-        """
-        values, fields_set, validation_error = validate_model(self.__class__, self.__dict__)
-        if validation_error:
-            return False
-        return True
-        
 # A retricted form of ISO date format.
 dt_regex = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
 
@@ -301,57 +258,56 @@ class CompileError(BaseModel):
     logline: int = Field(...,
                          title='Line in log where it occurs',
                          description='This is the start of where the error occurs, but there may be lines after it.')
-    package: str = Field(None,
-                         title='LaTeX package name',
-                         description='Populated when we find it. Not required')
-    pageno: int = Field(0,
+    package: Optional[str] = Field(default=None,
+                                   title='LaTeX package name',
+                                   description='Populated when we find it. Not required')
+    pageno: int = Field(default=0,
                         title = 'Page number in PDF',
                         description = 'Page number where problem appears. May required.')
-    pdf_line: int = Field(0,
+    pdf_line: int = Field(default=0,
                           title = 'Line number in PDF',
                           description = 'Line number in copyedit version. Not required.')
-    filepath: str = Field(None,
-                          title='path to LaTeX file',
-                          description = 'Location of LaTeX error or warning. Not required.')
-    filepath_line: int = Field(0,
+    filepath: Optional[str] = Field(default=None,
+                                    title='path to LaTeX file',
+                                    description = 'Location of LaTeX error or warning. Not required.')
+    filepath_line: int = Field(default=0,
                                title = 'Line number location for LaTeX warning',
                                description = 'Line number in filepath where LaTeX warning occurred. Not required.')
-    severity: float = Field(0,
+    severity: float = Field(default=0,
                             title='Severity of overfull or underfull hbox or vbox.',
                             description='For overfull boxes, it is the size in pts. For underfull boxes it is badness.')
-    help: str = Field(None,
-                      title='Help for authors',
-                      description='The parser may have more to say about an error')
+    help: Optional[str] = Field(default=None,
+                                title='Help for authors',
+                                description='The parser may have more to say about an error')
 
 
 class Compilation(BaseModel):
-    paperid: constr(min_length=3) = Field(...,
+    paperid: Annotated[str, StringConstraints(min_length=3)] = Field(...,
                                           title='Globally unique paper ID constructed in review system',
                                           description='ID must be globally unique.')
-    venue: constr(min_length=3) = Field(...,
+    venue: Annotated[str, StringConstraints(min_length=3)] = Field(...,
                                         title='The venue for the publication',
                                         description='This determines which cls to use. It\'s the key into the journal object in the database.')
-    status: CompileStatus = Field(CompileStatus.COMPILING,
+    status: CompileStatus = Field(default=CompileStatus.COMPILING,
                                   title='Current status',
                                   description='Indicates what stage the paper is at')
     email: EmailStr = Field(...,
                             title='Email for submitting author',
                             description='Who submitted the paper')
-    submitted: constr(regex=dt_regex) = Field(...,
+    submitted: Annotated[str, StringConstraints(pattern=dt_regex)] = Field(...,
                                               title='When paper was submitted for publication',
                                               description='Authenticated upon submission.')
-    accepted: constr(regex=dt_regex) = Field(...,
+    accepted: Annotated[str, StringConstraints(pattern=dt_regex)] = Field(...,
                                                title='When the paper was accepted for publication',
                                                description = 'Authenticated upon acceptance.')
     compiled: datetime = Field(...,
                                title='When the article was last compiled',
                                description='Last compilation date')
-    compile_time: float = Field(None,
-                                title='Number of seconds for compilation',
-                                description='May be none before it is compiled')
-    command: str = Field(None,
-                         title='latexmk command that was run')
-    log: str = Field(None,
+    compile_time: Optional[float] = Field(default=None,
+                                          title='Number of seconds for compilation',
+                                          description='May be none before it is compiled')
+    command: str = Field(title='latexmk command that was run')
+    log: Optional[str] = Field(default=None,
                      title='Log from running latexmk',
                      description='Will be absent until latex is attempted.')
     error_log: List[CompileError] = Field(...,
@@ -360,22 +316,23 @@ class Compilation(BaseModel):
     warning_log: List[CompileError] = Field(...,
                                             title='Warning messages',
                                             description='May be used to warn author of overfull hbox, missing DOI in bibtex, etc')
-    exit_code: int = Field(-1,
+    exit_code: int = Field(default=-1,
                             title='Exit code from running latexmk',
                             description='These are not well defined.')
     zipfilename: str = Field(...,
                              title='Name of uploaded zipfile',
                              description='Useful for authors to know what they uploaded.')
-    meta: Meta = Field(None,
-                       title='Parsed metadata',
-                       description='Present once status passes COMPILATION_SUCCESS')
-    output_files: List[str] = Field([],
+    meta: Optional[Meta] = Field(default=None,
+                                 title='Parsed metadata',
+                                 description='Present once status passes COMPILATION_SUCCESS')
+    output_files: List[str] = Field(default=[],
                                     title='List of file paths in output directory',
                                     description='Paths are relative to the output directory')
-    bibtex: str = Field(None,
-                        title='BibTeX entries that are cited',
-                        description='List of references cited from the paper in BibTeX format. These are not guaranteed to be valid, but are what the author supplied.')
+    bibtex: Optional[str] = Field(default=None,
+                                  title='BibTeX entries that are cited',
+                                  description='List of references cited from the paper in BibTeX format. These are not guaranteed to be valid, but are what the author supplied.')
     
 
 if __name__ == '__main__':
-    print(Compilation.schema_json(indent=2))
+    print(LicenseEnum.license_from_iacrcc('CC-by'))
+    print(json.dumps(Compilation.model_json_schema(), indent=2))

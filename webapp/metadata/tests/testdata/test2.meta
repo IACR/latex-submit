@@ -18,7 +18,9 @@ affiliation:
   country: Belgium
 affiliation:
   name: Self
+  country: Elbonia
 version: final
+license: CC-by
 title: How to Use the IACR Communications in Cryptology Class
   subtitle: A Template
 keywords: Template, LaTeX, IACR

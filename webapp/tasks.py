@@ -11,7 +11,7 @@ from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
-from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType
+from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser
 from .metadata.db_models import CompileRecord, TaskStatus
 
@@ -74,7 +74,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             if not comprec:
                 logging.error('no CompileRecord for {}'.format(paperid))
                 raise Exception('no CompileRecord')
-            compilation = Compilation.parse_raw(comprec.result)
+            compilation = Compilation.model_validate_json(comprec.result)
             compilation.compile_time = execution_time
             compilation.log = output.get('log', 'no log')
             compilation.output_files = sorted([str(p.relative_to(str(output_path))) for p in output_path.rglob('*') if p.is_file()])
@@ -125,6 +125,17 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                                                                           text='An abstract is required.'))
                             else:
                                 data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8', errors='replace'))
+                            if 'license' not in data:
+                                compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                                          logline=0,
+                                                                          text='A license is required.'))
+                            else:
+                                try:
+                                    # Translate license keys from iacrcc.cls to keys in LicenseEnum.
+                                    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
+                                except ValueError as e:
+                                    data['license'] = LicenseEnum.CC_BY.value.model_dump()
+                                    logging.error('License assigned by default as CC_BY')
                             compilation.meta = Meta(**data)
                             # Check authors to see if they have ORCID and affiliations.
                             for author in compilation.meta.authors:
@@ -165,7 +176,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
             # may not see the output from this file. As it turns out,
             # it still isn't seen so we switched to the database.
             jfile = open(str(json_file.resolve()), 'w', encoding='UTF-8')
-            jfile.write(compilation.json(indent=2, exclude_none=True))
+            jfile.write(compilation.model_dump_json(indent=2, exclude_none=True))
             jfile.flush()
             os.fsync(jfile.fileno())
             jfile.close()
@@ -174,7 +185,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                                                       logline=0,
                                                       text='exception someplace: ' + str(e)))
         # Update the database record with the compilation and status.
-        comprec.result = compilation.json(indent=2, exclude_none=True)
+        comprec.result = compilation.model_dump_json(indent=2, exclude_none=True)
         comprec.task_status = TaskStatus.FINISHED.value
         db.session.commit()
         task_queue.pop(task_key, None)

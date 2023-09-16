@@ -58,6 +58,9 @@ def index_funder(funder, writable_db=None, termgenerator=None):
     for altname in funder.altnames:
         termgenerator.index_text(altname, 1, SearchPrefix.NAME.value)
         termgenerator.index_text(altname, NAME_WEIGHT)
+    for child in funder.children:
+        termgenerator.index_text(child.name, 1, SearchPrefix.NAME.value)
+        termgenerator.index_text(child.name, NAME_WEIGHT)
     
     termgenerator.increase_termpos()
     location = funder.country
@@ -136,8 +139,8 @@ def search(db_path, offset=0, limit=1000, textq=None, locationq=None, source=Non
         enquire.set_query(query)
         res = {'parsed_query': str(query)}
         # Use source then relevance score.
-        enquire.set_sort_by_value_then_relevance(SLOT_NUMBER, True)
-        # enquire.set_sort_by_relevance()
+        # enquire.set_sort_by_value_then_relevance(SLOT_NUMBER, True)
+        enquire.set_sort_by_relevance()
         res['sort_order'] = 'sorted by relevance'
         matches = []
         # Retrieve the matched set of documents.

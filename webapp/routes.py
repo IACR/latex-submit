@@ -254,7 +254,7 @@ def submit_version():
         comprec = CompileRecord(paperid=paperid,version=version)
     comprec.task_status = TaskStatus.PENDING
     comprec.started = now
-    compstr = compilation.json(indent=2, exclude_none=True)
+    compstr = compilation.model_dump_json(indent=2, exclude_none=True)
     comprec.result = compstr
     db.session.add(comprec)
     db.session.commit()
@@ -358,7 +358,7 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='version_compilation not found',
                                error='version_compilation was not found. This is a bug')
-    version_compilation = Compilation.parse_raw(version_compilation)
+    version_compilation = Compilation.model_validate_json(version_compilation)
     # TODO: if we switch to having the editor assign a copy editor, then
     # the status will be set to PaperStatusEnum.SUBMITTED. For now we set it
     # to EDIT_PENDING, assuming that the assignment of copy editor is automatic.
@@ -399,7 +399,7 @@ def compile_for_copyedit():
                                  'warning_log': [],
                                  'zipfilename': version_compilation.zipfilename})
     command = version_compilation.command
-    compstr = compilation.json(indent=2, exclude_none=True)
+    compstr = compilation.model_dump_json(indent=2, exclude_none=True)
     copyedit_comprec.result = compstr
     db.session.add(copyedit_comprec)
     db.session.commit()
@@ -689,7 +689,7 @@ def view_results(paperid, version, auth):
             'source_auth': auth}
     try:
         json_file = paper_path / Path('compilation.json')
-        comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+        comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
         data['comp'] = comp
         data['auth'] = create_hmac(paperid, version, comp.submitted, comp.accepted)
     except Exception as e:

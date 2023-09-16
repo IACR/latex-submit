@@ -28,7 +28,7 @@ Funder types in ROR have the following distribution:
 """
 
 from enum import Enum
-from pydantic import BaseModel, Field, Extra, constr, conint, conlist, validator, root_validator, validate_model, AnyUrl
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, conint, conlist, validator, AnyUrl
 from typing import List, Dict, Optional, Union, Literal
 from typing_extensions import Annotated
 
@@ -90,21 +90,21 @@ class Funder(GlobalEntity):
     """Funder may come from Funder's Registry or ROR.  This picks up
        source, source_id, and global_id() from GlobalEntity.
     """
-    name: constr(min_length=2) = Field(...,
+    name: Annotated[str, StringConstraints(min_length=2)] = Field(...,
                                        title='The main name of the organization',
                                        description='Other names are in altnames')
     country: str = Field(...,
                          title='Country of affiliation',
                          description='May be any string')
-    country_code: str = Field(None,
-                              title='ISO 3-letter country code.',
-                              description='Optional')
+    country_code: Optional[str] = Field(default=None,
+                                        title='ISO 3-letter country code.',
+                                        description='Optional')
     funder_type: FunderType = Field(...,
                                     title='The type of funding agency',
                                     description='May be from ROR.')
-    preferred_fundref: str = Field(None,
-                                   title='ROR may stipulate a preferred FundRef value',
-                                   description='We use this to merge ROR records')
+    preferred_fundref: Optional[str] = Field(default=None,
+                                             title='ROR may stipulate a preferred FundRef value',
+                                             description='We use this to merge ROR records')
     altnames: List[str] = Field(...,
                                 title='List of alternative names',
                                 description='May be in a language other than English')
@@ -117,20 +117,7 @@ class Funder(GlobalEntity):
     related: List[Relationship] = Field(...,
                                         title='Related entities',
                                         description='From FundReg and ROR.')
-    # def children(self):
-    #     return [i for i in self.relationships if i.reltype == RelationshipType.CHILD]
-
-    # def parents(self):
-    #     return [i for i in self.relationships if i.reltype == RelationshipType.PARENT]
-
-    # def related(self):
-    #     return [i for i in self.relationships if i.reltype == RelationshipType.RELATED]
-
-    class Config:
-        title = 'Funder entity that sponsors Research',
-        validate_all = True
-        validate_assignment = True
-        extra = Extra.forbid
+    model_config = ConfigDict(title='Funder entity that sponsors Research', validate_default=True, validate_assignment=True, extra="forbid")
 
 class FunderList(BaseModel):
     """This is really a dict rather than a list. It facilitates easy lookup by global_id."""

@@ -121,7 +121,7 @@ def parse_rdf(country_map):
        return:
           a dict with items.
     """
-    funderlist = FunderList(funders=[])
+    funderlist = FunderList(funders={})
     handler = FunderHandler(funderlist, country_map)
     parse("data/registry.rdf", handler)
     add_names_to_relationships(funderlist)
@@ -130,4 +130,4 @@ def parse_rdf(country_map):
 if __name__ == '__main__':
     country_map = json.loads(open('data/country_map.json', 'r').read())
     funderlist = parse_rdf(country_map)
-    print(funderlist.json(indent=2))
+    print(funderlist.model_dump_json(indent=2))

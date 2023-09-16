@@ -56,7 +56,7 @@ def show_admin_home():
                                                                         '',
                                                                         ''),
                                                        _external=True),
-                                        'comp': Compilation.parse_raw(cstr)}
+                                        'comp': Compilation.model_validate_json(cstr)}
                 except Exception as e:
                     errors.append(str(v) + ':' + str(e))
         papertree[paperpath.name] = versions

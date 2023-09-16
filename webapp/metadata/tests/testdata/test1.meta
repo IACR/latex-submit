@@ -1,3 +1,4 @@
+license: CC-by
 author:
   name: Alice Accomplished
   surname: Accomplished
@@ -12,9 +13,11 @@ author:
 affiliation:
   name: University of California, Santa Barbara
   state: California
+  country: USA
   ror: 02t274463
 affiliation:
   name: University of Antartica
+  country: New Zealand
 affiliation:
   name: Bo{\u g}azi{\c c}i University
   street: Road to nowhere

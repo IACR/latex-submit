@@ -304,7 +304,7 @@ class LatexLogParser:
                 self.errors.append(error)
                 if debug:
                     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-                    print(error.json(indent=2))
+                    print(error.model_dump_json(indent=2))
 
 if __name__ == '__main__':
     """This is just test code."""
@@ -324,7 +324,7 @@ if __name__ == '__main__':
     parser = LatexLogParser(main_file=args.main_file, class_file=args.class_file)
     parser.parse_file(Path(args.log_file), debug=args.verbose)
     for error in parser.errors:
-        print(error.json(indent=2))
+        print(error.model_dump_json(indent=2))
     for root, dirnames, filenames in os.walk('/home/kevin/Downloads/iacrcc/crypto2023'):
         for fname in fnmatch.filter(filenames, '*.log'):
             filename = os.path.join(root, fname)
@@ -334,4 +334,4 @@ if __name__ == '__main__':
             print('---------------------{}'.format(filename))
             parser.parse_file(Path(filename), debug=args.verbose)
             for error in parser.errors:
-                print(error.json(indent=2))
+                print(error.model_dump_json(indent=2))

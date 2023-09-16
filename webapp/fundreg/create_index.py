@@ -137,7 +137,7 @@ if __name__ == '__main__':
     arguments.add_argument('--verbose',
                            action='store_true',
                            help='Whether to print debug info')
-    arguments.add_argument('--include_fundreg',
+    arguments.add_argument('--exclude_fundreg',
                            action='store_true',
                            help='Whether to include fundreg (recommended)')
     arguments.add_argument('--fetch_fundreg',
@@ -152,15 +152,13 @@ if __name__ == '__main__':
     arguments.add_argument('--dbpath',
                            default='xapian.db',
                            help='Path to writable database directory.')
-    arguments.add_argument('--include_ror',
+    arguments.add_argument('--exclude_ror',
                            action='store_true',
                            help='Whether to omit ROR data')
-    arguments.add_argument('--defer_to_fundreg',
+    arguments.add_argument('--exclude_dup_fundref',
                            action='store_true',
-                           help='Whether to replace ROR IDs by related fundreg ID')
+                           help='Whether to replace Fundref with corresponding ROR')
     args = arguments.parse_args()
-    funders = {}
-    outdated = []
     funders_file = Path('data/registry.json')
     ror_file = Path('data/ror.json')
     raw_ror_file = Path('data/raw_ror.json')
@@ -169,8 +167,8 @@ if __name__ == '__main__':
     if os.path.isfile(args.dbpath) or os.path.isdir(args.dbpath):
         print('CANNOT OVERWRITE dbpath')
         sys.exit(2)
-    if not args.include_fundreg and not args.include_ror:
-        print('To build an index, you need either --include_fundreg and/or --include_ror')
+    if args.exclude_fundreg and args.exclude_ror:
+        print('Invalid options')
         sys.exit(3)
     if args.fetch_fundreg:
         print('updating fundref.rdf...')
@@ -178,33 +176,39 @@ if __name__ == '__main__':
     if args.fetch_ror:
         print('fetching ror data...')
         fetch_ror()
-    if args.include_fundreg:
+    if args.exclude_fundreg:
+        print('excluding fundreg')
+    else:
         if args.use_cache:
             print('reading {}'.format(funders_file.name))
-            funderlist = FunderList.parse_raw(funders_file.read_text(encoding='UTF-8'))
+            funderlist = FunderList.model_validate_json(funders_file.read_text(encoding='UTF-8'))
         else:
             print('parsing data/registryrdf for fundreg...')
             funderlist = parse_rdf(country_map)
-            funders_file.write_text(funderlist.json(indent=2), encoding='UTF-8')
-    if args.include_ror:
+            funders_file.write_text(funderlist.model_dump_json(indent=2), encoding='UTF-8')
+    if args.exclude_ror:
+        print('excluding ror')
+    else:
         ror_funders = FunderList(funders={})
         if args.use_cache:
             print('reading {}'.format(ror_file.name))
-            ror_funders = FunderList.parse_raw(ror_file.read_text(encoding='UTF-8'))
+            ror_funders = FunderList.model_validate_json(ror_file.read_text(encoding='UTF-8'))
         else:
             print('parsing data/raw_ror.json...this is slow to parse 112000 entries...')
             ror_funders = parse_ror('data/raw_ror.json')
             print('saving cache in data/ror.json')
-            ror_file.write_text(ror_funders.json(indent=2), encoding='UTF-8')
+            ror_file.write_text(ror_funders.model_dump_json(indent=2), encoding='UTF-8')
         # For now simply add them without merging.
         for key, value in ror_funders.funders.items():
-            if args.defer_to_fundreg and value.preferred_fundref:
-                preferred_fundreg = '{}_{}'.format(DataSource.FUNDREG.value, value.preferred_fundref)
-                preferred_fundreg = funderlist.funders.get(preferred_fundreg)
-                if not preferred_fundreg: # unlikely
-                    funderlist.funders[key] = value
-            else:
-                funderlist.funders[key] = value
-
+            funderlist.funders[key] = value
+            if value.preferred_fundref:
+                preferred_fundreg_id = '{}_{}'.format(DataSource.FUNDREG.value, value.preferred_fundref)
+                preferred_fundreg = funderlist.funders.get(preferred_fundreg_id)
+                if preferred_fundreg and args.exclude_dup_fundref:
+                    if args.verbose:
+                        print('deleting {}:{}'.format(preferred_fundreg_id,
+                                                      preferred_fundreg.model_dump_json(indent=2)))
+                        print('prefer {}'.format(value.model_dump_json(indent=2)))
+                    del funderlist.funders[preferred_fundreg_id]
     create_index(args.dbpath, funderlist, args.verbose)
 
