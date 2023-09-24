@@ -78,7 +78,7 @@ def create_app(config):
     app = Flask('webapp', static_folder='static/', static_url_path='/')
     app.config.from_object(config)
     mail.init_app(app)
-    db.engine = create_engine(config.SQLALCHEMY_DATABASE_URI, pool_pre_ping-True)
+    db.engine = create_engine(config.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True)
     db.session = scoped_session(sessionmaker(autocommit=False,autoflush=False,bind=db.engine))
     def shutdown_session(ex):
         db.session.remove()
