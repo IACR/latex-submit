@@ -3,6 +3,7 @@
 	url = git@github.com:IACR/latex.git
 	ignore = dirty
 	branch = main
+        update = merge
 [submodule "webapp/metadata/iacrtrans"]
 	path = webapp/metadata/iacrtrans
 	url = git@github.com:Cryptosaurus/iacrtrans.git
