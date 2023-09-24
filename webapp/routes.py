@@ -5,6 +5,7 @@ from flask import json, Blueprint, render_template, request, jsonify, send_file,
 from flask import current_app as app
 from flask_mail import Message
 import hmac
+import markdown
 import os
 from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
@@ -819,6 +820,33 @@ def download_output_zipfile(version, paperid):
 def iacrcc_homepage():
     return render_template('iacrcc.html', title='iacrcc document class')
 
+@home_bp.route('/iacrcc/convertllncs', methods=['GET'])
+def iacrcc_convertllncs():
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrcc/convertllncs.md')
+    md = md_file.read_text(encoding='UTF-8')
+    html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
+    return render_template('embed_html.html',
+                           title='Converting llncs to iacrcc',
+                           html = html5)
+
+@home_bp.route('/iacrcc/convertiacrtrans', methods=['GET'])
+def iacrcc_convertiacrtrans():
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrcc/convertiacrtrans.md')
+    md = md_file.read_text(encoding='UTF-8')
+    html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
+    return render_template('embed_html.html',
+                           title='Converting iacrtrans to iacrcc',
+                           html = html5)
+    
+@home_bp.route('/iacrcc/convertieeetran', methods=['GET'])
+def iacrcc_convertieeetran():
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrcc/convertieeetran.md')
+    md = md_file.read_text(encoding='UTF-8')
+    html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
+    return render_template('embed_html.html',
+                           title='Converting ieeetran to iacrcc',
+                           html = html5)
+    
 @home_bp.route('/iacrcc/iacrdoc.pdf', methods=['GET'])
 def iacrdoc_pdf():
     pdf_path = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrcc/iacrdoc.pdf')

@@ -2,18 +2,29 @@
 {% block content %}
 <main id="mainContent" class="container px-3 px-md-4">
 <h2 class="mt-5 mb-3">The iacrcc document class</h2>
-<p>
-  Papers for the IACR Communications in Cryptology must be prepared
-  using the <i-mono>iacrcc</i-mono> LaTeX document class. This file provides
-  a crucial part of the publishing pipeline, because it allows us to
-  extract all the metadata required for open access publishing.
-</p>
-<a class="btn btn-success float-end" href="/iacrcc.zip">Download</a>
-<p>
-  You can <a href="/iacrcc.zip">download the LaTeX files in a zip file</a>.
-  This download includes the LaTeX document class,
-  a template to start from, and documentation.
-</p>
+<div class="row">
+  <div class="col-6">
+    <p>
+      Papers for the IACR Communications in Cryptology must be prepared
+      using the <i-mono>iacrcc</i-mono> LaTeX document class. This file provides
+      a crucial part of the publishing pipeline, because it allows us to
+      extract all the metadata required for open access publishing.
+    </p>
+  </div>
+  <div class="col-6">
+    <a class="btn btn-success m-2 float-end" href="/iacrcc.zip">Download</a>
+    <p>
+      You can <a href="/iacrcc.zip">download the LaTeX files in a zip file</a>.
+      This download includes the LaTeX document class,
+      a template to start from, and documentation. There are also
+      quick start guides to <a href="/iacrcc/convertllncs">convert from
+      <code>llncs</code></a>,
+      <a href="/iacrcc/convertieeetran">convert from
+        <code>ieeetran</code></a>, and
+      <a href="/iacrcc/convertiacrtrans">convert from <code>iacrtrans</code></a>.
+    </p>
+  </div>
+</div>
 <iframe src="/iacrcc/iacrdoc.pdf" width="100%" height="1200px"></iframe>
 </main>
 {% endblock %} {# content #}
