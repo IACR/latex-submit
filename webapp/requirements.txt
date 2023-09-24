@@ -1,7 +1,7 @@
 flask
 flask_mail
 flask_limiter
-pydantic>=2.0
+pydantic>=2.0[email]
 python-dotenv
 flask-wtf
 flask-login
@@ -10,3 +10,4 @@ arxiv-latex-cleaner
 pybtex
 pandas
 country-converter
+pymysql
