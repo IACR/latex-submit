@@ -2,6 +2,11 @@
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-5 text-center">Papers for copy editing</h1>
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
 <p>
   This shows papers that are in various stages of copy editing.
   The UI and workflow is still TBD.

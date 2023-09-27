@@ -24,26 +24,30 @@ class Config:
     TESTING = False
     JOURNALS = [
         {
-            'acronym': 'cic',
+            'hotcrp_key': 'cic',
+            'acronym': 'CiC',
             'name': 'IACR Communications in Cryptology',
             'EISSN': 'XXXX-YYYY',
             'DOI_PREFIX': '10.1729'
         },
         {
-            'acronym': 'tosc',
+            'hotcrp_key': 'tosc',
+            'acronym': 'TOSC',
             'name': 'IACR Transactions on Symmetric Cryptology',
             'EISSN': '2519-173X',
             'DOI_PREFIX': '10.46586'
         },
         {
-            'acronym': 'tches',
+            'hotcrp_key': 'tches',
+            'acronym': 'TCHES',
             'name': 'IACR Transactions on Cryptographic Hardware and Embedded Systems',
             'EISSN': '2569-2925',
             'DOI_PREFIX': '10.45686'
         },
         {
-            'acronym': 'lncs',
-            'name': 'Lecture Notes in Computer Science',
+            'hotcrp_key': 'lncs',
+            'acronym': 'LNCS',
+            'name': 'Springer Lecture Notes in Computer Science',
             'EISSN': '1611-3349',
             'DOI_PREFIX': '10.1007'
         },

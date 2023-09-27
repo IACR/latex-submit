@@ -287,7 +287,7 @@ class Compilation(BaseModel):
                                           description='ID must be globally unique.')
     venue: Annotated[str, StringConstraints(min_length=3)] = Field(...,
                                         title='The venue for the publication',
-                                        description='This determines which cls to use. It\'s the key into the journal object in the database.')
+                                        description='This determines which cls to use. It\'s the hotcrp_key in the Journal object db_models.py.')
     status: CompileStatus = Field(default=CompileStatus.COMPILING,
                                   title='Current status',
                                   description='Indicates what stage the paper is at')

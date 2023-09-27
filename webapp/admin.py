@@ -1,5 +1,6 @@
 """These routes are for admin only, and therefoer have the
 admin_required decorator on them. All routes should start with /admin."""
+from datetime import datetime
 from difflib import HtmlDiff
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
@@ -14,7 +15,7 @@ from pathlib import Path
 from . import db, create_hmac, mail
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
-from .metadata.db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal
+from .metadata.db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue
 from .forms import AdminUserForm, RecoverForm
 from functools import wraps
 
@@ -243,7 +244,7 @@ def copyedit(paperid):
     input_dir = paper_path / Path('input')
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     comp_path = paper_path / Path('compilation.json')
-    compilation = Compilation.parse_file(comp_path)
+    compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
     data = {'title': 'Viewing {}'.format(paperid),
             'comp': compilation,
             'input_files': input_files,
@@ -257,12 +258,66 @@ def copyedit(paperid):
     data['loglines'] = latexlog.splitlines()
     return render_template('admin/copyedit.html', **data)
 
-@admin_bp.route('/admin/approve_final/<paperid>', methods=['POST'])
+@admin_bp.route('/admin/approve_final', methods=['POST'])
 @login_required
 @admin_required
-def approve_final(paperid):
-    """Called when the final version is approved."""
-    return admin_message('This isn\'t finished yet')
+def approve_final():
+    """Called when the final version is approved by the copy editor."""
+    args = request.form.to_dict()
+    if 'paperid' not in args:
+        return admin_message('Missing paperid!')
+    paperid = args.get('paperid')
+    paper_status = db.session.execute(select(PaperStatus).filter_by(paperid=paperid)).scalar_one_or_none()
+    if not paper_status:
+        return admin_message('Missing PaperStatus for paperid {}'.format(paperid))
+    paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT
+    paper_status.lastmodified = datetime.now()
+    db.session.add(paper_status)
+    db.session.commit()
+    print(app.config)
+    editor_msg = Message('Copy edit changes approved for {}'.format(paperid),
+                         sender=app.config['EDITOR_EMAILS'],
+                         recipients=[app.config['EDITOR_EMAILS']])
+    maildata = {'journal_name': paper_status.journal_key,
+                'paperid': paperid,
+                'issue_url': url_for('admin_file.view_issue', issueid=paper_status.issue_id,
+                                     _external=True)}
+    editor_msg.body = app.jinja_env.get_template('admin/copyedit_approved.txt').render(maildata)
+    if 'TESTING' in app.config:
+        print(editor_msg.body)
+    mail.send(editor_msg)
+    ############ send a message to the author.
+    try:
+        comp_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value) / Path('compilation.json')
+        comp = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
+        maildata = {'paperid': paperid,
+                    'paper_title': comp.meta.title,
+                    'journal_name': paper_status.journal_key,
+                    'volume': paper_status.volume_key,
+                    'issue': paper_status.issue_key}
+        author_msg = Message('Copy edit changes approved for {}'.format(paperid),
+                             sender=app.config['EDITOR_EMAILS'],
+                             recipients=[paper_status.email])
+        author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
+        if 'TESTING' in app.config:
+            print(author_msg.body)
+        mail.send(author_msg)
+    except Exception as e:
+        flash('Error in sending author email: ' + str(e))
+    return redirect(url_for('admin_file.copyedit_home'), code=302)
+
+@admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
+@login_required
+@admin_required
+def view_issue(issueid):
+    issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issueid)).scalars().all()
+    data = {'title': 'View of issue {}'.format(issue.name),
+            'issue': issue,
+            'volume': issue.volume,
+            'journal': issue.volume.journal,
+            'papers': papers}
+    return render_template('admin/view_issue.html', **data)
 
 @admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])
 @login_required
@@ -299,7 +354,8 @@ def final_review(paperid):
             diffs[filename] = 'File was removed'
     for filename, file in final_file_map.items():
         diffs[filename] = 'File is new'
-    compilation = Compilation.parse_file(final_path / Path('compilation.json'))
+    comp_path = final_path / Path('compilation.json')
+    compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
     sql = select(Discussion).filter_by(paperid=paperid)
     items = db.session.execute(sql).scalars().all()
     data = {'title': 'Final review on paper # {}'.format(paperid),
@@ -325,6 +381,7 @@ def finish_copyedit():
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     paper_status.status = PaperStatusEnum.EDIT_FINISHED.value
+    paper_status.lastmodified = datetime.now()
     db.session.add(paper_status)
     db.session.commit()
     numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()

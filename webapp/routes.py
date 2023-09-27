@@ -67,7 +67,7 @@ def show_submit_version():
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
-    logging.error('Paper id is ' + paperid)
+    logging.info('Paper id is ' + paperid)
     if paper_status:
         if (paper_status.status != PaperStatusEnum.PENDING.value and
             paper_status.status != PaperStatusEnum.EDIT_FINISHED.value):
@@ -121,22 +121,25 @@ def submit_version():
         return render_template('submit.html', form=form)
     # Ensure that the journal, volume, and issue exist.
     journal_id = args.get('journal')
-    journal = db.session.execute(select(Journal).filter_by(acronym=journal_id)).scalar_one_or_none()
+    journal = db.session.execute(select(Journal).filter_by(hotcrp_key=journal_id)).scalar_one_or_none()
     if not journal:
         return render_template('message.html',
                                title='Unknown journal {}'.format(journal_id),
                                error='Unknown journal {}'.format(journal_id))
-    volume = db.session.execute(select(Volume).filter_by(name=args.get('volume'),
+    volume = db.session.execute(select(Volume).filter_by(hotcrp_key=args.get('volume'),
                                                          journal_id=journal.id)).scalar_one_or_none()
     if not volume:
         # First time we see the volume, so create it.
         volume = Volume(name=args.get('volume'),
+                        hotcrp_key=args.get('volume'),
                         journal_id=journal.id)
         db.session.add(volume)
         db.session.commit()
-    issue = db.session.execute(select(Issue).filter_by(name=args.get('issue'),volume_id=volume.id)).scalar_one_or_none()
+    issue = db.session.execute(select(Issue).filter_by(hotcrp_key=args.get('issue'),
+                                                       volume_id=volume.id)).scalar_one_or_none()
     if not issue:
         issue = Issue(name=args.get('issue'),
+                      hotcrp_key=args.get('issue'),
                       volume_id=volume.id)
         db.session.add(issue)
         db.session.commit()
@@ -152,6 +155,9 @@ def submit_version():
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
+                                   journal_key=args.get('journal'),
+                                   volume_key=args.get('volume'),
+                                   issue_key=args.get('issue'),
                                    issue_id=issue.id,
                                    status=PaperStatusEnum.PENDING.value)
         db.session.add(paper_status)
@@ -172,6 +178,7 @@ def submit_version():
                                error='Paper may not be updated after it is published')
     if paper_status.status == PaperStatusEnum.SUBMITTED:
         paper_status.status = PaperStatusEnum.PENDING
+        paper_status.lastmodified = datetime.datetime.now()
         db.session.add(paper_status)
         db.session.commit()
     if (paper_status.status == PaperStatusEnum.EDIT_FINISHED or
@@ -363,6 +370,7 @@ def compile_for_copyedit():
     # the status will be set to PaperStatusEnum.SUBMITTED. For now we set it
     # to EDIT_PENDING, assuming that the assignment of copy editor is automatic.
     paper_status.status = PaperStatusEnum.EDIT_PENDING
+    paper_status.lastmodified = datetime.datetime.now()
     db.session.add(paper_status)
     db.session.commit()
     log_event(db, paperid, 'Paper {} submitted for copy edit'.format(paperid))
@@ -387,7 +395,7 @@ def compile_for_copyedit():
     copyedit_comprec.started = now
     copyedit_comprec.task_status = TaskStatus.PENDING
     compilation = Compilation(**{'paperid': paperid,
-                                 'venue': paper_status.journal,
+                                 'venue': paper_status.journal_key,
                                  'status': CompileStatus.COMPILING,
                                  'version': Version.COPYEDIT.value,
                                  'email': version_compilation.email,
@@ -456,6 +464,7 @@ def final_review():
                                title='Missing status',
                                error='Paper status does not exist. This is a bug')
     paper_status.status = PaperStatusEnum.FINAL_SUBMITTED
+    paper_status.lastmodified = datetime.datetime.now()
     db.session.add(paper_status)
     db.session.commit()
     # Notify the copy editor.
@@ -506,7 +515,7 @@ def view_copyedit(paperid, auth):
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
-                                         journal=paper_status.journal,
+                                         journal=paper_status.journal_key,
                                          auth=create_hmac(paperid,
                                                           Version.FINAL.value,
                                                           paper_status.submitted,
@@ -552,7 +561,7 @@ def respond_to_comment(paperid, itemid, auth):
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
-                                         journal=paper_status.journal,
+                                         journal=paper_status.journal_key,
                                          auth=create_hmac(paperid,
                                                           Version.FINAL.value,
                                                           paper_status.submitted,

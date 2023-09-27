@@ -191,6 +191,22 @@ Papers than have multiple `CompileRecord`, `LogEvent`, and `Discussion`
 objects associated with them. The `result` field in `CompileRecord` is
 the JSON serialization of the `Compilation` object.
 
+### `db_models.py`
+A journal, volume, or issue is defined by a record in `db_models.py`.
+When a hotcrp instance is created, it has journal, volume, and issue
+identifiers that later show up in this server. Specifically the information
+is matched as follows:
+* journal (identified by hotcrp_key)
+* volume (identified by hotcrp_key)
+* issue (identified by hotcrp_key)
+This information is stored permanently in the `PaperStatus` record.
+The paper may later be moved to another issue, but this is done by
+changing the `issue_id` in `PaperStatus`.
+
+You can change the name or acronym of a journal or volume or issue,
+but the `hotcrp_key` should remain fixed to identify which hotcrp
+instance it came from.
+
 ### Usage for conferences
 This system is designed for journals, but computer science typically
 uses a conference model of publication. That can be mapped into the data
@@ -212,9 +228,10 @@ Alternatively, we could use this hierarchy:
 2. volume: TCC
 3. issue: year
 
-The mapping is arbitrary, but keep in mind that a journal needs an EISSN.
-Another contraint is that administrative or copy editor access control
-must be decided at the level of a journal or volume or issue (this is TBD).
+The mapping is arbitrary, but keep in mind that a journal needs an
+EISSN.  All LNCS volumes have the same EISSN of 1611-3349. Another
+contraint is that administrative or copy editor access control must be
+decided at the level of a journal or volume or issue (this is TBD).
 
 ### Authentication
 

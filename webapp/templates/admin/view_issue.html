@@ -1,0 +1,42 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
+<h1 class="mb-5 text-center">{{title}}</h1>
+<p>
+  This is a view of all papers that are scheduled to appear in issue {{issue.name}}
+  of volume {{volume.name}} in {{journal.name}}.
+</p>
+<div class="alert alert-danger">
+  <p>TODO:</p>
+  <ol>
+    <li>Include papers from hotcrp that have not been uploaded yet (this is tricky because I need the hotcrp instance
+      and we don't store that anywhere yet)</li>
+    <li>Make each paper clickable to a view that shows metadata, discussion, log, and PDF</li>
+    <li>Provide mechanism to order these in the final issue.</li>
+    <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
+      This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
+    record yet.</li>
+    <li>Provide button to publish the issue</li>
+  </ol>
+</div>
+<table class="table sortable">
+  <thead>
+    <tr>
+      <th>paperid</th>
+      <th>status</th>
+      <th>email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for status in papers %}
+      <td>{{status.paperid}}</td>
+      <td>{{status.status.value}}</td>
+      <td>{{status.email}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script src="/js/sorttable.js"></script>
+</main>
+{% endblock %}

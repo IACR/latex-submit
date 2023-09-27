@@ -118,7 +118,7 @@ class SubmitForm(FlaskForm):
                                          self.version.data,
                                          self.submitted.data,
                                          self.accepted.data)
-    paperid = StringField(label='Paper ID',
+    paperid = HiddenField(label='Paper ID',
                           id='paperid',
                           name='paperid',
                           validators=[InputRequired('paper id is required'),
@@ -130,11 +130,12 @@ class SubmitForm(FlaskForm):
                           validators=[InputRequired('version field is required'),
                                       ValidVersion()],
                           default=Version.CANDIDATE.value)
+    # TODO: change this to HiddenField
     journal = SelectField(id='journal',
                           name='journal',
-                          choices = [(j['acronym'], j['name']) for j in app.config['JOURNALS']],
+                          choices = [(j['hotcrp_key'], j['name']) for j in app.config['JOURNALS']],
                           validators=[InputRequired('Journal is required'),
-                                      AnyOf([j['acronym'] for j in app.config['JOURNALS']])],
+                                      AnyOf([j['hotcrp_key'] for j in app.config['JOURNALS']])],
                           # TODO remove default value below
                           default='cic')
     volume = HiddenField(id='volume',

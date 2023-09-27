@@ -113,8 +113,19 @@ class PaperStatus(Base):
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
-    issue_id: Mapped[int] = mapped_column(ForeignKey('issue.id'), nullable=False)
+    journal_key: Mapped[str] = mapped_column(String(32), nullable=False,
+                                             comment='Original journal::hotcrp_key. Should not be changed.')
+    volume_key: Mapped[str] = mapped_column(String(32), nullable=False,
+                                            comment='Original volume::hotcrp_key. Should not be changed.')
+    issue_key: Mapped[str] = mapped_column(String(32), nullable=False,
+                                           comment='Original issue::hotcrp_key. Should not be changed.')
+    issue_id: Mapped[int] = mapped_column(ForeignKey('issue.id'), nullable=False,
+                                          comment='May be changed if moved to another issue for the journal')
     issue: Mapped['Issue'] = relationship(back_populates='papers')
+    lastmodified: Mapped[datetime] = mapped_column(DateTime(),
+                                                   server_default=func.now())
+    creationtime: Mapped[datetime] = mapped_column(DateTime(),
+                                                   server_default=func.now())
 
 class LogEvent(Base):
     __tablename__ = 'log_event'
@@ -131,13 +142,15 @@ def log_event(db, paperid, action):
 class Journal(Base):
     __tablename__ = 'journal'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    EISSN: Mapped[str] = mapped_column(String(10), nullable=False)
-    DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
+    hotcrp_key: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     acronym: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(Text)
+    EISSN: Mapped[str] = mapped_column(String(10), nullable=False)
+    DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
     volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
     def __init__(self, data):
         self.EISSN = data['EISSN']
+        self.hotcrp_key = data['hotcrp_key']
         self.acronym = data['acronym']
         self.name = data['name']
         self.DOI_PREFIX = data['DOI_PREFIX']
@@ -146,6 +159,7 @@ class Volume(Base):
     __tablename__ = 'volume'
     __table_args__ = (UniqueConstraint('journal_id', 'name', name='journal_volume_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    hotcrp_key: Mapped[str] = mapped_column(String(32), comment='Should not be changed')
     name: Mapped[str] = mapped_column(String(32), comment='Usually the year')
     journal_id: Mapped[int] = mapped_column(ForeignKey('journal.id', ondelete='CASCADE'), nullable=False)
     journal: Mapped['Journal'] = relationship(back_populates='volumes')
@@ -156,6 +170,7 @@ class Issue(Base):
     __tablename__ = 'issue'
     __table_args__ = (UniqueConstraint('volume_id', 'name', name='volume_issue_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    hotcrp_key: Mapped[str] = mapped_column(String(32), comment='Should not be changed')
     name: Mapped[str] = mapped_column(String(32), comment='Usually number, e.g., 2')
     volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
     volume: Mapped['Volume'] = relationship(back_populates='issues')

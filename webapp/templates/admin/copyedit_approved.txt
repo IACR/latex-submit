@@ -1,0 +1,4 @@
+The copy editing on paper # {{paperid}}
+for the journal {{journal_name}} has been finished and it
+is ready to be published. You can view the issue at
+{{issue_url}}
