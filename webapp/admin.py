@@ -274,7 +274,6 @@ def approve_final():
     paper_status.lastmodified = datetime.now()
     db.session.add(paper_status)
     db.session.commit()
-    print(app.config)
     editor_msg = Message('Copy edit changes approved for {}'.format(paperid),
                          sender=app.config['EDITOR_EMAILS'],
                          recipients=[app.config['EDITOR_EMAILS']])
