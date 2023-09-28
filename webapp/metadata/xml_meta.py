@@ -210,8 +210,8 @@ def get_jats(comp: Compilation) -> ET.Element:
             ET.SubElement(a_elem, 'xref', attrib={'ref-type': 'aff', 'rid': 'aff{}'.format(i)})
     permissions = ET.SubElement(article_meta, 'permissions')
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
-                                                            'xlink:href': meta.license.value.reference})
-    ET.SubElement(license, 'license-p').text = meta.license.value.label
+                                                            'xlink:href': meta.license.reference})
+    ET.SubElement(license, 'license-p').text = meta.license.label
     abstract = ET.SubElement(article_meta, 'abstract')
     for paragraph in meta.abstract.split('\n\n'):
         ET.SubElement(abstract, 'p').text = paragraph
@@ -373,7 +373,7 @@ if __name__ == '__main__':
                            action='store_true')
     args = argparser.parse_args()
     json_file = Path('tests/testdata/xml/compilation1.json')
-    compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8', errors='replace'))
+    compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     compilation.meta.URL = 'https://example.com/thepaper'
     article = get_jats(compilation)
     #article = ET.parse('bmj_sample.xml').getroot()
