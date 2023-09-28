@@ -6,6 +6,9 @@ python-dotenv
 flask-wtf
 flask_limiter
 flask-login
+nameparser
+pybtex
+country_converter
 sqlalchemy
 arxiv-latex-cleaner
 pybtex
