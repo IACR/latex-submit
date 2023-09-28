@@ -24,6 +24,8 @@
     <tr>
       <th>paperid</th>
       <th>status</th>
+      <th>upload time</th>
+      <th>last modified</th>
       <th>email</th>
     </tr>
   </thead>
@@ -31,6 +33,8 @@
     {% for status in papers %}
       <td>{{status.paperid}}</td>
       <td>{{status.status.value}}</td>
+      <td>{{status.creationtime}}</td>
+      <td>{{status.lastmodified}}</td>
       <td>{{status.email}}</td>
     </tr>
     {% endfor %}

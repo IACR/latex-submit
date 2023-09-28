@@ -42,7 +42,6 @@ class AdminUserForm(FlaskForm):
 
 class PasswordForm(FlaskForm):
     """User to change their own password."""
-    old_password = PasswordField('Old password')
     password = PasswordField('New password',
                              validators=[
                                  InputRequired(message='Password must be at least 8 characters'),
@@ -54,9 +53,21 @@ class PasswordForm(FlaskForm):
 
 class RecoverForm(FlaskForm):
     """Password recovery request. This must be behind admin."""
-    email = EmailField('Email', validators=[InputRequired(),
-                                            Email(message='Enter a valid email')])
+    email = EmailField('Email of user', validators=[InputRequired(),
+                                                    Email(message='Enter a valid email')])
     submit = SubmitField('Send recovery information')
+
+class CaptchaForm(FlaskForm):
+    email = EmailField('Email',
+                       render_kw={'readonly': True},
+                       validators=[InputRequired(),
+                                   Email(message='Enter a valid email')])
+    auth = HiddenField(id='auth',
+                       name='auth',
+                       validators = [InputRequired('auth field is required')])
+    challenge = StringField('Challenge', render_kw={'readonly': True}, validators=[InputRequired()])
+    response = StringField('Response', validators=[InputRequired()])
+    submit = SubmitField('Submit answer')
 
 class ValidPaperId(object):
     """Validator to check paperid."""

@@ -5,7 +5,7 @@
 <h1 class="mb-5 text-center">User administration</h1>
 {% if form.email.data %}
 <h1 class="mt-4">Edit user {{form.email.data}}
-  <a class="ms-3 btn btn-warning" href="{{url_for('admin_file.recover', email=form.email.data)}}">Recover</a>
+  <a class="ms-3 btn btn-warning" href="{{url_for('auth.recover', email=form.email.data)}}">Reset password</a>
 </h1>
 {% else %}
 <h1 class="mt-4">Create user</h1>

@@ -4,6 +4,7 @@ flask_limiter
 pydantic>=2.0[email]
 python-dotenv
 flask-wtf
+flask_limiter
 flask-login
 sqlalchemy
 arxiv-latex-cleaner

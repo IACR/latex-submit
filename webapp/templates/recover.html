@@ -1,15 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
-<h1 class="mt-4">Reset password for user {{form.email.data}}</h1>
-{% set next=request.args.get('next', '') %}
-<form method="POST" action="{{url_for('admin_file.recover', next=request.args.get('next', ''))}}">
+<h1 class="mt-4">Reset password for a user</h1>
+<form method="POST" action="{{url_for('auth.recover')}}">
   {{ form.csrf_token }}
-  <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
   <div class="form-group mt-3 row">
     {{ form.email.label(class_="col-2 col-form-label text-end") }}
     <div class="col-6">
-      {{ form.email(placeholder='youremail@example.com',class_="form-control") }}
+      {{ form.email(placeholder='Enter the user\'s email',class_="form-control") }}
       {% if form.email.errors %}
       <ul class="errors">
         {% for error in form.email.errors %}

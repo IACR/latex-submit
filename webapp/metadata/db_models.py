@@ -122,8 +122,11 @@ class PaperStatus(Base):
     issue_id: Mapped[int] = mapped_column(ForeignKey('issue.id'), nullable=False,
                                           comment='May be changed if moved to another issue for the journal')
     issue: Mapped['Issue'] = relationship(back_populates='papers')
+    # This could use ON UPDATE CURRENT_TIMESTAMP, but that's mysql-specific. We could also try to use
+    # sqlalchemy.event, but it's easy to just update it manually.
     lastmodified: Mapped[datetime] = mapped_column(DateTime(),
                                                    server_default=func.now())
+    # This is created the first time someone uploads a paper with this paperid.
     creationtime: Mapped[datetime] = mapped_column(DateTime(),
                                                    server_default=func.now())
 

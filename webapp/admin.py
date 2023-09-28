@@ -9,14 +9,12 @@ from flask_login import login_required, current_user
 from flask_mail import Message
 import json
 import os
-import secrets
-import string
 from pathlib import Path
-from . import db, create_hmac, mail
+from . import db, create_hmac, mail, generate_password
 from .metadata.compilation import Compilation, PaperStatusEnum
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue
-from .forms import AdminUserForm, RecoverForm
+from .forms import AdminUserForm
 from functools import wraps
 
 # decorator for views that require admin role.
@@ -95,10 +93,6 @@ def all_users():
             'all_users': User.query.all()}
     return render_template('admin/all_users.html', **data)
 
-def _generate_password():
-    alphabet = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(alphabet) for i in range(12))
-
 @admin_bp.route('/admin/user', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -136,7 +130,7 @@ def user():
             if existing_user:
                 flash('That user already exists')
                 return redirect(url_for('admin_file.user'))
-            password = _generate_password()
+            password = generate_password()
             user = User(email=form.email.data,
                         role=form.role.data,
                         password=password)
@@ -176,58 +170,6 @@ def user():
         else:
             flash('no such user {}'.format(args.get('id')))
     return render_template('admin/user.html', form=form)
-
-@admin_bp.route('/admin/recover', methods=['POST', 'GET'])
-@login_required
-@admin_required
-def recover():
-    """This is behind /admin so we don't have to deal with captchas.
-    It sets the password to something random, and sends an email to the owner
-    of the account.
-    """
-    form = RecoverForm()
-    if form.validate_on_submit():
-        sql = select(User).filter_by(email=form.email.data)
-        user = db.session.execute(sql).scalar_one_or_none()
-        # Legacy API: user = User.query.filter_by(email=form.email.data).first()
-        if not user:
-            flash('Unknown user')
-            return redirect(url_for('admin_file.all_users'))
-        # Change the password for the user and send them an email.
-        password = _generate_password()
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        subject = 'Account recovery on {} for {}'.format(app.config['SITE_NAME'],
-                                                         form.email.data)
-        msg = Message(subject,
-                      sender=app.config['EDITOR_EMAILS'],
-                      recipients=[form.email.data])
-        maildata = {'email': user.email,
-                    'servername': app.config['SITE_NAME'],
-                    'password': password,
-                    'recover_url': url_for('auth.confirm_email',
-                                           email=user.email,
-                                           auth=create_hmac(user.email, '', '', ''),
-                                           _external=True)}
-        msg.body = app.jinja_env.get_template('admin/recover_password.txt').render(maildata)
-        mail.send(msg)
-        flash('User {} password was changed and they were notified'.format(form.email.data))
-        app.logger.info('user {} had their password changed'.format(form.email.data))
-        return redirect(url_for('admin_file.all_users'))
-    args = request.args.to_dict()
-    email = args.get('email')
-    if not email:
-        flash('missing email parameter for /recover')
-        return redirect(url_for('admin_bp.all_users'))
-    sql = select(User).filter_by(email=email)
-    user = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: user = User.query.filter_by(email=email).first()
-    if not user:
-        flash('Unknown user')
-        return redirect(url_for('admin_file.all_users'))
-    form.email.data = user.email
-    return render_template('admin/recover.html', form=form)
 
 @admin_bp.route('/admin/copyedit/<paperid>', methods=['GET'])
 @login_required
@@ -310,6 +252,9 @@ def approve_final():
 @admin_required
 def view_issue(issueid):
     issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
+    if not issue:
+        flash('No such issue')
+        return redirect(url_for('admin_file.show_admin_home'))
     papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issueid)).scalars().all()
     data = {'title': 'View of issue {}'.format(issue.name),
             'issue': issue,
@@ -426,7 +371,6 @@ def comments(paperid):
 def comment():
     """This is for handling copy editing comments."""
     data = request.json
-    print('data=' + json.dumps(data))
     try:
         action = data['action']
         if action == 'delete':

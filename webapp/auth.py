@@ -5,11 +5,15 @@ with complicated captchas, rate limiting, and annoyance.
 """
 from datetime import datetime
 from flask import Blueprint, flash, abort, redirect, request, render_template, url_for
+from flask import current_app as app
 from flask_login import login_user, logout_user, login_required, current_user
-#from . import User
+from flask_mail import Message
 from .metadata.db_models import User, Role
-from . import db, login_manager, validate_hmac
-from .forms import LoginForm, PasswordForm
+from . import db, login_manager, validate_hmac, generate_password, mail, create_hmac, validate_hmac
+from .forms import LoginForm, PasswordForm, RecoverForm, CaptchaForm
+import random
+from sqlalchemy import select
+import time
 from urllib.parse import urlparse, urljoin
 
 auth_bp = Blueprint('auth', __name__)
@@ -59,7 +63,7 @@ def confirm_email(email, auth):
     db.session.add(user)
     db.session.commit()
     login_user(user)
-    return redirect(url_for('home_bp.home'))
+    return redirect(url_for('auth.change_password'))
 
 @auth_bp.route('/change_password', methods=['GET', 'POST'])
 @login_required
@@ -67,8 +71,8 @@ def change_password():
     form = PasswordForm()
     form.email.data = current_user.email
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(password=form.old_password.data):
+        user = User.query.filter_by(email=current_user.email).first()
+        if user:
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
@@ -89,3 +93,130 @@ def load_user(userid):
     if userid is not None:
         return User.query.get(userid)
     return None
+
+def _reset_password(initiator, email):
+    sql = select(User).filter_by(email=email)
+    user = db.session.execute(sql).scalar_one_or_none()
+    if not user:
+        return False
+    # Change the password for the user and send them an email.
+    password = generate_password()
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    subject = 'Account recovery on {} for {}'.format(app.config['SITE_NAME'],
+                                                     email)
+    msg = Message(subject,
+                  sender=app.config['EDITOR_EMAILS'],
+                  recipients=[email])
+    maildata = {'initiator': initiator,
+                'email': email,
+                'servername': app.config['SITE_NAME'],
+                'password': password,
+                'recover_url': url_for('auth.confirm_email',
+                                       email=email,
+                                       auth=create_hmac(email, '', '', ''),
+                                       _external=True)}
+    msg.body = app.jinja_env.get_template('recover_password.txt').render(maildata)
+    if 'TESTING' in app.config:
+        print(msg.body)
+    mail.send(msg)
+    return True
+
+_challenges = {
+    'What is the first name of the D in DH?': [
+        'Whitfield',
+        'Whit'
+    ],
+    'What is the first name of the H in DH?': [
+        'Margin',
+        'Marty'
+    ],
+    'What is the first name of the A in RSA?': [
+        'Adi',
+        'adi'
+    ],
+    'What city is the Crypto conference always held in?': [
+        'Goleta',
+        'Santa Barbara'
+    ],
+    'What is the name of the website where people post preprints on cryptology?': [
+        'eprint',
+        'eprint.iacr.org',
+        'Cryptology ePrint Archive'
+    ],
+    'What is the first name of one of the first editors-in-chief of Communications in Cryptology?': [
+        'Joppe',
+        'Andreas',
+        'Andy'
+    ],
+    'What is the LaTeX document class used for the Communications in Cryptology?': [
+        'iacrcc',
+        'iacrcc.cls'
+    ],
+    'What is the name of the US Government agency responsible for government information security?': [
+        'NSA',
+        'National Security Agency'
+    ]
+}
+
+@auth_bp.route('/recover', methods=['POST', 'GET'])
+def recover():
+    """This allows reset of a password by email. If the user isn't logged in,
+    then it leads to a simple captcha page.
+    """
+    form = RecoverForm()
+    if form.validate_on_submit():
+        if current_user and current_user.is_authenticated:
+            if not _reset_password(current_user.email, form.email.data):
+                flash('Unknown user')
+                return redirect(url_for('home_bp.home'))
+            flash('User {} password was changed and they were notified'.format(form.email.data))
+            app.logger.info('user {} had their password changed by {}'.format(form.email.data,
+                                                                              current_user.email))
+            return redirect(url_for('home_bp.home'))
+        else: # show them a captcha
+            auth = create_hmac('', form.email.data, '', form.email.data)
+            return redirect(url_for('auth.captcha', email=form.email.data, auth=auth))
+    args = request.args.to_dict()
+    if 'email' in args:
+        form.email.data = args.get('email')
+    return render_template('recover.html', form=form)
+
+
+@auth_bp.route('/captcha', methods=['GET', 'POST'])
+def captcha():
+    time.sleep(2)
+    form = CaptchaForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        if not validate_hmac('', email, '', email, form.auth.data):
+            flash('Invalid request')
+            return redirect(url_for('home_bp.home'))
+        challenge = form.challenge.data
+        if challenge not in _challenges:
+            flash('Invalid challenge')
+            return redirect(url_for('home_bp.home'))
+        response = form.response.data.strip()
+        if response not in _challenges.get(challenge):
+            flash('Invalid response')
+            return redirect(url_for('home_bp.home'))
+        if _reset_password('An anonymous request', form.email.data):
+            flash('User {} password was changed and they were notified'.format(form.email.data))
+            return redirect(url_for('home_bp.home'))
+        flash('Invalid request format')
+        return redirect(url_for('home_bp.home'))
+    args = request.args.to_dict()
+    if 'email' in args and 'auth' in args:
+        form.email.data = args.get('email')
+        form.auth.data = args.get('auth')
+        # construct the challenge from auth.
+        index = 1
+        for c in form.auth.data:
+            if c.isdigit():
+                index += int(c)
+        keys = list(_challenges.keys())
+        form.challenge.data = keys[index % len(keys)]
+        return render_template('captcha.html', form=form)
+    flash('Invalid request')
+    return redirect(url_for('home_bp.home'))

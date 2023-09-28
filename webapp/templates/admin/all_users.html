@@ -2,6 +2,11 @@
 {% extends "admin/admin_base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
 <h1 class="mb-5 text-center">List of users</h1>
 <a class="btn btn-primary" href="{{url_for('admin_file.user')}}">Create user</a>
 <table class="table sortable mt-3" id="paperlist">

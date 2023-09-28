@@ -9,6 +9,8 @@ from collections import OrderedDict
 from flask import Flask, request, render_template, current_app
 from flask_login import LoginManager, UserMixin
 from flask_mail import Mail
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -17,6 +19,8 @@ from enum import Enum
 import hashlib, hmac
 import os
 from pathlib import Path
+import secrets
+import string
 import sys
 
 # Make sure we aren't running on an old python.
@@ -95,6 +99,17 @@ def create_app(config):
         app.register_blueprint(routes.home_bp)
         app.register_blueprint(admin.admin_bp)
         app.register_blueprint(auth.auth_bp)
+        # We use rate limiting in auth_bp. Note that because we are using the
+        # in-memory version of Limiter rather than redis or memcached to keep the tracking
+        # information, this is not quite accurate. mod_wsgi with mpm-prefork keeps
+        # separate records in each process for mod_wsgi, so each one has its own
+        # limit. I just don't want a dependency on redis or memcached.
+        limiter = Limiter(app,
+                          key_func=get_remote_address,
+                          default_limits=[])
+        limiter.limit("5/minute", error_message='Too many requests. Rate limiting is in effect.')(auth.auth_bp)
+        limiter.exempt(admin.admin_bp)
+        limiter.exempt(routes.home_bp)
         if config.USERS:
             for user in config.USERS:
                 u = User.query.filter_by(email=user['email']).first()
@@ -110,6 +125,10 @@ def create_app(config):
         db.session.commit()
         return app
 
+
+def generate_password():
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for i in range(12))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

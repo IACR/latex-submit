@@ -45,6 +45,7 @@
                 <li><hr class="dropdown-divider"></li>
                 {% if current_user.role.value == 'admin' %}
                 <li><a href="{{ url_for('admin_file.show_admin_home') }}" class="dropdown-item">Admin portal</a></li>
+                <li><a href="{{ url_for('auth.recover') }}" class="dropdown-item">Reset someone's password</a></li>
                 {% endif %}
                 <li><a href="{{ url_for('auth.change_password') }}" class="dropdown-item">Change password</a></li>
                 <li><a href="{{ url_for('auth.logout') }}" class="dropdown-item">Logout</a></li>
