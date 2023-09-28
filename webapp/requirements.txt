@@ -1,7 +1,7 @@
 flask
 flask_mail
 flask_limiter
-pydantic>=2.0[email]
+pydantic[email]>=2.0
 python-dotenv
 flask-wtf
 flask_limiter
