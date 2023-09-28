@@ -113,6 +113,9 @@ class PaperStatus(Base):
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
+    hotcrp_id: Mapped[str] = mapped_column(String(32),
+                                           comment=('This is constructed as shortName_paperid in hotcrp '
+                                                    'so that we can track a paper back to hotcrp.'))
     journal_key: Mapped[str] = mapped_column(String(32), nullable=False,
                                              comment='Original journal::hotcrp_key. Should not be changed.')
     volume_key: Mapped[str] = mapped_column(String(32), nullable=False,

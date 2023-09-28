@@ -14,7 +14,7 @@ from config import DebugConfig
 def test_jats_creation1():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     json_file = Path('testdata/xml/compilation1.json')
-    compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8', errors='replace'))
+    compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(compilation)
     authors = list(article.iter('contrib'))
     assert len(authors) == 5
@@ -37,7 +37,7 @@ def test_jats_creation1():
 def test_jats_creation2():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     json_file = Path('testdata/xml/compilation2.json')
-    compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8', errors='replace'))
+    compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(compilation)
     ET.indent(article, space=' ', level=1)
     article_str = ET.tostring(article, encoding='utf-8').decode('utf-8')
@@ -66,12 +66,14 @@ def test_jats_example():
 def test_crossref_creation1():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/crossref/schema-0.3.1/schemas/crossref5.3.1.xsd'))
     json_file = Path('testdata/xml/compilation1.json')
-    compilation = Compilation.parse_raw(json_file.read_text(encoding='UTF-8', errors='replace'))
+    compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     compilation.meta.URL = 'https://example.com/crossref'
     journal = Journal({'EISSN': '1234-5678',
                        'key': 'testkey',
                        'name': 'Test Journal',
-                       'DOI_PREFIX': '10.1729'})
+                       'DOI_PREFIX': '10.1729',
+                       'acronym': 'CiC',
+                       'hotcrp_key': '1'})
     xml = get_crossref('testbatch',
                        'International Association for Testing',
                        'testing@example.com',
