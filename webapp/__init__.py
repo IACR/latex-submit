@@ -104,7 +104,7 @@ def create_app(config):
         # information, this is not quite accurate. mod_wsgi with mpm-prefork keeps
         # separate records in each process for mod_wsgi, so each one has its own
         # limit. I just don't want a dependency on redis or memcached.
-        limiter = Limiter(app,
+        limiter = Limiter(app=app,
                           key_func=get_remote_address,
                           default_limits=[])
         limiter.limit("5/minute", error_message='Too many requests. Rate limiting is in effect.')(auth.auth_bp)
