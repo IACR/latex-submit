@@ -12,4 +12,5 @@ pybtex
 pandas
 country-converter
 pymysql
+lxml
 xmlschema
