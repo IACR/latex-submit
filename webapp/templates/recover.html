@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
-<h1 class="mt-4">Reset password for a user</h1>
+<h1 class="mt-4">Send link to reset password for a user</h1>
 <form method="POST" action="{{url_for('auth.recover')}}">
   {{ form.csrf_token }}
   <div class="form-group mt-3 row">

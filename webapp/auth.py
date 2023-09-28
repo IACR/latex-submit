@@ -51,14 +51,19 @@ def logout():
     flash('You were logged out')
     return redirect('/')
 
-@auth_bp.route('/confirm_email/<email>/<auth>', methods=['GET'])
-def confirm_email(email, auth):
+@auth_bp.route('/confirm_email/<email>/<auth>/<ts>', methods=['GET'])
+def confirm_email(email, auth, ts):
     """This just sets the last_login time."""
-    if not validate_hmac(email, '', '', '', auth):
-        return 'Invalid url'
+    if not validate_hmac(email, '', ts, '', auth):
+        flash('Invalid url')
+        return redirect(url_for('home_bp.home'))
+    if time.time() > int(ts) + 172800: # 48 hour expiration.
+        flash('URL has expired. Request a new one at /recover')
+        return redirect(url_for('home_bp.home'))
     user = User.query.filter_by(email=email).first()
     if not user:
-        return 'Unknown user'
+        flash('Unknown user')
+        return redirect(url_for('home_bp.home'))
     user.last_login = datetime.now()
     db.session.add(user)
     db.session.commit()
@@ -94,28 +99,24 @@ def load_user(userid):
         return User.query.get(userid)
     return None
 
-def _reset_password(initiator, email):
+def _send_login_link(initiator, email):
     sql = select(User).filter_by(email=email)
     user = db.session.execute(sql).scalar_one_or_none()
     if not user:
         return False
-    # Change the password for the user and send them an email.
-    password = generate_password()
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
     subject = 'Account recovery on {} for {}'.format(app.config['SITE_NAME'],
                                                      email)
     msg = Message(subject,
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[email])
+    ts = int(time.time())
     maildata = {'initiator': initiator,
                 'email': email,
                 'servername': app.config['SITE_NAME'],
-                'password': password,
                 'recover_url': url_for('auth.confirm_email',
                                        email=email,
-                                       auth=create_hmac(email, '', '', ''),
+                                       ts=ts,
+                                       auth=create_hmac(email, '', str(ts), ''),
                                        _external=True)}
     msg.body = app.jinja_env.get_template('recover_password.txt').render(maildata)
     if 'TESTING' in app.config:
@@ -168,12 +169,12 @@ def recover():
     form = RecoverForm()
     if form.validate_on_submit():
         if current_user and current_user.is_authenticated:
-            if not _reset_password(current_user.email, form.email.data):
+            if not _send_login_link(current_user.email, form.email.data):
                 flash('Unknown user')
                 return redirect(url_for('home_bp.home'))
-            flash('User {} password was changed and they were notified'.format(form.email.data))
-            app.logger.info('user {} had their password changed by {}'.format(form.email.data,
-                                                                              current_user.email))
+            flash('User {} was sent a link to login and change their password'.format(form.email.data))
+            app.logger.info('Login link for user {} requested by {}'.format(form.email.data,
+                                                                            current_user.email))
             return redirect(url_for('home_bp.home'))
         else: # show them a captcha
             auth = create_hmac('', form.email.data, '', form.email.data)
@@ -201,8 +202,8 @@ def captcha():
         if response not in _challenges.get(challenge):
             flash('Invalid response')
             return redirect(url_for('home_bp.home'))
-        if _reset_password('An anonymous request', form.email.data):
-            flash('User {} password was changed and they were notified'.format(form.email.data))
+        if _send_login_link('An anonymous request', form.email.data):
+            flash('A login link was sent to user {}'.format(form.email.data))
             return redirect(url_for('home_bp.home'))
         flash('Invalid request format')
         return redirect(url_for('home_bp.home'))
