@@ -10,6 +10,7 @@ from flask_mail import Message
 import json
 import os
 from pathlib import Path
+import time
 from . import db, create_hmac, mail, generate_password
 from .metadata.compilation import Compilation
 from .metadata import validate_paperid
@@ -149,12 +150,14 @@ def user():
             msg = Message(subject,
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[form.email.data])
+            timestamp = str(int(time.time()))
             maildata = {'email': user.email,
                         'servername': app.config['SITE_NAME'],
                         'password': password,
                         'confirm_url': url_for('auth.confirm_email',
                                                email=user.email,
-                                               auth=create_hmac(user.email,'', '', ''),
+                                               auth=create_hmac(user.email,'', timestamp, ''),
+                                               ts=timestamp,
                                                _external=True)}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
             if 'TESTING' in app.config:
