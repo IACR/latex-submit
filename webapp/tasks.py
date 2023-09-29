@@ -191,6 +191,5 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
         task_queue.pop(task_key, None)
     except Exception as e:
         logging.error('ERROR in task: {}'.format(str(e)))
-        print(e)
     return output.get('errors', [])
 

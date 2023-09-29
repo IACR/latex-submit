@@ -1,102 +1,78 @@
 {% extends "admin/admin_base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
-<h1 class="mb-5 text-center">Admin console</h1>
+<h1 class="mb-4 text-center">Admin console</h1>
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
   {{ message }}
 </div>
 {% endfor %}
-<p class="alert alert-warning">
-  This needs to be rewritten to reflect the workflow and tasks performed by the
-  editor. That includes reviewing copy editing, assembling papers for an issue,
-  approving the papers for DOI assignment, and final publishing.
-</p>
-<p>
-  This page is reserved for the managing editor(s) of <a href="/">{{journal_name}}</a>.
-  The UI and workflow is TBD:
-  <ol>
-    <li>How should we organize the views in this console?</li>
-    <li>Should we require approval from an editor, at which point we would
-      assign the DOI?</li>
-    <li>How should we handle communication to the author(s)?</li>
-  </ol>
-</p>
+<div class="row">
+  <div class="col-6">
+    <p>
+      This provides access to administrative actions by Journal editors
+      and copy editors. We plan to restrict access by both role and
+      journal in the future, but for now all admin users can see
+      everything under the admin console.
+    </p>
+    <p>
+      At the moment only Communications in Cryptology is fully supported,
+      because we depend on the metadata extraction from the
+      <i-mono>iacrcc</i-mono> LaTeX document class.
+    </p>
+  </div>
+  <div class="col-6">
+    <p>
+      This server fulfills three steps in a journal publishing workflow:
+      <ol>
+        <li>Upload of final LaTeX for compilation on this server.</li>
+        <li>Copy editing of the final versions on this server.</li>
+        <li>Publishing to the publicly-facing site for the journal.</li>
+      </ol>
+    </p>
+  </div>
+</div>
 <h3>List of journals</h3>
 <table class="table">
   <thead>
     <tr>
       <th>key</th>
       <th>name</th>
-      <th>EISSN</th>
-      <th>DOI prefix</th>
       <th>volumes</th>
     </tr>
   </thead>
   <tbody>
     {% for journal in journals %}
-      <td>{{journal.key}}</td>
-      <td>{{journal.name}}</td>
-      <td>{{journal.EISSN}}</td>
-      <td>{{journal.DOI_PREFIX}}</td>
-      <td>{{journal.volumes|length}} volumes</td>
+    <td>{{journal.acronym}}</td>
+    <td><a href="{{url_for('admin_file.view_journal', jid=journal.id)}}">{{journal.name}}</a></td>
+    <td>{{journal.volumes|length}} volumes</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-<h3>List of papers</h3>
+<h3>Recent activity</h3>
 <table class="table">
   <thead>
     <tr>
-      <th>paperid</th>
-      <th>venue</th>
-      <th>email</th>
-      <th>submitted</th>
-      <th>accepted</th>
-      <th>status</th>
-      <th>issue ID</th>
+      <th>Paper id</th>
+      <th>Status</th>
+      <th>Journal</th>
+      <th>Volume</th>
+      <th>Issue</th>
+      <th>hotcrp</th>
+      <th>Email</th>
     </tr>
   </thead>
   <tbody>
     {% for paper in papers %}
-      <td>{{paper.paperid}}</td>
-      <td>{{paper.venue}}</td>
+      <td><a href="{{url_for('admin_file.show_admin_paper', paperid=paper.paperid)}}">{{paper.paperid}}</a></td>
+      <td>{{paper.status.value}}</td>
+      <td>{{paper.journal_key}}</td>
+      <td>{{paper.volume_key}}</td>
+      <td><A href="{{url_for('admin_file.view_issue', issueid=paper.issue_id)}}">{{paper.issue_key}}</a></td>
+      <td><a target="_blank" href="https://submit.iacr.org/{{paper.hotcrp}}/paper/{{paper.hotcrp_id}}">{{paper.hotcrp}}/{{paper.hotcrp_id}}</a></td>
       <td>{{paper.email}}</td>
-      <td>{{paper.submitted}}</td>
-      <td>{{paper.accepted}}</td>
-      <td>{{paper.status}}</td>
-      <td>{{paper.issue_id}}</td>
     </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<h3>List of submitted papers</h3>
-<table class="table sortable" id="paperlist">
-  <thead>
-    <tr>
-      <th>Paper ID</th>
-      <th>Version</th>
-      <th>Venue</th>
-      <th>Date</th>
-      <th>Status</th>
-      <th>Email</th>
-      <th>Title</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for paperid, versions in papertree.items() %}
-    {% for version, paper in versions.items() %}
-    <tr{% if not loop.first %} class="table-light"{% endif %}>
-      <td>{% if loop.first %}<a href="/admin/view/{{paperid}}">{{paperid}}</a>{% endif %}</td>
-      <td><a href="{{paper.url}}">{{version}}</a></td>
-      <td>{{paper.comp.venue.value}}</td>
-      <td>{{paper.comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-      <td>{{paper.comp.status.value}} ({{paper.comp.error_log|length}}/{{paper.comp.warning_log|length}})</td>
-      <td>{{paper.comp.email}}</td>
-      <td>{% if paper.comp.meta %}{{paper.comp.meta.title}}{% else %}(unknown){% endif %}</td>
-    </tr>
-    {% endfor %}
     {% endfor %}
   </tbody>
 </table>

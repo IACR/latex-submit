@@ -8,12 +8,38 @@
 {% endblock %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
-<h1 class="mb-5 text-center">Status on {{paper.paperid}}</h1>
+<h1 class="mb-5 text-center">Status on paper: {{paper_status.paperid}}</h1>
 <table class="table">
   <tbody>
-    <tr><th>Venue:</th><td>{{paper.venue}}</td></tr>
-    <tr><th>Status:</th><td>{{paper.status.value}}{% if paper.status.value == 'submitted' %} <a href="/admin/copyedit/{{paper.paperid}}">copy edit</a>{% endif %}</td></tr>
-    <tr><th>email:</th><td>{{paper.email}}</td></tr>
+    <tr><th>Status:</th><td>{{paper_status.status.value}}</td></tr>
+    <tr><th>HotCRP paper:</th><td><a href="https://submit.iacr.org/{{paper_status.hotcrp}}/paper/{{paper_status.hotcrp_id}}">{{paper_status.hotcrp}}</a></td></tr>
+    <tr><th>email:</th><td>{{paper_status.email}}</td></tr>
+    <tr><th>original volume:</th><td>{{paper_status.volume_key}}</td></tr>
+    <tr><th>original issue:</th><td>{{paper_status.issue_key}}</td></tr>
+    <tr><th>currently slated issue:</th><td>{{issue.name}}</td></tr>
+  </tbody>
+</table>
+<h4>Compiled versions</h4>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Version</th>
+      <th>Last modified</th>
+      <th>Compilation status</th>
+      <th>Warnings</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for name, data in versions.items() %}
+    <tr>
+      <td><a href="{{data.url}}">{{name}}</a></td>
+      <td>{{data.comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+      <td>{{data.comp.status.value}}</td>
+      <td align="center">{{data.comp.warning_log|count}}</td>
+      <td>{{data.comp.meta.title}}</td>
+    </tr>
+    {% endfor %}
   </tbody>
 </table>
 <h4>Action log</h4>

@@ -2,10 +2,6 @@
 This defines the database models for SQLAlchemy in 2.0 style.
 """
 from datetime import datetime
-try:
-    from .compilation import PaperStatusEnum
-except:
-    from compilation import PaperStatusEnum
 from enum import Enum
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,6 +10,15 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from typing import List, Optional
 
+class PaperStatusEnum(str, Enum):
+    PENDING = 'In progress'
+    SUBMITTED = 'Submitted'
+    EDIT_PENDING = 'Awaiting copy editing'
+    EDIT_FINISHED = 'Copy editing finished'
+    FINAL_SUBMITTED = 'Pending final review'
+    COPY_EDIT_ACCEPT = 'Copy edit complete'
+    PUBLISHED = 'Published'
+  
 class Role(str, Enum):
     AUTHOR = 'author'
     COPYEDIT = 'copyedit'
@@ -108,14 +113,20 @@ class PaperStatus(Base):
     """Primary record for a paper. It may have compilations, discussion, etc associated with it."""
     __tablename__ = 'paper_status'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    paperid: Mapped[str] = mapped_column(String(32), nullable = False, unique=True, index=True, comment='Assumed to be globally unique across all journals, volumes, and issues')
+    paperid: Mapped[str] = mapped_column(String(32),
+                                         nullable = False,
+                                         unique=True,
+                                         index=True,
+                                         comment=('Assumed to be globally unique across all journals, volumes, and issues.'
+                                                  'This is used to construct the DOI'))
     email: Mapped[str] = mapped_column(String(50), nullable=False)
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
+    hotcrp: Mapped[str] = mapped_column(String(32),
+                                        comment='This is the shortName of the HotCRP instance')
     hotcrp_id: Mapped[str] = mapped_column(String(32),
-                                           comment=('This is constructed as shortName_paperid in hotcrp '
-                                                    'so that we can track a paper back to hotcrp.'))
+                                           comment='The paperid in the HotCRP instance')
     journal_key: Mapped[str] = mapped_column(String(32), nullable=False,
                                              comment='Original journal::hotcrp_key. Should not be changed.')
     volume_key: Mapped[str] = mapped_column(String(32), nullable=False,

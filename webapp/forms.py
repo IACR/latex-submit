@@ -141,6 +141,14 @@ class SubmitForm(FlaskForm):
                           validators=[InputRequired('version field is required'),
                                       ValidVersion()],
                           default=Version.CANDIDATE.value)
+    hotcrp = HiddenField(id='hotcrp',
+                         name='hotcrp',
+                         validators=[InputRequired('hotcrp instance shortName')],
+                         default='cictest') # TODO: remove the default
+    hotcrp_id = HiddenField(id='hotcrp_id',
+                            name='hotcrp_id',
+                            validators=[InputRequired('paper id in HotCRP instance')],
+                            default='1') # TODO: remove the default
     # TODO: change this to HiddenField
     journal = SelectField(id='journal',
                           name='journal',
@@ -151,11 +159,11 @@ class SubmitForm(FlaskForm):
                           default='cic')
     volume = HiddenField(id='volume',
                          name='volume',
-                         default=2023,
-                         validators=[maxmin_check(name='volume',min=2023), InputRequired('Volume is required')])
+                         default='1',
+                         validators=[InputRequired('Volume is required')])
     issue = HiddenField(id='issue',
                         name='issue',
-                        default=2,
+                        default=1,
                         validators=[maxmin_check(name='issue',min=1)])
     submitted = HiddenField(id='submitted',
                             name='submitted',

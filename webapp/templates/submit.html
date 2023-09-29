@@ -55,6 +55,8 @@
       {% endif %}
       <form method="POST" action="{{url_for('home_bp.submit_version')}}" enctype="multipart/form-data">
         {{ form.csrf_token }}
+        {{ form.hotcrp }}
+        {{ form.hotcrp_id }}
         {% if form.auth.errors %}
         {% for msg in form.auth.errors %}
         <div class="alert alert-danger">{{ msg }}</div>

@@ -1,32 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
-<h1 class="mt-4">Send link to reset password for a user</h1>
-<form method="POST" action="{{url_for('auth.recover')}}">
-  {{ form.csrf_token }}
-  <div class="form-group mt-3 row">
-    {{ form.email.label(class_="col-2 col-form-label text-end") }}
-    <div class="col-6">
-      {{ form.email(placeholder='Enter the user\'s email',class_="form-control") }}
-      {% if form.email.errors %}
-      <ul class="errors">
-        {% for error in form.email.errors %}
-        <li>{{ error }}</li>{% endfor %}
-      </ul>
-      {% endif %}
+  <h1 class="mt-4">Send link to reset password for a user</h1>
+  <p>
+    Note: new accounts on this site may only be created by an admin.
+  </p>
+  <form method="POST" action="{{url_for('auth.recover')}}">
+    {{ form.csrf_token }}
+    <div class="form-group mt-3 row">
+      {{ form.email.label(class_="col-2 col-form-label text-end") }}
+      <div class="col-6">
+        {{ form.email(placeholder='Enter the user\'s email',class_="form-control") }}
+        {% if form.email.errors %}
+        <ul class="errors">
+          {% for error in form.email.errors %}
+          <li>{{ error }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
     </div>
-  </div>
-  <div class="row mt-3">
-    <div class="offset-2">
-      {{ form.submit(class_="btn btn-primary") }}
+    <div class="row mt-3">
+      <div class="offset-2">
+        {{ form.submit(class_="btn btn-primary") }}
+      </div>
     </div>
-  </div>
-  {% for message in get_flashed_messages() %}
-  <div class="alert alert-warning mt-3">
-    {{ message }}
-  </div>
-  {% endfor %}
-</form>
-</div>
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning mt-3">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </form>
+    </div>
 </main>
 {% endblock %}

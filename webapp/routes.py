@@ -13,9 +13,9 @@ import shutil
 from sqlalchemy import select
 from sqlalchemy.sql import func
 import string
-from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
+from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, PaperStatusEnum
+from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .fundreg.search_lib import search
@@ -98,6 +98,8 @@ def submit_version():
     version = args.get('version', Version.CANDIDATE.value)
     accepted = args.get('accepted', '')
     submitted = args.get('submitted', '')
+    hotcrp = args.get('hotcrp', '')
+    hotcrp_id = args.get('hotcrp_id', '')
     if not paperid:
         return render_template('message.html',
                                title='Missing parameter',
@@ -152,6 +154,8 @@ def submit_version():
     send_mail = False
     if not paper_status:
         paper_status = PaperStatus(paperid=paperid,
+                                   hotcrp=hotcrp,
+                                   hotcrp_id=hotcrp_id,
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
@@ -788,6 +792,7 @@ def view_source(paperid, version, auth):
     filename = request.args.to_dict().get('filename')
     if not filename:
         data = {'input_files': input_files}
+        # TODO: remove this. It's for debugging I guess.
         print(json.dumps(data,indent=2))
     else:
         source_file = paper_dir / Path('output') / Path(filename)

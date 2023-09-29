@@ -23,15 +23,6 @@ class StrEnum(str, Enum):
                 return e
         return None
 
-class PaperStatusEnum(StrEnum):
-    PENDING = 'pending'
-    SUBMITTED = 'submitted'
-    EDIT_PENDING = 'edit_pending'
-    EDIT_FINISHED = 'edit_finished'
-    FINAL_SUBMITTED = 'final_submitted'
-    COPY_EDIT_ACCEPT = 'copy_edit_accept'
-    PUBLISHED = 'published'
-  
 class CompileStatus(StrEnum):
     """Used to categorize current status of a paper. Only shown to author and editor."""
     COMPILING = 'compiling'   # Submitted, but pending compilation

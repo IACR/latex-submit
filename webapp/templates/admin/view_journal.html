@@ -1,0 +1,48 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
+<h1 class="mb-5 text-center">{{title}}</h1>
+<p>
+  This is a view of all papers that are pending for journal {{journal.name}}.
+</p>
+<div>
+  {% for volume in volumes %}
+  <div>
+    <h5>Volume: {{volume.name}}</h5>
+    <div class="d-flex ms-3 mb-3">
+      Issues:
+      {% for issue in volume.issues %}
+      <a class="ms-3" href="{{url_for('admin_file.view_issue', issueid=issue.id)}}">{{issue.name}}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<table class="table sortable">
+  <thead>
+    <tr>
+      <th>paperid</th>
+      <th>volume</th>
+      <th>issue</th>
+      <th>status</th>
+      <th>upload time</th>
+      <th>last modified</th>
+      <th>email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for status in papers %}
+      <td><a href="{{url_for('admin_file.show_admin_paper', paperid=status.paperid)}}">{{status.paperid}}</td>
+      <td>{{status.volume_key}}</td>
+      <td><a href="{{url_for('admin_file.view_issue', issueid=status.issue_id)}}">{{status.issue_key}}</a></td>
+      <td>{{status.status.value}}</td>
+      <td>{{status.creationtime}}</td>
+      <td>{{status.lastmodified}}</td>
+      <td>{{status.email}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script src="/js/sorttable.js"></script>
+</main>
+{% endblock %}

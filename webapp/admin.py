@@ -11,9 +11,9 @@ import json
 import os
 from pathlib import Path
 from . import db, create_hmac, mail, generate_password
-from .metadata.compilation import Compilation, PaperStatusEnum
+from .metadata.compilation import Compilation
 from .metadata import validate_paperid
-from .metadata.db_models import Role, User, validate_version, PaperStatus, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue
+from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume
 from .forms import AdminUserForm
 from functools import wraps
 
@@ -37,32 +37,12 @@ admin_bp = Blueprint('admin_file', __name__)
 @login_required
 @admin_required
 def show_admin_home():
-    papertree = {} # paperid -> version -> compilation
     errors = []
-    journals = db.session.execute(select(Journal)).scalars()
-    papers = db.session.execute(select(PaperStatus)).scalars()
-    for paperpath in Path(app.config['DATA_DIR']).iterdir():
-        versions = {}
-        for v in paperpath.iterdir():
-            if v.is_dir() and validate_version(v.name):
-                try:
-                    cstr = (v / Path('compilation.json')).read_text(encoding='UTF-8')
-                    versions[v.name] = {'url': url_for('home_bp.view_results',
-                                                       paperid=paperpath.name,
-                                                       version=v.name,
-                                                       auth=create_hmac(paperpath.name,
-                                                                        v.name,
-                                                                        '',
-                                                                        ''),
-                                                       _external=True),
-                                        'comp': Compilation.model_validate_json(cstr)}
-                except Exception as e:
-                    errors.append(str(v) + ':' + str(e))
-        papertree[paperpath.name] = versions
+    journals = db.session.execute(select(Journal)).scalars().all()
+    papers = db.session.execute(select(PaperStatus).order_by(PaperStatus.lastmodified.desc())).scalars().all()
     data = {'title': 'IACR CC Upload Admin Home',
             'errors': errors,
             'journal_name': app.config['SITE_SHORTNAME'],
-            'papertree': papertree,
             'papers': papers,
             'journals': journals}
     return render_template('admin/home.html', **data)
@@ -78,10 +58,37 @@ def show_admin_paper(paperid):
     # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
+    issue = db.session.execute(select(Issue).where(Issue.id==paper_status.issue_id)).scalar_one_or_none()
     sql = select(LogEvent).filter_by(paperid=paperid)
     events = db.session.execute(sql).scalars().all()
-    data = {'title': 'Viewing {}'.format(paperid),
-            'paper': paper_status,
+    paper_path = Path(app.config['DATA_DIR']) / Path(paperid)
+    versions = {}
+    for v in paper_path.iterdir():
+        if v.is_dir() and validate_version(v.name):
+            if v.name == Version.CANDIDATE:
+                url = url_for('home_bp.view_results',
+                              paperid=paper_path.name,
+                              version=v.name,
+                              auth=create_hmac(paper_path.name,
+                                               v.name,
+                                               '',
+                                               ''))
+            elif v.name == Version.COPYEDIT:
+                url = url_for('admin_file.copyedit',
+                              paperid=paper_path.name)
+            else: # final
+                url = url_for('admin_file.final_review',
+                              paperid = paper_path.name)
+            try:
+                cstr = (v / Path('compilation.json')).read_text(encoding='UTF-8')
+                versions[v.name] = {'url': url,
+                                    'comp': Compilation.model_validate_json(cstr)}
+            except Exception as e:
+                errors.append(str(v) + ':' + str(e))
+    data = {'title': 'Paper status: {}'.format(paperid),
+            'paper_status': paper_status,
+            'issue': issue,
+            'versions': versions,
             'events': events}
     return render_template('admin/view.html', **data)
 
@@ -247,6 +254,25 @@ def approve_final():
         flash('Error in sending author email: ' + str(e))
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
+@admin_bp.route('/admin/view_journal/<jid>', methods=['GET'])
+@login_required
+@admin_required
+def view_journal(jid):
+    journal = db.session.execute(select(Journal).where(Journal.id==jid)).scalar_one_or_none()
+    if not journal:
+        flash('No such journal')
+        return redirect(url_for('admin_file.show_admin_home'))
+    volume_info = db.session.execute(select(Volume.id, Volume.name).where(Volume.journal_id==jid)).all()
+    volumes = [obj._asdict() for obj in volume_info]
+    for volume in volumes:
+        volume['issues'] = db.session.execute(select(Issue).where(Issue.volume_id==volume['id'])).scalars().all()
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.journal_key==journal.hotcrp_key)).scalars().all()
+    data = {'title': journal.name,
+            'journal': journal,
+            'volumes': volumes,
+            'papers': papers}
+    return render_template('admin/view_journal.html', **data)
+
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
 @login_required
 @admin_required
@@ -369,7 +395,7 @@ def comments(paperid):
 @login_required
 @admin_required
 def comment():
-    """This is for handling copy editing comments."""
+    """This is for ajax to handle copy editing comments."""
     data = request.json
     try:
         action = data['action']
