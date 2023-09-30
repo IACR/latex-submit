@@ -11,6 +11,7 @@ from .metadata.compilation import dt_regex
 import random, string # TODO - remove this
 from . import create_hmac, validate_hmac
 import logging
+import time
 
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[InputRequired(),
@@ -113,6 +114,10 @@ def maxmin_check(name, min=-1, max=-1):
             raise ValidationError(str(e))
     return _check_hidden
 
+def _tmp_randstring():
+    val = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
+    return val + str(int(time.time()) % 100000)
+
 class SubmitForm(FlaskForm):
     """Form to submit a version of a paper. The auth field authenticates
     required fields. This may be supplied by an external link for the
@@ -135,7 +140,7 @@ class SubmitForm(FlaskForm):
                           validators=[InputRequired('paper id is required'),
                                       ValidPaperId()],
                           # TODO - remove default below
-                          default=''.join(random.choices(string.ascii_lowercase + string.digits, k=8)))
+                          default= _tmp_randstring())
     version = HiddenField(id='version',
                           name='version',
                           validators=[InputRequired('version field is required'),
