@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 import shutil
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.sql import func
 import string
 from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
@@ -337,13 +337,12 @@ def compile_for_copyedit():
                                error='Paper directory does not exist. This is a bug')
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return render_template('message.html',
                                title='Missing status',
                                error='Paper status does not exist. This is a bug')
-    # TODO: enable generating copy edit version from other states.
-    if paper_status.status != PaperStatusEnum.PENDING:
+    if (paper_status.status != PaperStatusEnum.PENDING and
+        paper_status.status != PaperStatusEnum.EDIT_REVISED):
         return render_template('message.html',
                                title='Paper was already sent to copy editor',
                                error = 'Paper was already sent for copy editing.')
@@ -358,7 +357,6 @@ def compile_for_copyedit():
                                error='At most one compilation may be queued on each paper.')
     sql = select(CompileRecord).filter_by(paperid=paperid, version=form.version.data)
     version_comprec = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: version_comprec = CompileRecord.query.filter_by(paperid=paperid,version=form.version.data).first()
     if not version_comprec:
         return render_template('message.html',
                                title='Compilation not found',
@@ -439,7 +437,7 @@ def compile_for_copyedit():
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
-    msg.body = 'A paper for CiC needs copy editing.\n\nYou can view it at {}'.format(copyedit_url)
+    msg.body = 'A paper for CiC is being compiled for copy editing.\n\nYou can view it at {}'.format(copyedit_url)
     mail.send(msg)
     if 'TESTING' in app.config:
         print(msg.body)
@@ -495,22 +493,28 @@ def view_copyedit(paperid, auth):
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     if paper_status:
-        if paper_status.status == PaperStatusEnum.EDIT_PENDING.value:
+        if (paper_status.status == PaperStatusEnum.EDIT_PENDING.value or
+            paper_status.status == PaperStatusEnum.EDIT_REVISED.value):
             return render_template('message.html',
                                    title='Your copy edit was submitted',
                                    message='You will receive an email when the copy editor finishes with your paper')
         elif paper_status.status == PaperStatusEnum.EDIT_FINISHED.value:
-            sql = select(Discussion).filter_by(paperid=paperid)
+            sql = select(Discussion).where(and_(Discussion.paperid == paperid,
+                                                Discussion.archived == None)).order_by(Discussion.created.desc())
             items = [item.as_dict() for item in db.session.execute(sql).scalars().all()]
             responded_count = 0
             for item in items:
                 item['token'] = create_hmac(paperid, item['text'], str(item['id']), '')
-                if item['status'] != DiscussionStatus.PENDING.value:
+                if item['status']['name'] != DiscussionStatus.PENDING.name:
                     responded_count += 1
+            archived_sql = select(Discussion).where(and_(Discussion.paperid == paperid,
+                                                         Discussion.archived != None)).order_by(Discussion.created.desc())
+            archived_items = db.session.execute(archived_sql).scalars().all()
             data = {'paperid': paperid,
                     'status_values': {s.name: s.value for s in DiscussionStatus},
                     'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
                     'items': items,
+                    'archived_items': archived_items,
                     'upload': ''}
             if responded_count == len(items):
                 data['upload'] = url_for('home_bp.submit_version',
@@ -580,10 +584,13 @@ def get_status(paperid, version, auth):
     This returns a json object with 'url', 'status', and 'msg', and the user will
     be redirected to url when the compilation is completed.
     """
+    args = request.args.to_dict()
     if not validate_hmac(paperid, version, '', '', auth):
         return jsonify({'status': TaskStatus.ERROR,
                         'msg': 'hmac is invalid'})
-    if version == Version.COPYEDIT.value:
+    if 'request_more' in args: # This means that it's an admin recompile for EDIT_REVISED.
+        paper_url = url_for('admin_file.copyedit', paperid=paperid)
+    elif version == Version.COPYEDIT.value:
         paper_url = url_for('home_bp.view_copyedit',
                             paperid=paperid,
                             auth=create_hmac(paperid, version, '', ''))

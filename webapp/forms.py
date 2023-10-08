@@ -293,3 +293,11 @@ class CompileForCopyEditForm(FlaskForm):
             logging.warning('CompileForCopyEditForm has wrong version: {}'.format(version.data))
             return False
         return self.check_auth()
+
+class MoreChangesForm(FlaskForm):
+    """This is used to replace the candidate version by the copyedit version, and is only
+       called by the admin in the final review phase."""
+    paperid = HiddenField(id='paperid', name='paperid',
+                          validators=[InputRequired('paper id is required'),
+                                      ValidPaperId()])
+    submit = SubmitField('Replace candidate version by final version')

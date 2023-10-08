@@ -87,6 +87,20 @@ This template is used to show the status of a compilation for copyedit
           <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span></div>
         </div>
         {% endfor %}
+        {% if archived_items %}
+        <h5>Archived items below</h5>
+        {% for item in archived_items %}
+        <div class="alert alert-secondary">
+          <div class="item pb-1 d-flex justify-content-between">
+            <div id="item-div-{{item.id}}">
+              <div>Page {{item.pageno}}, line {{item.lineno}}</div>
+              <span>{{item.text}}</span>
+            </div>
+          </div>
+          <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span></div>
+        </div>
+        {% endfor %}
+        {% endif %}
       </div>
     </div>
   </div>
@@ -195,7 +209,7 @@ This template is used to show the status of a compilation for copyedit
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="response" id="CLARIFY" value="CLARIFY" onclick="setError('')">
-          <label class="form-check-label" for="CLARIFIED">Need clarification</label>
+          <label class="form-check-label" for="CLARIFY">Need clarification</label>
         </div>
         <div id="error_msg" class="form-text text-danger d-none"></div>
         <textarea id="reply-text" name="text" class="mb-3 mt-2 form-control" placeholder="Enter text response if desired"></textarea>

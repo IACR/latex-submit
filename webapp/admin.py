@@ -4,19 +4,22 @@ from datetime import datetime
 from difflib import HtmlDiff
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
-from sqlalchemy import select
+from sqlalchemy import select, or_, and_
 from flask_login import login_required, current_user
 from flask_mail import Message
 import json
 import os
 from pathlib import Path
 import time
-from . import db, create_hmac, mail, generate_password
-from .metadata.compilation import Compilation
+from . import db, create_hmac, mail, generate_password, task_queue, paper_key, executor
+from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
-from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume
-from .forms import AdminUserForm
+from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus
+from .forms import AdminUserForm, MoreChangesForm
+from .tasks import run_latex_task
+from .routes import context_wrap
 from functools import wraps
+import shutil
 
 # decorator for views that require admin role.
 def admin_required(f):
@@ -181,6 +184,19 @@ def user():
             flash('no such user {}'.format(args.get('id')))
     return render_template('admin/user.html', form=form)
 
+def _copyedit_url(paperid: str, status: PaperStatusEnum) -> str:
+    """A paper can have several admin views on the copy editing, depending on
+       what the status is. This includes first copyedit and approve_final."""
+    if (status == PaperStatusEnum.EDIT_PENDING.name or
+        status == PaperStatusEnum.EDIT_REVISED.name or
+        status == PaperStatusEnum.EDIT_FINISHED.name):
+        return url_for('admin_file.copyedit', paperid=paperid)
+    if (status == PaperStatusEnum.FINAL_SUBMITTED.name or
+        status == PaperStatusEnum.EDIT_ACCEPT.name or
+        status == PaperStatusEnum.PUBLISHED.name):
+        return url_for('admin_file.final_review', paperid=paperid)
+    return None
+
 @admin_bp.route('/admin/copyedit/<paperid>', methods=['GET'])
 @login_required
 @admin_required
@@ -329,11 +345,12 @@ def final_review(paperid):
         diffs[filename] = 'File is new'
     comp_path = final_path / Path('compilation.json')
     compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
-    sql = select(Discussion).filter_by(paperid=paperid)
+    sql = select(Discussion).filter_by(paperid=paperid).order_by(Discussion.created.desc())
     items = db.session.execute(sql).scalars().all()
+    morechangesform = MoreChangesForm(paperid=paperid)
     data = {'title': 'Final review on paper # {}'.format(paperid),
-            'warnings': compilation.warning_log,
-            'log': compilation.log,
+            'comp': compilation,
+            'morechangesform': morechangesform,
             'discussion': items,
             'pdf_copyedit_auth': create_hmac(paperid, 'copyedit', '', ''),
             'pdf_final_auth': create_hmac(paperid, 'final', '', ''),
@@ -373,12 +390,124 @@ def finish_copyedit():
     mail.send(msg)
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
+## This method is used if a paper is being sent back to the author for
+## further changes after their first round of responses. In this case
+## 1. The candidate version is replaced by the final version and the
+##    final version is removed
+## 2. The copyedit version is generated from the new candidate version.
+## 3. All Discussion items are "archived" to indicate that the data in them
+##    is not trustworthy because it depends on a previous compilation.
+@admin_bp.route('/admin/request_more_changes', methods=['POST'])
+@login_required
+@admin_required
+def request_more_changes():
+    form = MoreChangesForm()
+    if not form.validate_on_submit():
+        return admin_message('Invalid form submission. This is a bug.')
+    paperid = form.paperid.data
+    sql = select(PaperStatus).filter_by(paperid=paperid)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    if not paper_status:
+        return admin_message('Unknown paper: {}'.format(paperid))
+    paper_status.status = PaperStatusEnum.EDIT_REVISED
+    now = datetime.now()
+    paper_status.lastmodified = now
+    db.session.add(paper_status)
+    db.session.commit()
+    sql = select(Discussion).where(and_(Discussion.paperid==paperid, Discussion.archived == None))
+    items = db.session.execute(sql).scalars().all()
+    for item in items:
+        item.archived = now
+        db.session.add(item)
+    db.session.commit()
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+    candidate_dir = paper_dir / Path(Version.CANDIDATE.value)
+    shutil.rmtree(candidate_dir)
+    final_dir = paper_dir / Path(Version.FINAL.value)
+    shutil.move(final_dir, candidate_dir)
+    candidate_sql = select(CompileRecord).where(and_(CompileRecord.paperid == paperid,
+                                                     CompileRecord.version == Version.CANDIDATE))
+    candidate_comprec = db.session.execute(candidate_sql).scalar_one_or_none()
+    db.session.delete(candidate_comprec)
+    db.session.commit()
+    sql = select(CompileRecord).where(and_(CompileRecord.paperid == paperid,
+                                           CompileRecord.version == Version.FINAL))
+    comprec = db.session.execute(sql).scalar_one_or_none()
+    # change the version of comprec to CANDIDATE
+    comprec.version = Version.CANDIDATE
+    last_compilation = Compilation.model_validate_json(comprec.result)
+    db.session.add(comprec)
+    db.session.commit()
+    copyedit_dir = paper_dir / Path(Version.COPYEDIT.value)
+    if copyedit_dir.is_dir():
+        shutil.rmtree(copyedit_dir)
+    copyedit_dir.mkdir(parents=True)
+    # copy everything from candidate input_dir
+    candidate_input_dir = candidate_dir / Path('input')
+    copyedit_input_dir = copyedit_dir / Path('input')
+    shutil.copytree(candidate_input_dir,
+                    copyedit_input_dir)
+    copyedit_file = copyedit_input_dir / Path('main.copyedit')
+    copyedit_file.touch() # this iacrcc.cls to add line numbers.
+
+    copyedit_comprec_sql = select(CompileRecord).where(and_(CompileRecord.paperid == paperid,
+                                                            CompileRecord.version == Version.COPYEDIT))
+    copyedit_comprec = db.session.execute(copyedit_comprec_sql).scalar_one_or_none()
+    copyedit_comprec.task_status = TaskStatus.PENDING
+    copyedit_comprec.started = now
+    compilation = Compilation(**{'paperid': paperid,
+                                 'venue': paper_status.journal_key,
+                                 'status': CompileStatus.COMPILING,
+                                 'version': Version.COPYEDIT.value,
+                                 'email': last_compilation.email,
+                                 'submitted': last_compilation.submitted,
+                                 'accepted': last_compilation.accepted,
+                                 'compiled': now,
+                                 'command': last_compilation.command,
+                                 'error_log': [],
+                                 'warning_log': [],
+                                 'zipfilename': last_compilation.zipfilename})
+    command = last_compilation.command
+    compstr = compilation.model_dump_json(indent=2, exclude_none=True)
+    copyedit_comprec.result = compstr
+    db.session.add(copyedit_comprec)
+    db.session.commit()
+    compilation_file = copyedit_dir / Path('compilation.json')
+    compilation_file.write_text(compstr, encoding='UTF-8')
+    # fire off a separate task to compile. We wrap run_latex_task so it
+    # can have the flask context to use sqlalchemy on the database.
+    task_key = paper_key(paperid, Version.COPYEDIT.value)
+    task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           command,
+                                           str(copyedit_dir.absolute()),
+                                           paperid,
+                                           Version.COPYEDIT.value,
+                                           task_key)
+    status_url = url_for('home_bp.get_status',
+                         paperid=paperid,
+                         version=Version.COPYEDIT.value,
+                         auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                         request_more='yes',
+                         _external=True)
+    data = {'title': 'Recompiling copy editor version',
+            'status_url': status_url,
+            'headline': 'Recompiling your paper with line numbers for the copy editor'}
+    return render_template('running.html', **data)
+
+
 @admin_bp.route('/admin/copyedit', methods=['GET'])
 @login_required
 @admin_required
 def copyedit_home():
-    papers = PaperStatus.query.filter((PaperStatus.status == PaperStatusEnum.EDIT_PENDING) |
-                                      (PaperStatus.status == PaperStatusEnum.EDIT_FINISHED)).all()
+    """Show the list of papers with pending copy edit actions."""
+    sql = select(PaperStatus).where(or_(PaperStatus.status == PaperStatusEnum.EDIT_PENDING,
+                                        PaperStatus.status == PaperStatusEnum.EDIT_REVISED,
+                                        PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
+                                        PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).order_by(PaperStatus.lastmodified)
+    statuses = db.session.execute(sql).scalars().all()
+    papers = [p.as_dict() for p in statuses]
+    for paper in papers:
+        paper['url'] = _copyedit_url(paper['paperid'], paper['status']['name'])
     data = {'title': 'Papers for copy editing',
             'papers': papers}
     return render_template('admin/copyedit_home.html', **data)
@@ -389,9 +518,8 @@ def copyedit_home():
 def comments(paperid):
     if not validate_paperid(paperid):
         return jsonify([])
-    sql = select(Discussion).filter_by(paperid=paperid)
+    sql = select(Discussion).filter_by(paperid=paperid).order_by(Discussion.created)
     notes = db.session.execute(sql).scalars().all()
-    # notes = Discussion.query.filter(paperid==paperid).all()
     return jsonify([n.as_dict() for n in notes])
 
 @admin_bp.route('/admin/comment', methods=['POST'])
@@ -416,6 +544,8 @@ def comment():
                 d.source_file = data['source_file']
             if 'source_lineno' in data:
                 d.source_lineno = data['source_lineno']
+            if 'warning_id' in data:
+                d.warning_id = data['warning_id']
             db.session.add(d)
             db.session.commit()
             return jsonify(d.as_dict())

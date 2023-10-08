@@ -16,7 +16,7 @@
    margin-bottom: .25rem;
  }
  .discussionTabs {
-   max-height:70vh;
+   max-height:50vh;
    overflow-y:scroll;
  }
  ul#myTab .nav-item button.active, #tabContent {
@@ -57,6 +57,18 @@
    padding-left: .75rem;
    max-height: 80vh;
  }
+ div[data-status="PENDING"] {
+   background-color: #e0f0e0;
+  }
+ div[data-status="WILLFIX"] {
+   background-color: #c0ffc0;
+  }
+ div[data-status="CLARIFY"] {
+   background-color: #f0c0f0;
+  }
+ div[data-status="DECLINED"] {
+   background-color: #fff3cd;
+ }
 </style>
 {# this template is used for generating notes from javascript. #}
 {% raw %}
@@ -81,8 +93,11 @@
         </div>
       </div>
       <div class="ps-2 d-flex flex-column align-items-end">
-      <img src="/img/delete-icon.svg" class="icon" onclick="deleteNote({{id}})">
+        <img src="/img/delete-icon.svg" class="icon" onclick="deleteNote({{id}})">
+        {{#if archived }}<span class="mt-3 badge text-bg-warning">Archived</span>{{/if}}
+      </div>
     </div>
+    {{#if archived}}<div class="item px-3 p-1" data-status="{{status.name}}">Status: <span>{{status.value}}</span>. <span>{{#if reply }}{{reply}}{{/if}}</span></div>{{/if}}
   </alert>
 </script>
 {% endraw %}
@@ -95,6 +110,7 @@
    document.getElementById('sourcefile').selectedIndex = -1;
    document.getElementById('sourceline').value = '';
    document.getElementById('logline').value = '';
+   document.getElementById('warning_id').value = '';
  }
 
  {#  We never finished this. #}
@@ -131,7 +147,11 @@
  var item_template = Handlebars.compile(document.getElementById('item_template').innerHTML);
 
  function appendComment(data) {
-   let discussion = document.getElementById('discussion');
+   let id = 'discussion';
+   if (data.archived) {
+     id = 'archived';
+   }
+   let discussion = document.getElementById(id);
    discussion.innerHTML = discussion.innerHTML + item_template(data);
  }
 
@@ -178,6 +198,9 @@
    if (document.getElementById('logline').value) {
      data['logline'] = +document.getElementById('logline').value;
    }
+   if (document.getElementById('warning_id').value) {
+     data['warning_id'] = +document.getElementById('warning_id').value;
+   }
    resetForm();
    fetch('/admin/comment', {
      method: "POST",
@@ -196,6 +219,7 @@
        return;
      }
      appendComment(data); // data['id'], data['pageno'], data['lineno'], data['text']);
+     document.getElementById('item-'+data.id).scrollIntoView({behavior: "smooth", block: "start"});
    });
  }
 
@@ -221,6 +245,7 @@
      setErrorMessage('Please supply a page number and line number. Other fields are optional.');
      const firstTab = document.querySelector('#myTab li:first-child button');
      bootstrap.Tab.getInstance(firstTab).show(); // Select the first tab.
+     document.getElementById('warning_id').value = index;
      el.remove();
    }
  }
@@ -295,6 +320,7 @@
           <input type="hidden" id="logline" value="">
           <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
           <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
+          <input type="hidden" id="warning_id" value="">
           <div class="row">
             <div class="col-6">
               <label for="pageno" class="form-label">Page number</label>
@@ -330,12 +356,17 @@
           </div>
           <div id="error_msg" class="text-danger d-none"></div>
           <button type="submit" class="mt-3 btn btn-primary btn-sm" onclick="addComment()">Add comment</button>
-          <div id="discussion" class="list-group mt-3 discussionTabs">
+          <button type="submit" class="ms-3 mt-3 btn btn-secondary btn-sm" onclick="resetForm()">Clear</button>
+          <div class="discussionTabs">
+            <div id="discussion" class="list-group mt-3">
+            </div>
+            <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
+              <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
+              <button class="my-4 btn btn-success btn-sm" type="submit">Finish and send to author(s)</button>
+            </form>
+            <div id="archived" class="list-group mt-3">
+            </div>
           </div>
-          <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
-            <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
-            <button class="my-4 btn btn-success btn-sm" type="submit">Finish and send to author(s)</button>
-          </form>
           <div class="alert alert-info alert-dismissible fade show" role="alert">
             Start with the tab showing the compile warnings. Some might need escalation to have the author fix them.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -370,7 +401,7 @@
                     {% endif %}
                   </div>
                   <div class="">
-              {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
+                    {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
                   </div>
                   <div class="text-end">
                     {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
@@ -510,6 +541,13 @@
  }).then((response) => response.json()).then((data) => {
    console.dir(data);
    data.forEach(d => {
+     {# warning_id is only valid for non-archived items #}
+     if (d.warning_id && d.archived == null) {
+       let el = document.getElementById('warning-' + d.warning_id);
+       if (el) {
+         el.remove();
+       }
+     }
      appendComment(d); // d['id'], d['pageno'], d['lineno'], d['text']);
    });
  });

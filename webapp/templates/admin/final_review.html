@@ -235,7 +235,7 @@
           {% endfor %}
         </div>
         <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab" tabindex="0">
-          <pre>{{log}}</pre>
+          <pre>{{comp.log}}</pre>
         </div>
       </div>
     </div>
@@ -252,16 +252,13 @@
         </p>
         <div class="row">
           <div class="col-6 text-center">
-            <form METHOD="post" action="{{url_for('admin_file.approve_final', paperid=paperid)}}">
+            <form METHOD="post" action="{{url_for('admin_file.approve_final')}}">
               <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
               <button class="my-4 btn btn-success" type="submit">Approve for publishing</button>
             </form>
           </div>
           <div class="col-6 text-center">
-            <form METHOD="post" action="{#{{url_for('admin_file.request_more_changes', paperid=paperid)}}#}">
-              <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
-              <button class="my-4 btn btn-warning" type="submit" title="Still to be implemented. Use email?">Request more changes</button>
-            </form>
+            <a class="my-4 btn btn-warning" href="#" data-bs-toggle="modal" data-bs-target="#moreChangesModal">Request more changes</a>
           </div>
         </div>
         {#  tabs for discussion and warnings from compilation #}
@@ -280,7 +277,7 @@
             {% for item in discussion %}
             <div class="alert alert-secondary">
               <div id="item-div-{{item.id}}" class="mb-2">
-                <div>Page {{item.pageno}}, line {{item.lineno}}</div>
+                <div class="d-flex justify-content-between"><span>Page {{item.pageno}}, line {{item.lineno}}</span> {% if item.archived %}<span class="ms-3 badge text-bg-dark">Archived</span>{% endif %}</div>
                 <span>{{item.text}}</span>
               </div>
               <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">
@@ -291,15 +288,48 @@
           </div>
         </div>
         <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
-          <p>Authors have already seen these, but apparently
-            ignored them. You can request them to fix individual items.
+          <p>These warnings are from compiling the author's final version. You can view the warnings on the author's
+            first version in a separate tab by <a target="_blank" href="{{url_for('admin_file.copyedit', paperid=paper.paperid)}}">clicking here</a>.
           </p>
           <div class="list-group discussionTabs">
-            {% if warnings %}
-            {% for warning in warnings %}
-            <div id="warning-{{loop.index}}" class="alert alert-warning alert-dismissible fade show">
-              {{warning}}
-              <button type="button" title="Dismiss" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+            {% if comp.warning_log %}
+            {% for err in comp.warning_log %}
+            <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show"
+                 {% if err.filepath %}
+                 {% if err.filepath.startswith('/usr/') %}
+                 {% set filepath = err.filepath.split('/')[-1] %}
+                 {% else %}
+                 {% set filepath = err.filepath %}
+                 data-sourcefile={{filepath}} data-sourceline={{err.filepath_line}}
+                 {% endif %}
+                 {% endif %}
+                 {% if err.pageno %}
+                 data-pageno={{err.pageno}}
+                 {% endif %}
+            >
+              <div class="d-flex flex-column justify-content-between w-100">
+                <div id="warning-text-{{loop.index}}">{{loop.index}}: {{err.text}}</div>
+                <div class="d-flex justify-content-between">
+                  <div class="">
+                    {% if err.logline %}
+                    <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to log line">Log line {{err.logline}}</span>
+                    {% endif %}
+                  </div>
+                  <div class="">
+                    {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
+                  </div>
+                  <div class="text-end">
+                    {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
+                                           {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
+                                           class="lognav" title="Show source file">{{filepath}}
+                    {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="ms-3 d-flex flex-column align-items-end">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
+                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Include</button>
+              </div>
             </div>
             {% endfor %}
             {% else %}
@@ -311,6 +341,61 @@
     </div>
   </div>
 </div>  
+{# modal for requesting more changes. #}
+<div class="modal fade" id="moreChangesModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h1 class="modal-title fs-3" id="helpModalLabel">Requesting more changes</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The author has now responded to all of the items in your original review. You may wish to request more
+          changes if one of the following is true:
+        </p>
+        <ol>
+          <li>You noticed something serious that you overlooked in your previous review.</li>
+          <li>You are not satisfied with the responses from the author.</li>
+          <li>The changes made by the author in their latest version introduced new problems.</li>
+        </ol>
+        <p>
+          Please keep in mind that the goal is to have the paper be published. No paper is ever perfect.
+        </p>
+        <h3>What happens next?</h3>
+        <p>
+          You have two options:
+        </p>
+        <ol>
+          <li>
+            You can use the button below to replace their candidate version by their most
+            recently uploaded final version, which starts another cycle of copy editing.
+            In this case further requests will have to be made relative
+            to that version. The old change items will be "archived" and
+            accessible to the author, but the page numbers, line
+            numbers, file numbers etc may no longer be accurate. For
+            this reason, if you are unsatisfied with the response to an
+            item you raised previously, then please create a new issue
+            referencing the current compilation.
+          </li>
+          <li>You can send email to the author at {{paper.email}} asking them to make a minor change. This is not
+            recommended, because authors may try to send you just the change, so make sure you tell
+            them to upload a final version again.
+          </li>
+        </ol>
+      </div>
+      <form METHOD="post" action="{{url_for('admin_file.request_more_changes')}}">
+        {{ morechangesform.csrf_token }}
+        {{ morechangesform.paperid }}
+        {{ morechangesform.submit(class_="btn btn-warning mb-3") }}
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {# modal for help. #}
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -331,7 +416,7 @@
           quite old, but still useful.
         </p>
         <p>
-          One principle that we stive for is that metadata should be
+          One principle that we strive for is that metadata should be
           carefully checked. The LaTeX style is designed to encourage
           authors to supply all necessary metadata, but there are
           still some things that authors will overlook. These include:

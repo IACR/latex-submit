@@ -14,8 +14,9 @@ class PaperStatusEnum(str, Enum):
     PENDING = 'In progress'
     SUBMITTED = 'Submitted'
     EDIT_PENDING = 'Awaiting copy editing'
-    EDIT_FINISHED = 'Copy editing finished'
+    EDIT_FINISHED = 'Awaiting author response to copyedit'
     FINAL_SUBMITTED = 'Pending final review'
+    EDIT_REVISED = 'Further revision requested'
     COPY_EDIT_ACCEPT = 'Copy edit complete'
     PUBLISHED = 'Published'
   
@@ -43,7 +44,15 @@ class TaskStatus(str, Enum):
     ERROR = 'ERROR'
 
 class Base(DeclarativeBase):
-    pass
+    def as_dict(self):
+        """Convert to dict with Enum fields as {'name': ..., 'value': ...}."""
+        retval = dict()
+        for c in self.__table__.columns:
+            obj = getattr(self, c.name)
+            if isinstance(obj, Enum):
+                obj = {'name': obj.name, 'value': obj.value}
+            retval[c.name] = obj
+        return retval
 
 class User(UserMixin, Base):
     __tablename__ = 'user'
@@ -95,6 +104,8 @@ class DiscussionStatus(str, Enum):
 class Discussion(Base):
     __tablename__ = 'discussion'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    warning_id: Mapped[Optional[int]] = mapped_column(Integer,
+                                                      comment='Optional index of item from compilation.error_log that was escalated.')
     paperid: Mapped[str] = mapped_column(ForeignKey('paper_status.paperid', ondelete='CASCADE'), nullable=False)
     creator_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     created: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=func.now())
@@ -106,8 +117,12 @@ class Discussion(Base):
     text: Mapped[str] = mapped_column(Text, nullable=False)
     reply: Mapped[str] = mapped_column(Text, nullable=True) # from author
     status: Mapped[DiscussionStatus] = mapped_column(default=DiscussionStatus.PENDING)
-    def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    archived: Mapped[Optional[datetime]] = mapped_column(default=None,
+                                                         comment=('An item can be archived when it no longer applies '
+                                                                  'to the current candidate version. This usually means that '
+                                                                  'things like logline, pageno, etc are no longer derived from the '
+                                                                  'current compiled version and are therefore unreliable. If '
+                                                                  'this is non-null, then it indicates when the item was archived.'))
 
 class PaperStatus(Base):
     """Primary record for a paper. It may have compilations, discussion, etc associated with it."""

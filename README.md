@@ -142,14 +142,33 @@ flagged as acceptable to the author, then it may no longer be
 edited. The `copyedit` version is created when the copy editor is
 assigned. This is derived from the `candidate` version by only adding
 page numbers. The copy editor reviews the paper and creates a list of
-queries to the author for them to correct.  The `final` version is
-created when the author uploads their response to the copy editor. As
-it stands now, the copy editor can only send messages to the author to
-change their file - the copy editor does not directly edit the LaTeX.
-If the copy editor submits further queries to the author, then they can
-continue to upload a `final` version until the copy editor is satisfied.
-Once they are satisfied, the `final` version is frozen and used to
-produce the published paper.
+discussion items to the author for them to correct.  The `final`
+version is created when the author uploads their response to the copy
+editor.
+
+After one round of copy editing, we hope that the `final` version
+fulfills all of the required changes from the copy editor, but if they
+find new problems or if the author hasn't corrected serious problems,
+then the copy editing process starts anew.  In this case, the
+`candidate` version is replaced by the `final` version and the
+`copyedit` version is recompiled from the new `candidate` version. The
+`final` version is removed and all existing discussion items are
+archived because they no longer have line numbers and page numbers
+that reference the `candidate` version.
+
+It's possible that the new `final` version is actually worse than the
+original `candidate` version, but the original `candidate` version is
+lost at this point. If the copy editor wishes to avoid this, then they
+should communicate to the author via email and have them upload a
+different `final` version instead of cycling the `final` version to
+replace the `candidate` version.
+
+As it stands now, the copy editor can only send messages to the author
+to change their file - the copy editor does not directly edit the
+LaTeX.  If the copy editor submits further items to the author, then
+they can continue to upload a `final` version until the copy editor is
+satisfied.  Once they are satisfied, the `final` version is frozen and
+used to produce the published paper.
 
 ### Data model and database schema
 
