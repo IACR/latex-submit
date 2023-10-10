@@ -339,7 +339,22 @@
 
   <script>
    var engineSelect = document.getElementById('engine');
-   const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
+
+   function generateString(length) {
+     const characters ='abcdefghijklmnopqrstuvwzyz0123456789';
+     let result = '';
+     const charactersLength = characters.length;
+     for ( let i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+     }
+     return result;
+   }
+
+   let paperidelem = document.getElementById('paperid');
+   if (paperidelem.value == '') {
+     console.log('generating random paperid');
+     paperidelem.value = generateString(8);
+   }
 
    function showHelp() {
      bootstrap.Tab.getOrCreateInstance(document.getElementById('nav-help-tab')).show();

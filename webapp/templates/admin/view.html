@@ -19,7 +19,7 @@
     <tr><th>currently slated issue:</th><td>{{issue.name}}</td></tr>
   </tbody>
 </table>
-<h4>Compiled versions</h4>
+<h4 class="mt-4">Compiled versions</h4>
 <table class="table">
   <thead>
     <tr>
@@ -42,7 +42,36 @@
     {% endfor %}
   </tbody>
 </table>
-<h4>Action log</h4>
+{% if discussion %}
+<h4 class="mb-2 mt-4">Copy edit discussion</h4>
+<div class="row fw-bolder">
+  <div class="col-2">
+    Status
+  </div>
+  <div class="col-5">
+    Editor request
+  </div>
+  <div class="col-5">
+    Author response
+  </div>
+</div>
+<hr class="my-2">
+{% for item in discussion %}
+<div class="row">
+  <div class="col-2">
+    {% if item.archived %}Archived{% else %}{{item.status.value}}{% endif %}
+  </div>
+  <div class="col-5">
+    {{item.text}}
+  </div>
+  <div class="col-5">
+    {{item.reply}}
+  </div>
+</div>
+<hr class="my-2">
+{% endfor %}
+{% endif %}
+<h4 class="mt-4">Action log</h4>
 <table class="table">
   <thead>
     <tr>

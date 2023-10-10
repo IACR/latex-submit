@@ -296,7 +296,7 @@ def submit_version():
     paper_url = url_for('home_bp.view_results',
                         paperid=paperid,
                         version=version,
-                        auth=create_hmac(paperid, version, '', ''),
+                        auth=create_hmac([paperid, version]),
                         _external=True)
     if send_mail:
         msg = Message('Paper {} was submitted'.format(paperid),
@@ -375,7 +375,7 @@ def compile_for_copyedit():
     paper_status.lastmodified = datetime.datetime.now()
     db.session.add(paper_status)
     db.session.commit()
-    log_event(db, paperid, 'Paper {} submitted for copy edit'.format(paperid))
+    log_event(db, paperid, 'Submitted for copy edit'.format(paperid))
     copyedit_dir = paper_dir / Path(Version.COPYEDIT.value)
     if copyedit_dir.is_dir():
         shutil.rmtree(copyedit_dir)
@@ -430,7 +430,7 @@ def compile_for_copyedit():
     status_url = url_for('home_bp.get_status',
                          paperid=paperid,
                          version=Version.COPYEDIT.value,
-                         auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                         auth=create_hmac([paperid, Version.COPYEDIT.value]),
                          _external=True)
     # Notify the copy editor.
     msg = Message('Paper {} is ready for copy editing'.format(paperid),
@@ -439,7 +439,7 @@ def compile_for_copyedit():
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC is being compiled for copy editing.\n\nYou can view it at {}'.format(copyedit_url)
     mail.send(msg)
-    if 'TESTING' in app.config:
+    if app.config['TESTING']:
         print(msg.body)
     data = {'title': 'Compiling your LaTeX for copy editor',
             'status_url': status_url,
@@ -476,7 +476,7 @@ def final_review():
     final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
     mail.send(msg)
-    if 'TESTING' in app.config:
+    if app.config['TESTING']:
         print(msg.body)
     return render_template('message.html',
                            title='Your paper will be reviewed',
@@ -486,7 +486,7 @@ def final_review():
 @home_bp.route('/copyedit/<paperid>/<auth>', methods=['GET'])
 def view_copyedit(paperid, auth):
     """View the feedback from the copyeditor."""
-    if not validate_hmac(paperid, Version.COPYEDIT.value, '', '', auth):
+    if not validate_hmac([paperid, Version.COPYEDIT.value], auth):
         return render_template('message.html',
                                title='Invalid request',
                                error='Your authentication cannot be verified')
@@ -504,7 +504,7 @@ def view_copyedit(paperid, auth):
             items = [item.as_dict() for item in db.session.execute(sql).scalars().all()]
             responded_count = 0
             for item in items:
-                item['token'] = create_hmac(paperid, item['text'], str(item['id']), '')
+                item['token'] = create_hmac([paperid, item['text'], str(item['id'])])
                 if item['status']['name'] != DiscussionStatus.PENDING.name:
                     responded_count += 1
             archived_sql = select(Discussion).where(and_(Discussion.paperid == paperid,
@@ -512,7 +512,7 @@ def view_copyedit(paperid, auth):
             archived_items = db.session.execute(archived_sql).scalars().all()
             data = {'paperid': paperid,
                     'status_values': {s.name: s.value for s in DiscussionStatus},
-                    'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
+                    'pdf_auth': create_hmac([paperid, 'copyedit']),
                     'items': items,
                     'archived_items': archived_items,
                     'upload': ''}
@@ -524,10 +524,10 @@ def view_copyedit(paperid, auth):
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
-                                         auth=create_hmac(paperid,
-                                                          Version.FINAL.value,
-                                                          paper_status.submitted,
-                                                          paper_status.accepted))
+                                         auth=create_hmac([paperid,
+                                                           Version.FINAL.value,
+                                                           paper_status.submitted,
+                                                           paper_status.accepted]))
             return render_template('view_copyedit.html', **data)
         else:
             # TODO: handle the other cases like SUBMITTED or PENDING.
@@ -550,7 +550,7 @@ def respond_to_comment(paperid, itemid, auth):
             return jsonify({'error': 'Unknown item'})
         # If the text has changed, it means someone edited it but the author
         # has seen an old version.
-        if not validate_hmac(paperid, item.text, str(itemid), '', auth):
+        if not validate_hmac([paperid, item.text, str(itemid)], auth):
             return jsonify({'error': 'Text has changed. Please reload'})
         item.reply = data['reply']
         item.status = data['status']
@@ -570,10 +570,10 @@ def respond_to_comment(paperid, itemid, auth):
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
-                                         auth=create_hmac(paperid,
-                                                          Version.FINAL.value,
-                                                          paper_status.submitted,
-                                                          paper_status.accepted))
+                                         auth=create_hmac([paperid,
+                                                           Version.FINAL.value,
+                                                           paper_status.submitted,
+                                                           paper_status.accepted]))
         return jsonify(response)
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -585,7 +585,7 @@ def get_status(paperid, version, auth):
     be redirected to url when the compilation is completed.
     """
     args = request.args.to_dict()
-    if not validate_hmac(paperid, version, '', '', auth):
+    if not validate_hmac([paperid, version], auth):
         return jsonify({'status': TaskStatus.ERROR,
                         'msg': 'hmac is invalid'})
     if 'request_more' in args: # This means that it's an admin recompile for EDIT_REVISED.
@@ -593,12 +593,12 @@ def get_status(paperid, version, auth):
     elif version == Version.COPYEDIT.value:
         paper_url = url_for('home_bp.view_copyedit',
                             paperid=paperid,
-                            auth=create_hmac(paperid, version, '', ''))
+                            auth=create_hmac([paperid, version]))
     else:
         paper_url = url_for('home_bp.view_results',
                             paperid=paperid,
                             version=version,
-                            auth=create_hmac(paperid, version, '', ''))
+                            auth=create_hmac([paperid, version]))
     if not validate_paperid(paperid):
         return jsonify({'url': paper_url,
                         'status': TaskStatus.ERROR,
@@ -667,7 +667,7 @@ def show_pdf(paperid,version, auth):
         return render_template('message.html',
                                title=msg,
                                error=msg)
-    if not validate_hmac(paperid, version, '', '', auth):
+    if not validate_hmac([paperid, version], auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
@@ -694,7 +694,7 @@ def view_results(paperid, version, auth):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
-    if not validate_hmac(paperid, version, '', '', auth):
+    if not validate_hmac([paperid, version], auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
@@ -711,7 +711,7 @@ def view_results(paperid, version, auth):
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
         data['comp'] = comp
-        data['auth'] = create_hmac(paperid, version, comp.submitted, comp.accepted)
+        data['auth'] = create_hmac([paperid, version, comp.submitted, comp.accepted])
     except Exception as e:
         return render_template('message.html',
                                title='Unable to parse compilation',
@@ -749,27 +749,25 @@ def view_results(paperid, version, auth):
             formdata = MultiDict({'email': comp.email,
                                   'version': Version.CANDIDATE.value,
                                   'paperid': comp.paperid,
-                                  'auth': create_hmac(comp.paperid, version, '', comp.email)})
+                                  'auth': create_hmac([comp.paperid, version, comp.email])})
             form = CompileForCopyEditForm(formdata=formdata)
             data['form'] = form
             data['next_action'] = 'copy editing'
         else: # version == Version.FINAL.value
             formdata = MultiDict({'paperid': comp.paperid,
                                   'email': comp.email,
-                                  'auth': create_hmac(comp.paperid,
-                                                      Version.FINAL.value,
-                                                      comp.email,
-                                                      '')})
+                                  'auth': create_hmac([comp.paperid,
+                                                       Version.FINAL.value,
+                                                       comp.email])})
             form = NotifyFinalForm(formdata=formdata)
             data['form'] = form
             data['next_action'] = 'final review'
     else:
         formdata = MultiDict({'paperid': comp.paperid,
                               'email': comp.email,
-                              'auth': create_hmac(comp.paperid,
-                                                  Version.FINAL.value,
-                                                  comp.email,
-                                                  '')})
+                              'auth': create_hmac([comp.paperid,
+                                                   Version.FINAL.value,
+                                                   comp.email])})
         form = NotifyFinalForm(formdata=formdata)
         data['form'] = form
         data['next_action'] = 'final publication'
@@ -789,7 +787,7 @@ def view_source(paperid, version, auth):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
-    if not validate_hmac(paperid, version, '', '', auth):
+    if not validate_hmac([paperid, version], auth):
         return render_template('message.html',
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')

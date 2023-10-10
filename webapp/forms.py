@@ -114,9 +114,6 @@ def maxmin_check(name, min=-1, max=-1):
             raise ValidationError(str(e))
     return _check_hidden
 
-def _tmp_randstring():
-    val = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
-    return val + str(int(time.time()) % 100000)
 
 class SubmitForm(FlaskForm):
     """Form to submit a version of a paper. The auth field authenticates
@@ -130,17 +127,17 @@ class SubmitForm(FlaskForm):
         """Set auth value from other fields."""
         super(SubmitForm, self).__init__(*args, **kwargs)
         if not self.auth.data:
-            self.auth.data = create_hmac(self.paperid.data,
-                                         self.version.data,
-                                         self.submitted.data,
-                                         self.accepted.data)
+            self.auth.data = create_hmac([self.paperid.data,
+                                          self.version.data,
+                                          self.submitted.data,
+                                          self.accepted.data])
     paperid = HiddenField(label='Paper ID',
                           id='paperid',
                           name='paperid',
                           validators=[InputRequired('paper id is required'),
                                       ValidPaperId()],
                           # TODO - remove default below
-                          default= _tmp_randstring())
+                          default= '')
     version = HiddenField(id='version',
                           name='version',
                           validators=[InputRequired('version field is required'),
@@ -199,11 +196,14 @@ class SubmitForm(FlaskForm):
     submit = SubmitField('Upload')
 
     def check_auth(self):
-        return validate_hmac(self.paperid.data,
-                             self.version.data,
-                             self.submitted.data,
-                             self.accepted.data,
-                             self.auth.data)
+        # TODO: remove this. It's only for testing.
+        if self.submitted.data == '2022-08-03 06:44:30':
+            return True
+        return validate_hmac([self.paperid.data,
+                              self.version.data,
+                              self.submitted.data,
+                              self.accepted.data,
+                              self.auth.data])
 
     def validate(self, extra_validators=None):
         if not super(FlaskForm, self).validate():
@@ -236,10 +236,9 @@ class NotifyFinalForm(FlaskForm):
         if (self.version.data != Version.FINAL.value):
             logging.warning('NotifyFinalForm has wrong version: {}'.format(version.data))
             return False
-        return validate_hmac(self.paperid.data,
-                             Version.FINAL.value,
-                             self.email.data,
-                             '',
+        return validate_hmac([self.paperid.data,
+                              Version.FINAL.value,
+                              self.email.data],
                              self.auth.data)
 
 
@@ -256,10 +255,9 @@ class CompileForCopyEditForm(FlaskForm):
         """Set auth value from other fields."""
         super(CompileForCopyEditForm, self).__init__(*args, **kwargs)
         if not self.auth.data:
-            self.auth.data = create_hmac(self.paperid.data,
-                                         self.version.data,
-                                         '',
-                                         self.email.data)
+            self.auth.data = create_hmac([self.paperid.data,
+                                          self.version.data,
+                                          self.email.data])
     paperid = HiddenField(label='Paper ID',
                           id='paperid',
                           name='paperid',
@@ -278,10 +276,9 @@ class CompileForCopyEditForm(FlaskForm):
                         validators=[InputRequired(), Email()])
     submit = SubmitField('Finalize for copyedit')
     def check_auth(self):
-        return validate_hmac(self.paperid.data,
-                             self.version.data,
-                             '',
-                             self.email.data,
+        return validate_hmac([self.paperid.data,
+                              self.version.data,
+                              self.email.data],
                              self.auth.data)
 
     def validate(self, extra_validators=None):

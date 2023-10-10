@@ -31,7 +31,7 @@
   </thead>
   <tbody>
     {% for status in papers %}
-      <td>{{status.paperid}}</td>
+      <td><a href="../view/{{status.paperid}}">{{status.paperid}}</a></td>
       <td>{{status.status.value}}</td>
       <td>{{status.creationtime}}</td>
       <td>{{status.lastmodified}}</td>

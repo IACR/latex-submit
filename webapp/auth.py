@@ -9,7 +9,7 @@ from flask import current_app as app
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message
 from .metadata.db_models import User, Role
-from . import db, login_manager, validate_hmac, generate_password, mail, create_hmac, validate_hmac
+from . import db, login_manager, validate_hmac, generate_password, mail, create_hmac
 from .forms import LoginForm, PasswordForm, RecoverForm, CaptchaForm
 import random
 from sqlalchemy import select
@@ -54,7 +54,7 @@ def logout():
 @auth_bp.route('/confirm_email/<email>/<auth>/<ts>', methods=['GET'])
 def confirm_email(email, auth, ts):
     """This just sets the last_login time."""
-    if not validate_hmac(email, '', ts, '', auth):
+    if not validate_hmac([email, ts], auth):
         flash('Invalid url')
         return redirect(url_for('home_bp.home'))
     if time.time() > int(ts) + 172800: # 48 hour expiration.
@@ -116,10 +116,10 @@ def _send_login_link(initiator, email):
                 'recover_url': url_for('auth.confirm_email',
                                        email=email,
                                        ts=ts,
-                                       auth=create_hmac(email, '', str(ts), ''),
+                                       auth=create_hmac([email, str(ts)]),
                                        _external=True)}
     msg.body = app.jinja_env.get_template('recover_password.txt').render(maildata)
-    if 'TESTING' in app.config:
+    if app.config['TESTING']:
         print(msg.body)
     mail.send(msg)
     return True
@@ -177,7 +177,7 @@ def recover():
                                                                             current_user.email))
             return redirect(url_for('home_bp.home'))
         else: # show them a captcha
-            auth = create_hmac('', form.email.data, '', form.email.data)
+            auth = create_hmac([form.email.data, form.email.data])
             return redirect(url_for('auth.captcha', email=form.email.data, auth=auth))
     args = request.args.to_dict()
     if 'email' in args:
@@ -191,7 +191,7 @@ def captcha():
     form = CaptchaForm()
     if form.validate_on_submit():
         email = form.email.data
-        if not validate_hmac('', email, '', email, form.auth.data):
+        if not validate_hmac([email, email], form.auth.data):
             flash('Invalid request')
             return redirect(url_for('home_bp.home'))
         challenge = form.challenge.data

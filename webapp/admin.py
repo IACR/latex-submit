@@ -14,7 +14,7 @@ import time
 from . import db, create_hmac, mail, generate_password, task_queue, paper_key, executor
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
-from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus
+from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event
 from .forms import AdminUserForm, MoreChangesForm
 from .tasks import run_latex_task
 from .routes import context_wrap
@@ -66,6 +66,7 @@ def show_admin_paper(paperid):
     sql = select(LogEvent).filter_by(paperid=paperid)
     events = db.session.execute(sql).scalars().all()
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid)
+    discussion = db.session.execute(select(Discussion).where(Discussion.paperid==paperid)).scalars().all()
     versions = {}
     for v in paper_path.iterdir():
         if v.is_dir() and validate_version(v.name):
@@ -73,10 +74,8 @@ def show_admin_paper(paperid):
                 url = url_for('home_bp.view_results',
                               paperid=paper_path.name,
                               version=v.name,
-                              auth=create_hmac(paper_path.name,
-                                               v.name,
-                                               '',
-                                               ''))
+                              auth=create_hmac([paper_path.name,
+                                                v.name]))
             elif v.name == Version.COPYEDIT:
                 url = url_for('admin_file.copyedit',
                               paperid=paper_path.name)
@@ -93,6 +92,7 @@ def show_admin_paper(paperid):
             'paper_status': paper_status,
             'issue': issue,
             'versions': versions,
+            'discussion': discussion,
             'events': events}
     return render_template('admin/view.html', **data)
 
@@ -159,11 +159,11 @@ def user():
                         'password': password,
                         'confirm_url': url_for('auth.confirm_email',
                                                email=user.email,
-                                               auth=create_hmac(user.email,'', timestamp, ''),
+                                               auth=create_hmac([user.email, timestamp]),
                                                ts=timestamp,
                                                _external=True)}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
-            if 'TESTING' in app.config:
+            if app.config['TESTING']:
                 print(msg.body)
             mail.send(msg)
             flash('User {} was created and they were notified.'.format(form.email.data))
@@ -192,7 +192,7 @@ def _copyedit_url(paperid: str, status: PaperStatusEnum) -> str:
         status == PaperStatusEnum.EDIT_FINISHED.name):
         return url_for('admin_file.copyedit', paperid=paperid)
     if (status == PaperStatusEnum.FINAL_SUBMITTED.name or
-        status == PaperStatusEnum.EDIT_ACCEPT.name or
+        status == PaperStatusEnum.COPY_EDIT_ACCEPT.name or
         status == PaperStatusEnum.PUBLISHED.name):
         return url_for('admin_file.final_review', paperid=paperid)
     return None
@@ -218,8 +218,8 @@ def copyedit(paperid):
             'input_files': input_files,
             'version': Version.CANDIDATE.value,
             'warnings': compilation.warning_log,
-            'source_auth': create_hmac(paperid, Version.CANDIDATE.value, '', ''),
-            'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
+            'source_auth': create_hmac([paperid, Version.CANDIDATE.value]),
+            'pdf_auth': create_hmac([paperid, 'copyedit']),
             'paper': paper_status}
     log_file = paper_path / Path('output') / Path('main.log')
     latexlog = log_file.read_text(encoding='UTF-8', errors='replace')
@@ -242,6 +242,7 @@ def approve_final():
     paper_status.lastmodified = datetime.now()
     db.session.add(paper_status)
     db.session.commit()
+    log_event(db, paperid, 'Final version approved for publication')
     editor_msg = Message('Copy edit changes approved for {}'.format(paperid),
                          sender=app.config['EDITOR_EMAILS'],
                          recipients=[app.config['EDITOR_EMAILS']])
@@ -250,7 +251,7 @@ def approve_final():
                 'issue_url': url_for('admin_file.view_issue', issueid=paper_status.issue_id,
                                      _external=True)}
     editor_msg.body = app.jinja_env.get_template('admin/copyedit_approved.txt').render(maildata)
-    if 'TESTING' in app.config:
+    if app.config['TESTING']:
         print(editor_msg.body)
     mail.send(editor_msg)
     ############ send a message to the author.
@@ -266,7 +267,7 @@ def approve_final():
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
         author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
-        if 'TESTING' in app.config:
+        if app.config['TESTING']:
             print(author_msg.body)
         mail.send(author_msg)
     except Exception as e:
@@ -352,8 +353,8 @@ def final_review(paperid):
             'comp': compilation,
             'morechangesform': morechangesform,
             'discussion': items,
-            'pdf_copyedit_auth': create_hmac(paperid, 'copyedit', '', ''),
-            'pdf_final_auth': create_hmac(paperid, 'final', '', ''),
+            'pdf_copyedit_auth': create_hmac([paperid, 'copyedit']),
+            'pdf_final_auth': create_hmac([paperid, 'final']),
             'diffs': diffs,
             'paper': paper_status}
     return render_template('admin/final_review.html', **data)
@@ -381,13 +382,14 @@ def finish_copyedit():
     maildata = {'journal_name': app.config['SITE_NAME'],
                 'paperid': paperid,
                 'numitems': numitems,
-                'pdf_auth': create_hmac(paperid, 'copyedit', '', ''),
-                'final_url': url_for('home_bp.view_copyedit', paperid=paperid,auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                'pdf_auth': create_hmac([paperid, 'copyedit']),
+                'final_url': url_for('home_bp.view_copyedit', paperid=paperid,auth=create_hmac([paperid, Version.COPYEDIT.value]),
                                      _external=True)}
     msg.body = app.jinja_env.get_template('admin/copyedit_finished.txt').render(maildata)
-    if 'TESTING' in app.config:
+    if app.config['TESTING']:
         print(msg.body)
     mail.send(msg)
+    log_event(db, paperid, 'Copy edit was finished and author notified')
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
 ## This method is used if a paper is being sent back to the author for
@@ -486,12 +488,13 @@ def request_more_changes():
     status_url = url_for('home_bp.get_status',
                          paperid=paperid,
                          version=Version.COPYEDIT.value,
-                         auth=create_hmac(paperid, Version.COPYEDIT.value, '', ''),
+                         auth=create_hmac([paperid, Version.COPYEDIT.value]),
                          request_more='yes',
                          _external=True)
     data = {'title': 'Recompiling copy editor version',
             'status_url': status_url,
             'headline': 'Recompiling your paper with line numbers for the copy editor'}
+    log_event(db, paperid, 'Another round of copy edit initiated')
     return render_template('running.html', **data)
 
 
