@@ -2,15 +2,10 @@
 
 This repository contains a web server to support the workflow of
 submission of final papers for a journal (the IACR Communications
-in Cryptology).
+in Cryptology). The system may prove useful for other journals in
+computer science and mathematics.
 
 ## Publishing workflows
-
-The purpose of this server is to fulfill part of the publishing
-workflow for a journal. Once a paper is accepted by a review process,
-the authors will be pointed to this server in order to upload their
-final versions.  This is but one part of a publishing workflow based
-on a LaTeX class that captures metadata about publications.
 
 A publishing workflow consists of several steps, which may
 include:
@@ -19,30 +14,121 @@ include:
 2. submission for review
 3. a review process
 4. feedback to authors
-5. possible revision
-6. submission of final version
+5. possible revision; acceptance or rejection.
+6. submission of final version by the author
 7. copy editing, with feedback to authors
 8. revision by author or copy editor to fix errors.
 9. production of final version
-10. registration of metadata
+10. registration of metadata and DOI assignment.
 11. hosting for publication.
 
-This project is only designed to fulfill steps 6-11 in a process that
-is automated to the extent possible. The one step that is impossible
-to automate is copy editing, which is mentioned in a separate section
-at the end.  One crucial feature of step 8 is that the `iacrcc` LaTeX
-class produces machine-readable metadata as a byproduct of compiling
-the LaTeX.
+We exclude from discussion certain other steps such as marketing, cost
+recovery, access control, and distribution through print or electronic
+push technologies. Our focus is on open access publishing, so these are
+less important to us.
 
-The design of this application is heavily dependent on the use of the
-IACR `iacrcc.cls` LaTeX class, because when papers written in that
-class are processed, the metadata from the paper is automatically extracted.
-This project has a submodule from IACR/latex in order to import
-`iacrcc.cls`. In order to pull this in, use
-```
-git submodule update --init --recursive --remote
-```
-This also pulls in `cryptobib` since IACR/latex depends on it.
+### Monolithic vs Component Architecture
+
+A system that implements all of the steps in a publishing workflow is
+necessarily quite complex, because there are multiple paths between
+authors, editors, reviewers, copy editors, and production
+editors. People have designed systems for some parts of the workflow,
+including overleaf for authoring, HotCRP and openreview.net for
+reviewing, and various web-based systems for hosting a journal. Others
+like [OJS](https://pkp.sfu.ca/software/ojs/) have taken the monolithic
+approach to develop a system to encompass the entire workflow. Unfortunately
+a monolithic approach has several drawbacks, and we chose to tackle
+a smaller part of the problem.
+
+A journal publishing workflow can be separated into three major components:
+
+1. Reviewing (steps 1-5 above).
+2. Production and copy editing (steps 6-10).
+3. Hosting and publication (step 11).
+
+Systems like HotCRP and openreview.net implement the first phase
+(openreview can also be used for the third phase). By contrast, the
+goal of our system is to implement the second phase. We expect to
+combine our system with HotCRP for the first phase. The third phase
+should be fairly easy once we export the necessary metadata
+about publications.
+
+In order to break the publishing workflow into a set of components, we
+need to define the interaction between them. The output from the
+reviewing process consists of manuscripts that need to be curated for
+publishing and readership. As such, we only need to provide an
+interface in the reviewing phase for authors of accepted papers to
+upload their "final" versions to the production and copy editing
+process. This consists of a URL with embedded authentication that is
+constructed with a shared key between the reviewing phase and the
+production phase.
+
+Our system is based on the assumption that authors use LaTeX; and
+moreover that authors use a specific LaTeX document class that
+facilitates metadata capture. More about this can be found in the
+[iacrcc document class](https://github.com/IACR/latex) and also in [a
+separate paper](https://arxiv.org/abs/2301.08277) describing the
+solution.  The system can be extended to cover other LaTeX classes,
+but then the capture of metadata needs to be done in the reviewing
+phase and communicated to this system via a separate API. We may build
+that in the future, but for now we didn't want to modify any specific
+reviewing systems.
+
+The capture of metadata is designed to eliminate as much human labor
+as possible. It is essentially impossible to completely automate copy
+editing, which is mentioned in a separate section below.
+
+The output from the production and copy editing phase consists of a
+set of article documents with associated metadata. Articles may be
+grouped into issues, or articles may be emitted individually. The
+metadata may be used for indexing and browsing in the hosting phase.
+In the production and copy editing phase, each paper is assigned a DOI
+and the hosting phase must agree to provide access to the article at
+the URL pointed to by the DOI. The term "document" is a little vague;
+for now we assume that authors write in LaTeX for eventual production
+of a PDF document.
+
+### Drawbacks of monolithic systems
+
+By viewing a publishing workflow as these three phases, it allows us
+to concentrate on building systems incrementally rather than
+monolithically. By contrast, the OJS system is a monolithic systems
+that bundles all three phases into a single one. This makes it easy
+for a journal to run a single system, but it also constrains the
+publication process to fit within the assumptions made by OJS.  We
+found multiple places where OJS did not fulfill our needs in all three
+phases of publishing. For example, we wanted to start a journal that
+used a completely different reviewing system (HotCRP) in which papers
+are submitted at periodic deadlines, and reviewing is done by a
+committee on a schedule that results in a new set of accepted papers
+on a schedule. Others may choose to change to an open reviewing system
+like openreview.net. We wanted the flexibility to replace part of the
+publishing workflow.
+
+As a monolithic system, OJS has an underlying schema for metadata that
+needs to support all three phases of publishing. Schema changes are
+notoriously difficult to change in software systems, because a schema
+change can touch many different parts of the code. Moreover, metadata
+is increasingly important to academic publishing, and OJS has been
+slow to adopt things like multiple affiliations, authors with multiple
+countries, matching to different taxonomies, extraction of
+bibligraphic references, different document formats, etc.
+
+Another reason why we rejected OJS is due to the fact that it's
+inconvenient to customize the hosting system. If for example the journal
+wanted to provide different views on their content (e.g., by topic or
+by a hierarchical taxonomy), it would be difficult to build this into
+OJS. Support for mathematics is quite limited in OJS. There is no
+support for hosting both HTML and PDF versions of articles. Perhaps
+most importantly to us, there is no support for LaTeX in the copy
+editing and production phases.
+
+From a software standpoint, OJS is written in the fairly archaic
+programming language of PHP with Smarty templates. Front-end web
+development is increasingly moving toward javascript frontends with
+REST backends, and fewer people are learning PHP as a result. From
+a long-term maintenance and evolution standpoint, a monolithic
+system built in PHP looks less desirable.
 
 ## Architecture
 
@@ -54,7 +140,7 @@ controlled environment. Due to the fact that LaTeX is a programming
 environment, we have chosen to provide a controlled environment so as
 to enforce a look and feel of the papers by limiting which LaTeX
 packages may be used. This is essentially the same approach taken by
-ACM and arXiv.
+ACM and arXiv. 
 
 NOTE: The original implementation used celery to maintain a queue of
 compilation tasks and execute them. This was deemed to be too

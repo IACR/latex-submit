@@ -1,6 +1,11 @@
 {% extends "admin/admin_base.html" %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
 <h1 class="mb-5 text-center">{{title}}</h1>
 <p>
   This is a view of all papers that are scheduled to appear in issue {{issue.name}}
@@ -40,7 +45,31 @@
     {% endfor %}
   </tbody>
 </table>
-
+{% if hotcrp %}
+<h4>Papers from HotCRP <a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}">{{hotcrp.shortName}}</a>
+  ({{hotcrp.longName}})<br>Vol {{hotcrp.volume}} issue {{hotcrp.issue}}</h4>
+<table class="table sortable">
+  <thead>
+    <tr>
+      <th>paperId</th>
+      <th>Title</th>
+      <th>Authors</th>
+    </tr>
+    </thhead>
+    <tbody>
+      {% for p in hotcrp.acceptedPapers %}
+      <tr>
+        <td>{{p.paperid}}</td>
+        <td>{{p.title}}</td>
+        <td>{% for author in p.authorlist %}
+          {{author.name}} ({{author.affiliation}})<br>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 <script src="/js/sorttable.js"></script>
 </main>
 {% endblock %}

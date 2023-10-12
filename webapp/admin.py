@@ -7,6 +7,7 @@ from flask import current_app as app
 from sqlalchemy import select, or_, and_
 from flask_login import login_required, current_user
 from flask_mail import Message
+import hashlib, hmac
 import json
 import os
 from pathlib import Path
@@ -20,6 +21,7 @@ from .tasks import run_latex_task
 from .routes import context_wrap
 from functools import wraps
 import shutil
+import urllib
 
 # decorator for views that require admin role.
 def admin_required(f):
@@ -293,6 +295,26 @@ def view_journal(jid):
             'papers': papers}
     return render_template('admin/view_journal.html', **data)
 
+def _get_hotcrp_papers(issue: Issue):
+    """Fetch papers from hotcrp and return JSON."""
+    # Get the last paper added for this issue. Every issue must have papers in it.
+    try:
+        paper_sql = select(PaperStatus).where(PaperStatus.issue_id==issue.id).order_by(PaperStatus.id.desc())
+        papers = db.session.execute(paper_sql).scalars().all()
+        if not papers:
+            return {'error': 'No papers'}
+        paper = papers[0]
+        conf_msg = ':'.join([paper.hotcrp, 'cic'])
+        auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
+                        conf_msg.encode('utf-8'), hashlib.sha256).hexdigest()
+        url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(paper.hotcrp, auth)
+        with urllib.request.urlopen(url) as response:
+            data = json.loads(response.read())
+            return data
+    except Exception as e:
+        app.logger.critical('unable to fetch paper info from hotcrp: ' + str(e))
+    return {'error': 'unable to retrieve hotcrp papers'}
+
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
 @login_required
 @admin_required
@@ -301,12 +323,24 @@ def view_issue(issueid):
     if not issue:
         flash('No such issue')
         return redirect(url_for('admin_file.show_admin_home'))
-    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issueid)).scalars().all()
-    data = {'title': 'View of issue {}'.format(issue.name),
+    papers = issue.papers
+    data = {'title': 'View of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
             'journal': issue.volume.journal,
             'papers': papers}
+    hotcrp_papers = _get_hotcrp_papers(issue)
+    if 'error' in hotcrp_papers:
+        flash(hotcrp_papers['error'])
+    else:
+        if hotcrp_papers['issue'] != issue.hotcrp_key:
+            flash('Mismatch in hotcrp key: {}/{}'.format(hotcrp_papers['issue'],
+                                                         issue.hotcrp_key))
+        elif hotcrp_papers['volume'] != issue.volume.hotcrp_key:
+            flash('Mismatch in volume hotcrp_key: {}/{}'.format(hotcrp_papers['volume'],
+                                                                issue.volume.hotcrp_key))
+        else:
+            data['hotcrp'] = hotcrp_papers
     return render_template('admin/view_issue.html', **data)
 
 @admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])

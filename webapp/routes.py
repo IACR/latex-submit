@@ -1,5 +1,4 @@
 import datetime
-import random
 from io import BytesIO
 from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for
 from flask import current_app as app
@@ -8,11 +7,12 @@ import hmac
 import markdown
 import os
 from pathlib import Path
-from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
+import random
 import shutil
 from sqlalchemy import select, and_
 from sqlalchemy.sql import func
 import string
+from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus
@@ -44,16 +44,18 @@ def home():
 
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
-    random.seed(datetime.datetime.now())
     form = SubmitForm(formdata=request.args)
-    # We only perform partial validation on the GET request to make sure that
-    # the auth token is valid.
-    if not form.check_auth():
-        if app.config['TESTING']:
-            logging.warning('TESTING MODE ONLY')
-            # go ahead and send a clean form anyway.
-            form = SubmitForm(formdata=request.args)
-        else:
+    if not form.paperid.data:
+        #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
+        random.seed()
+        form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        form.volume.data = str(random.randint(1, 2))
+        form.issue.data = random.randint(1, 2)
+        form.generate_auth()
+    else:
+        # We only perform partial validation on the GET request to make sure that
+        # the auth token is valid.
+        if not form.check_auth():
             logging.warning('{}:{}:{} form not authenticated'.format(form.paperid.data,
                                                                      form.version.data,
                                                                      form.auth.data))
@@ -61,24 +63,34 @@ def show_submit_version():
                                    title='This submission is not authorized.',
                                    error='The token for this request is invalid')
     paperid = form.paperid.data
-    # Submission form is only shown for papers that have no status or have status
-    # of PENDING or EDIT_FINISHED. The latter is when the author is submitting
-    # their final version.
+    # Submission form is limited to papers that are not in copy editing mode and not already
+    # accepted for publication. 
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
-    # legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
-    logging.info('Paper id is ' + paperid)
     if paper_status:
-        if (paper_status.status != PaperStatusEnum.PENDING.value and
-            paper_status.status != PaperStatusEnum.EDIT_FINISHED.value):
+        if (paper_status.status == PaperStatusEnum.SUBMITTED.value or
+            paper_status.status == PaperStatusEnum.EDIT_PENDING.value):
             return render_template('message.html',
-                                   title='This submission is invalid.',
-                                   error='The paper should not be in this state: {}'.format(paper_status.status.value))
-        elif (paper_status.status == PaperStatusEnum.EDIT_FINISHED.value and
+                                   title='Your paper has been sent to the copy editor.',
+                                   error='Your paper {} has been sent to the copy editor.'.format(paperid))
+        elif ((paper_status.status == PaperStatusEnum.EDIT_FINISHED.value or
+               paper_status.status == PaperStatusEnum.EDIT_REVISED) and
               form.version.data != Version.FINAL.value):
             return render_template('message.html',
                                    title='Wrong version',
-                                   error='Version should be FINAL. This is a bug')
+                                   error='Version should be final. This is a bug')
+        elif paper_status.status == PaperStatusEnum.FINAL_SUBMITTED:
+            return render_template('message.html',
+                                   title='Your paper is pending final review.',
+                                   error='Your paper ID {} is pending final review. No more revisions will be accepted.'.format(paperid))
+        elif paper_status.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
+            return render_template('message.html',
+                                   title='Your paper has been accepted by the copy editor.',
+                                   error='Your paper is pending for publication. No more revisions will be accepted.')
+        elif paper_status.status == PaperStatusEnum.PUBLISHED:
+            return render_template('message.html',
+                                   title='Your paper has already been published.',
+                                   error='Your paper has already been published.')
     return render_template('submit.html', form=form)
 
 def context_wrap(fn):
@@ -93,6 +105,14 @@ def context_wrap(fn):
 # the current status for the paperid.
 @home_bp.route('/submit', methods=['POST'])
 def submit_version():
+    form = SubmitForm()
+    if not form.validate_on_submit():
+        logging.critical('{}:{}:{} submission not authenticated'.format(form.paperid.data,
+                                                                        form.version.data,
+                                                                        form.auth.data))
+        return render_template('message.html',
+                               title='The form data is invalid.',
+                               error='The form data is invalid. This is a bug')
     args = request.form.to_dict()
     paperid = args.get('paperid')
     version = args.get('version', Version.CANDIDATE.value)
@@ -115,12 +135,6 @@ def submit_version():
         return render_template('message.html',
                                title='Another one is running',
                                error='At most one compilation may be queued on each paper.')
-    if not form.validate_on_submit():
-        logging.error('Validation failed {}:{}:{}'.format(form.paperid.data,
-                                                          form.version.data,
-                                                          form.auth.data))
-        form.auth.errors.append('Validation failed')
-        return render_template('submit.html', form=form)
     # Ensure that the journal, volume, and issue exist.
     journal_id = args.get('journal')
     journal = db.session.execute(select(Journal).filter_by(hotcrp_key=journal_id)).scalar_one_or_none()
@@ -520,11 +534,15 @@ def view_copyedit(paperid, auth):
                 data['upload'] = url_for('home_bp.submit_version',
                                          paperid=paperid,
                                          version=Version.FINAL.value,
+                                         issue=paper_status.issue_key,
+                                         hotcrp_id=paper_status.hotcrp_id,
+                                         hotcrp=paper_status.hotcrp,
+                                         volume=paper_status.volume_key,
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
-                                         auth=create_hmac([paperid,
+                                         auth=create_hmac([paperid, # TODO: authenticate other fields
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted]))
@@ -566,11 +584,15 @@ def respond_to_comment(paperid, itemid, auth):
             response['upload'] = url_for('home_bp.submit_version',
                                          paperid=paperid,
                                          version=Version.FINAL.value,
+                                         issue=paper_status.issue_key,
+                                         hotcrp_id=paper_status.hotcrp_id,
+                                         hotcrp=paper_status.hotcrp,
+                                         volume=paper_status.volume_key,                                         
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
-                                         auth=create_hmac([paperid,
+                                         auth=create_hmac([paperid, # TODO: authenticate other fields
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted]))

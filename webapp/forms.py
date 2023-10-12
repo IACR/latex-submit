@@ -146,7 +146,7 @@ class SubmitForm(FlaskForm):
     hotcrp = HiddenField(id='hotcrp',
                          name='hotcrp',
                          validators=[InputRequired('hotcrp instance shortName')],
-                         default='cictest') # TODO: remove the default
+                         default='cictest2') # TODO: remove the default
     hotcrp_id = HiddenField(id='hotcrp_id',
                             name='hotcrp_id',
                             validators=[InputRequired('paper id in HotCRP instance')],
@@ -161,12 +161,11 @@ class SubmitForm(FlaskForm):
                           default='cic')
     volume = HiddenField(id='volume',
                          name='volume',
-                         default='1',
                          validators=[InputRequired('Volume is required')])
     issue = HiddenField(id='issue',
                         name='issue',
-                        default=1,
-                        validators=[maxmin_check(name='issue',min=1)])
+                        validators=[InputRequired('Issue is required'),
+                                    maxmin_check(name='issue',min=1)])
     submitted = HiddenField(id='submitted',
                             name='submitted',
                             validators=[InputRequired('Submission date is required'),
@@ -192,18 +191,24 @@ class SubmitForm(FlaskForm):
                          default = 'pdflatex')
     zipfile = FileField(id='zipfile',
                         name='zipfile',
-                        validators=[FileRequired(), FileAllowed(['zip'])])
+                        validators=[FileRequired(),
+                                    FileAllowed(['zip'])])
     submit = SubmitField('Upload')
 
     def check_auth(self):
-        # TODO: remove this. It's only for testing.
-        if self.submitted.data == '2022-08-03 06:44:30':
-            return True
+        # TODO also validate the email from hotcrp
         return validate_hmac([self.paperid.data,
                               self.version.data,
                               self.submitted.data,
-                              self.accepted.data,
-                              self.auth.data])
+                              self.accepted.data],
+                             self.auth.data)
+
+    # TODO: remove this. It's only for testing.
+    def generate_auth(self):
+        self.auth.data = create_hmac([self.paperid.data,
+                                      self.version.data,
+                                      self.submitted.data,
+                                      self.accepted.data])
 
     def validate(self, extra_validators=None):
         if not super(FlaskForm, self).validate():
