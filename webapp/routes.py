@@ -49,8 +49,8 @@ def show_submit_version():
         #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        form.volume.data = str(random.randint(1, 2))
-        form.issue.data = random.randint(1, 2)
+        form.volume.data = '1'
+        form.issue.data = '3'
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that
