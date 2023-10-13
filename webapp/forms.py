@@ -146,7 +146,7 @@ class SubmitForm(FlaskForm):
     hotcrp = HiddenField(id='hotcrp',
                          name='hotcrp',
                          validators=[InputRequired('hotcrp instance shortName')],
-                         default='cictest') # TODO: remove the default
+                         default='') # TODO: remove the default
     hotcrp_id = HiddenField(id='hotcrp_id',
                             name='hotcrp_id',
                             validators=[InputRequired('paper id in HotCRP instance')],
