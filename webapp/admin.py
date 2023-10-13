@@ -340,6 +340,14 @@ def view_issue(issueid):
             flash('Mismatch in volume hotcrp_key: {}/{}'.format(hotcrp_papers['volume'],
                                                                 issue.volume.hotcrp_key))
         else:
+            # go through the hotcrp papers and remove any that already have a PaperStatus in papers.
+            paperids = set()
+            for p in papers:
+                paperids.add(p.paperid)
+            accepted = hotcrp_papers.get('acceptedPapers')
+            for p in accepted[:]: # loop over a copy of accepted
+                if p['paperid'] in paperids:
+                    accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
     return render_template('admin/view_issue.html', **data)
 

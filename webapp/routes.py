@@ -91,7 +91,7 @@ def show_submit_version():
             return render_template('message.html',
                                    title='Your paper has already been published.',
                                    error='Your paper has already been published.')
-    return render_template('submit.html', form=form)
+    return render_template('submit.html', form=form, title='Upload your paper')
 
 def context_wrap(fn):
     """Wrapper to pass context to function in thread."""
