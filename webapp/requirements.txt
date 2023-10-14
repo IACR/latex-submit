@@ -3,6 +3,7 @@ flask==2.3.3
 flask_mail
 flask_limiter
 pydantic[email]>=2.0
+pylatexenc
 python-dotenv
 flask-wtf
 flask_limiter
