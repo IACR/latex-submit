@@ -30,9 +30,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Test for xml_test.py
+    - name: Tests for metadata
       working-directory: webapp/metadata/tests
       run: |
         pytest xml_meta_test.py
         pytest parse_test.py
         pytest metadata_test.py
+    - name: Test for log_parser
+      working-directory: webapp/metadata
+      run: |
+        pytest log_parser_test.py
