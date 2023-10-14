@@ -32,3 +32,5 @@ jobs:
       working-directory: webapp/metadata/tests
       run: |
         pytest xml_meta_test.py
+        pytest parse_test.py
+        pytest metadata_test.py
