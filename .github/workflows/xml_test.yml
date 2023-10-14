@@ -37,6 +37,6 @@ jobs:
         pytest parse_test.py
         pytest metadata_test.py
     - name: Test for log_parser
-      working-directory: webapp/metadata
+      working-directory: webapp
       run: |
         pytest log_parser_test.py
