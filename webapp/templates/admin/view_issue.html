@@ -14,8 +14,6 @@
 <div class="alert alert-danger">
   <p>TODO:</p>
   <ol>
-    <li>Include papers from hotcrp that have not been uploaded yet (this is tricky because I need the hotcrp instance
-      and we don't store that anywhere yet)</li>
     <li>Make each paper clickable to a view that shows metadata, discussion, log, and PDF</li>
     <li>Provide mechanism to order these in the final issue.</li>
     <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
@@ -47,7 +45,7 @@
 </table>
 {% if hotcrp %}
 <h4>Papers from HotCRP <a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}">{{hotcrp.shortName}}</a>
-  ({{hotcrp.longName}})<br>Vol {{hotcrp.volume}} issue {{hotcrp.issue}}</h4>
+  ({{hotcrp.longName}})<br>Volume {{hotcrp.volume}} Issue {{hotcrp.issue}}</h4>
 <p>
   The following papers are accepted in hotcrp but have not yet been uploaded here.
 </p>

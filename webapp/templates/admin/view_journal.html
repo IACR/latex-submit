@@ -2,15 +2,11 @@
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-5 text-center">{{title}}</h1>
-<p>
-  This is a view of all papers that are pending for journal {{journal.name}}.
-</p>
 <div>
   {% for volume in volumes %}
   <div>
-    <h5>Volume: {{volume.name}}</h5>
-    <div class="d-flex ms-3 mb-3">
-      Issues:
+    <h5>   <div class="d-flex ms-3 mb-3">Volume: {{volume.name}}
+      <span class="ms-3">Issues:</span>
       {% for issue in volume.issues %}
       <a class="ms-3" href="{{url_for('admin_file.view_issue', issueid=issue.id)}}">{{issue.name}}</a>
       {% endfor %}
@@ -18,6 +14,9 @@
   </div>
   {% endfor %}
 </div>
+<h3 class="mt-5">
+  Recently modified papers
+</h3>
 <table class="table sortable">
   <thead>
     <tr>
