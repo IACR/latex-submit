@@ -1,6 +1,6 @@
 {% extends "admin/admin_base.html" %}
 {% block content %}
-<main id="adminContent" class="container px-md-4 py-3">
+<main id="adminContent" class="container-fluid admin-container px-md-4 py-3">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
   {{ message }}
@@ -8,69 +8,57 @@
 {% endfor %}
 <h1 class="mb-5 text-center">{{title}}</h1>
 <p>
-  This is a view of all papers that are scheduled to appear in issue {{issue.name}}
-  of volume {{volume.name}} in {{journal.name}}.
+  This is a view of all papers that are tentatively scheduled to appear in Issue {{issue.name}}
+  of Volume {{volume.name}} in {{journal.name}}.
 </p>
-<div class="alert alert-danger">
-  <p>TODO:</p>
-  <ol>
-    <li>Make each paper clickable to a view that shows metadata, discussion, log, and PDF</li>
-    <li>Provide mechanism to order these in the final issue.</li>
-    <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
-      This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
-    record yet.</li>
-    <li>Provide button to publish the issue</li>
-  </ol>
-</div>
+<form class="mt-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
 <table class="table sortable">
   <thead>
     <tr>
       <th>paperid</th>
       <th>status</th>
-      <th>upload time</th>
-      <th>last modified</th>
+      <th>modified</th>
       <th>email</th>
+      <th>Title &amp; authors</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="paperList">
     {% for status in papers %}
       <td><a href="../view/{{status.paperid}}">{{status.paperid}}</a></td>
-      <td>{{status.status.value}}</td>
-      <td>{{status.creationtime}}</td>
-      <td>{{status.lastmodified}}</td>
+      <td class="status {{status.status.name}}">{{status.status.value}}</td>
+      <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
       <td>{{status.email}}</td>
+      <td>{{status.title}}<br><span class="fst-italic">{{status.authors}}</span></td>
     </tr>
     {% endfor %}
-  </tbody>
-</table>
+    <div class="alert alert-info"p>
+      <p>TODO:</p>
+      <ol>
+        <li>figure out how to structure this form. Only papers with status of "Copy edit complete" can be published.</li>
+        <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
+          This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
+          record yet.</li>
+        <li>Provide mechanism to order these in the final issue.</li>
+      </ol>
+    </div>
+</form>
 {% if hotcrp %}
-<h4>Papers from HotCRP <a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}">{{hotcrp.shortName}}</a>
-  ({{hotcrp.longName}})<br>Volume {{hotcrp.volume}} Issue {{hotcrp.issue}}</h4>
-<p>
-  The following papers are accepted in hotcrp but have not yet been uploaded here.
-</p>
-<table class="table sortable">
-  <thead>
-    <tr>
-      <th>paperId</th>
-      <th>Title</th>
-      <th>Authors</th>
-    </tr>
-    </thhead>
-    <tbody>
-      {% for p in hotcrp.acceptedPapers %}
-      <tr>
-        <td>{{p.paperid}}</td>
-        <td>{{p.title}}</td>
-        <td>{% for author in p.authorlist %}
-          {{author.name}} ({{author.affiliation}})<br>
-          {% endfor %}
-        </td>
-      </tr>
+{% for p in hotcrp.acceptedPapers %}
+<tr>
+  <td><a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}/paper/{{p.paperId}}">{{p.paperid}}</a></td>
+  <td class="UNSUBMITTED">Unsubmitted</td>
+  <td>Unsubmitted</td>
+  <td>Unsubmitted</td>
+  <td>{{p.title}}<br>
+      {% for author in p.authorlist %}
+        {{author.name}} ({{author.affiliation}})
       {% endfor %}
-    </tbody>
-</table>
+   </td>
+</tr>
+{% endfor %}
 {% endif %}
+</tbody>
+</table>
 <script src="/js/sorttable.js"></script>
 </main>
 {% endblock %}

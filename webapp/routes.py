@@ -51,6 +51,7 @@ def show_submit_version():
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         form.volume.data = '1'
         form.issue.data = '3'
+        form.hotcrp.data = 'bogus'
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that

@@ -4,7 +4,7 @@ from flask import current_app as app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
 from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
-from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField
+from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField, FieldList, Form, FormField
 from .metadata.db_models import Role, validate_version, Version
 from .metadata import validate_paperid
 from .metadata.compilation import dt_regex
@@ -303,3 +303,15 @@ class MoreChangesForm(FlaskForm):
                           validators=[InputRequired('paper id is required'),
                                       ValidPaperId()])
     submit = SubmitField('Replace candidate version by final version')
+
+class PublishSubForm(Form):
+    paperid = HiddenField(name='paperid',
+                          validators=[InputRequired(),
+                                      ValidPaperId()])
+
+class PublishIssueForm(FlaskForm):
+    """This is used by the admin to publish an issue for a journal."""
+    paperlist = FieldList(FormField(PublishSubForm),
+                          min_entries=1,
+                          validators=[InputRequired('List of papers is required')])
+    submit = SubmitField('Publish finished papers')

@@ -158,6 +158,8 @@ class PaperStatus(Base):
     # This is created the first time someone uploads a paper with this paperid.
     creationtime: Mapped[datetime] = mapped_column(DateTime(),
                                                    server_default=func.now())
+    title: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded title')
+    authors: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded, comma-delimited list of authors')
 
 class LogEvent(Base):
     __tablename__ = 'log_event'

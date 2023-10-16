@@ -13,8 +13,8 @@ from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser
-from .metadata.db_models import CompileRecord, TaskStatus
-
+from .metadata.db_models import CompileRecord, TaskStatus, PaperStatus
+from sqlalchemy import select
 
 def is_fatal(err):
     """This is used to classify log messages as "fatal" meaning they need to
@@ -187,6 +187,14 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
         # Update the database record with the compilation and status.
         comprec.result = compilation.model_dump_json(indent=2, exclude_none=True)
         comprec.task_status = TaskStatus.FINISHED.value
+        db.session.add(comprec)
+        if compilation.meta:
+            sql = select(PaperStatus).where(PaperStatus.paperid==paperid)
+            paper_status = db.session.execute(sql).scalar_one_or_none()
+            paper_status.title = compilation.meta.title
+            if compilation.meta.authors:
+                paper_status.authors = ', '.join([a.name for a in compilation.meta.authors])
+            db.session.add(paper_status)
         db.session.commit()
         task_queue.pop(task_key, None)
     except Exception as e:

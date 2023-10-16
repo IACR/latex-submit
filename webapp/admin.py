@@ -16,7 +16,7 @@ from . import db, create_hmac, mail, generate_password, task_queue, paper_key, e
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event
-from .forms import AdminUserForm, MoreChangesForm
+from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, PublishSubForm
 from .tasks import run_latex_task
 from .routes import context_wrap
 from functools import wraps
@@ -323,7 +323,8 @@ def view_issue(issueid):
     if not issue:
         flash('No such issue')
         return redirect(url_for('admin_file.show_admin_home'))
-    papers = issue.papers
+    papers = sorted(issue.papers, key=lambda p: p.status.value)
+    finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
     data = {'title': 'View of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
@@ -349,6 +350,8 @@ def view_issue(issueid):
                 if p['paperid'] in paperids:
                     accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
+    formdata = [{'paperid': p.paperid} for p in finished_papers]
+    data['form'] = PublishIssueForm(paperlist=formdata)
     return render_template('admin/view_issue.html', **data)
 
 @admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])
@@ -596,3 +599,12 @@ def comment():
             return jsonify(d.as_dict())
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@admin_bp.route('/admin/publish_issue', methods=['POST'])
+@login_required
+@admin_required
+def publish_issue():
+    form = PublishIssueForm()
+    if not form.validate_on_submit():
+        return admin_message('Invalid form submission. This is a bug.')
+    return admin_message('The form was validated')
