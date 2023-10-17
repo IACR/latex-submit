@@ -297,6 +297,9 @@ class Compilation(BaseModel):
     compile_time: Optional[float] = Field(default=None,
                                           title='Number of seconds for compilation',
                                           description='May be none before it is compiled')
+    engine: str = Field(default='pdflatex',
+                        title='latex engine used',
+                        description='Choices are currently pdflatex, lualatex, xelatex')
     command: str = Field(title='latexmk command that was run')
     log: Optional[str] = Field(default=None,
                      title='Log from running latexmk',

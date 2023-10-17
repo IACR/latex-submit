@@ -37,7 +37,7 @@ This template is used to show the status of a compilation for iacrcc.cls
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
   <div id="splitView" class="d-flex w-100">
     <div class="left-column">
-      <a class="btn btn-primary my-3" href="{{url_for('home_bp.show_submit_version', paperid=paperid,version=version,auth=auth,email=comp.email,venue=comp.venue.value,submitted=comp.submitted,accepted=comp.accepted)}}">You may still resubmit your paper</a>
+      <a class="btn btn-primary my-3" href="{{submit_url}}">You may still resubmit your paper</a>
       {% if comp.error_log %}
       <div class="border border-danger p-3 mb-3 border-3 rounded">
         Unfortunately the compilation of your paper has encountered errors.

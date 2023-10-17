@@ -44,9 +44,10 @@ def home():
 
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
-    form = SubmitForm(formdata=request.args)
+    form = SubmitForm(request.args)
     if not form.paperid.data:
         #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
+        # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         form.volume.data = '1'
@@ -268,6 +269,7 @@ def submit_version():
                         'submitted': submitted,
                         'accepted': accepted,
                         'compiled': now,
+                        'engine': args.get('engine'),
                         'command': command,
                         'error_log': [],
                         'warning_log': [],
@@ -419,6 +421,7 @@ def compile_for_copyedit():
                                  'submitted': version_compilation.submitted,
                                  'accepted': version_compilation.accepted,
                                  'compiled': now,
+                                 'engine': version_compilation.engine,
                                  'command': version_compilation.command,
                                  'error_log': [],
                                  'warning_log': [],
@@ -749,10 +752,7 @@ def view_results(paperid, version, auth):
     output_dir = paper_path / Path('output')
     comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*') if p.is_file()])
     pdf_file = output_path / Path('main.pdf')
-    meta_file = output_path / Path('main.meta')
     log_file = output_path / Path('main.log')
-    if meta_file.is_file():
-        data['metafile'] = meta_file.read_text(encoding='UTF-8')
     if pdf_file.is_file():
         data['pdf'] = get_pdf_url(paperid, version)
     if log_file.is_file():
@@ -765,6 +765,20 @@ def view_results(paperid, version, auth):
             # readable as UTF-8 (in spite of the _input_ encoding being set to UTF-8).
             # see https://github.com/IACR/latex-submit/issues/26
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
+    pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    data['submit_url'] = url_for('home_bp.show_submit_version',
+                                 paperid=paperid,
+                                 version=version,
+                                 hotcrp=pstatus.hotcrp,
+                                 hotcrp_id=pstatus.hotcrp_id,
+                                 journal=pstatus.journal_key,
+                                 volume=pstatus.volume_key,
+                                 issue=pstatus.issue_key,
+                                 submitted=pstatus.submitted,
+                                 accepted=pstatus.accepted,
+                                 auth=create_hmac([paperid, version, comp.submitted, comp.accepted]),
+                                 email=pstatus.email,
+                                 engine=comp.engine)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('view.html', **data)
     if comp.venue == 'cic': # special handling for this journal.

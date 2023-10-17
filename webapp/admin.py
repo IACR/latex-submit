@@ -312,7 +312,7 @@ def _get_hotcrp_papers(issue: Issue):
             data = json.loads(response.read())
             return data
     except Exception as e:
-        app.logger.critical('unable to fetch paper info from hotcrp: ' + str(e))
+        app.logger.critical('unable to fetch paper info from hotcrp {}:{} '.format(url, str(e)))
     return {'error': 'unable to retrieve hotcrp papers'}
 
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
