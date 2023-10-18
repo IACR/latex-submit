@@ -193,19 +193,24 @@ class Volume(Base):
     __tablename__ = 'volume'
     __table_args__ = (UniqueConstraint('journal_id', 'name', name='journal_volume_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    hotcrp_key: Mapped[str] = mapped_column(String(32), comment='Should not be changed')
-    name: Mapped[str] = mapped_column(String(32), comment='Usually the year')
+    hotcrp_key: Mapped[str] = mapped_column(String(32),
+                                            comment='Should not be changed because it\'s used to match papers from HotCRP.')
+    name: Mapped[str] = mapped_column(String(32),
+                                      comment='Usually the year or a number. Starts off as hotcrp_key.')
     journal_id: Mapped[int] = mapped_column(ForeignKey('journal.id', ondelete='CASCADE'), nullable=False)
     journal: Mapped['Journal'] = relationship(back_populates='volumes')
     issues: Mapped[List['Issue']] = relationship(back_populates='volume', cascade='all, delete-orphan')
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 class Issue(Base):
     __tablename__ = 'issue'
     __table_args__ = (UniqueConstraint('volume_id', 'name', name='volume_issue_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    hotcrp_key: Mapped[str] = mapped_column(String(32), comment='Should not be changed')
-    name: Mapped[str] = mapped_column(String(32), comment='Usually number, e.g., 2')
+    hotcrp_key: Mapped[str] = mapped_column(String(32),
+                                            comment='Should not be changed because it\'s used to match papers from HotCRP')
+    name: Mapped[str] = mapped_column(String(32),
+                                      comment='Usually number, e.g., 2. Starts off as hotcrp_key.')
     volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
     volume: Mapped['Volume'] = relationship(back_populates='issues')
     papers: Mapped[List['PaperStatus']] = relationship(back_populates='issue')
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True,
+                                                       comment='For example, "Special issue on secure messaging"')

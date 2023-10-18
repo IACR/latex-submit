@@ -122,13 +122,8 @@ def submit_version():
     submitted = args.get('submitted', '')
     hotcrp = args.get('hotcrp', '')
     hotcrp_id = args.get('hotcrp_id', '')
-    if not paperid:
-        return render_template('message.html',
-                               title='Missing parameter',
-                               error='Missing parameter')
     task_key = paper_key(paperid, version)
     now = datetime.datetime.now()
-    form = SubmitForm()
     if task_queue.get(task_key):
         log_event(db, paperid, 'Attempt to resubmit while compiling')
         msg = 'Already running {}:{}'.format(form.paperid.data,
@@ -277,7 +272,6 @@ def submit_version():
     compilation = Compilation(**compilation_data)
     sql = select(CompileRecord).filter_by(paperid=paperid).filter_by(version=version)
     comprec = db.session.execute(sql).scalar_one_or_none()
-    # legacy API: comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
     if not comprec:
         comprec = CompileRecord(paperid=paperid,version=version)
     comprec.task_status = TaskStatus.PENDING
@@ -296,6 +290,8 @@ def submit_version():
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
+    metadata += '\\setvolume{' + paper_status.issue.volume.name + '}\n'
+    metadata += '\\setnumber{' + paper_status.issue.name + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
