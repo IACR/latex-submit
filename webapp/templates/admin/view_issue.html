@@ -8,7 +8,11 @@
 {% endfor %}
 <div class="row">
   <div class="col-6">
-    <h1 class="mb-5 text-center">{{title}}</h1>
+    <h1 class="mb-2 text-center">{{title}}</h1>
+    <p>
+      This is a view of all papers that are tentatively scheduled to appear in Issue {{issue.name}}
+      of Volume {{volume.name}} in {{journal.name}}.
+    </p>
   </div>
   <div class="col-6">
     <table class="table">
@@ -19,16 +23,12 @@
         <tr>
           <th>Completed papers:</th><td>{{finished_papers}}</td>
         <tr>
-          <th>HotCRP accepted papers:</th>
+          <th>Accepted but not submitted:</th>
           <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}no HotCRP instance{% endif %}</td>
         </tr>
     </table>
   </div>
 </div>
-<p>
-  This is a view of all papers that are tentatively scheduled to appear in Issue {{issue.name}}
-  of Volume {{volume.name}} in {{journal.name}}.
-</p>
 <form class="mt-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
 <table class="table sortable">
   <thead>
@@ -65,10 +65,11 @@
 {% if hotcrp %}
 {% for p in hotcrp.acceptedPapers %}
 <tr>
-  <td><a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}/paper/{{p.paperId}}">{{p.paperid}}</a></td>
+  <td>{{p.paperid}}</td>
+  <td><a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}/paper/{{p.paperId}}">{{hotcrp.shortName}}/{{p.paperId}}</a></td>
   <td class="UNSUBMITTED">Unsubmitted</td>
-  <td>Unsubmitted</td>
-  <td>Unsubmitted</td>
+  <td>-</td>
+  <td>-</td>
   <td>{{p.title}}<br>
       {% for author in p.authorlist %}
         {{author.name}} ({{author.affiliation}})
