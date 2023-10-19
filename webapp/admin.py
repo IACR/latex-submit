@@ -332,12 +332,12 @@ def view_issue(issueid):
     if 'error' in hotcrp_papers:
         flash(hotcrp_papers['error'])
     else:
-        if hotcrp_papers['issue'] != issue.hotcrp_key:
+        if hotcrp_papers['issue'] != issue.name:
             flash('Mismatch in hotcrp key: {}/{}'.format(hotcrp_papers['issue'],
-                                                         issue.hotcrp_key))
-        elif hotcrp_papers['volume'] != issue.volume.hotcrp_key:
+                                                         issue.name))
+        elif hotcrp_papers['volume'] != issue.volume.name:
             flash('Mismatch in volume hotcrp_key: {}/{}'.format(hotcrp_papers['volume'],
-                                                                issue.volume.hotcrp_key))
+                                                                issue.volume.name))
         else:
             # go through the hotcrp papers and remove any that already have a PaperStatus in papers.
             paperids = set()
