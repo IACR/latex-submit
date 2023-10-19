@@ -297,23 +297,20 @@ def view_journal(jid):
 
 def _get_hotcrp_papers(issue: Issue):
     """Fetch papers from hotcrp and return JSON."""
-    # Get the last paper added for this issue. Every issue must have papers in it.
+    # Get the last paper added for this issue, because that has the hotcrp instance id.
+    if not issue.hotcrp or issue.hotcrp == 'none':
+        return {'error': 'No hotcrp for this issue'}
     try:
-        paper_sql = select(PaperStatus).where(PaperStatus.issue_id==issue.id).order_by(PaperStatus.id.desc())
-        papers = db.session.execute(paper_sql).scalars().all()
-        if not papers:
-            return {'error': 'No papers'}
-        paper = papers[0]
-        conf_msg = ':'.join([paper.hotcrp, 'cic'])
+        conf_msg = ':'.join([issue.hotcrp, 'cic'])
         auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
                         conf_msg.encode('utf-8'), hashlib.sha256).hexdigest()
-        url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(paper.hotcrp, auth)
+        url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(issue.hotcrp, auth)
         with urllib.request.urlopen(url) as response:
             data = json.loads(response.read())
             return data
     except Exception as e:
         app.logger.critical('unable to fetch paper info from hotcrp {}:{} '.format(url, str(e)))
-    return {'error': 'unable to retrieve hotcrp papers'}
+        return {'error': 'unable to retrieve hotcrp papers: ' + str(e)}
 
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
 @login_required
@@ -325,9 +322,10 @@ def view_issue(issueid):
         return redirect(url_for('admin_file.show_admin_home'))
     papers = sorted(issue.papers, key=lambda p: p.status.value)
     finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
-    data = {'title': 'View of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
+    data = {'title': 'Status of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
+            'finished_papers': len(finished_papers),
             'journal': issue.volume.journal,
             'papers': papers}
     hotcrp_papers = _get_hotcrp_papers(issue)

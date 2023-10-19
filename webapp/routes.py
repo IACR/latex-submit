@@ -50,9 +50,13 @@ def show_submit_version():
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        form.volume.data = '1'
-        form.issue.data = '3'
-        form.hotcrp.data = 'bogus'
+        form.volume.data = 'test'
+        form.issue.data = 'test'
+        form.hotcrp.data = 'none'
+        form.hotcrp_id.data = 'none'
+        form.journal.data = 'cic'
+        form.accepted.data = '2022-09-30 17:49:20'
+        form.submitted.data = '2022-08-03 06:44:30'
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that
@@ -139,20 +143,19 @@ def submit_version():
         return render_template('message.html',
                                title='Unknown journal {}'.format(journal_id),
                                error='Unknown journal {}'.format(journal_id))
-    volume = db.session.execute(select(Volume).filter_by(hotcrp_key=args.get('volume'),
+    volume = db.session.execute(select(Volume).filter_by(name=args.get('volume'),
                                                          journal_id=journal.id)).scalar_one_or_none()
     if not volume:
         # First time we see the volume, so create it.
         volume = Volume(name=args.get('volume'),
-                        hotcrp_key=args.get('volume'),
                         journal_id=journal.id)
         db.session.add(volume)
         db.session.commit()
-    issue = db.session.execute(select(Issue).filter_by(hotcrp_key=args.get('issue'),
+    issue = db.session.execute(select(Issue).filter_by(name=args.get('issue'),
                                                        volume_id=volume.id)).scalar_one_or_none()
     if not issue:
         issue = Issue(name=args.get('issue'),
-                      hotcrp_key=args.get('issue'),
+                      hotcrp=args.get('hotcrp'),
                       volume_id=volume.id)
         db.session.add(issue)
         db.session.commit()

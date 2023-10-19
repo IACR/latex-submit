@@ -139,7 +139,8 @@ class PaperStatus(Base):
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
     hotcrp: Mapped[str] = mapped_column(String(32),
-                                        comment='This is the shortName of the HotCRP instance')
+                                        default='none',
+                                        comment='This is the shortName of the HotCRP instance.')
     hotcrp_id: Mapped[str] = mapped_column(String(32),
                                            comment='The paperid in the HotCRP instance')
     journal_key: Mapped[str] = mapped_column(String(32), nullable=False,
@@ -175,7 +176,8 @@ def log_event(db, paperid, action):
 
 class Journal(Base):
     __tablename__ = 'journal'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True,
+                                    comment='What the journal is known by in hotcrp')
     hotcrp_key: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     acronym: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(Text)
@@ -193,22 +195,27 @@ class Volume(Base):
     __tablename__ = 'volume'
     __table_args__ = (UniqueConstraint('journal_id', 'name', name='journal_volume_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    hotcrp_key: Mapped[str] = mapped_column(String(32),
-                                            comment='Should not be changed because it\'s used to match papers from HotCRP.')
     name: Mapped[str] = mapped_column(String(32),
-                                      comment='Usually the year or a number. Starts off as hotcrp_key.')
+                                      comment='Usually the year or a number. Should match value in hotcrp instance.')
     journal_id: Mapped[int] = mapped_column(ForeignKey('journal.id', ondelete='CASCADE'), nullable=False)
     journal: Mapped['Journal'] = relationship(back_populates='volumes')
     issues: Mapped[List['Issue']] = relationship(back_populates='volume', cascade='all, delete-orphan')
 
+# Each hotcrp instance corresponds to an issue. An issue may be
+# created by uploading the first paper from the hotcrp instance, or it
+# may be created in the admin interface. In any event the hotcrp value
+# should be the hotcrp shortName value so we can show pending papers
+# for the issue.
 class Issue(Base):
     __tablename__ = 'issue'
     __table_args__ = (UniqueConstraint('volume_id', 'name', name='volume_issue_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    hotcrp_key: Mapped[str] = mapped_column(String(32),
-                                            comment='Should not be changed because it\'s used to match papers from HotCRP')
+    hotcrp: Mapped[str] = mapped_column(String(32),
+                                        comment=('The shortName of the hotcrp instance this issue is matched to. '
+                                                 'Each issue corresponds to a hotcrp instance, but other papers may '
+                                                 'be added to the issue. This value should not be changed.'))
     name: Mapped[str] = mapped_column(String(32),
-                                      comment='Usually number, e.g., 2. Starts off as hotcrp_key.')
+                                      comment='Usually number, e.g., 2. Starts off as value from hotcrp.')
     volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
     volume: Mapped['Volume'] = relationship(back_populates='issues')
     papers: Mapped[List['PaperStatus']] = relationship(back_populates='issue')

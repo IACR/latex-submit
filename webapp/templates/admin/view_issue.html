@@ -6,7 +6,25 @@
   {{ message }}
 </div>
 {% endfor %}
-<h1 class="mb-5 text-center">{{title}}</h1>
+<div class="row">
+  <div class="col-6">
+    <h1 class="mb-5 text-center">{{title}}</h1>
+  </div>
+  <div class="col-6">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Uploaded papers:</th><td>{{papers|length}}</td>
+        </tr>
+        <tr>
+          <th>Completed papers:</th><td>{{finished_papers}}</td>
+        <tr>
+          <th>HotCRP accepted papers:</th>
+          <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}no HotCRP instance{% endif %}</td>
+        </tr>
+    </table>
+  </div>
+</div>
 <p>
   This is a view of all papers that are tentatively scheduled to appear in Issue {{issue.name}}
   of Volume {{volume.name}} in {{journal.name}}.
@@ -16,6 +34,7 @@
   <thead>
     <tr>
       <th>paperid</th>
+      <th>hotcrp</th>
       <th>status</th>
       <th>modified</th>
       <th>email</th>
@@ -24,7 +43,8 @@
   </thead>
   <tbody id="paperList">
     {% for status in papers %}
-      <td><a href="../view/{{status.paperid}}">{{status.paperid}}</a></td>
+    <td><a href="../view/{{status.paperid}}">{{status.paperid}}</a></td>
+    <td>{% if status.hotcrp == 'none' %}none{% else %}<a target="_blank" href="https://submit.iacr.org/{{status.hotcrp}}/paper/{{status.hotcrp_id}}">{{status.hotcrp}}/{{status.hotcrp_id}}</a>{% endif %}</td>
       <td class="status {{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
       <td>{{status.email}}</td>

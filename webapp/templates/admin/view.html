@@ -11,8 +11,9 @@
 <h1 class="mb-5 text-center">Status on paper: {{paper_status.paperid}}</h1>
 <table class="table">
   <tbody>
-    <tr><th>Status:</th><td>{{paper_status.status.value}}</td></tr>
-    <tr><th>HotCRP paper:</th><td><a href="https://submit.iacr.org/{{paper_status.hotcrp}}/paper/{{paper_status.hotcrp_id}}">{{paper_status.hotcrp}}</a></td></tr>
+    <tr><th>Status:</th><td class="{{paper_status.status.name}}">{{paper_status.status.value}}</td></tr>
+    <tr><th>HotCRP paper:</th><td>
+      {% if paper_status.hotcrp == 'none' %}none{% else %}<a href="https://submit.iacr.org/{{paper_status.hotcrp}}/paper/{{paper_status.hotcrp_id}}">{{paper_status.hotcrp}}</a>{% endif %}</td></tr>
     <tr><th>email:</th><td>{{paper_status.email}}</td></tr>
     <tr><th>original volume:</th><td>{{paper_status.volume_key}}</td></tr>
     <tr><th>original issue:</th><td>{{paper_status.issue_key}}</td></tr>

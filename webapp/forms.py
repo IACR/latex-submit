@@ -145,37 +145,34 @@ class SubmitForm(FlaskForm):
                           default=Version.CANDIDATE.value)
     hotcrp = HiddenField(id='hotcrp',
                          name='hotcrp',
-                         validators=[InputRequired('hotcrp instance shortName')],
-                         default='') # TODO: remove the default
+                         validators=[InputRequired('hotcrp instance shortName')])
     hotcrp_id = HiddenField(id='hotcrp_id',
                             name='hotcrp_id',
-                            validators=[InputRequired('paper id in HotCRP instance')],
-                            default='1') # TODO: remove the default
+                            validators=[InputRequired('paper id in HotCRP instance')])
     # TODO: change this to HiddenField
     journal = SelectField(id='journal',
                           name='journal',
                           choices = [(j['hotcrp_key'], j['name']) for j in app.config['JOURNALS']],
                           validators=[InputRequired('Journal is required'),
-                                      AnyOf([j['hotcrp_key'] for j in app.config['JOURNALS']])],
-                          # TODO remove default value below
-                          default='cic')
+                                      AnyOf([j['hotcrp_key'] for j in app.config['JOURNALS']])])
     volume = HiddenField(id='volume',
                          name='volume',
+                         description='This is the name field on volume',
                          validators=[InputRequired('Volume is required')])
     issue = HiddenField(id='issue',
                         name='issue',
-                        validators=[InputRequired('Issue is required'),
-                                    maxmin_check(name='issue',min=1)])
+                        description='This is the name field on Issue',
+                        validators=[InputRequired('Issue is required')])
     submitted = HiddenField(id='submitted',
                             name='submitted',
                             validators=[InputRequired('Submission date is required'),
                                         Regexp(dt_regex, message='Format of submitted is YYYY-mm-dd HH:MM:SS')],
-                            default='2022-08-03 06:44:30') # TODO remove this.
+                            default='')
     accepted = HiddenField(id='accepted',
                            name='accepted',
                            validators=[InputRequired('Accepted date is required'),
                                        Regexp(dt_regex, message='Format of accepted is YYYY-mm-dd HH:MM:SS')],
-                           default='2022-09-30 17:49:20') # TODO remove this.
+                           default='')
     auth = HiddenField(id='auth',
                        name='auth',
                        validators = [InputRequired('auth field is required')])
