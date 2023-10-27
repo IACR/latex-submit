@@ -65,7 +65,7 @@
     {% for paper in papers %}
       <td><a href="{{url_for('admin_file.show_admin_paper', paperid=paper.paperid)}}">{{paper.paperid}}</a></td>
       <td>{{paper.status.value}}</td>
-      <td>{{paper.journal_key}}, Vol. {{paper.volume_key}}, No. <A href="{{url_for('admin_file.view_issue', issueid=paper.issue_id)}}">{{paper.issue_key}}</a></td>
+      <td>{{paper.journal_key}}, Vol. {{paper.volume_key}}, Issue {{paper.issue_key}}</td>
       <td>{% if paper.hotcrp == 'none' %}none{% else %}<a target="_blank" href="https://submit.iacr.org/{{paper.hotcrp}}/paper/{{paper.hotcrp_id}}">{{paper.hotcrp}}/{{paper.hotcrp_id}}</a>{% endif %}</td>
       <td>{{paper.title}}<br>{{paper.authors}}</td>
     </tr>

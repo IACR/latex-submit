@@ -15,8 +15,8 @@ import time
 from . import db, create_hmac, mail, generate_password, task_queue, paper_key, executor
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
-from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event
-from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, PublishSubForm
+from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event, NO_HOTCRP
+from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, PublishSubForm, ChangeIssueForm
 from .tasks import run_latex_task
 from .routes import context_wrap
 from functools import wraps
@@ -61,7 +61,6 @@ def show_admin_paper(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     issue = db.session.execute(select(Issue).where(Issue.id==paper_status.issue_id)).scalar_one_or_none()
@@ -116,7 +115,6 @@ def user():
     if form.validate_on_submit():
         sql = select(User).filter_by(email=form.old_email.data)
         user = db.session.execute(sql).scalar_one_or_none()
-        # Legacy API: user = User.query.filter_by(email=form.old_email.data).first()
         if user:
             user.email = form.email.data
             if form.delete_cb.data: # delete the user
@@ -176,7 +174,6 @@ def user():
         # in this case, edit an existing user.
         sql = select(User).filter_by(id=args.get('id'))
         user = db.session.execute(sql).scalar_one_or_none()
-        # Legacy API: user = User.query.filter_by(id=args.get('id')).first()
         if user:
             form.email.data = user.email
             form.old_email.data = user.email
@@ -207,7 +204,6 @@ def copyedit(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
@@ -250,8 +246,7 @@ def approve_final():
                          recipients=[app.config['EDITOR_EMAILS']])
     maildata = {'journal_name': paper_status.journal_key,
                 'paperid': paperid,
-                'issue_url': url_for('admin_file.view_issue', issueid=paper_status.issue_id,
-                                     _external=True)}
+                'issue_url': url_for('admin_file.copyedit_home', _external=True)}
     editor_msg.body = app.jinja_env.get_template('admin/copyedit_approved.txt').render(maildata)
     if app.config['TESTING']:
         print(editor_msg.body)
@@ -298,7 +293,7 @@ def view_journal(jid):
 def _get_hotcrp_papers(issue: Issue):
     """Fetch papers from hotcrp and return JSON."""
     # Get the last paper added for this issue, because that has the hotcrp instance id.
-    if not issue.hotcrp or issue.hotcrp == 'none':
+    if not issue.hotcrp or issue.hotcrp == NO_HOTCRP:
         return {'error': 'No hotcrp for this issue'}
     try:
         conf_msg = ':'.join([issue.hotcrp, 'cic'])
@@ -322,11 +317,18 @@ def view_issue(issueid):
         return redirect(url_for('admin_file.show_admin_home'))
     papers = sorted(issue.papers, key=lambda p: p.status.value)
     finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
+    unassigned_sql = select(PaperStatus).where(PaperStatus.issue_id == None)
+    unassigned_papers = db.session.execute(unassigned_sql).scalars().all()
+    bumpform = ChangeIssueForm(nexturl=request.path)
+    includeform = ChangeIssueForm(issueid=issueid,nexturl=request.path)
     data = {'title': 'Status of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
             'finished_papers': len(finished_papers),
+            'unassigned_papers': unassigned_papers,
             'journal': issue.volume.journal,
+            'bumpform': bumpform,
+            'includeform': includeform,
             'papers': papers}
     hotcrp_papers = _get_hotcrp_papers(issue)
     if 'error' in hotcrp_papers:
@@ -605,4 +607,24 @@ def publish_issue():
     form = PublishIssueForm()
     if not form.validate_on_submit():
         return admin_message('Invalid form submission. This is a bug.')
-    return admin_message('The form was validated')
+    return admin_message('The form was validated. We still need to finish the push to cic.iacr.org')
+
+@admin_bp.route('/admin/change_issue', methods=['POST'])
+@login_required
+@admin_required
+def change_issue():
+    form = ChangeIssueForm()
+    if not form.validate_on_submit():
+        for error in form.errors:
+            log_event(db, form.paperid.data, 'Submission error: {}'.format(str(error)))
+        return admin_message('Invalid form submission. This is a bug.')
+    paper = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==form.paperid.data)).scalar_one_or_none()
+    if not paper:
+        return admin_message('Unknown paper {}'.format(form.paperid.data))
+    if form.issueid.data:
+        paper.issue_id = form.issueid.data
+    else:
+        paper.issue_id = None
+    db.session.add(paper)
+    db.session.commit()
+    return redirect(form.nexturl.data, code=302)

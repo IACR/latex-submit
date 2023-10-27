@@ -17,7 +17,7 @@
     <tr><th>email:</th><td>{{paper_status.email}}</td></tr>
     <tr><th>original volume:</th><td>{{paper_status.volume_key}}</td></tr>
     <tr><th>original issue:</th><td>{{paper_status.issue_key}}</td></tr>
-    <tr><th>currently slated issue:</th><td>{{issue.name}}</td></tr>
+    <tr><th>assigned issue:</th><td>{% if issue %}<a href="{{url_for('admin_file.view_issue', issueid=paper_status.issue_id)}}">{{issue.name}}</a>{% else %}<span class="text-danger">None</span>{% endif %}</td></tr>
   </tbody>
 </table>
 <h4 class="mt-4">Compiled versions</h4>

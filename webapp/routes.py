@@ -13,7 +13,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.sql import func
 import string
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
-from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue
+from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue, NO_HOTCRP
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid, get_doi
@@ -52,8 +52,8 @@ def show_submit_version():
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         form.volume.data = 'test'
         form.issue.data = 'test'
-        form.hotcrp.data = 'none'
-        form.hotcrp_id.data = 'none'
+        form.hotcrp.data = NO_HOTCRP
+        form.hotcrp_id.data = NO_HOTCRP
         form.journal.data = 'cic'
         form.accepted.data = '2022-09-30 17:49:20'
         form.submitted.data = '2022-08-03 06:44:30'

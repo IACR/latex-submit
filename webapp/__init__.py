@@ -11,7 +11,7 @@ from flask_login import LoginManager, UserMixin
 from flask_mail import Mail
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from concurrent.futures import ThreadPoolExecutor
@@ -87,7 +87,7 @@ def create_app(config):
     def shutdown_session(ex):
         db.session.remove()
     app.teardown_request(shutdown_session)
-    from webapp.metadata.db_models import Base, User, Journal
+    from webapp.metadata.db_models import Base, User, Journal, Volume, Issue
     Base.query = db.session.query_property()
     # Create database tables if they don't already exist.
     Base.metadata.create_all(bind=db.engine)
@@ -119,7 +119,7 @@ def create_app(config):
                                         user['password']))
             db.session.commit()
         for journal in config.JOURNALS:
-            j = Journal.query.filter_by(name=journal['name']).first()
+            j = db.session.execute(select(Journal).where(Journal.name==journal['name'])).scalar_one_or_none()
             if not j:
                 db.session.add(Journal(journal))
         db.session.commit()

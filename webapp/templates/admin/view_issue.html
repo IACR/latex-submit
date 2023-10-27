@@ -22,17 +22,30 @@
         </tr>
         <tr>
           <th>Completed papers:</th><td>{{finished_papers}}</td>
+        </tr>
         <tr>
           <th>Accepted but not submitted:</th>
           <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}no HotCRP instance{% endif %}</td>
         </tr>
+      </tbody>
     </table>
   </div>
 </div>
-<form class="mt-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
+<div class="alert alert-info d-flex">
+  <p>TODOs:</p>
+  <ol>
+    <li>figure out how to structure this form. Only papers with status of "Copy edit complete" can be published.</li>
+    <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
+      This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
+      record yet.</li>
+    <li>Provide mechanism to order these in the final issue.</li>
+  </ol>
+</div>
+<h4 class="mt-4">Assigned papers</h4>
 <table class="table sortable">
   <thead>
     <tr>
+      <th></th>
       <th>paperid</th>
       <th>hotcrp</th>
       <th>status</th>
@@ -43,7 +56,16 @@
   </thead>
   <tbody id="paperList">
     {% for status in papers %}
-    <td><a href="../view/{{status.paperid}}">{{status.paperid}}</a></td>
+    <td>{% if status.status.name!='COPY_EDIT_ACCEPT' %}
+      <form method="POST" action="{{url_for('admin_file.change_issue')}}">
+        {{ bumpform.csrf_token }}
+        {{ bumpform.nexturl(value=url_for('admin_file.view_issue', issueid=issue.id)) }}
+        {{ bumpform.paperid(value=status.paperid) }}
+        {{ bumpform.submit(class_='btn btn-sm btn-warning',value='bump') }}
+      </form>
+      {% endif %}
+    </td>
+    <td><a href="{{url_for('admin_file.show_admin_paper', paperid=status.paperid)}}">{{status.paperid}}</a></td>
     <td>{% if status.hotcrp == 'none' %}none{% else %}<a target="_blank" href="https://submit.iacr.org/{{status.hotcrp}}/paper/{{status.hotcrp_id}}">{{status.hotcrp}}/{{status.hotcrp_id}}</a>{% endif %}</td>
       <td class="status {{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
@@ -51,17 +73,6 @@
       <td>{{status.title}}<br><span class="fst-italic">{{status.authors}}</span></td>
     </tr>
     {% endfor %}
-    <div class="alert alert-info"p>
-      <p>TODO:</p>
-      <ol>
-        <li>figure out how to structure this form. Only papers with status of "Copy edit complete" can be published.</li>
-        <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
-          This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
-          record yet.</li>
-        <li>Provide mechanism to order these in the final issue.</li>
-      </ol>
-    </div>
-</form>
 {% if hotcrp %}
 {% for p in hotcrp.acceptedPapers %}
 <tr>
@@ -80,6 +91,40 @@
 {% endif %}
 </tbody>
 </table>
+{% if unassigned_papers %}
+<h4 class="mt-4">Unassigned papers</h4>
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>paperid</th>
+      <th>status</th>
+      <th>Title &amp; authors</th>
+    </tr>
+  </thead>
+  <tbody id="unassigned">
+    {% for paper in unassigned_papers %}
+    <tr>
+      <td>{% if paper.status.name == 'COPY_EDIT_ACCEPT' %}
+        <form method="POST" action="{{url_for('admin_file.change_issue')}}">
+          {{ includeform.csrf_token }}
+          {{ includeform.paperid(value=paper.paperid) }}
+          {{ includeform.issueid }}
+          {{ includeform.nexturl }}
+          {{ includeform.submit(class_='btn btn-sm btn-warning',value='include') }}
+        </form>
+        {% endif %}
+      </td>
+      <td><a href="{{url_for('admin_file.show_admin_paper', paperid=paper.paperid)}}">{{paper.paperid}}</a></td>
+      <td class="status {{paper.status.name}}">{{paper.status.value}}</td>
+      <td>{{paper.title}}<br><span class="fst-italic">{{paper.authors}}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+<form class="mt-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
+</form>
 <script src="/js/sorttable.js"></script>
 </main>
 {% endblock %}

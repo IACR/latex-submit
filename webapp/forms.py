@@ -312,3 +312,14 @@ class PublishIssueForm(FlaskForm):
                           min_entries=1,
                           validators=[InputRequired('List of papers is required')])
     submit = SubmitField('Publish finished papers')
+
+class ChangeIssueForm(FlaskForm):
+    """Used to change the issue for a paper."""
+    paperid = HiddenField(name='paperid',
+                          validators=[InputRequired(),
+                                      ValidPaperId()])
+    # If this is missing, it means to unassign the paper.
+    issueid = HiddenField(name='issueid')
+    # nexturl is used for redirection.
+    nexturl = HiddenField(name='nexturl', validators=[InputRequired()])
+    submit = SubmitField(label='bump')

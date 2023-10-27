@@ -31,7 +31,7 @@
   <tbody>
     {% for status in papers %}
       <td><a href="{{url_for('admin_file.show_admin_paper', paperid=status.paperid)}}">{{status.paperid}}</td>
-      <td>Vol {{status.volume_key}}, issue <a href="{{url_for('admin_file.view_issue', issueid=status.issue_id)}}">{{status.issue_key}}</a></td>
+      <td>{% if status.issue_id %}Vol {{status.volume_key}}, issue <a href="{{url_for('admin_file.view_issue', issueid=status.issue_id)}}">{{status.issue_key}}</a>{% else %}<span class="text-danger">None</span>{% endif %}</td>
       <td class="{{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.creationtime}}</td>
       <td>{{status.lastmodified}}</td>
