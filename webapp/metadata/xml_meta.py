@@ -403,7 +403,8 @@ if __name__ == '__main__':
         print('error in jats:' + str(e))
         print(schema.error_log)
     journal = Journal({'EISSN': '1234-5678',
-                       'key': 'testkey',
+                       'hotcrp_key': 'testkey',
+                       'acronym': 'TJ',
                        'name': 'Test Journal',
                        'DOI_PREFIX': '10.1729'})
     crossref = get_crossref('testbatch',

@@ -99,12 +99,9 @@ def create_app(config):
         app.register_blueprint(routes.home_bp)
         app.register_blueprint(admin.admin_bp)
         app.register_blueprint(auth.auth_bp)
-        # We use rate limiting in auth_bp. Note that because we are using the
-        # in-memory version of Limiter rather than redis or memcached to keep the tracking
-        # information, this is not quite accurate. mod_wsgi with mpm-prefork keeps
-        # separate records in each process for mod_wsgi, so each one has its own
-        # limit. I just don't want a dependency on redis or memcached.
+        # We use rate limiting in auth_bp.
         limiter = Limiter(app=app,
+                          storage_uri=app.config['RATELIMIT_STORAGE_URI'],
                           key_func=get_remote_address,
                           default_limits=[])
         limiter.limit("5/minute", error_message='Too many requests. Rate limiting is in effect.')(auth.auth_bp)

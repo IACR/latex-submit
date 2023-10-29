@@ -1,21 +1,54 @@
-werkzeug==2.3.7
+# Python dependencies are a mess.
+#
+# Packages can depend on each other and also on the version of
+# python. Some packages don't pin upper bounds on their dependencies,
+# so major changes in other packages can break backward compatilibility.
+#
+# This project depends on some packages that have a history of making
+# many breaking changes - even in minor versions (e.g., flask). It also
+# uses three packages that have recently made major version changes
+# that are not distributed in debian (yet).  The question is whether
+# to write toward the newer versions or the older versions. If we write
+# to the old ones, then we introduce long-term upgrade debt. If we write
+# to the new ones, then we need to depend on packages that are not yet
+# distributed with debian.
+#
+# Some packages below are pinned by version. In each case we try to explain
+# why.
+arxiv-latex-cleaner
+country_converter
+# ##########################################
+# The flask package is frozen because we use flask-login. flask-login is barely being
+# maintained, and the flask developers seem to have no interest in maintaining backward
+# compatibility with extensions.
 flask==2.3.3
+# ##########################################
 flask_mail
 flask_limiter
-pydantic[email]>=2.0
-pylatexenc
-python-dotenv
-flask-wtf
-flask_limiter
+# ##################################
+# flask-login is brittle. You cannot install from debian because it
+# has a dependency on an old werkzeug. See
+# https://blog.miguelgrinberg.com/post/we-have-to-talk-about-flask The
+# fix for flask-login has been checked into github, but has not been
+# pushed to pypi at this time:
+# https://github.com/maxcountryman/flask-login/pull/746/files
 flask-login
-nameparser
-pybtex
-country_converter
-sqlalchemy
-arxiv-latex-cleaner
-pybtex
-pandas
-country-converter
-pymysql
-lxml
-xmlschema
+# ##########################################
+flask-wtf
+# pydantic when through a major change with 2.0.
+pydantic[email]>=2.0
+# sqlalchemy also went through a major change with 2.0.
+sqlalchemy>=2.0
+# we need werkzeug for flask, flask_login, and MultiDict. The
+# version is pinned in order to maintain compatibility with flask_login
+werkzeug==2.3.7      
+# ##########################################################
+# Packages below can be installed from debian.
+pandas               # for country_converter only.
+lxml                 # from debian
+nameparser           # from debian
+pybtex               # from debian
+pybtex               # from debian
+pylatexenc           # from debian
+pymysql              # from debian
+xmlschema            # from debian
