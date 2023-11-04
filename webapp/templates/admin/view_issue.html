@@ -75,18 +75,19 @@
     {% endfor %}
 {% if hotcrp %}
 {% for p in hotcrp.acceptedPapers %}
-<tr>
-  <td>{{p.paperid}}</td>
-  <td><a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}/paper/{{p.paperId}}">{{hotcrp.shortName}}/{{p.paperId}}</a></td>
-  <td class="UNSUBMITTED">Unsubmitted</td>
-  <td>-</td>
-  <td>-</td>
-  <td>{{p.title}}<br>
-      {% for author in p.authorlist %}
+    <tr>
+      <td></td>
+      <td>{{p.paperid}}</td>
+      <td><a target="_blank" href="https://submit.iacr.org/{{hotcrp.shortName}}/paper/{{p.paperId}}">{{hotcrp.shortName}}/{{p.paperId}}</a></td>
+      <td class="UNSUBMITTED">Unsubmitted</td>
+      <td>-</td>
+      <td>-</td>
+      <td>{{p.title}}<br>
+        {% for author in p.authorlist %}
         {{author.name}} ({{author.affiliation}})
-      {% endfor %}
-   </td>
-</tr>
+        {% endfor %}
+      </td>
+    </tr>
 {% endfor %}
 {% endif %}
 </tbody>
