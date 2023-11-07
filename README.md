@@ -290,9 +290,9 @@ by mysql Workbench below.
 
 This makes the hierarchy obvious:
 ```
-Journal -> Volume -> Issue -> Paper
+Journal -> Volume -> Issue -> PaperStatus
 ```
-Papers than have multiple `CompileRecord`, `LogEvent`, and `Discussion`
+A `PaperStatus` can have multiple `CompileRecord`, `LogEvent`, and `Discussion`
 objects associated with them. The `result` field in `CompileRecord` is
 the JSON serialization of the `Compilation` object.
 
@@ -302,11 +302,15 @@ When a hotcrp instance is created, it has journal, volume, and issue
 identifiers that later show up in this server. Specifically the information
 is matched as follows:
 * journal (identified by hotcrp_key)
-* volume (identified by hotcrp_key)
-* issue (identified by hotcrp_key)
+* volume (identified by name)
+* issue (identified by name)
 This information is stored permanently in the `PaperStatus` record.
 The paper may later be moved to another issue, but this is done by
-changing the `issue_id` in `PaperStatus`.
+changing the `issue_id` in `PaperStatus`. A paper may be "unassigned"
+by setting the `issue_id` to null. If a paper is assigned to an issue,
+then the paper must be recompiled because the `main.iacrmetadata` file
+will have to be changed to inject the volume and issue number back into
+the PDF.
 
 You can change the name or acronym of a journal or volume or issue,
 but the `hotcrp_key` should remain fixed to identify which hotcrp
@@ -463,3 +467,145 @@ Science Editing service
 (ISE)](https://www.acm.org/publications/authors/submissions) to
 provide language editing services for authors. The cost of these
 editing services is borne by the authors.
+
+## Publishing an issue
+
+The current model of the journal has that the unit of publication is
+an "issue" consisting of a sequence of papers that have been reviewed
+in hotcrp.  At some point in the future we may move to a rolling model
+in which papers are published individually, and the notion of an
+"issue" goes away.
+
+A hotcrp instance is intended to supply the papers for an issue, but papers may
+theoretically arise from other sources:
+1. an invited paper may bypass hotcrp.
+2. a paper may be held over from a previous hotcrp if the author does not meet the
+   deadline for publishing.
+
+The `PaperStatus` table has a reference to the issue for a paper, but
+that can be changed in the admin interface. When a paper is reassigned to a new
+issue, it must be recompiled to make sure that the PDF contains the correct
+issue number.
+
+When an issue is published, it takes all of the papers in the issue
+and sets their status to `PaperStatusEnum.PUBLISHED`, exports them to
+the journal site, and sets the `published` date on the issue. If a
+paper is submitted to this issue after the issue has been published,
+then the paper is automatically unassigned.
+
+## Export to the journal site
+
+The act of publishing an issue must push the data to the site that
+hosts the journal. This server may or may not run on the same machine
+as the public-facing journal site where papers are hosted. In order to
+maintain this separation, we define an export format from this server
+that can be read by the journal site.
+
+### Archiving
+
+There is yet another constraint on the export of published articles,
+namely that it should fulfill the need for archiving. The CLOCKSS system
+is organized around an AU (Archival Unit). It would be nice to make our
+export format consistent with the format required by
+[CLOCKSS](https://lockss.github.io/clockss-file-transfer-guidelines.htmlhttps://lockss.github.io/clockss-file-transfer-guidelines.html)
+but unfortunately that format is rather vague. The format that we
+use is at least consistent with their requirements.
+
+### Export for cic.iacr.org
+
+The format that we use for export to cic.iacr.org is our own design. There are dependencies
+in the [github for cic](https://github.com/IACR/cicjournal).
+
+1. each issue consists of a zip file.
+2. within the zip file, there is a file called `issue.json` that contains volume number,
+   issue number, year, an array that specifies the order of the papers, and an optional
+   title field for the issue (e.g., "Special Issue on Information Theory".
+3. There is also a subdirectory `papers` that contains a subdirectory for each paper.
+4. within the subdirectory for a paper, there are three items:
+    - `compilation.json` with article metadata.
+    - `main.pdf`
+    - `main.zip` with all LaTeX sources.
+
+This omits some information from publish.iacr.org such as the copyedit information.
+
+### Export for OJS
+
+(This is currently not implemented, so it's just a draft plan).
+
+If the journal site is OJS then we should probably use their native
+import XML format, which has a schema that changes with every release
+[native.xsd](https://github.com/pkp/ojs/blob/main/plugins/importexport/native/native.xsd)
+that in turn depends upon another
+[pkp-native.xsd](https://github.com/pkp/pkp-lib/blob/main/plugins/importexport/native/pkp-native.xsd)
+These schemas are lacking in several ways, including the fact that they
+don't support ROR for affiliations.  I tried exporting an issue from
+an OJS instance, and got a file that was something like the one below
+(some fields omitted).
+```
+<?xml version="1.0"?>
+<issue xmlns="http://pkp.sfu.ca"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       published="1"
+       current="1"
+       access_status="1"
+       url_path=""
+       xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+  <id type="internal" advice="ignore">2</id>
+  <issue_identification>
+    <volume>1</volume>
+    <number>2</number>
+    <year>2024</year>
+    <title locale="en">This is optional</title>
+  </issue_identification>
+  <date_published>2024-04-01</date_published> <!== optional ==>
+  <date_modified>2024-04-01</date_modified>   <!== optional ==>
+  <articles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+    <article xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" locale="en" date_submitted="2023-11-06" status="3" submission_progress="" current_publication_id="3" stage="production">
+      <id type="internal" advice="ignore">3</id>
+      <submission_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="15" created_at="2023-11-06" date_created="" file_id="7" stage="final" updated_at="2023-11-06" viewable="false" genre="Source Texts" source_submission_file_id="14" uploader="fester" xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+        <name locale="en">164.zip</name>
+        <file id="7" filesize="322938" extension="zip">
+          <embed encoding="base64">base64 content goes here</embed>
+        </file>
+      </submission_file>
+      <submission_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="16" created_at="2023-11-06" date_created="" file_id="6" stage="final" updated_at="2023-11-06" viewable="false" genre="Article Text" source_submission_file_id="13" uploader="fester" xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+        <name locale="en">main.pdf</name>
+        <file id="6" filesize="266578" extension="pdf">
+          <embed encoding="base64">base64 content goes here</embed>
+        </file>
+      </submission_file>
+      <publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1" status="3" primary_contact_id="6" url_path="" seq="2" access_status="0" date_published="2023-11-06" section_ref="ART" xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+        <id type="internal" advice="ignore">3</id>
+        <title locale="en">This is my paper title</title>
+        <abstract locale="en">&lt;p&gt;I was too lazy to write an abstract. Note that this is HTML.&lt;/p&gt;</abstract>
+        <copyrightHolder locale="en">Author(s)</copyrightHolder>
+        <copyrightYear>2023</copyrightYear>
+        <authors xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pkp.sfu.ca native.xsd">
+          <author include_in_browse="true" user_group_ref="Author" seq="0" id="6">
+            <givenname locale="en">Fester</givenname>
+            <familyname locale="en">Bestertester</familyname>
+            <affiliation locale="en">Digicrime</affiliation>
+            <country>US</country>
+            <email>author1@digicrime.com</email>
+          </author>
+          <author include_in_browse="true" user_group_ref="Author" seq="0" id="7">
+            <givenname locale="en">Kevin</givenname>
+            <familyname locale="en">McCurley</familyname>
+            <affiliation locale="en">San Jose State University</affiliation>
+            <country>US</country>
+            <email>author3@digicrime.com</email>
+            <orcid>https://orcid.org/0000-0001-7890-5430</orcid>
+            <biography locale="en">&lt;p&gt;Kevin is retired.&lt;/p&gt;</biography>
+          </author>
+        </authors>
+      </publication>
+    </article>
+  </articles>
+</issue>
+```
+The specifics are described in the schemas (sort of). Note that
+others have reported that the import/export plugin sometimes just fails. This makes it
+fragile to try this route, so it's currently not implemented. If ToSC and TCHES adopt
+this route then it will require coordination with whoever runs the RUB OJS site.
+

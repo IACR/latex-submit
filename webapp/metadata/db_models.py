@@ -208,12 +208,10 @@ class Volume(Base):
     issues: Mapped[List['Issue']] = relationship(back_populates='volume', cascade='all, delete-orphan')
 
 # Each hotcrp instance corresponds to an issue. An issue may be
-# created by uploading the first paper from the hotcrp instance, or it
-# may be created in the admin interface. In any event the hotcrp value
+# created by uploading the first paper from the hotcrp instance.
+# In any event the hotcrp value
 # should be the hotcrp shortName value so we can show pending papers
 # for the issue.
-#
-# Each journal has a Volume named UNASSIGNED which holds an issue named UNASSIGNED.
 
 class Issue(Base):
     __tablename__ = 'issue'
@@ -228,7 +226,9 @@ class Issue(Base):
                                                  'Each issue corresponds to a hotcrp instance, but other papers may '
                                                  'be added to the issue. This value should not be changed.'))
     name: Mapped[str] = mapped_column(String(32),
-                                      comment='Usually number, e.g., 2. Starts off as value from hotcrp.')
+                                      comment=('Usually number, e.g., 2. Starts off as value from hotcrp.'
+                                               'If this is changed then papers uploaded from the hotcrp instance '
+                                               'will create a new issue with the name in hotcrp.'))
     volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
     volume: Mapped['Volume'] = relationship(back_populates='issues')
     papers: Mapped[List['PaperStatus']] = relationship(back_populates='issue')
