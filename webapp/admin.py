@@ -316,7 +316,7 @@ def view_issue(issueid):
     if not issue:
         flash('No such issue')
         return redirect(url_for('admin_file.show_admin_home'))
-    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id != None).order_by(PaperStatus.paperno)).scalars().all()
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id == issue.id).order_by(PaperStatus.paperno)).scalars().all()
     finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
     unassigned_sql = select(PaperStatus).where(PaperStatus.issue_id == None)
     unassigned_papers = db.session.execute(unassigned_sql).scalars().all()
