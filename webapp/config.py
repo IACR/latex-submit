@@ -30,7 +30,7 @@ class Config:
             'hotcrp_key': 'cic',
             'acronym': 'CiC',
             'name': 'IACR Communications in Cryptology',
-            'EISSN': 'XXXX-YYYY',
+            'EISSN': '',
             'DOI_PREFIX': '10.1729'
         },
         {
