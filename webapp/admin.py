@@ -1,10 +1,11 @@
 """These routes are for admin only, and therefoer have the
 admin_required decorator on them. All routes should start with /admin."""
-from datetime import datetime
+from datetime import datetime, date
 from difflib import HtmlDiff
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from sqlalchemy import select, or_, and_
+from sqlalchemy.sql import func
 from flask_login import login_required, current_user
 from flask_mail import Message
 import hashlib, hmac
@@ -16,7 +17,7 @@ from . import db, create_hmac, mail, generate_password, task_queue, paper_key, e
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event, NO_HOTCRP
-from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, PublishSubForm, ChangeIssueForm
+from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm
 from .tasks import run_latex_task
 from .routes import context_wrap
 from functools import wraps
@@ -294,7 +295,7 @@ def _get_hotcrp_papers(issue: Issue):
     """Fetch papers from hotcrp and return JSON."""
     # Get the last paper added for this issue, because that has the hotcrp instance id.
     if not issue.hotcrp or issue.hotcrp == NO_HOTCRP:
-        return {'error': 'No hotcrp for this issue'}
+        return {'error': ''}
     try:
         conf_msg = ':'.join([issue.hotcrp, 'cic'])
         auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
@@ -315,12 +316,13 @@ def view_issue(issueid):
     if not issue:
         flash('No such issue')
         return redirect(url_for('admin_file.show_admin_home'))
-    papers = sorted(issue.papers, key=lambda p: p.status.value)
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id != None).order_by(PaperStatus.paperno)).scalars().all()
     finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
     unassigned_sql = select(PaperStatus).where(PaperStatus.issue_id == None)
     unassigned_papers = db.session.execute(unassigned_sql).scalars().all()
     bumpform = ChangeIssueForm(nexturl=request.path)
     includeform = ChangeIssueForm(issueid=issueid,nexturl=request.path)
+    papernoform = ChangePaperNumberForm(issueid=issueid)
     data = {'title': 'Status of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
@@ -328,11 +330,13 @@ def view_issue(issueid):
             'unassigned_papers': unassigned_papers,
             'journal': issue.volume.journal,
             'bumpform': bumpform,
+            'papernoform': papernoform,
             'includeform': includeform,
             'papers': papers}
     hotcrp_papers = _get_hotcrp_papers(issue)
     if 'error' in hotcrp_papers:
-        flash(hotcrp_papers['error'])
+        if hotcrp_papers['error']:
+            flash(hotcrp_papers['error'])
     else:
         if hotcrp_papers['issue'] != issue.name:
             flash('Mismatch in hotcrp key: {}/{}'.format(hotcrp_papers['issue'],
@@ -351,7 +355,8 @@ def view_issue(issueid):
                     accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
     formdata = [{'paperid': p.paperid} for p in finished_papers]
-    data['form'] = PublishIssueForm(paperlist=formdata)
+    if len(finished_papers) == len(papers):
+        data['form'] = PublishIssueForm(issueid=issue.id)
     return render_template('admin/view_issue.html', **data)
 
 @admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])
@@ -528,6 +533,7 @@ def request_more_changes():
                                            command,
                                            str(copyedit_dir.absolute()),
                                            paperid,
+                                           last_compilation.meta.DOI,
                                            Version.COPYEDIT.value,
                                            task_key)
     status_url = url_for('home_bp.get_status',
@@ -607,6 +613,8 @@ def publish_issue():
     form = PublishIssueForm()
     if not form.validate_on_submit():
         return admin_message('Invalid form submission. This is a bug.')
+    # TODO: Finish this. We should export the archive, set the papers to published, and set the published date
+    # on the issue.
     return admin_message('The form was validated. We still need to finish the push to cic.iacr.org')
 
 @admin_bp.route('/admin/change_issue', methods=['POST'])
@@ -615,16 +623,163 @@ def publish_issue():
 def change_issue():
     form = ChangeIssueForm()
     if not form.validate_on_submit():
-        for error in form.errors:
-            log_event(db, form.paperid.data, 'Submission error: {}'.format(str(error)))
+        for key, value in form.errors:
+            log_event(db, form.paperid.data, 'Submission error: {}:{}'.format(key, value))
         return admin_message('Invalid form submission. This is a bug.')
-    paper = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==form.paperid.data)).scalar_one_or_none()
-    if not paper:
+    paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==form.paperid.data)).scalar_one_or_none()
+    if not paper_status:
         return admin_message('Unknown paper {}'.format(form.paperid.data))
-    if form.issueid.data:
-        paper.issue_id = form.issueid.data
+    if not form.issueid.data: # paper is being removed from its issue.
+        paperno = paper_status.paperno
+        issueid = paper_status.issue_id
+        paper_status.paperno = None
+        paper_status.issue_id = None
+        db.session.add(paper_status)
+        # renumber the papers.
+        later_papers = db.session.execute(select(PaperStatus).where(and_(PaperStatus.paperno > paperno,
+                                                                         PaperStatus.issue_id==issueid))).scalars().all()
+        for paper in later_papers:
+            paper.paperno = paperno
+            paperno += 1
+            db.session.add(paper)
+        db.session.commit()
+        return redirect(form.nexturl.data, code=302)
+    # In this case we need to recompile the final version of the paper in order to incorporate
+    # the issue and volume names.
+    issue = db.session.execute(select(Issue).where(Issue.id == form.issueid.data)).scalar_one_or_none()
+    if not issue:
+        return admin_message('Unknown issue {}'.format(form.issueid.data))
+    paper_status.issue_id = form.issueid.data
+    papernum = db.session.execute(select(func.max(PaperStatus.paperno)).where(PaperStatus.issue_id==issue.id)).scalar_one_or_none()
+    if papernum is None:
+        paper_status.paperno = 1
     else:
-        paper.issue_id = None
-    db.session.add(paper)
+        paper_status.paperno = 1 + papernum # put it at the end of the list.
+    db.session.add(paper_status)
     db.session.commit()
-    return redirect(form.nexturl.data, code=302)
+    volume = issue.volume
+    journal = volume.journal
+    paperid = paper_status.paperid
+    task_key = paper_key(paperid, 'final')
+    if task_queue.get(task_key):
+        log_event(db, paperid, 'Attempt to recompile while already compiling')
+        return render_template('message.html',
+                               title='Another one is running',
+                               error='At most one compilation may be queued on each paper.')
+    now = datetime.now()
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+    final_dir = paper_dir / Path('final')
+    compilation_file = final_dir / Path('compilation.json')
+    compilation = Compilation.model_validate_json(compilation_file.read_text(encoding='UTF-8'))
+    compilation.error_log = []
+    compilation.warning_log = []
+    compilation.compiled = now
+    compilation.status = CompileStatus.COMPILING
+    input_dir = final_dir / Path('input')
+    output_dir = final_dir / Path('output')
+    sql = select(CompileRecord).filter_by(paperid=paperid).filter_by(version='final')
+    comprec = db.session.execute(sql).scalar_one_or_none()
+    comprec.task_status = TaskStatus.PENDING
+    comprec.started = now
+    compstr = compilation.model_dump_json(indent=2, exclude_none=True)
+    compilation_file.write_text(compstr, encoding='UTF-8')
+    comprec.result = compstr
+    db.session.add(comprec)
+    db.session.commit()
+    publishedDate = date.today().strftime('%Y-%m-%d')
+    metadata = '\\def\\IACR@DOI{' + compilation.meta.DOI + '}\n'
+    if journal.EISSN:
+        metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
+    metadata += '\\def\\IACR@Received{' + compilation.submitted[:10] + '}\n'
+    metadata += '\\def\\IACR@Accepted{' + compilation.accepted[:10] + '}\n'
+    metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
+    metadata += '\\setvolume{' + volume.name + '}\n'
+    metadata += '\\setnumber{' + issue.name + '}\n'
+    metadata_file = input_dir / Path('main.iacrmetadata')
+    metadata_file.write_text(metadata)
+    # Remove output from any previous run.
+    if output_dir.is_dir():
+        shutil.rmtree(output_dir)
+    # fire off a separate task to compile. We wrap run_latex_task so it
+    # can have the flask context to use sqlalchemy on the database.
+    log_event(db, paperid, 'Recmpiled for volume {} issue {}'.format(volume.name, issue.name))
+    task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           compilation.command,
+                                           str(final_dir.absolute()),
+                                           paperid,
+                                           'final',
+                                           task_key)
+    if form.nexturl.data:
+        next_url = form.nexturl.data
+    else:
+        next_url = url_for('admin_file.view_issue', issueid=issue.id)
+    status_url = url_for('home_bp.get_status',
+                         paperid=paperid,
+                         version=Version.FINAL.value,
+                         auth=create_hmac([paperid, Version.FINAL.value]),
+                         next=next_url,
+                         _external=True)
+    data = {'title': 'Recompiling final version',
+            'status_url': status_url,
+            'headline': 'Recompiling final version with volume and issue'}
+    return render_template('running.html', **data)
+
+
+@admin_bp.route('/admin/change_paperno', methods=['POST'])
+@login_required
+@admin_required
+def change_paperno():
+    """This is for increasing or decreasing the paperno on an individual paper."""
+    form = ChangePaperNumberForm()
+    if not form.validate_on_submit():
+        for key, value in form.errors.items():
+            log_event(db, form.paperid.data, 'paperno error: {}:{}'.format(key, value))
+        flash('Invalid values')
+        return admin_message('Invalid form submission. This is a bug.')
+    paperid = form.paperid.data
+    issueid = form.issueid.data
+    paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    old_paperno = paper_status.paperno
+    if form.upbutton.data: # decrease the paperno by one. This means the paper above it must be renumbered.
+        new_paperno = old_paperno - 1
+        if new_paperno < 1:
+            # can't move it up
+            return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)
+        upper_paper = db.session.execute(select(PaperStatus).where(PaperStatus.paperno==new_paperno).where(PaperStatus.issue_id==issueid)).scalar_one_or_none()
+        if upper_paper:
+            upper_paper.paperno = new_paperno + 1
+            paper_status.paperno = new_paperno
+            db.session.add(upper_paper)
+            db.session.add(paper_status)
+        else:
+            # This would be a bug.
+            paperno = 0
+            issue_papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issueid)).scalars().all()
+            for paper in issue_papers:
+                paperno += 1
+                paper.paperno = paperno
+                db.session.add(paper)
+            flash('There is a bug in paper numbers. They were reset')
+    else: # increase the paper number by one.
+        max_paperno = db.session.execute(select(func.max(PaperStatus.paperno)).where(PaperStatus.issue_id==issueid)).scalar_one_or_none()
+        if old_paperno == max_paperno:
+            # can't move it down
+            return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)
+        new_paperno = old_paperno + 1
+        lower_paper = db.session.execute(select(PaperStatus).where(PaperStatus.paperno==new_paperno).where(PaperStatus.issue_id==issueid)).scalar_one_or_none()
+        if lower_paper:
+            lower_paper.paperno = old_paperno
+            paper_status.paperno = new_paperno
+            db.session.add(lower_paper)
+            db.session.add(paper_status)
+        else:
+            # This would be a bug.
+            paperno = 0
+            issue_papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issueid)).scalars().all()
+            for paper in issue_papers:
+                paperno += 1
+                paper.paperno = paperno
+                db.session.add(paper)
+            flash('There is a bug in paper numbers. They were reset')
+    db.session.commit()
+    return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)

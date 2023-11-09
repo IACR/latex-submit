@@ -40,7 +40,7 @@ def login():
                     abort(400)
                 return redirect(next)
             else:
-                return redirect('/')
+                return redirect(url_for('admin_file.show_admin_home'))
         flash("Invalid username/password combination")
         return redirect(url_for("auth.login"))
     return render_template('login.html', form=form)

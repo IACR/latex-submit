@@ -304,13 +304,15 @@ is matched as follows:
 * journal (identified by hotcrp_key)
 * volume (identified by name)
 * issue (identified by name)
-This information is stored permanently in the `PaperStatus` record.
-The paper may later be moved to another issue, but this is done by
-changing the `issue_id` in `PaperStatus`. A paper may be "unassigned"
-by setting the `issue_id` to null. If a paper is assigned to an issue,
-then the paper must be recompiled because the `main.iacrmetadata` file
-will have to be changed to inject the volume and issue number back into
-the PDF.
+
+The information for a paper is stored permanently in the `PaperStatus`
+record, and a paper is initially linked to an issue.  The paper may
+later be moved to another issue, but this is done by changing the
+`issue_id` in `PaperStatus`. A paper may be "unassigned" by setting
+the `issue_id` to null. If a paper is assigned to an issue, then the
+paper must be recompiled because the `main.iacrmetadata` file will
+have to be changed to inject the volume and issue number back into the
+PDF.
 
 You can change the name or acronym of a journal or volume or issue,
 but the `hotcrp_key` should remain fixed to identify which hotcrp
@@ -472,7 +474,7 @@ editing services is borne by the authors.
 
 The current model of the journal has that the unit of publication is
 an "issue" consisting of a sequence of papers that have been reviewed
-in hotcrp.  At some point in the future we may move to a rolling model
+in hotcrp.  At some point in the future we may move to a continuous model
 in which papers are published individually, and the notion of an
 "issue" goes away.
 
@@ -487,11 +489,24 @@ that can be changed in the admin interface. When a paper is reassigned to a new
 issue, it must be recompiled to make sure that the PDF contains the correct
 issue number.
 
+Papers are assigned a `paperno` within the issue that indicates their
+order within the issue. This will influence the order in which the
+papers appear in the table of contents, and may also provide the
+final URL for the paper. Prior to publishing the issue, the papers can
+be re-ordered in the administrative interface. Once the issue is published,
+the `paperno` is fixed and may not be changed because it becomes part
+of the archived contents.
+
 When an issue is published, it takes all of the papers in the issue
 and sets their status to `PaperStatusEnum.PUBLISHED`, exports them to
 the journal site, and sets the `published` date on the issue. If a
 paper is submitted to this issue after the issue has been published,
 then the paper is automatically unassigned.
+
+There is some doubt about whether the papers in an issue have a prescribed
+order. For now we assume that the editor decides this as the issue is
+published, and a paper therefore gets a paper number starting with 1
+for that issue.
 
 ## Export to the journal site
 
@@ -504,12 +519,13 @@ that can be read by the journal site.
 ### Archiving
 
 There is yet another constraint on the export of published articles,
-namely that it should fulfill the need for archiving. The CLOCKSS system
-is organized around an AU (Archival Unit). It would be nice to make our
-export format consistent with the format required by
+namely that it should fulfill the need for archiving. The CLOCKSS
+system is organized around an AU (Archival Unit) and in our case that
+corresponds to an issue. It would be nice to make our export format
+consistent with the format required by
 [CLOCKSS](https://lockss.github.io/clockss-file-transfer-guidelines.htmlhttps://lockss.github.io/clockss-file-transfer-guidelines.html)
-but unfortunately that format is rather vague. The format that we
-use is at least consistent with their requirements.
+but unfortunately that format is rather vague. The format that we use
+is at least consistent with their requirements.
 
 ### Export for cic.iacr.org
 
@@ -518,8 +534,9 @@ in the [github for cic](https://github.com/IACR/cicjournal).
 
 1. each issue consists of a zip file.
 2. within the zip file, there is a file called `issue.json` that contains volume number,
-   issue number, year, an array that specifies the order of the papers, and an optional
-   title field for the issue (e.g., "Special Issue on Information Theory".
+   issue number, year, and an optional title field for the issue (e.g.,
+   "Special Issue on Information Theory"). It also contains the paper numbers to indicate
+   the order of papers in the issue.
 3. There is also a subdirectory `papers` that contains a subdirectory for each paper.
 4. within the subdirectory for a paper, there are three items:
     - `compilation.json` with article metadata.

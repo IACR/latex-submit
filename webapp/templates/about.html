@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
+<div class="row">
+  <div class="col-md-8 offset-md-2 col-12">
+    <h3 class="mt-4">{{title}}</h3>
+    <p>
+      This site is run for the publishing pipeline of the <a href="https://iacr.org/">Interational
+      Association for Cryptologic Research</a> and will be used first for the journal titled
+      <a href="https://cic.iacr.org/">Communications
+        in Cryptology</a>.
+    </p>
+    <h3 class="mt-4">Who to contact</h3>
+    <p>
+      Contact iacrcc-support &lt;insert at here&gt; iacr.org
+    </p>
+  </div>
+</div>
+</main>
+{% endblock %} {# content #}

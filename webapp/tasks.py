@@ -34,7 +34,7 @@ def is_fatal(err):
         return True
     return False
 
-def run_latex_task(cmd, paper_path, paperid, version, task_key):
+def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
     """Execute latex on input_path contents, writing into output_path.
     args:
        cmd: latex command to run
@@ -137,6 +137,7 @@ def run_latex_task(cmd, paper_path, paperid, version, task_key):
                                     data['license'] = LicenseEnum.CC_BY.value.model_dump()
                                     logging.error('License assigned by default as CC_BY')
                             compilation.meta = Meta(**data)
+                            compilation.meta.DOI = doi
                             # Check authors to see if they have ORCID and affiliations.
                             for author in compilation.meta.authors:
                                 if not author.orcid:

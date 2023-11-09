@@ -8,10 +8,11 @@
 {% endfor %}
 <div class="row">
   <div class="col-6">
-    <h1 class="mb-2 text-center">{{title}}</h1>
+    <h2 class="mb-2 text-center">{{title}}</h2>
     <p>
-      This is a view of all papers that are tentatively scheduled to appear in Issue {{issue.name}}
-      of Volume {{volume.name}} in {{journal.name}}.
+      This is a view of all papers for the issue in {{journal.name}}.
+      By default papers are assigned a paper number in the order they are uploaded. You can reorder them using the buttons below, but they cannot
+      be changed once the issue is published.
     </p>
   </div>
   <div class="col-6">
@@ -25,51 +26,51 @@
         </tr>
         <tr>
           <th>Accepted but not submitted:</th>
-          <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}no HotCRP instance{% endif %}</td>
+          <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}<span class="text-danger">no HotCRP instance</span>{% endif %}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
-<div class="alert alert-info d-flex">
-  <p>TODOs:</p>
-  <ol>
-    <li>figure out how to structure this form. Only papers with status of "Copy edit complete" can be published.</li>
-    <li>Provide mechanism to change the paper to a later issue if the status is not <i-mono>copy_edit_accept</i-mono>.
-      This is tricky if the author hasn't even uploaded anything yet, because we don't have a <i-mono>PaperStatus</i-mono>
-      record yet.</li>
-    <li>Provide mechanism to order these in the final issue.</li>
-  </ol>
-</div>
-<h4 class="mt-4">Assigned papers</h4>
+<h4 class="mt-3">Papers assigned to the issue</h4>
 <table class="table sortable">
   <thead>
     <tr>
-      <th></th>
-      <th>paperid</th>
+      <th class="sorttable_nosort"></th>
+      <th>paper number</th>
+      <th>paper id</th>
       <th>hotcrp</th>
       <th>status</th>
       <th>modified</th>
-      <th>email</th>
       <th>Title &amp; authors</th>
     </tr>
   </thead>
   <tbody id="paperList">
     {% for status in papers %}
+    <tr class="align-middle">
     <td>{% if status.status.name!='COPY_EDIT_ACCEPT' %}
       <form method="POST" action="{{url_for('admin_file.change_issue')}}">
         {{ bumpform.csrf_token }}
         {{ bumpform.nexturl(value=url_for('admin_file.view_issue', issueid=issue.id)) }}
         {{ bumpform.paperid(value=status.paperid) }}
-        {{ bumpform.submit(class_='btn btn-sm btn-warning',value='bump') }}
+        {{ bumpform.submit(class_='btn btn-sm btn-warning',value='bump', title='Remove from this issue') }}
       </form>
       {% endif %}
+    </td>
+    <td>
+      <form method="POST" action="{{url_for('admin_file.change_paperno')}}">
+        <span class="pe-2">{{status.paperno}}</span>
+        {{ papernoform.csrf_token }}
+        {{ papernoform.paperid(value=status.paperid) }}
+        {{ papernoform.issueid }}
+        {{ papernoform.upbutton(class_="btn btn-sm btn-outline-dark py-0 px-1 fs-5",title="decrease paperno") }}
+        {{ papernoform.downbutton(class_="btn btn-sm btn-outline-dark py-0 px-1 fs-5",title="increase paperno") }}
+      </form>
     </td>
     <td><a href="{{url_for('admin_file.show_admin_paper', paperid=status.paperid)}}">{{status.paperid}}</a></td>
     <td>{% if status.hotcrp == 'none' %}none{% else %}<a target="_blank" href="https://submit.iacr.org/{{status.hotcrp}}/paper/{{status.hotcrp_id}}">{{status.hotcrp}}/{{status.hotcrp_id}}</a>{% endif %}</td>
       <td class="status {{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
-      <td>{{status.email}}</td>
       <td>{{status.title}}<br><span class="fst-italic">{{status.authors}}</span></td>
     </tr>
     {% endfor %}
@@ -92,6 +93,18 @@
 {% endif %}
 </tbody>
 </table>
+{% if form %}
+<div class="d-flex">
+  <form class="my-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
+    {{form.submit(class_='btn btn-sm btn-success')}}
+    {{form.issue_id}}
+  </form>
+  <div class="ms-4 alert alert-info">
+    Once you publish the issue, any papers that are still unassigned or are later uploaded from hotcrp
+    cannot be added to this issue. They will have to be published in later issues.
+  </div>
+</div>
+{% endif %}
 {% if unassigned_papers %}
 <h4 class="mt-4">Unassigned papers</h4>
 <table class="table">
@@ -124,8 +137,6 @@
   </tbody>
 </table>
 {% endif %}
-<form class="mt-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
-</form>
 <script src="/js/sorttable.js"></script>
 </main>
 {% endblock %}

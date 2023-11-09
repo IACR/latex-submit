@@ -301,17 +301,12 @@ class MoreChangesForm(FlaskForm):
                                       ValidPaperId()])
     submit = SubmitField('Replace candidate version by final version')
 
-class PublishSubForm(Form):
-    paperid = HiddenField(name='paperid',
-                          validators=[InputRequired(),
-                                      ValidPaperId()])
-
 class PublishIssueForm(FlaskForm):
     """This is used by the admin to publish an issue for a journal."""
-    paperlist = FieldList(FormField(PublishSubForm),
-                          min_entries=1,
-                          validators=[InputRequired('List of papers is required')])
-    submit = SubmitField('Publish finished papers')
+    issueid = HiddenField(name='issueid',
+                          validators=[InputRequired(),
+                                      ValidPaperId()])
+    submit = SubmitField('Publish issue')
 
 class ChangeIssueForm(FlaskForm):
     """Used to change the issue for a paper."""
@@ -323,3 +318,10 @@ class ChangeIssueForm(FlaskForm):
     # nexturl is used for redirection.
     nexturl = HiddenField(name='nexturl', validators=[InputRequired()])
     submit = SubmitField(label='bump')
+
+class ChangePaperNumberForm(FlaskForm):
+    """Use to change the paperno on an issue."""
+    issueid = HiddenField(name='issueid', validators=[InputRequired()])
+    paperid = HiddenField(name='paperid', validators=[InputRequired()])
+    upbutton = SubmitField(name='up', label='⇑')
+    downbutton = SubmitField(name='down', label='⇓')

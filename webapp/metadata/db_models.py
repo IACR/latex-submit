@@ -156,6 +156,7 @@ class PaperStatus(Base):
                                                     nullable=True,
                                                     comment='May be changed if moved to another issue for the journal')
     issue: Mapped['Issue'] = relationship(back_populates='papers')
+    paperno: Mapped[int] = mapped_column(Integer, nullable=True, comment='Paper number within its issue')
     # This could use ON UPDATE CURRENT_TIMESTAMP, but that's mysql-specific. We could also try to use
     # sqlalchemy.event, but it's easy to just update it manually.
     lastmodified: Mapped[datetime] = mapped_column(DateTime(),

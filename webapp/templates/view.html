@@ -187,6 +187,8 @@ This template is used to show the status of a compilation for iacrcc.cls
             </ul>
             {% endif %}
           </div>
+          <h5 class="mt-3">Bibliography</h5>
+          <div class="elem" id="bibtex">{% if comp.bibtex %}<pre>{{comp.bibtex}}</pre>{% else %}<span class="text-danger">None</span>{% endif %}</div>
         </div>
         <div class="tab-pane fade show p-3" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
           {% if not comp.meta %}
@@ -240,8 +242,6 @@ This template is used to show the status of a compilation for iacrcc.cls
               </div>
               {% endfor %}
             </div>
-            <h5 class="mt-3">Bibliography</h5>
-            <div class="elem" id="bibtex">{% if comp.bibtex %}<pre>{{comp.bibtex}}</pre>{% else %}<span class="text-danger">None</span>{% endif %}</div>
             <table class="table ms-3 mt-2 table-bordered">
               <tbody>
                 <tr>
@@ -261,11 +261,12 @@ This template is used to show the status of a compilation for iacrcc.cls
             <div class="elem" id="status"><div class="elem_title">status:</div> {{comp.status.value}}</div>
             {#  <div class="elem" id="exit_code"><div class="elem_title">exit code:</div> {{comp.exit_code}}</div>#}
             <div class="elem" id="email"><div class="elem_title">email:</div> {{comp.email}}</div>
+            <div class="elem" id="bibtex"><div class="elem_title">BibTeX:</div>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</div>
             <div class="elem" id="submitted"><div class="elem_title">submitted:</div> {{comp.submitted}}</div>
             <div class="elem" id="accepted"><div class="elem_title">accepted:</div> {{comp.accepted}}</div>
             <div class="elem" id="compiled"><div class="elem_title">compiled:</div> {{comp.compiled}}</div>
             <div class="elem" id="compile_time"><div class="elem_title">compile_time:</div> {{comp.compile_time}} seconds</div>
-            <div class="elem" id="doi"><div class="elem_title">DOI:</div> {{comp.meta.doi}}</div>
+            <div class="elem" id="doi"><div class="elem_title">DOI:</div> {{comp.meta.DOI}}</div>
             <div class="elem" id="zipfile"><div class="elem_title">zip filename:</div> {{comp.zipfilename}}</div>
           </div>
           {% if form %}

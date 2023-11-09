@@ -167,6 +167,11 @@ def submit_version():
     # happens on the first upload of each version.
     send_mail = False
     if not paper_status:
+        papernum = db.session.execute(select(func.max(PaperStatus.paperno)).where(PaperStatus.issue_id==issue.id)).scalar_one_or_none()
+        if papernum is None:
+            papernum = 1
+        else:
+            papernum += 1
         paper_status = PaperStatus(paperid=paperid,
                                    hotcrp=hotcrp,
                                    hotcrp_id=hotcrp_id,
@@ -177,6 +182,7 @@ def submit_version():
                                    volume_key=args.get('volume'),
                                    issue_key=args.get('issue'),
                                    issue_id=issue.id,
+                                   paperno=papernum,
                                    status=PaperStatusEnum.PENDING.value)
         db.session.add(paper_status)
         db.session.commit()
@@ -219,13 +225,13 @@ def submit_version():
         logging.error('Unable to save zip file: {}'.format(str(e)))
         form.zipfile.errors.append('unable to save zip file')
         return render_template('submit.html', form=form)
-    # remove __MACOSX and .DS_Store detritus created from an apple filesystem.
     try:
         allzip= zipfile.ZipFile(zip_path, 'w')
         with zipfile.ZipFile(tmpzip_path, 'r') as tmpzip:
             for item in tmpzip.infolist():
                 buffer = tmpzip.read(item.filename)
                 filename = str(item.filename)
+                # remove __MACOSX and .DS_Store detritus created from an apple filesystem.
                 if filename != '__MACOSX' and filename != '.DS_Store':
                     allzip.writestr(item, buffer)
         allzip.close()
@@ -288,13 +294,16 @@ def submit_version():
     receivedDate = datetime.datetime.strptime(submitted[:10],'%Y-%m-%d')
     acceptedDate = datetime.datetime.strptime(accepted[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
-    metadata = '\\def\\IACR@DOI{' + get_doi(journal.DOI_PREFIX, paperid) + '}\n'
-    metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
+    doi = get_doi(journal.DOI_PREFIX, paperid)
+    metadata = '\\def\\IACR@DOI{' + doi + '}\n'
+    if journal.EISSN:
+        metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
-    metadata += '\\setvolume{' + paper_status.issue.volume.name + '}\n'
-    metadata += '\\setnumber{' + paper_status.issue.name + '}\n'
+    if paper_status.issue:
+        metadata += '\\setvolume{' + paper_status.issue.volume.name + '}\n'
+        metadata += '\\setnumber{' + paper_status.issue.name + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
@@ -307,6 +316,7 @@ def submit_version():
                                            command,
                                            str(version_dir.absolute()),
                                            paperid,
+                                           doi,
                                            version,
                                            task_key)
     paper_url = url_for('home_bp.view_results',
@@ -442,6 +452,7 @@ def compile_for_copyedit():
                                            command,
                                            str(copyedit_dir.absolute()),
                                            paperid,
+                                           version_compilation.meta.DOI,
                                            Version.COPYEDIT.value,
                                            task_key)
     status_url = url_for('home_bp.get_status',
@@ -677,6 +688,8 @@ def get_status(paperid, version, auth):
         status == TaskStatus.CANCELLED or
         status == TaskStatus.FAILED_EXCEPTION):
         task_queue.pop(task_key, None)
+    if 'next' in args: # this allows us to override the redirect target.
+        paper_url = args.get('next')
     return jsonify({'url': paper_url,
                     'status': status.value,
                     'msg': msg}), 200
@@ -947,3 +960,7 @@ def get_results():
                                locationq=args.get('locationq'),
                                source=args.get('source'),
                                app=app))
+
+@home_bp.route('/about', methods=['GET'])
+def about():
+    return render_template('about.html', title='About this site')
