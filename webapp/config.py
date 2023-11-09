@@ -25,6 +25,7 @@ class Config:
     USERS = None
     TESTING = False
     WTF_CSRF_TIME_LIMIT = None
+    EXPORT_PATH = '/tmp'
     JOURNALS = [
         {
             'hotcrp_key': 'cic',
@@ -62,6 +63,7 @@ class ProdConfig(Config):
     XAPIAN_DB_PATH = '/var/www/wsgi/latex-submit/webapp/fundreg/xapian.db'
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     RATELIMIT_STORAGE_URI = 'memcached://localhost:11211'
+    EXPORT_PATH = '/var/www/wsgi/cicjournal/archive'
     
 class DebugConfig(Config):
     FLASK_ENV = 'development'
