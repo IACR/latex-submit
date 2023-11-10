@@ -10,7 +10,7 @@
   <div class="col-6">
     <h2 class="mb-2 text-center">{{title}}</h2>
     <p>
-      This is a view of all papers for the issue in {{journal.name}}.
+      This is a view of all papers for the issue in <a href="{{url_for('admin_file.view_journal', jid=journal.id)}}">{{journal.name}}</a>.
       By default papers are assigned a paper number in the order they are uploaded. You can reorder them using the buttons below, but they cannot
       be changed once the issue is published.
     </p>
@@ -96,8 +96,9 @@
 {% if form %}
 <div class="d-flex">
   <form class="my-3" action="{{url_for('admin_file.publish_issue')}}" METHOD="POST">
-    {{form.submit(class_='btn btn-sm btn-success')}}
-    {{form.issue_id}}
+    {{ form.csrf_token }}
+    {{ form.submit(class_='btn btn-sm btn-success') }}
+    {{ form.issueid(issueid=id) }}
   </form>
   <div class="ms-4 alert alert-info">
     Once you publish the issue, any papers that are still unassigned or are later uploaded from hotcrp
