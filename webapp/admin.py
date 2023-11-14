@@ -2,6 +2,7 @@
 admin_required decorator on them. All routes should start with /admin."""
 from datetime import datetime, date
 from difflib import HtmlDiff
+from .export import export_issue
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from sqlalchemy import select, or_, and_
@@ -10,6 +11,7 @@ from flask_login import login_required, current_user
 from flask_mail import Message
 import hashlib, hmac
 import json
+import logging
 import os
 from pathlib import Path
 import time
@@ -612,10 +614,25 @@ def comment():
 def publish_issue():
     form = PublishIssueForm()
     if not form.validate_on_submit():
+        for key, value in form.errors.items():
+            logging.warning('PublishIssueForm: {}:{}:{} is invalid'.format(form.issueid.datapaperid.data,
+                                                                           key,
+                                                                           str(value)))
         return admin_message('Invalid form submission. This is a bug.')
-    # TODO: Finish this. We should export the archive, set the papers to published, and set the published date
-    # on the issue.
-    return admin_message('The form was validated. We still need to finish the push to cic.iacr.org')
+    issueid = form.issueid.data
+    issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
+    if not issue:
+        return admin_message('Nonexistent issue')
+    try:
+        export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
+        logging.info('Issue was exported {} to {}'.format(issue.name,
+                                                          str(app.config['EXPORT_PATH'])))
+    except Exception as e:
+        msg = 'Failure to export issue {}: {}'.format(issue.name, str(e))
+        logging.warning(msg)
+        return admin_message(msg)
+    flash('Issue was exported')
+    return redirect(url_for('admin_file.view_issue', issueid=issue.id))
 
 @admin_bp.route('/admin/change_issue', methods=['POST'])
 @login_required
@@ -733,7 +750,7 @@ def change_paperno():
     form = ChangePaperNumberForm()
     if not form.validate_on_submit():
         for key, value in form.errors.items():
-            log_event(db, form.paperid.data, 'paperno error: {}:{}'.format(key, value))
+            log_event(db, form.paperid.data, 'paperno error: {}:{}'.format(key, str(value)))
         flash('Invalid values')
         return admin_message('Invalid form submission. This is a bug.')
     paperid = form.paperid.data

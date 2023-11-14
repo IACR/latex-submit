@@ -545,12 +545,29 @@ in the [github for cic](https://github.com/IACR/cicjournal).
 
 This omits some information from publish.iacr.org such as the copyedit information.
 
-### Export for OJS
+### Export and import for OJS
 
-(This is currently not implemented, so it's just a draft plan).
+There are potentially three ways to do this:
+1. have this server export in a native format. OJS has a native import/export plugin, but it
+   is poorly documented and the schema changes from one version to another. For example,
+   you cannot export from OJS 3.2 and import into 3.3. The OJS team has advised against
+   using this as an import method.
+2. We could write a different import plugin, but I am unable to locate any template that is
+   usable for writing an import template and it would have the same schema problem across different
+   versions of OJS as their database schema changes.  The "quickSubmit" plugin might come closest,
+   since it provides a form for each new submission.
+3. The OJS team [recommended][appears](https://github.com/pkp/pkp-lib/issues/7898)
+   using their REST API to import data into OJS. This is weakly
+   documented and changes from one version of OJS to another. Since the papers don't start
+   out in OJS, we would have to create completely new submissions and publications that
+   would bypass the review process.
 
-If the journal site is OJS then we should probably use their native
-import XML format, which has a schema that changes with every release
+It's not clear if ToSC or TCHES would use any of these.
+
+#### The native import/export plugin.
+
+At first glance, it appears that if the journal site is OJS then we should probably use
+their native import XML format, which has a schema that changes with every release
 [native.xsd](https://github.com/pkp/ojs/blob/main/plugins/importexport/native/native.xsd)
 that in turn depends upon another
 [pkp-native.xsd](https://github.com/pkp/pkp-lib/blob/main/plugins/importexport/native/pkp-native.xsd)

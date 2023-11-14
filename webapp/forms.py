@@ -304,9 +304,8 @@ class MoreChangesForm(FlaskForm):
 class PublishIssueForm(FlaskForm):
     """This is used by the admin to publish an issue for a journal."""
     issueid = HiddenField(name='issueid',
-                          validators=[InputRequired(),
-                                      ValidPaperId()])
-    submit = SubmitField('Publish issue')
+                          validators=[InputRequired()])
+    submit = SubmitField('Export issue for publishing')
 
 class ChangeIssueForm(FlaskForm):
     """Used to change the issue for a paper."""

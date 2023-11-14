@@ -4,10 +4,17 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 import xmlschema
 from pybtex.database import parse_string, Entry
-from compilation import Compilation, Meta
+try:
+    from .compilation import Compilation, Meta
+except Exception as e:
+    from compilation import Compilation, Meta
+    
 import country_converter as coco
 import sys
-from db_models import Journal
+try:
+    from .db_models import Journal
+except Exception as e:
+    from db_models import Journal
 
 # because of typing hints.
 assert sys.version_info >= (3,9)
@@ -155,8 +162,7 @@ def _add_crossref_citation(index: int, citation_list: ET.Element, entry: Entry):
     if 'title' in entry.fields:
         ET.SubElement(citation, 'article_title').text = entry.fields['title']
 
-def get_jats(comp: Compilation) -> ET.Element:
-    meta = comp.meta
+def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.Element:
     article = ET.Element('article', attrib={
         'xmlns:mml': 'http://www.w3.org/1998/Math/MathML',
         'xmlns:xlink': 'http://www.w3.org/1999/xlink',
@@ -166,25 +172,39 @@ def get_jats(comp: Compilation) -> ET.Element:
         'xml:lang': 'en'})
     front = ET.SubElement(article, 'front')
     journal_meta = ET.SubElement(front, 'journal-meta')
-    ET.SubElement(journal_meta, 'journal-id', attrib={'journal-id-type': 'doi'}).text = '10.1234.5678'
-    ET.SubElement(journal_meta, 'journal-id', attrib={'journal-id-type': 'publisher'}).text = 'IACR CiC'
-    ET.SubElement(ET.SubElement(journal_meta, 'journal-title-group'),
-                  'abbrev-journal-title').text = 'IACR Communications in Cryptology'
-    ET.SubElement(journal_meta, 'issn', attrib={'publication-format': 'electronic'}).text = '1234.abcd'
-    ET.SubElement(ET.SubElement(journal_meta, 'publisher'), 'publisher-name').text = 'International Association for Cryptologic Research'
+    if journal.EISSN:
+        ET.SubElement(journal_meta, 'journal-id', attrib={'journal-id-type': 'issn'}).text = journal.EISSN
+    journal_title_group = ET.SubElement(journal_meta, 'journal-title-group')
+    ET.SubElement(journal_title_group, 'journal-title').text = journal.name
+    ET.SubElement(journal_title_group, 'abbrev-journal-title').text = journal.acronym
+    if journal.EISSN:
+        ET.SubElement(journal_meta, 'issn', attrib={'publication-format': 'electronic'}).text = journal.EISSN
+    ET.SubElement(ET.SubElement(journal_meta, 'publisher'), 'publisher-name').text = journal.publisher
+    meta = comp.meta
     article_meta = ET.SubElement(front, 'article-meta')
-    ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'publisher-id'}).text = '2022/197'
-    ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'doi'}).text = '10.1233-23423'
+    ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'publisher-id'}).text = public_paper_id
+    ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'doi'}).text = meta.DOI
     title_group = ET.SubElement(article_meta, 'title-group')
     ET.SubElement(title_group, 'article-title').text = meta.title
     if meta.subtitle:
         ET.SubElement(title_group, 'subtitle').text = meta.subtitle
     cg_elem = ET.SubElement(article_meta, 'contrib-group')
+    for author in meta.authors:
+        a_elem = ET.SubElement(cg_elem, 'contrib', attrib={'contrib-type': 'author'})
+        if author.orcid:
+            ET.SubElement(a_elem, 'contrib-id', attrib={'contrib-id-type': 'orcid',
+                                                        'authenticated': 'false'}).text = 'https://orcid.org/' + author.orcid
+        ET.SubElement(a_elem, 'string-name').text = author.name
+        for i in author.affiliations:
+            ET.SubElement(a_elem, 'xref', attrib={'ref-type': 'aff', 'rid': 'aff{}'.format(i)})
     for i in range(len(meta.affiliations)):
         aff = meta.affiliations[i]
         aff_elem = ET.SubElement(article_meta, 'aff', attrib={'id': 'aff{}'.format(i+1)})
         inst_wrap = ET.SubElement(aff_elem, 'institution-wrap')
-        ET.SubElement(inst_wrap, 'institution').text = aff.name
+        if aff.department:
+            ET.SubElement(inst_wrap, 'institution').text = '{}, {}'.format(aff.department, aff.name)
+        else:
+            ET.SubElement(inst_wrap, 'institution').text = aff.name
         if aff.ror:
             ET.SubElement(inst_wrap, 'institution-id', attrib={'institution-id-type': 'ror'}).text = 'https://ror.org/' + aff.ror
         if aff.street:
@@ -200,14 +220,6 @@ def get_jats(comp: Compilation) -> ET.Element:
         if aff.postcode:
             ET.SubElement(aff_elem, 'postal-code').text = aff.postcode
             
-    for author in meta.authors:
-        a_elem = ET.SubElement(cg_elem, 'contrib', attrib={'contrib-type': 'author'})
-        if author.orcid:
-            ET.SubElement(a_elem, 'contrib-id', attrib={'contrib-id-type': 'orcid',
-                                                        'authenticated': 'false'}).text = 'https://orcid.org/' + author.orcid
-        ET.SubElement(a_elem, 'string-name').text = author.name
-        for i in author.affiliations:
-            ET.SubElement(a_elem, 'xref', attrib={'ref-type': 'aff', 'rid': 'aff{}'.format(i)})
     permissions = ET.SubElement(article_meta, 'permissions')
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})
@@ -375,7 +387,13 @@ if __name__ == '__main__':
     json_file = Path('tests/testdata/xml/compilation1.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     compilation.meta.URL = 'https://example.com/thepaper'
-    article = get_jats(compilation)
+    journal = Journal({'EISSN': '1234-5678',
+                       'hotcrp_key': 'testkey',
+                       'acronym': 'TJ',
+                       'name': 'Test Journal',
+                       'publisher': 'Society of Nonsense',
+                       'DOI_PREFIX': '10.1729'})
+    article = get_jats(journal, '17/5', compilation)
     #article = ET.parse('bmj_sample.xml').getroot()
     ET.indent(article, space='  ', level=1)
     #article_str = ET.tostring(article, encoding='utf-8', xml_declaration=True).decode('utf-8')
@@ -402,11 +420,6 @@ if __name__ == '__main__':
     except Exception as e:
         print('error in jats:' + str(e))
         print(schema.error_log)
-    journal = Journal({'EISSN': '1234-5678',
-                       'hotcrp_key': 'testkey',
-                       'acronym': 'TJ',
-                       'name': 'Test Journal',
-                       'DOI_PREFIX': '10.1729'})
     crossref = get_crossref('testbatch',
                             'International Association for Cryptologic Research',
                             'crossref@iacr.org',

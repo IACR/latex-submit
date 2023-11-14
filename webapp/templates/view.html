@@ -187,8 +187,13 @@ This template is used to show the status of a compilation for iacrcc.cls
             </ul>
             {% endif %}
           </div>
-          <h5 class="mt-3">Bibliography</h5>
-          <div class="elem" id="bibtex">{% if comp.bibtex %}<pre>{{comp.bibtex}}</pre>{% else %}<span class="text-danger">None</span>{% endif %}</div>
+          {% if comp.bibtex %}
+          <h5 class="mt-3">Extracted Bibliography</h5>
+          <p>Note: citations from cryptobib are not currently extracted</p>
+          <pre>{{comp.bibtex}}</pre>
+          {% else %}
+          <h5 class="mt-3 text-danger">No bibliography extracted</h5>
+          {% endif %}
         </div>
         <div class="tab-pane fade show p-3" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
           {% if not comp.meta %}

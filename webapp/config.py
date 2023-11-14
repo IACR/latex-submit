@@ -31,13 +31,15 @@ class Config:
             'hotcrp_key': 'cic',
             'acronym': 'CiC',
             'name': 'IACR Communications in Cryptology',
-            'EISSN': '',
+            'publisher': 'International Association for Cryptologic Research',
+            'EISSN': None,
             'DOI_PREFIX': '10.1729'
         },
         {
             'hotcrp_key': 'tosc',
             'acronym': 'TOSC',
             'name': 'IACR Transactions on Symmetric Cryptology',
+            'publisher': 'International Association for Cryptologic Research',
             'EISSN': '2519-173X',
             'DOI_PREFIX': '10.46586'
         },
@@ -45,6 +47,7 @@ class Config:
             'hotcrp_key': 'tches',
             'acronym': 'TCHES',
             'name': 'IACR Transactions on Cryptographic Hardware and Embedded Systems',
+            'publisher': 'International Association for Cryptologic Research',
             'EISSN': '2569-2925',
             'DOI_PREFIX': '10.45686'
         },
@@ -52,6 +55,7 @@ class Config:
             'hotcrp_key': 'lncs',
             'acronym': 'LNCS',
             'name': 'Springer Lecture Notes in Computer Science',
+            'publisher': 'Springer',
             'EISSN': '1611-3349',
             'DOI_PREFIX': '10.1007'
         },

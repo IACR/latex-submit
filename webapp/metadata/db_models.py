@@ -188,13 +188,16 @@ class Journal(Base):
                                             comment='What the journal is known by in hotcrp')
     acronym: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(Text)
-    EISSN: Mapped[str] = mapped_column(String(10), nullable=False)
+    publisher: Mapped[str] = mapped_column(Text, nullable=False)
+    EISSN: Mapped[str] = mapped_column(String(10), nullable=True)
     DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
     volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
     def __init__(self, data):
-        self.EISSN = data['EISSN']
+        if 'EISSN' in data:
+            self.EISSN = data['EISSN']
         self.hotcrp_key = data['hotcrp_key']
         self.acronym = data['acronym']
+        self.publisher = data['publisher']
         self.name = data['name']
         self.DOI_PREFIX = data['DOI_PREFIX']
 
