@@ -2,7 +2,10 @@
 admin_required decorator on them. All routes should start with /admin."""
 from datetime import datetime, date
 from difflib import HtmlDiff
-from .export import export_issue
+try:
+    from .export import export_issue
+except Exception as e:
+    from export import export_issue
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from sqlalchemy import select, or_, and_
@@ -350,6 +353,8 @@ def view_issue(issueid):
             # go through the hotcrp papers and remove any that already have a PaperStatus in papers.
             paperids = set()
             for p in papers:
+                paperids.add(p.paperid)
+            for p in unassigned_papers:
                 paperids.add(p.paperid)
             accepted = hotcrp_papers.get('acceptedPapers')
             for p in accepted[:]: # loop over a copy of accepted
