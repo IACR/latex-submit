@@ -9,7 +9,10 @@ try:
 except Exception as e:
     from compilation import Compilation, Meta
     
-import country_converter as coco
+try:
+    from .countries import country_lookup
+except Exception as e:
+    from countries import country_lookup
 import sys
 try:
     from .db_models import Journal
@@ -214,7 +217,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
         if aff.country:
             country = ET.SubElement(aff_elem, 'country')
             country.text = aff.country
-            iso = coco.convert([aff.country], to='ISO2')
+            iso = country_lookup(aff.country)
             if iso:
                 country.set('country', iso)
         if aff.postcode:
@@ -237,7 +240,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
             award_group = ET.SubElement(funding_group, 'award-group')
             funding_source = ET.SubElement(award_group, 'funding-source')
             if funder.country:
-                iso = coco.convert([funder.country], to='ISO2')
+                iso = country_lookup(funder.country)
                 if iso:
                     funding_source.set('country', iso)
                 else:
