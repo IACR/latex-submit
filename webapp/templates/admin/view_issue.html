@@ -75,7 +75,8 @@
     </tr>
     {% endfor %}
 {% if hotcrp %}
-{% for p in hotcrp.acceptedPapers %}
+    <tr><td></td><td colspan="6"><strong>Unsubmitted papers</strong></td></tr>
+    {% for p in hotcrp.acceptedPapers %}
     <tr>
       <td></td>
       <td></td>
