@@ -36,7 +36,8 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue):
     volume = issue.volume
     issuedata = {'issue': issue.name,
                  'volume': volume.name,
-                 'year': datetime.now().year}
+                 'year': datetime.now().year,
+                 'papers': len(issue.papers)}
     if issue.description:
         issuedata['title'] = issue.description
     filename = '{}_{}.zip'.format(volume.name, issue.name)
@@ -55,16 +56,15 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue):
         latex_zip_file = paper_path / Path('all.zip')
         if not latex_zip_file.is_file():
             raise ValueError('missing all.zip file {}'.format(str(latex_zip_file)))
-        zip_file.write(str(pdf_file), arcname='papers/{}/main.pdf'.format(paperstatus.paperno))
-#        zip_file.write(str(json_file), arcname='papers/{}/compilation.json'.format(paperstatus.paperno))
-        zip_file.write(str(latex_zip_file), arcname='papers/{}/latex.zip'.format(paperstatus.paperno))
+        zip_file.write(str(pdf_file), arcname='{}/main.pdf'.format(paperstatus.paperno))
+        zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
         jats_elem = get_jats(issue.volume.journal, '{}/{}/{}'.format(issue.volume.name,
                                                                      issue.name,
                                                                      paperstatus.paperno), comp)
         ET.indent(jats_elem, space='  ', level=0)
         jats_str = ET.tostring(jats_elem, encoding='utf-8').decode('utf-8')
-        zip_file.writestr('papers/{}/jats.xml'.format(paperstatus.paperno), jats_str)
+        zip_file.writestr('{}/jats.xml'.format(paperstatus.paperno), jats_str)
         meta_data = comp.model_dump(exclude={'venue',
                                              'status',
                                              'exit_code',
@@ -74,7 +74,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue):
                                              'warning_log'})
         meta_data['compiled'] = meta_data['compiled'].strftime('%Y-%m-%d %H:%M:%S')
         meta_data['published'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        zip_file.writestr('papers/{}/meta.json'.format(paperstatus.paperno),
+        zip_file.writestr('{}/meta.json'.format(paperstatus.paperno),
                           json.dumps(meta_data, indent=2))
     zip_file.close()
 
