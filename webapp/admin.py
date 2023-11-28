@@ -629,12 +629,15 @@ def publish_issue():
     if not issue:
         return admin_message('Nonexistent issue')
     try:
-        export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
+        now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
         logging.info('Issue was exported {} to {}'.format(issue.name,
                                                           str(app.config['EXPORT_PATH'])))
+        issue.exported = now
+        db.session.add(issue)
+        db.session.commit()
     except Exception as e:
         msg = 'Failure to export issue {}: {}'.format(issue.name, str(e))
-        logging.warning(msg)
+        logging.critical(msg)
         return admin_message(msg)
     flash('Issue was exported')
     return redirect(url_for('admin_file.view_issue', issueid=issue.id))

@@ -1,7 +1,7 @@
 """This is for exporting a bundle of papers for an issue. The format consists of a zip file with
 three components:
 1. a file issue.json that contains metadata.
-2. a subdirectory 'papers' that directories named by the paperid.
+2. a subdirectory named `paperno` for each paper.
 3. within each subdirectory it contains main.pdf, compilation.json, jats.xml, and all.zip
    with the LaTeX sources.
 
@@ -25,25 +25,41 @@ from xml.etree import ElementTree as ET
 import zipfile
 from .metadata.compilation import Compilation
 from .metadata.xml_meta import get_jats
+from . import db
 
 try:
     from .metadata.db_models import Issue, PaperStatusEnum, Version
 except Exception as e:
     from metadata.db_models import Issue, PaperStatusEnum, Version
 
-def export_issue(data_path: Path, output_path: Path, issue: Issue):
+def _datetime_serialize(obj):
+    if isinstance(obj, datetime):
+        return obj.strftime('%Y-%m-%d %H-%M-%S')
+    raise TypeError('Type {} is not serializable'.format(str(type(obj))))
+
+def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
     """data_path is the DATA_DIR from app.config"""
     volume = issue.volume
-    issuedata = {'issue': issue.name,
-                 'volume': volume.name,
-                 'year': datetime.now().year,
-                 'papers': len(issue.papers)}
+    now = datetime.now()
+    issuedata = {'exported': now,
+                 'issue_name': issue.name,
+                 'volume_name': volume.name,
+                 'year': now.year,
+                 'paper_numbers': {}}
+    if issue.hotcrp:
+        issuedata['hotcrp'] = issue.hotcrp
+    if issue.description:
+        issuedata['issue_description'] = issue.description
+    # This assumes that all papers associated with the issue are ready to be published
+    for paperstatus in issue.papers:
+        if paperstatus.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
+            issuedata['paper_numbers'][paperstatus.paperid] = paperstatus.paperno
     if issue.description:
         issuedata['title'] = issue.description
     filename = '{}_{}.zip'.format(volume.name, issue.name)
     zip_path = output_path / Path(filename)
     zip_file = zipfile.ZipFile(zip_path, 'w')
-    zip_file.writestr('issue.json', json.dumps(issuedata, indent=2))
+    zip_file.writestr('issue.json', json.dumps(issuedata, indent=2, default=_datetime_serialize))
     # This assumes that all papers associated with the issue are ready to be published
     for paperstatus in issue.papers:
         paper_path = data_path / Path(paperstatus.paperid) / Path(Version.FINAL.value)
@@ -59,24 +75,25 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue):
         zip_file.write(str(pdf_file), arcname='{}/main.pdf'.format(paperstatus.paperno))
         zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+        # Remove some fields from the compilation.
+        data = comp.model_dump(exclude={'email': True,
+                                        'status': True,
+                                        'exit_code': True,
+                                        'error_log': True,
+                                        'warning_log': True,
+                                        'zipfilename': True,
+                                        'output_files': True,
+                                        'meta': {'version': True}})
+        zip_file.writestr('{}/meta.json'.format(paperstatus.paperno),
+                          json.dumps(data, indent=2, default=_datetime_serialize))
         jats_elem = get_jats(issue.volume.journal, '{}/{}/{}'.format(issue.volume.name,
                                                                      issue.name,
                                                                      paperstatus.paperno), comp)
         ET.indent(jats_elem, space='  ', level=0)
         jats_str = ET.tostring(jats_elem, encoding='utf-8').decode('utf-8')
         zip_file.writestr('{}/jats.xml'.format(paperstatus.paperno), jats_str)
-        meta_data = comp.model_dump(exclude={'venue',
-                                             'status',
-                                             'exit_code',
-                                             'zipfilename',
-                                             'output_files',
-                                             'error_log',
-                                             'warning_log'})
-        meta_data['compiled'] = meta_data['compiled'].strftime('%Y-%m-%d %H:%M:%S')
-        meta_data['published'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        zip_file.writestr('{}/meta.json'.format(paperstatus.paperno),
-                          json.dumps(meta_data, indent=2))
     zip_file.close()
+    return now
 
 if __name__ == '__main__':
     """This is just for testing."""

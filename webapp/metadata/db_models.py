@@ -205,33 +205,32 @@ class Volume(Base):
     __tablename__ = 'volume'
     __table_args__ = (UniqueConstraint('journal_id', 'name', name='journal_volume_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(32),
+    name: Mapped[int] = mapped_column(Integer,
                                       comment='Usually the year or a number. Should match value in hotcrp instance.')
     journal_id: Mapped[int] = mapped_column(ForeignKey('journal.id', ondelete='CASCADE'), nullable=False)
     journal: Mapped['Journal'] = relationship(back_populates='volumes')
     issues: Mapped[List['Issue']] = relationship(back_populates='volume', cascade='all, delete-orphan')
 
-# Each hotcrp instance corresponds to an issue. An issue may be
-# created by uploading the first paper from the hotcrp instance.
-# In any event the hotcrp value
-# should be the hotcrp shortName value so we can show pending papers
-# for the issue.
+# Each hotcrp instance corresponds to an issue. An issue is created by
+# uploading the first paper from the hotcrp instance.  In any event
+# the hotcrp value should be the hotcrp shortName value so we can show
+# pending papers for the issue.
 
 class Issue(Base):
     __tablename__ = 'issue'
     __table_args__ = (UniqueConstraint('volume_id', 'name', name='volume_issue_ind'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    published: Mapped[Optional[datetime]] = mapped_column(DateTime(),
-                                                          default=None,
-                                                          comment='When an issue is published')
+    exported: Mapped[Optional[datetime]] = mapped_column(DateTime(),
+                                                         default=None,
+                                                         comment='When an issue is exported')
     hotcrp: Mapped[Optional[str]] = mapped_column(String(32),
                                                   default=None,
                                                   comment=('The shortName of the hotcrp instance this issue is matched to. '
                                                  'Each issue corresponds to a hotcrp instance, but other papers may '
                                                  'be added to the issue. This value should not be changed.'))
-    name: Mapped[str] = mapped_column(String(32),
-                                      comment=('Usually number, e.g., 2. Starts off as value from hotcrp.'
-                                               'If this is changed then papers uploaded from the hotcrp instance '
+    name: Mapped[int] = mapped_column(Integer,
+                                      comment=('Issues are numbered starting at 1 within a volume. If this is '
+                                               'changed then papers uploaded from the hotcrp instance '
                                                'will create a new issue with the name in hotcrp.'))
     volume_id: Mapped[int] = mapped_column(ForeignKey('volume.id', ondelete='cascade'), nullable=False)
     volume: Mapped['Volume'] = relationship(back_populates='issues')

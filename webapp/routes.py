@@ -50,8 +50,8 @@ def show_submit_version():
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        form.volume.data = 'test'
-        form.issue.data = 'test'
+        form.volume.data = 9999
+        form.issue.data = 4
         form.hotcrp.data = NO_HOTCRP
         form.hotcrp_id.data = NO_HOTCRP
         form.journal.data = 'cic'
@@ -302,8 +302,8 @@ def submit_version():
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
     if paper_status.issue:
-        metadata += '\\setvolume{' + paper_status.issue.volume.name + '}\n'
-        metadata += '\\setnumber{' + paper_status.issue.name + '}\n'
+        metadata += '\\setvolume{' + str(paper_status.issue.volume.name) + '}\n'
+        metadata += '\\setnumber{' + str(paper_status.issue.name) + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
@@ -874,13 +874,15 @@ def download_output_zipfile(version, paperid):
         return render_template('message.html',
                                title='Invalid version',
                                error='Invalid version')
-    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+    paper_dir = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version)
     output_dir =  paper_dir / Path('output')
-    subdir_offset = len(str(paper_dir)) + 1
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
-        for f in output_dir.glob('**/*'):
-            zf.write(f, arcname=str(f)[subdir_offset:])
+        for root, dirs, files in os.walk(output_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                archive_path = os.path.relpath(file_path, output_dir)
+                zf.write(file_path, archive_path)
     memory_file.seek(0)
     return send_file(memory_file, download_name='output.zip', as_attachment=True)
 

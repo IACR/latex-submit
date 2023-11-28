@@ -534,13 +534,14 @@ in the [github for cic](https://github.com/IACR/cicjournal).
 
 1. each issue consists of a zip file.
 2. within the zip file, there is a file called `issue.json` that contains volume number,
-   issue number, year, and an optional title field for the issue (e.g.,
-   "Special Issue on Information Theory"). It also contains the paper numbers to indicate
-   the order of papers in the issue.
-3. There is also a subdirectory `papers` that contains a subdirectory for each paper.
-4. within the subdirectory for a paper, there are three items:
-    - `compilation.json` with article metadata.
+   export date, issue number, year, hotcrp shortName, and an optional description field for
+   the issue (e.g., "Special Issue on Information Theory"). It also contains the paper
+   numbers to indicate the order of papers in the issue.
+3. For each paper there is a subdirectory for that paper named by the `paperno`.
+4. within the subdirectory for a paper, there are four items:
+    - `meta.json` with article metadata that is a stripped-down version of `Compilation`.
     - `main.pdf`
+    - `jats.xmp` with metadata in JATS format.
     - `main.zip` with all LaTeX sources.
 
 This omits some information from publish.iacr.org such as the copyedit information.
