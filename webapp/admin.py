@@ -343,10 +343,10 @@ def view_issue(issueid):
         if hotcrp_papers['error']:
             flash(hotcrp_papers['error'])
     else:
-        if hotcrp_papers['issue'] != issue.name:
+        if hotcrp_papers['issue'] != str(issue.name):
             flash('Mismatch in hotcrp key: {}/{}'.format(hotcrp_papers['issue'],
                                                          issue.name))
-        elif hotcrp_papers['volume'] != issue.volume.name:
+        elif hotcrp_papers['volume'] != str(issue.volume.name):
             flash('Mismatch in volume hotcrp_key: {}/{}'.format(hotcrp_papers['volume'],
                                                                 issue.volume.name))
         else:
