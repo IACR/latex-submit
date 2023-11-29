@@ -30,8 +30,9 @@ This template is used to show the status of a compilation for iacrcc.cls
    "{{f}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=f)}}",
    {% endfor %}
  };
+ var allSources = "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth)}}";
  </script>
- <script src="/js/nav.js"></script>
+ <script src="/js/nav.js?v=2"></script>
  {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
@@ -177,14 +178,14 @@ This template is used to show the status of a compilation for iacrcc.cls
         </div>
         {% endif %}
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
-          <div class="ms-3">
+          <p><a href="/output/{{paperid}}/{{version}}">Download zip file of all sources</a> (Note: some files below may have been removed before compiling)</p>
+          <div class="ms-3" id="sourcefile">
             {% if comp.output_files %}
-            Output files from running latexmk: (<a href="/output/{{paperid}}/{{version}}">download zip file</a>)
-            <ul>
+            <ol>
               {% for f in comp.output_files %}
-              <li>{{f}}</li>
+              <li><span class="lognav" data-filepath="{{f}}" onclick="showSource(this)">{{f}}</span></li>
               {% endfor %}
-            </ul>
+            </ol>
             {% endif %}
           </div>
           {% if comp.bibtex %}

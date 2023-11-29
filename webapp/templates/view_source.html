@@ -2,10 +2,12 @@
    all source files. It is fetched via an ajax call.
 #}
 {% if input_files %}
-<div class="px-5 py-3">
+<div class="py-3">
+  <ol>
   {% for f in input_files %}
-  <span data-filepath="{{f}}" onclick="showSource(this)" class="lognav" title="Show source file">{{f}}</span><br>
+  <li title="Show source file"><span class="lognav" data-filepath="{{f}}" onclick="showSource(this)">{{f}}</span></li>
   {% endfor %}
+  </ol>
 </div>
 {% else %}
 <span data-filepath="" onclick="showSource(this)" class="lognav" title="Show all source files">Show all source files</span>

@@ -841,13 +841,11 @@ def view_source(paperid, version, auth):
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version)
-    input_dir = paper_dir / Path('input')
+    input_dir = paper_dir / Path('output')
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     filename = request.args.to_dict().get('filename')
     if not filename:
         data = {'input_files': input_files}
-        # TODO: remove this. It's for debugging I guess.
-        print(json.dumps(data,indent=2))
     else:
         source_file = paper_dir / Path('output') / Path(filename)
         if not source_file.is_file():

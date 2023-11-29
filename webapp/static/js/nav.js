@@ -5,7 +5,7 @@ function showSource(el) {
     fetch(sources[filename])
       .then(response => response.text())
       .then(data => {
-        document.getElementById('nav-source').innerHTML = data;
+        document.getElementById('sourcefile').innerHTML = data;
         const sourceTab = document.querySelector('button[data-bs-target="#nav-source"]')
         bootstrap.Tab.getOrCreateInstance(sourceTab).show()
         if ('filepath_line' in el.dataset) {
@@ -29,7 +29,7 @@ function showSource(el) {
     fetch(allSources)
       .then(response=>response.text())
       .then(data => {
-        document.getElementById('nav-source').innerHTML = data;
+        document.getElementById('sourcefile').innerHTML = data;
       });
   }
 }
