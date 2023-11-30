@@ -8,6 +8,7 @@ import markdown
 import os
 from pathlib import Path
 import random
+import requests
 import shutil
 from sqlalchemy import select, and_
 from sqlalchemy.sql import func
@@ -336,6 +337,27 @@ def submit_version():
             'headline': 'Compiling your paper'}
     return render_template('running.html', **data)
 
+def _register_hotcrp_upload(paperid: str):
+    """We make a post to submit.iacr.org, and validate the paperid, hotcrp version."""
+    status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    if not status:
+        logging.critical('Unable to report upload to hotcrp: {}'.format(paperid))
+        return
+    if status.hotcrp == NO_HOTCRP:
+        return
+    args = [status.hotcrp, status.hotcrp_id, status.email]
+    auth = hmac.new(current_app.config['HOTCRP_API_KEY'].encode('utf-8'),
+                    (''.join(args)).encode('utf-8'), hashlib.sha256).hexdigest()
+    payload = {'auth': auth,
+               'action': 'finalPaper',
+               'paperId': status.hotcrp_id,
+               'email': status.email}
+    url = 'https://submit.iacr.org/{}/iacr/api/updatePaper.php'.format(status.hotcrp)
+    r = requests.post(url, data=payload)
+    if r.status_code != 200:
+        logging.critical('Unable to update hotcrp with final paper status {}:{}'.format(status.hotcrp,
+                                                                                        status.hotcrp_id))
+
 # When an author sends for copy editing, we set the status to SUBMITTED and
 # compile it with line numbers to produce the COPYEDIT version. After
 # the compilation finishes, set the status to EDIT_PENDING and an email is
@@ -460,6 +482,7 @@ def compile_for_copyedit():
                          version=Version.COPYEDIT.value,
                          auth=create_hmac([paperid, Version.COPYEDIT.value]),
                          _external=True)
+    _register_hotcrp_upload(paperid)
     # Notify the copy editor.
     msg = Message('Paper {} is ready for copy editing'.format(paperid),
                   sender=app.config['EDITOR_EMAILS'],

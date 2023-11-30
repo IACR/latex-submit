@@ -34,7 +34,7 @@ def get_json_path(paperid, version):
     return Path(current_app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('compilation.json')
 def create_hmac(args: list[str]):
     """Create hmac used for validating local URLs."""
-    return hmac.new(current_app.config['HOTCRP_API_KEY'].encode('utf-8'),
+    return hmac.new(current_app.config['HOTCRP_POST_KEY'].encode('utf-8'),
                     (''.join(args)).encode('utf-8'), hashlib.sha256).hexdigest()
 
 def validate_hmac(args: list[str], auth):

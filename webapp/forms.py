@@ -128,6 +128,8 @@ class SubmitForm(FlaskForm):
         super(SubmitForm, self).__init__(*args, **kwargs)
         if not self.auth.data:
             self.auth.data = create_hmac([self.paperid.data,
+                                          self.hotcrp.data,
+                                          self.hotcrp_id.data,
                                           self.version.data,
                                           self.submitted.data,
                                           self.accepted.data])
@@ -193,8 +195,10 @@ class SubmitForm(FlaskForm):
     submit = SubmitField('Upload')
 
     def check_auth(self):
-        # TODO also validate the email from hotcrp
+        # TODO also validate the email from hotcrp?
         return validate_hmac([self.paperid.data,
+                              self.hotcrp.data,
+                              self.hotcrp_id.data,
                               self.version.data,
                               self.submitted.data,
                               self.accepted.data],
@@ -203,6 +207,8 @@ class SubmitForm(FlaskForm):
     # TODO: remove this. It's only for testing.
     def generate_auth(self):
         self.auth.data = create_hmac([self.paperid.data,
+                                      self.hotcrp.data,
+                                      self.hotcrp_id.data,
                                       self.version.data,
                                       self.submitted.data,
                                       self.accepted.data])

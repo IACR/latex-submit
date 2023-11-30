@@ -6,7 +6,8 @@ class Config:
     EMAIL_NOREPLY = 'iacrcc-noreply@iacr.org'
     EDITOR_EMAILS = 'iacrcc-editors@iacr.org'
     COPYEDITOR_EMAILS = 'iacrcc-copyedit@iacr.org'
-    HOTCRP_API_KEY = 'IChangedIt'
+    HOTCRP_API_KEY = 'IChangedIt'  # used for API calls to hotcrp
+    HOTCRP_POST_KEY = 'IChangedIt' # used for posting papers from hotcrp
     MAIL_SERVER = 'mx2.iacr.org'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
@@ -73,6 +74,8 @@ class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
+    # used by kevin.
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]
