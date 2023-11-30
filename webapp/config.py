@@ -6,7 +6,7 @@ class Config:
     EMAIL_NOREPLY = 'iacrcc-noreply@iacr.org'
     EDITOR_EMAILS = 'iacrcc-editors@iacr.org'
     COPYEDITOR_EMAILS = 'iacrcc-copyedit@iacr.org'
-    HOTCRP_API_KEY = 'jaln3KJZ_2PpQ}R+sr'
+    HOTCRP_API_KEY = 'IChangedIt'
     MAIL_SERVER = 'mx2.iacr.org'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
