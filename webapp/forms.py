@@ -147,9 +147,11 @@ class SubmitForm(FlaskForm):
                           default=Version.CANDIDATE.value)
     hotcrp = HiddenField(id='hotcrp',
                          name='hotcrp',
+                         default='',
                          validators=[InputRequired('hotcrp instance shortName')])
     hotcrp_id = HiddenField(id='hotcrp_id',
                             name='hotcrp_id',
+                            default='',
                             validators=[InputRequired('paper id in HotCRP instance')])
     # TODO: change this to HiddenField
     journal = SelectField(id='journal',
