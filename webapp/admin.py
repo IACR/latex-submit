@@ -685,7 +685,7 @@ def change_issue():
     volume = issue.volume
     journal = volume.journal
     paperid = paper_status.paperid
-    task_key = paper_key(paperid, 'final')
+    task_key = paper_key(paperid, Version.FINAL.value)
     if task_queue.get(task_key):
         log_event(db, paperid, 'Attempt to recompile while already compiling')
         return render_template('message.html',
@@ -727,12 +727,13 @@ def change_issue():
         shutil.rmtree(output_dir)
     # fire off a separate task to compile. We wrap run_latex_task so it
     # can have the flask context to use sqlalchemy on the database.
-    log_event(db, paperid, 'Recmpiled for volume {} issue {}'.format(volume.name, issue.name))
+    log_event(db, paperid, 'Recompiled for volume {} issue {}'.format(volume.name, issue.name))
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
                                            compilation.command,
                                            str(final_dir.absolute()),
                                            paperid,
-                                           'final',
+                                           compilation.meta.DOI,
+                                           Version.FINAL.value,
                                            task_key)
     if form.nexturl.data:
         next_url = form.nexturl.data
