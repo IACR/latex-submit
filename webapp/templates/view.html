@@ -179,7 +179,7 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endif %}
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
           <p><a href="/output/{{paperid}}/{{version}}">Download zip file of all sources</a> (Note: some files below may have been removed before compiling)</p>
-          <div class="ms-3" id="sourcefile">
+          <div id="sourcefile">
             {% if comp.output_files %}
             <ol>
               {% for f in comp.output_files %}

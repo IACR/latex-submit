@@ -580,6 +580,8 @@ def view_copyedit(paperid, auth):
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
                                          auth=create_hmac([paperid, # TODO: authenticate other fields
+                                                           paper_status.hotcrp,
+                                                           paper_status.hotcrp_id,
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted]))
@@ -630,6 +632,8 @@ def respond_to_comment(paperid, itemid, auth):
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
                                          auth=create_hmac([paperid, # TODO: authenticate other fields
+                                                           paper_status.hotcrp,
+                                                           paper_status.hotcrp_id,
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted]))
@@ -864,13 +868,13 @@ def view_source(paperid, version, auth):
                                title = 'Invalid hmac',
                                error = 'Invalid hmac')
     paper_dir = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version)
-    input_dir = paper_dir / Path('output')
-    input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
+    output_dir = paper_dir / Path('output')
+    output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*') if p.is_file()])
     filename = request.args.to_dict().get('filename')
     if not filename:
-        data = {'input_files': input_files}
+        data = {'input_files': output_files}
     else:
-        source_file = paper_dir / Path('output') / Path(filename)
+        source_file = output_dir / Path(filename)
         if not source_file.is_file():
             return render_template('message.html',
                                    title='Missing filename',
