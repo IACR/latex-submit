@@ -4,13 +4,15 @@
 <h1 class="mb-5 text-center">{{title}}</h1>
 <div>
   {% for volume in volumes %}
-  <div>
-    <h5>   <div class="d-flex ms-3 mb-3">Volume: {{volume.name}}
-      <span class="ms-3">Issues:</span>
-      {% for issue in volume.issues %}
-      <a class="ms-3" href="{{url_for('admin_file.view_issue', issueid=issue.id)}}">{{issue.name}}</a>
-      {% endfor %}
+  <div class="d-flex align-items-center">
+    <div class="fs-5 bg-success-subtle">
+      Volume: {{volume.name}}
     </div>
+    {% for issue in volume.issues %}
+    <div>
+      <a class="ms-2 fs-5" href="{{url_for('admin_file.view_issue', issueid=issue.id)}}">Issue {{issue.name}}</a>
+    </div>
+    {% endfor %}
   </div>
   {% endfor %}
 </div>
