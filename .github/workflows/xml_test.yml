@@ -25,9 +25,9 @@ jobs:
       with:
         python-version: "3.10"
     - name: Install Xapian
-        run: |
-          sudo apt-get install -y libxapian30
-          sudo apt-get install -y libxapian-dev
+      run: |
+        sudo apt-get install -y libxapian30
+        sudo apt-get install -y libxapian-dev
     - name: Install dependencies
       working-directory: webapp
       run: |
