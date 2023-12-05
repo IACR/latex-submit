@@ -54,5 +54,5 @@ xmlschema            # from debian
 requests
 docker
 markdown
-xapian-bindings
+#xapian-bindings
 pymemcache
