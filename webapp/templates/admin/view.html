@@ -8,6 +8,11 @@
 {% endblock %}
 {% block content %}
 <main id="adminContent" class="container px-md-4 py-3">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
 <h1 class="mb-5 text-center">Status on paper: {{paper_status.paperid}}</h1>
 <table class="table">
   <tbody>
