@@ -66,6 +66,8 @@ def show_submit_version():
             logging.warning('{}:{}:{} form not authenticated'.format(form.paperid.data,
                                                                      form.version.data,
                                                                      form.auth.data))
+            for error in form.errors:
+                print(error)
             return render_template('message.html',
                                    title='This submission is not authorized.',
                                    error='The token for this request is invalid')
@@ -815,7 +817,7 @@ def view_results(paperid, version, auth):
                                  issue=pstatus.issue_key,
                                  submitted=pstatus.submitted,
                                  accepted=pstatus.accepted,
-                                 auth=create_hmac([paperid, version, comp.submitted, comp.accepted]),
+                                 auth=create_hmac([paperid, pstatus.hotcrp, pstatus.hotcrp_id, version, comp.submitted, comp.accepted]),
                                  email=pstatus.email,
                                  engine=comp.engine)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:

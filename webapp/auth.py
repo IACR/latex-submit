@@ -9,7 +9,7 @@ from flask import current_app as app
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_mail import Message
 from .metadata.db_models import User, Role
-from . import db, login_manager, validate_hmac, generate_password, mail, create_hmac
+from . import db, login_manager, validate_hmac, mail, create_hmac
 from .forms import LoginForm, PasswordForm, RecoverForm, CaptchaForm
 import random
 from sqlalchemy import select
