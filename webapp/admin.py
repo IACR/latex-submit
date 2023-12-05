@@ -94,7 +94,7 @@ def show_admin_paper(paperid):
                 versions[v.name] = {'url': url,
                                     'comp': Compilation.model_validate_json(cstr)}
             except Exception as e:
-                errors.append(str(v) + ':' + str(e))
+                flash('Error: {}:{}'.format(str(v), str(e)))
     data = {'title': 'Paper status: {}'.format(paperid),
             'paper_status': paper_status,
             'issue': issue,

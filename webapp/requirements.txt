@@ -44,7 +44,6 @@ sqlalchemy>=2.0
 werkzeug==2.3.7      
 # ##########################################################
 # Packages below can be installed from debian.
-pandas               # for country_converter only.
 lxml                 # from debian
 nameparser           # from debian
 pybtex               # from debian
@@ -53,3 +52,7 @@ pylatexenc           # from debian
 pymysql              # from debian
 xmlschema            # from debian
 requests
+docker
+markdown
+xapian-bindings
+pymemcache

@@ -7,12 +7,8 @@ from pydantic import model_validator, StringConstraints, ConfigDict, BaseModel, 
 from typing import List, Optional
 from typing_extensions import Annotated
 
-import packaging.version
 from datetime import datetime, timezone
 from enum import Enum
-
-class SchemaVersion(packaging.version.Version, Enum):
-    VERSION1 = '1.0'
 
 class StrEnum(str, Enum):
     @classmethod
@@ -22,6 +18,9 @@ class StrEnum(str, Enum):
             if e.value == val:
                 return e
         return None
+
+class SchemaVersion(StrEnum):
+    VERSION1 = '1.0'
 
 class CompileStatus(StrEnum):
     """Used to categorize current status of a paper. Only shown to author and editor."""
