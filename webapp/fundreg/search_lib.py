@@ -126,7 +126,10 @@ def search(db_path, offset=0, limit=1000, textq=None, locationq=None, source=Non
             return {'error': 'missing query'}
         query_list = []
         if textq:
-            query_list.append(queryparser.parse_query(textq, flags))
+            terms = textq.split()
+            terms[-1] = terms[-1] + '*'
+            for term in terms:
+                query_list.append(queryparser.parse_query(term, flags))
         if locationq:
             location_query = queryparser.parse_query(locationq, flags, SearchPrefix.LOCATION.value)
             query_list.append(location_query)

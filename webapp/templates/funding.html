@@ -82,11 +82,11 @@ This template is used to show search on fundreg.
     <div class="col-md-6 col-12">
       <p class="mt-2">
         This is designed to help you locate identifiers for the macros
-        <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> in
+        <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> macros in
         <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>.
-        ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono>.
-        FUNDREG identifiers are intended for <i-mono>\addfunding</i-mono>, but you may
-        also use ROR IDs if you received funding as a visitor.
+        ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono> as well
+        as <i-mono>\addfunding</i-mono>. FUNDREG identifiers are intended only
+        for <i-mono>\addfunding</i-mono>.
         Search is performed as you type. <a href="#helpModal" data-bs-toggle="modal">Help</a>
         is available.
       </p>
@@ -114,8 +114,8 @@ This template is used to show search on fundreg.
           </div>
           <div class="col-sm-3">
             <select onchange="doSearch()" id="source" class="form-select form-select-lg" aria-label="Default select example">
-              <option value="all">Search all</option>
-              <option value="ror">Affiliations</option>
+              <option value="ror">ROR Affiliations</option>
+              <option value="all">ROR and Funding Registry</option>
             </select>
           </div>
         </div>
@@ -155,7 +155,7 @@ This template is used to show search on fundreg.
                 country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
 </pre>
 <p class="mt-4">
-  To cite funding as a visitor: <button id="fundingcopy" class="ms-3 btn btn-sm btn-secondary"
+  To cite funding: <button id="fundingcopy" class="ms-3 btn btn-sm btn-secondary"
                                         aria-label="Copy to clipboard"
                                         onclick="copyMetadata('fundingcopy', 'latexfunding')">Copy \addfunding to clipboard</button>
 </p>
@@ -339,7 +339,7 @@ This template is used to show search on fundreg.
           The <i-mono>\addaffiliation</i-mono> macro expects an ID from the
           <a href="https://ror.org/" target="_blank">Research Organization Registry</a> (ROR).
           Not every organization will have such an ID, but there are
-          now 102,000 organizations that have been registered.
+          now 107,000 organizations that have been registered.
         </p>
         <p>The <i-mono>\addfunding</i-mono> macro may take two kinds of IDs:
           <ul>
