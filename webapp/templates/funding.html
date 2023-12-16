@@ -161,7 +161,7 @@ This template is used to show search on fundreg.
 </p>
 <pre id="latexfunding" class="py-2">
 \addfunding[ror={{item.source_id}},{% if item.preferred_fundref %}
-            fundref={{item.preferred_fundref}}{% endif %}
+            fundref={{item.preferred_fundref}},{% endif %}
             grantid={XXXXXX}, % optional
             country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
 </pre>
