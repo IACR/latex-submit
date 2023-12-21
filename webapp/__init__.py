@@ -120,6 +120,9 @@ def create_app(config):
             if not j:
                 db.session.add(Journal(journal))
         db.session.commit()
+        # This makes it possible for bibexport to find cryptobib.
+        os.environ['BIBINPUTS'] = '.:{}'.format(os.path.join(app.root_path,
+                                                             'metadata/latex/iacrcc'))
         return app
 
 
