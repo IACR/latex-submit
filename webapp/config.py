@@ -34,7 +34,7 @@ class Config:
             'name': 'IACR Communications in Cryptology',
             'publisher': 'International Association for Cryptologic Research',
             'EISSN': None,
-            'DOI_PREFIX': '10.1729'
+            'DOI_PREFIX': '10.62056'
         },
         {
             'hotcrp_key': 'tosc',
