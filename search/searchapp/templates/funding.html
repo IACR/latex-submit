@@ -1,0 +1,379 @@
+{#
+=================================================================
+This template is used to show search on fundreg.
+=================================================================
+#}
+{% set title='Crossref Funding Registry Search' %}
+{% extends "base.html" %}
+{% block endOfHead %}
+<style>
+ @media screen and (min-width:992px) {
+   .dropper:hover .dropdown-menu {
+     display:block;
+     margin-top: 2rem;
+   }
+   .dropper .dropdown-menu {
+     display:none;
+   }
+ }
+ .header img {
+   max-width: 3rem;
+   margin-right: 1rem;
+   margin-left: 1rem;
+ }
+ img.icon {
+   max-width: 2rem;
+ }
+ .widecontainer {
+   --bs-gutter-x: 1.5rem;
+   --bs-gutter-y: 0;
+   width: 100%;
+   padding-right: calc(var(--bs-gutter-x) * 0.5);
+   padding-left: calc(var(--bs-gutter-x) * 0.5);
+   margin-right: auto;
+   margin-left: auto;
+ }
+
+ @media (min-width: 576px) {
+   .widecontainer {
+     max-width: 540px;
+   }
+ }
+ @media (min-width: 768px) {
+   .widecontainer {
+     max-width: 720px;
+   }
+ }
+ @media (min-width: 992px) {
+   .widecontainer {
+     max-width: 960px;
+   }
+ }
+ @media (min-width: 1200px) {
+   .widecontainer {
+     max-width: 1140px;
+   }
+ }
+ @media (min-width: 1400px) {
+   .widecontainer {
+     max-width: 1320px;
+   }
+ }
+ @media (min-width: 1600px) {
+   .widecontainer {
+     max-width: 1500px;
+   }
+ }
+ @media (min-width: 1800px) {
+   .widecontainer {
+     max-width: 1600px;
+   }
+ }
+ pre#latex {
+   background-color: #f8f8f8;
+ }
+</style>
+{% endblock %} {# endOfHead #}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
+<div class="container mt-3">
+  <h2>Metadata search</h2>
+  <div class="row">
+    <div class="col-md-6 col-12">
+      <p class="mt-2">
+        This is designed to help you locate identifiers for the macros
+        <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> macros in
+        <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>.
+        ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono> as well
+        as <i-mono>\addfunding</i-mono>. FUNDREG identifiers are intended only
+        for <i-mono>\addfunding</i-mono>.
+        Search is performed as you type. <a href="#helpModal" data-bs-toggle="modal">Help</a>
+        is available.
+      </p>
+    </div>
+    <div class="col-md-6 col-12">
+      <p class="alert alert-info">
+        Crossref and ROR have <a href="https://ror.org/blog/2023-09-07-open-funder-registry-transition-ror-cross-post/" target="_blank">announced plans</a> to merge the ROR registry with the FUNDREG registry. For this reason we recommend
+        using ROR identifiers in funding information.
+      </p>
+    </div>
+  </div>
+      <form class="mt-3">
+        <div class="row align-items-center">
+          <div class="col-sm-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="textq" placeholder="NSF">
+              <label for="textq">name of organization</label>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="locationq" placeholder="Denmark">
+              <label for="locationq">country (optional)</label>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <select onchange="doSearch()" id="source" class="form-select form-select-lg" aria-label="Default select example">
+              <option value="ror">ROR Affiliations</option>
+              <option value="all">ROR and Funding Registry</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="widecontainer">
+      {% if item %}
+      <div id="view" class="mt-4">
+        <div class="row">
+          <div class="col-6">
+            <h3 class="mb-4">{{item.name}}</h3>
+{% if item.source == 'fundreg' %}
+<p class="mb-2">To cite funding:
+  <button id="fundregcopy" class="ms-3 btn btn-sm btn-secondary"
+          aria-label="Copy to clipboard"
+          onclick="copyMetadata('fundregcopy', 'latexfundreg')">Copy \addfunding to clipboard</button>
+</p>
+<pre id="latexfundreg" class="py-2">
+\addfunding[fundref={{item.source_id}},
+            grantid={optional grant number}, % optional
+            country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+{% else %}
+<p>
+  For an affiliation:<button id="bibcopy" class="ms-3 btn btn-sm btn-secondary"
+                                        aria-label="Copy to clipboard"
+                                        onclick="copyMetadata('bibcopy', 'latexaffiliation')">Copy \addaffiliation to clipboard</button>
+</p>
+<pre id="latexaffiliation" class="mt-2 py-2">
+\addaffiliation[ror        = {{item.source_id}},
+                onclick    = {optional url},
+                department = {optional department},
+                street     = {optional street address},
+                city       = {optional city},
+                state      = {optional state or region},
+                postcode   = {optional postal code},
+                country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+<p class="mt-4">
+  To cite funding: <button id="fundingcopy" class="ms-3 btn btn-sm btn-secondary"
+                                        aria-label="Copy to clipboard"
+                                        onclick="copyMetadata('fundingcopy', 'latexfunding')">Copy \addfunding to clipboard</button>
+</p>
+<pre id="latexfunding" class="py-2">
+\addfunding[ror={{item.source_id}},{% if item.preferred_fundref %}
+            fundref={{item.preferred_fundref}},{% endif %}
+            grantid={XXXXXX}, % optional
+            country={{'{'+item.country+'}'}}]{{'{'+item.name+'}'}}
+</pre>
+{% endif %}
+            <p>
+              You may need to supply the grantid.
+            </p>
+          </div>
+          <div class="col-6">
+            {% if item.parents %}
+            <h5>Parent organizations</h5>
+            <ul>
+              {% for org in item.parents %}
+              <li><a href="{{url_for('search_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.children %}
+            <h5>Child organizations</h5>
+            <ul>
+              {% for org in item.children %}
+              <li><a href="{{url_for('search_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.related %}
+            <h5>Related organizations</h5>
+            <ul>
+              {% for org in item.related %}
+              <li><a href="{{url_for('search_bp.view_funder', id=org.source+'_'+org.source_id)}}">{{org.name}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.altnames %}
+            <h5>Alternate names</h5>
+            <ul>
+              {% for nam in item.altnames %}
+              <li>{{nam}}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div id="results" class="mt-3"></div>
+    </div>
+{% raw %}
+<script id="results-template" type="text/x-handlebars-template">
+  <p>{{estimated_results}} results (if more than 1000, then refine your query)</p>
+  <ol>
+    {{#each results}}
+    <li role="presentation"><span style="text-transform:uppercase">{{source}}</span>:
+      <a href="/funding/view/{{id}}">{{name}}</a>
+      <span class="fw-light">{{country}}</span>
+      {{#if altnames}}
+      <div class="btn-group dropdown dropper">
+        <span class="ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Alternate names</span>
+        <ul class="dropdown-menu">
+          {{#each altnames}}
+          <li class="dropdown-item">{{this}}</li>
+        {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ol>
+</script>
+{% endraw %}
+<script src="{{url_for('static', filename='/js/handlebars-v4.7.7.js')}}"></script>
+<script>
+  function copyMetadata(buttid, id) {
+    let range = document.createRange();
+    range.selectNode(document.getElementById(id));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    const copyTooltip = new bootstrap.Tooltip('#' + buttid,
+                                              {trigger: 'manual',
+                                               title: 'Copied!'});
+    console.log('copied');
+    copyTooltip.show();
+   setTimeout(function() {
+     copyTooltip.dispose();
+   }, 2000);
+ }
+  var theTemplateScript = document.getElementById('results-template').innerHTML;
+  var resultsTemplate = Handlebars.compile(theTemplateScript);
+  var textinput = document.getElementById('textq');
+  var locinput = document.getElementById('locationq');
+  var sourceinput = document.getElementById('source');
+
+ // Returns a function, that, as long as it continues to be invoked, will not
+ // be triggered. The function will be called after it stops being called for
+ // N milliseconds. If `immediate` is passed, trigger the function on the
+ // leading edge, instead of the trailing.
+ function debounce(func, wait, immediate) {
+   var timeout;
+   return function() {
+     var context = this, args = arguments;
+     var later = function() {
+       timeout = null;
+       if (!immediate) func.apply(context, args);
+     };
+     var callNow = immediate && !timeout;
+     clearTimeout(timeout);
+     timeout = setTimeout(later, wait);
+     if (callNow) func.apply(context, args);
+   };
+ };
+
+ 
+ let controller;
+ let signal;
+ 
+ var doSearch = debounce(function() {
+   args = {}
+   if (textinput.value || locinput.value) {
+     if (textinput.value) {
+       args['textq'] = textinput.value;
+     }
+     if (locinput.value) {
+       args['locationq'] = locinput.value;
+     }
+     if (sourceinput.value == 'ror') {
+       // restrict to ror
+       args['source'] = 'ror'
+     }
+     if (controller !== undefined) {
+       console.log('killing');
+       controller.abort();
+     }
+     controller = new AbortController();
+     signal = controller.signal;
+     fetch("{{url_for('search_bp.get_results')}}?" + new URLSearchParams(args), {signal})
+       .then((response) => response.json())
+       .then((data) => {
+         console.log(data);
+         let elem = document.getElementById('view');
+         if (elem) {elem.innerHTML = '';}
+         if (data.results.length > 0) {
+           document.getElementById('results').innerHTML = resultsTemplate(data);
+         } else {
+           document.getElementById('results').innerHTML = 'no results';
+         }
+         controller = undefined;
+       }).catch((error) => {
+         console.log('error in fetch');
+         console.log(error);
+       });
+   } else {
+     console.log('no query');
+   }
+ }, 500); // only after 250 ms.
+
+ document.querySelectorAll('input').forEach((elem) => {
+   elem.addEventListener('input', doSearch);
+ });
+</script>
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Help on metadata search</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The <i-mono>\addfunding</i-mono> and <i-mono>\addaffiliation</i-mono> macros in
+          <i-mono>iacrcc.cls</i-mono> can use IDs that globally identify organizations.
+        </p>
+        <p>
+          The <i-mono>\addaffiliation</i-mono> macro expects an ID from the
+          <a href="https://ror.org/" target="_blank">Research Organization Registry</a> (ROR).
+          Not every organization will have such an ID, but there are
+          now 107,000 organizations that have been registered.
+        </p>
+        <p>The <i-mono>\addfunding</i-mono> macro may take two kinds of IDs:
+          <ul>
+            <li>A ROR ID is preferred.</li>
+            <li>An ID from the
+              <a href="https://www.crossref.org/services/funder-registry/" target="_blank">Crossref Funder Registry</a>
+              may be used. This includes almost 45,000 funding agencies.
+            </li>
+          </ul>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+ window.addEventListener('load', (event) => {
+   const queryString = window.location.search;
+   if (queryString) {
+     const urlParams = new URLSearchParams(queryString);
+     const query = urlParams.get('textq');
+     if (query) {
+       textinput.value = query;
+       if (urlParams.get('ror')) {
+         sourceinput.value = 'ror';
+       }
+       doSearch();
+     }
+   }
+ });
+</script>
+
+</main>
+{% endblock %} {# end of content #}
+
