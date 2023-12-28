@@ -68,6 +68,10 @@ function showWhere(elem) {
   }
   console.log(elem);
 }
+function showHTML() {
+  const htmlTab = document.querySelector('button[data-bs-target="#nav-html"]')
+    bootstrap.Tab.getOrCreateInstance(htmlTab).show()
+}
 function showMeta() {
   const metaTab = document.querySelector('button[data-bs-target="#nav-meta"]')
   bootstrap.Tab.getOrCreateInstance(metaTab).show()

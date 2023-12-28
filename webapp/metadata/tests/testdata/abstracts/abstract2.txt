@@ -1,0 +1,20 @@
+%% just a comment
+First paragraph is here.
+\begin{comment}
+This sucks
+\end{comment}
+
+Try this with $a=b$ to see what happens with $x=\zeta(s^2)$ until %
+an $(x_1, ... x_n)$ is a vector in the
+abstract with short lines. This decreases by 10\%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+until it is smaller than 5\% again.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+Now see what happens if
+\begin{itemize}
+\item First
+\item second
+\end{itemize}
+
+another paragraph.

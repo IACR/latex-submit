@@ -8,6 +8,7 @@ from arxiv_latex_cleaner import arxiv_latex_cleaner
 from pybtex.database import parse_string, BibliographyData, BibliographyDataError, Entry
 import pybtex.errors
 import random
+import re
 import string
 import tempfile
 import xml.etree.ElementTree as ET
@@ -175,12 +176,37 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
 
 
 def clean_abstract(text):
-    """Remove comments, todos, \begin{comment} from abstract."""
+    """Remove comments, todos, \begin{comment} from abstract. Convert
+    \n\n to </p><p> to be JATS-compliant."""
     lines = text.splitlines(keepends=True)
     # There is some doubt about whether to include things like \textrm
     # in the commands_only_to_delete. It depends on how mathjax or
     # katex is configured.
     args = {'commands_only_to_delete': [],
             'commands_to_delete': ['todo', 'footnote']}
-    clean_lines = arxiv_latex_cleaner._remove_comments_and_commands_to_delete(lines, args)
-    return ''.join(clean_lines)
+    # This is an internal command, so we may have to change to our own code
+    # or using it through subprocess.
+    clean_text = arxiv_latex_cleaner._remove_comments_and_commands_to_delete(lines, args)
+    # for some reason, arxiv_latex_cleaner leaves % at end of line in order
+    # to preserve LaTeX spacing. We remove it unless it is \%
+    clean_text = re.sub(r'[^\\]%', '', clean_text)
+    clean_text = re.sub(r'\n\n', '</p><p>', clean_text)
+    clean_text = re.sub(r'\n', ' ', clean_text)
+    # I decided that latex_to_text is too destructive
+    # to inline mathematics. It is useful for itemize and enumerate
+    # environments, but it doesn't have a way to disable munging
+    # inline mathematics.
+    ### converter = LatexNodes2Text()
+    ### clean_text = converter.latex_to_text(clean_text)
+    return '<p>\n' + re.sub(r'</p><p>', '\n</p>\n<p>\n', clean_text) + '\n</p>'
+
+if __name__ == '__main__':
+    import argparse
+    argparser = argparse.ArgumentParser(description='abstract cleaner')
+    argparser.add_argument('--file',
+                           default = 'abstract.txt')
+    args = argparser.parse_args()
+    abstract = Path(args.file).read_text(encoding='UTF-8')
+    print(abstract)
+    print('====================================================================')
+    print(clean_abstract(abstract))
