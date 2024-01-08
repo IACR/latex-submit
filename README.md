@@ -1,9 +1,17 @@
 # IACR LaTeX Publishing Workflow
 
-This repository contains a web server to support the workflow of
+This repository contains two web servers to support the workflow of
 submission of final papers for a journal (the IACR Communications
 in Cryptology). The system may prove useful for other journals in
 computer science and mathematics.
+
+The reason why there are two web servers is that the `xapian` package
+is distributed under the GPL license, so we isolate the search part of
+this application into its own server in order to allow other licenses
+for the main web server. We use apache mod_wsgi to configure the
+search server to run under /funding, and every other path is served
+by the main app. All of the discussion below refers to the main publishing
+server, so you can safely ignore the search part.
 
 ## Publishing workflows
 
