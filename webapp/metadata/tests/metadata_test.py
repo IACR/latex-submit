@@ -16,9 +16,8 @@ from metadata import _alphabet, _scramble, _unscramble
 def test_abstract1():
     input = Path('testdata/abstracts/abstract1.txt').read_text(encoding='UTF-8')
     output = clean_abstract(input)
-    print(output)
     assert 'should be removed' not in output
-    assert output.count('</p>\n<p>') == 1 # just two paragraphs.
+    assert output.count('</p><p>') == 1 # just two paragraphs.
     assert '\n\n' not in output
     assert '\n \n' not in output
     assert '\\begin{comment}' not in output
@@ -36,11 +35,15 @@ def test_abstract1():
 def test_abstract2():
     output = clean_abstract(Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8'))
     assert 'just a comment' not in output
-    assert output.count('</p>\n<p>') == 3 # four paragraphs
-    paragraphs = output.split('\n</p>\n<p>\n')
+    assert output.count('</p><p>') == 3 # four paragraphs
+    paragraphs = output.split('</p><p>')
     print(json.dumps(paragraphs, indent=2))
     assert len(paragraphs) == 4
     assert '\n\n' not in output
+    assert 'a<b' not in output
+    assert 'a&lt;b' in output
+    assert 'a>b' not in output
+    assert 'a&gt;b' in output
     assert r'\begin{comment}' not in output
 
 def _test_bibtex_entry(case):

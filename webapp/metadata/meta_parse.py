@@ -3,7 +3,6 @@ Library for handling output meta file from compiling latex.
 """
 
 from nameparser import HumanName
-from pylatexenc.latex2text import LatexNodes2Text
 from arxiv_latex_cleaner import arxiv_latex_cleaner
 from pybtex.database import parse_string, BibliographyData, BibliographyDataError, Entry
 import pybtex.errors
@@ -177,7 +176,10 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
 
 def clean_abstract(text):
     """Remove comments, todos, \begin{comment} from abstract. Convert
-    \n\n to </p><p> to be JATS-compliant."""
+     dangerous characters like <, >,  and & by their entity equivalents.
+     Convert \n\n to </p><p>. We could have used pylatexenc to convert
+     text entities to UTF-8 equivalents, but this destroys some inline
+    mathematics."""
     lines = text.splitlines(keepends=True)
     # There is some doubt about whether to include things like \textrm
     # in the commands_only_to_delete. It depends on how mathjax or
@@ -190,15 +192,13 @@ def clean_abstract(text):
     # for some reason, arxiv_latex_cleaner leaves % at end of line in order
     # to preserve LaTeX spacing. We remove it unless it is \%
     clean_text = re.sub(r'[^\\]%', '', clean_text)
+    clean_text = clean_text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    # If we were to use the text as an attribute, then we would need to replace
+    # single and double quotes. We leave them for now.
+    # clean_text = clean_text.replace('"', '&quot;').replace("'", '&apos;')
     clean_text = re.sub(r'\n\n', '</p><p>', clean_text)
     clean_text = re.sub(r'\n', ' ', clean_text)
-    # I decided that latex_to_text is too destructive
-    # to inline mathematics. It is useful for itemize and enumerate
-    # environments, but it doesn't have a way to disable munging
-    # inline mathematics.
-    ### converter = LatexNodes2Text()
-    ### clean_text = converter.latex_to_text(clean_text)
-    return '<p>\n' + re.sub(r'</p><p>', '\n</p>\n<p>\n', clean_text) + '\n</p>'
+    return '<p>' + clean_text + '</p>'
 
 if __name__ == '__main__':
     import argparse
