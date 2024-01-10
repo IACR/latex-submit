@@ -9,29 +9,30 @@
 <div class="alert alert-danger mt-4">
   This site is currently used for submissions of <strong>final</strong> versions of
   papers for <a href="https://cic.iacr.org/">IACR Communications in Cryptology</a>.
-  You would only use this if you are following a link from HotCRP on submit.iacr.org
-  for an accepted paper. If you are looking to submit a paper to the journal, see
+ If you are looking to submit a paper to the journal, see
   the <a href="https://cic.iacr.org/callforpapers.php">Call for Papers</a>.
 </div>
 <p>
-  This site is intended to become part of the IACR publishing
-  pipeline, starting with the IACR Communications in Cryptology. Our
-  goal is to reduce the cost of open access publishing by reducing the
+  Papers submitted to the IACR Communications in Cryptology are required to use the
+  <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class.
+</p>
+<p>
+  The goal of this site is to reduce the cost of open access publishing by reducing the
   amount of human effort required by both authors and editors in the
   production of a paper. Once a paper is accepted, authors will be
-  directed to this site in order to submit their final versions in
+  directed to a URL on this site in order to submit their final versions in
   LaTeX format.  Their sources will be compiled, and after some light
   copy editing, the paper will be ready for publication within seconds
   rather than weeks or months.
 </p>
 <p>
-  Papers submitted to the IACR Communications in Cryptology will be required to use the
-  <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
+  {#At
   the present time we also support uploads for other publishing venues, but the main purpose
-  of this site is to support a new generation of LaTeX document classes. The approach
-  for this journal is described in <a href="https://arxiv.org/pdf/2301.08277.pdf">this paper</a>.
+  of this site is to support a new generation of LaTeX document classes.
+  The approach
+  for this journal is described in <a href="https://arxiv.org/pdf/2301.08277.pdf">this paper</a>.#}
 </p>
-<p>
+{#<p>
   The purpose of this system is:
 </p>
 <ol>
@@ -40,17 +41,17 @@
   <li>Validate that the author has supplied sufficient metadata (e.g., title, affiliations,
     funding information, etc).</li>
   <li>Assign a DOI immediately upon submission.</li>
-</ol>
+</ol>#}
 <p>
-  Automated submission systems like this are a bit complicated to run because it is generally
-  unsafe to accept LaTeX sources from an untrusted source. This system does not support all
+{#  Automated submission systems like this are a bit complicated to run because it is generally
+  unsafe to accept LaTeX sources from an untrusted source.#} This system does not support all
   of the thousands of LaTeX packages. The list of supported packages is given below, along
   with <a href="#unsupported">some packages that are explicitly forbidden</a>.
 </p>
-<p class="text-center">
+{#<p class="text-center">
   <a href="/submit"
      class="btn btn-primary">Try submitting a paper</a>
-</p>
+</p>#}
 {% include "installed.html" %}
 {% include "unsupported.html" %}
 </main>
