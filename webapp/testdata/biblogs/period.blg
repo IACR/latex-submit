@@ -1,0 +1,63 @@
+This is BibTeX, Version 0.99d (TeX Live 2023)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: abbrv.bst
+Database file #1: abbrev3.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Database file #2: crypto_crossref.bib
+Database file #3: extra.bib
+Repeated entry---line 1347 of file extra.bib
+ : @misc{EPRINT:BIPPS22
+ :                     ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 1371 of file extra.bib
+ :       howpublished = {In Eurocrypt 2023}
+ :                                         .
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 1380 of file extra.bib
+ :       howpublished = {In Eurocrypt 2023}
+ :                                         .
+I'm skipping whatever remains of this entry
+You've used 36 entries,
+            2118 wiz_defined-function locations,
+            13805 strings with 163983 characters,
+and the built_in function-call counts, 16470 in all, are:
+= -- 1639
+> -- 818
+< -- 49
++ -- 295
+- -- 258
+* -- 1219
+:= -- 2519
+add.period$ -- 134
+call.type$ -- 36
+change.case$ -- 212
+chr.to.int$ -- 0
+cite$ -- 36
+duplicate$ -- 664
+empty$ -- 1236
+format.name$ -- 270
+if$ -- 3632
+int.to.chr$ -- 0
+int.to.str$ -- 36
+missing$ -- 29
+newline$ -- 184
+num.names$ -- 122
+pop$ -- 251
+preamble$ -- 1
+purify$ -- 178
+quote$ -- 0
+skip$ -- 555
+stack$ -- 0
+substring$ -- 963
+swap$ -- 303
+text.length$ -- 45
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 142
+warning$ -- 0
+while$ -- 177
+width$ -- 38
+write$ -- 429
+(There were 3 error messages)

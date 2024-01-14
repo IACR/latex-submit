@@ -1,0 +1,84 @@
+This is BibTeX, Version 0.99d (TeX Live 2019)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: main.aux
+The style file: plain.bst
+Database file #1: bib.bib
+Warning--empty year in DBLP:conf/asiacrypt/0001LPR0V19
+Warning--empty year in DBLP:conf/acns/AnkeleBCLMSW17
+Warning--empty year in gift
+Warning--empty year in DBLP:conf/eurocrypt/Bar-OnDKW19
+Warning--empty year in beierle2016skinny
+Warning--empty year in DBLP:conf/fse/BihamAK98
+Warning--empty year in DBLP:conf/asiacrypt/BihamDK06
+Warning--empty year in Biham02new
+Warning--empty year in Biham01rectangle
+Warning--empty year in Biham05related
+Warning--empty year in DBLP:conf/crypto/BiryukovCD03
+Warning--empty year in Biryukov09related
+Warning--empty year in DBLP:conf/eurocrypt/BiryukovN10
+Warning--empty year in DBLP:conf/ctrsa/BiryukovV14
+Warning--empty year in DBLP:conf/asiacrypt/BonnetainPT19
+Warning--empty year in DBLP:conf/asiacrypt/BouraNS14
+Warning--empty year in DBLP:conf/crypto/CanteautNV13
+Warning--empty year in Cid18BCT
+Warning--empty year in DBLP:conf/crypto/DerbezF16
+Warning--empty year in DBLP:conf/eurocrypt/DerbezFJ13
+Warning--empty year in DBLP:conf/indocrypt/DunkelmanIK08
+Warning--empty year in DBLP:conf/eurocrypt/DunkelmanKRS20
+Warning--empty year in DBLP:conf/asiacrypt/DunkelmanKS10
+Warning--empty year in Dunkelman10a
+Warning--empty year in DBLP:conf/eurocrypt/Florez-Gutierrez20
+Warning--empty year in DBLP:conf/asiacrypt/JeanNP14
+Warning--empty year in gift_sac
+Warning--empty year in Kelsey00amplified
+Warning--empty year in DBLP:conf/crypto/KolblLT15
+Warning--empty year in DBLP:conf/crypto/LiuLL21
+Warning--empty year in DBLP:conf/ctrsa/LuKKD08
+Warning--empty year in mouha_milp
+Warning--empty year in sasaki_impossible17
+Warning--empty year in DBLP:conf/asiacrypt/ShiSDTSH18
+Warning--empty year in sun_ac14
+Warning--empty year in Wagner99boom
+Warning--empty year in DBLP:conf/indocrypt/ZhaoDJM19
+You've used 64 entries,
+            2118 wiz_defined-function locations,
+            884 strings with 16906 characters,
+and the built_in function-call counts, 28279 in all, are:
+= -- 2756
+> -- 1338
+< -- 60
++ -- 533
+- -- 460
+* -- 2105
+:= -- 4259
+add.period$ -- 193
+call.type$ -- 64
+change.case$ -- 422
+chr.to.int$ -- 0
+cite$ -- 101
+duplicate$ -- 1106
+empty$ -- 2174
+format.name$ -- 460
+if$ -- 6069
+int.to.chr$ -- 0
+int.to.str$ -- 64
+missing$ -- 61
+newline$ -- 324
+num.names$ -- 128
+pop$ -- 547
+preamble$ -- 1
+purify$ -- 358
+quote$ -- 0
+skip$ -- 887
+stack$ -- 0
+substring$ -- 1988
+swap$ -- 432
+text.length$ -- 60
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 256
+warning$ -- 37
+while$ -- 281
+width$ -- 66
+write$ -- 689
+(There were 37 warnings)

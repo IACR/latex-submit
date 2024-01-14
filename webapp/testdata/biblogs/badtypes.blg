@@ -1,0 +1,61 @@
+This is BibTeX, Version 0.99d (TeX Live 2022)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: alpha.bst
+Database file #1: abbrev3.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Database file #2: crypto.bib
+Database file #3: biblio.bib
+Warning--entry type for "apple-xnor" isn't style-file defined
+--line 158 of file biblio.bib
+Warning--entry type for "traincost" isn't style-file defined
+--line 165 of file biblio.bib
+Warning--entry type for "edge-ai" isn't style-file defined
+--line 190 of file biblio.bib
+Warning--entry type for "aicam" isn't style-file defined
+--line 350 of file biblio.bib
+Warning--there's a number but no volume in fukushima1983neocognitron
+Warning--empty booktitle in gilbert2011testing
+You've used 111 entries,
+            2543 wiz_defined-function locations,
+            12964 strings with 167403 characters,
+and the built_in function-call counts, 60481 in all, are:
+= -- 6002
+> -- 3528
+< -- 95
++ -- 1272
+- -- 1257
+* -- 4729
+:= -- 9650
+add.period$ -- 395
+call.type$ -- 111
+change.case$ -- 869
+chr.to.int$ -- 109
+cite$ -- 113
+duplicate$ -- 2265
+empty$ -- 4005
+format.name$ -- 1344
+if$ -- 12623
+int.to.chr$ -- 3
+int.to.str$ -- 0
+missing$ -- 105
+newline$ -- 570
+num.names$ -- 391
+pop$ -- 844
+preamble$ -- 1
+purify$ -- 980
+quote$ -- 0
+skip$ -- 1996
+stack$ -- 0
+substring$ -- 3265
+swap$ -- 739
+text.length$ -- 95
+text.prefix$ -- 12
+top$ -- 0
+type$ -- 888
+warning$ -- 2
+while$ -- 576
+width$ -- 115
+write$ -- 1532
+(There were 6 warnings)

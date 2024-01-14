@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+Database file #1: MITM_bib.bib
+I was expecting a `,' or a `}'---line 38 of file MITM_bib.bib
+ :  bibsource = {dblp computer science bibliography, https://dblp.org}
+ :                                                                    ，
+I'm skipping whatever remains of this entry
+Repeated entry---line 863 of file MITM_bib.bib
+ : @article{AnkeleDGLLT19
+ :                       ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 879 of file MITM_bib.bib
+ : @inproceedings{Tolba0Y17
+ :                         ,
+I'm skipping whatever remains of this entry
+You've used 23 entries,
+            2850 wiz_defined-function locations,
+            785 strings with 10735 characters,
+and the built_in function-call counts, 16220 in all, are:
+= -- 1396
+> -- 521
+< -- 35
++ -- 210
+- -- 184
+* -- 1062
+:= -- 2039
+add.period$ -- 66
+call.type$ -- 23
+change.case$ -- 182
+chr.to.int$ -- 0
+cite$ -- 23
+duplicate$ -- 1400
+empty$ -- 1379
+format.name$ -- 214
+if$ -- 3580
+int.to.chr$ -- 0
+int.to.str$ -- 23
+missing$ -- 288
+newline$ -- 75
+num.names$ -- 60
+pop$ -- 524
+preamble$ -- 1
+purify$ -- 130
+quote$ -- 0
+skip$ -- 468
+stack$ -- 0
+substring$ -- 925
+swap$ -- 831
+text.length$ -- 35
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 90
+warning$ -- 0
+while$ -- 137
+width$ -- 25
+write$ -- 294
+(There were 3 error messages)

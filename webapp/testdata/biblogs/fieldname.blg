@@ -1,0 +1,56 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+Database file #1: refs.bib
+You're missing a field name---line 407 of file refs.bib
+ :     
+ :     %note         = %{\url{https://ia.cr/2015/1065}},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Database file #2: crypto.bib
+Database file #3: cache_obliv.bib
+Database file #4: bibdiffpriv.bib
+Warning--empty booktitle in nonbbgram-owf
+You've used 42 entries,
+            2850 wiz_defined-function locations,
+            808 strings with 10686 characters,
+and the built_in function-call counts, 20425 in all, are:
+= -- 1591
+> -- 719
+< -- 5
++ -- 298
+- -- 254
+* -- 1220
+:= -- 2821
+add.period$ -- 83
+call.type$ -- 42
+change.case$ -- 325
+chr.to.int$ -- 0
+cite$ -- 43
+duplicate$ -- 1877
+empty$ -- 1979
+format.name$ -- 289
+if$ -- 4390
+int.to.chr$ -- 0
+int.to.str$ -- 42
+missing$ -- 380
+newline$ -- 132
+num.names$ -- 84
+pop$ -- 872
+preamble$ -- 1
+purify$ -- 211
+quote$ -- 0
+skip$ -- 473
+stack$ -- 0
+substring$ -- 693
+swap$ -- 784
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 168
+warning$ -- 1
+while$ -- 136
+width$ -- 44
+write$ -- 463
+(There was 1 error message)

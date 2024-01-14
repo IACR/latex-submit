@@ -1,0 +1,60 @@
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+White space in argument---line 54 of file main.aux
+ : \citation{CCS:KelOrsSch16,
+ :                            AC:HOSS18, EPRINT:CDESX18, C:GLOPS21,C:DPSZ12}
+I'm skipping whatever remains of this command
+White space in argument---line 73 of file main.aux
+ : \citation{CCS:KelOrsSch16,
+ :                            AC:HOSS18, EPRINT:CDESX18, C:DPSZ12,EC:CraDamNie01}
+I'm skipping whatever remains of this command
+The style file: plain.bst
+Database file #1: abbrev3.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Database file #2: crypto.bib
+Database file #3: extra_citations.bib
+Warning--to sort, need author or key in lattigo
+You've used 40 entries,
+            2118 wiz_defined-function locations,
+            13203 strings with 157862 characters,
+and the built_in function-call counts, 20029 in all, are:
+= -- 1996
+> -- 953
+< -- 60
++ -- 348
+- -- 303
+* -- 1496
+:= -- 2988
+add.period$ -- 158
+call.type$ -- 40
+change.case$ -- 243
+chr.to.int$ -- 0
+cite$ -- 41
+duplicate$ -- 839
+empty$ -- 1556
+format.name$ -- 303
+if$ -- 4483
+int.to.chr$ -- 0
+int.to.str$ -- 40
+missing$ -- 35
+newline$ -- 207
+num.names$ -- 140
+pop$ -- 311
+preamble$ -- 1
+purify$ -- 203
+quote$ -- 0
+skip$ -- 679
+stack$ -- 0
+substring$ -- 1215
+swap$ -- 412
+text.length$ -- 60
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 160
+warning$ -- 1
+while$ -- 209
+width$ -- 42
+write$ -- 507
+(There were 2 error messages)

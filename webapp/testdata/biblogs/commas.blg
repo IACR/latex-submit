@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2022)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+Database file #1: references.bib
+Too many commas in name 1 of "Rabin, Ke Zhong, Tal, Yiping Ma and Angel, Sebastian" for entry rabin_incremental_2022
+while executing---line 1503 of file splncs04.bst
+Too many commas in name 1 of "Pietrzak, Momchil Konstantinov, Krzysztof, Georg Fuchsbauer and Rao, Vanishree" for entry pietrzak_adaptive_2014
+while executing---line 1503 of file splncs04.bst
+Warning--to sort, need author or key in noauthor_source_nodate
+Warning--empty booktitle in boyle_can_2017
+Warning--empty journal in henzinger_one_2022
+Warning--missing institution in holmgren_towards_2017
+Too many commas in name 1 of "Pietrzak, Momchil Konstantinov, Krzysztof, Georg Fuchsbauer and Rao, Vanishree" for entry pietrzak_adaptive_2014
+while executing---line 1540 of file splncs04.bst
+Warning--empty booktitle in pietrzak_adaptive_2014
+Too many commas in name 1 of "Rabin, Ke Zhong, Tal, Yiping Ma and Angel, Sebastian" for entry rabin_incremental_2022
+while executing---line 1540 of file splncs04.bst
+Warning--empty booktitle in stefanov_practical_2014
+Warning--missing institution in stefanov_fastprp_2012
+You've used 47 entries,
+            2850 wiz_defined-function locations,
+            932 strings with 16799 characters,
+and the built_in function-call counts, 31078 in all, are:
+= -- 2646
+> -- 908
+< -- 49
++ -- 363
+- -- 312
+* -- 2121
+:= -- 3872
+add.period$ -- 117
+call.type$ -- 47
+change.case$ -- 342
+chr.to.int$ -- 0
+cite$ -- 54
+duplicate$ -- 2779
+empty$ -- 2810
+format.name$ -- 363
+if$ -- 6853
+int.to.chr$ -- 0
+int.to.str$ -- 47
+missing$ -- 557
+newline$ -- 147
+num.names$ -- 118
+pop$ -- 998
+preamble$ -- 1
+purify$ -- 228
+quote$ -- 0
+skip$ -- 785
+stack$ -- 0
+substring$ -- 1860
+swap$ -- 1562
+text.length$ -- 49
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 188
+warning$ -- 7
+while$ -- 254
+width$ -- 49
+write$ -- 592
+(There were 4 error messages)

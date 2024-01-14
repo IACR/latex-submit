@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2023)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: alphaurl.bst
+Illegal, another \bibstyle command---line 197 of file main.aux
+ : \bibstyle
+ :          {splncs04}
+I'm skipping whatever remains of this command
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: abbrev3.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Database file #2: custom.bib
+Database file #3: crypto.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Warning--to sort, need author or key in Cal
+You've used 46 entries,
+            3368 wiz_defined-function locations,
+            12820 strings with 152614 characters,
+and the built_in function-call counts, 29288 in all, are:
+= -- 3250
+> -- 1007
+< -- 58
++ -- 313
+- -- 310
+* -- 1779
+:= -- 3979
+add.period$ -- 197
+call.type$ -- 46
+change.case$ -- 284
+chr.to.int$ -- 45
+cite$ -- 48
+duplicate$ -- 979
+empty$ -- 2566
+format.name$ -- 369
+if$ -- 7430
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 37
+newline$ -- 268
+num.names$ -- 171
+pop$ -- 547
+preamble$ -- 1
+purify$ -- 330
+quote$ -- 0
+skip$ -- 2015
+stack$ -- 0
+substring$ -- 1364
+swap$ -- 404
+text.length$ -- 116
+text.prefix$ -- 16
+top$ -- 0
+type$ -- 368
+warning$ -- 1
+while$ -- 228
+width$ -- 52
+write$ -- 708
+(There was 1 error message)

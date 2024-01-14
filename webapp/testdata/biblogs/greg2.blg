@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2023)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: alphaurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: main.bib
+You're missing a field name---line 16 of file main.bib
+ : 
+ : }
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 9 entries,
+            3368 wiz_defined-function locations,
+            759 strings with 6961 characters,
+and the built_in function-call counts, 4438 in all, are:
+= -- 457
+> -- 153
+< -- 9
++ -- 45
+- -- 42
+* -- 223
+:= -- 641
+add.period$ -- 29
+call.type$ -- 9
+change.case$ -- 50
+chr.to.int$ -- 8
+cite$ -- 9
+duplicate$ -- 144
+empty$ -- 407
+format.name$ -- 56
+if$ -- 1129
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 5
+newline$ -- 48
+num.names$ -- 31
+pop$ -- 110
+preamble$ -- 1
+purify$ -- 59
+quote$ -- 0
+skip$ -- 328
+stack$ -- 0
+substring$ -- 147
+swap$ -- 40
+text.length$ -- 15
+text.prefix$ -- 5
+top$ -- 0
+type$ -- 72
+warning$ -- 0
+while$ -- 33
+width$ -- 14
+write$ -- 117
+(There was 1 error message)

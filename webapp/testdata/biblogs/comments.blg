@@ -1,0 +1,68 @@
+This is BibTeX, Version 0.99d (TeX Live 2022)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+A level-1 auxiliary file: bu.aux
+Database file #1: bib.bib
+You're missing a field name---line 179 of file bib.bib
+ :   
+ :   %pages     = {541},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 246 of file bib.bib
+ :   
+ :   %pages     = {296},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 318 of file bib.bib
+ :   
+ :   %pages     = {156--189},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 468 of file bib.bib
+ :   
+ :   %volume={41},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You've used 35 entries,
+            2850 wiz_defined-function locations,
+            735 strings with 9796 characters,
+and the built_in function-call counts, 16177 in all, are:
+= -- 1181
+> -- 650
+< -- 0
++ -- 269
+- -- 232
+* -- 945
+:= -- 2243
+add.period$ -- 35
+call.type$ -- 35
+change.case$ -- 276
+chr.to.int$ -- 0
+cite$ -- 35
+duplicate$ -- 1521
+empty$ -- 1562
+format.name$ -- 265
+if$ -- 3417
+int.to.chr$ -- 0
+int.to.str$ -- 35
+missing$ -- 323
+newline$ -- 111
+num.names$ -- 70
+pop$ -- 775
+preamble$ -- 1
+purify$ -- 186
+quote$ -- 0
+skip$ -- 328
+stack$ -- 0
+substring$ -- 463
+swap$ -- 614
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 140
+warning$ -- 0
+while$ -- 105
+width$ -- 37
+write$ -- 323
+(There were 4 error messages)

@@ -1,0 +1,86 @@
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+Database file #1: bib.bib
+A bad cross reference---entry "DBLP:conf/ches/BogdanovKLPPRSV07"
+refers to entry "DBLP:conf/ches/2007", which doesn't exist
+A bad cross reference---entry "DBLP:conf/ches/BanikPPSST17"
+refers to entry "DBLP:conf/ches/2017", which doesn't exist
+A bad cross reference---entry "DBLP:conf/cisc/MouhaWGP11"
+refers to entry "DBLP:conf/cisc/2011", which doesn't exist
+A bad cross reference---entry "DBLP:conf/asiacrypt/SunHWQMS14"
+refers to entry "DBLP:conf/asiacrypt/2014-1", which doesn't exist
+A bad cross reference---entry "DBLP:conf/crypto/KolblLT15"
+refers to entry "DBLP:conf/crypto/2015-1", which doesn't exist
+A bad cross reference---entry "DBLP:conf/eurocrypt/SasakiT17"
+refers to entry "DBLP:conf/eurocrypt/2017-3", which doesn't exist
+A bad cross reference---entry "DBLP:conf/eurocrypt/BihamBS99"
+refers to entry "DBLP:conf/eurocrypt/99", which doesn't exist
+A bad cross reference---entry "DBLP:conf/asiacrypt/XiangZBL16"
+refers to entry "DBLP:conf/asiacrypt/2016-1", which doesn't exist
+A bad cross reference---entry "DBLP:conf/crypto/BihamS90"
+refers to entry "DBLP:conf/crypto/1990", which doesn't exist
+A bad cross reference---entry "DBLP:conf/eurocrypt/Matsui93"
+refers to entry "DBLP:conf/eurocrypt/93", which doesn't exist
+A bad cross reference---entry "DBLP:conf/cp/Sinz05"
+refers to entry "DBLP:conf/cp/2005", which doesn't exist
+A bad cross reference---entry "DBLP:conf/eurocrypt/Matsui94"
+refers to entry "DBLP:conf/eurocrypt/94", which doesn't exist
+A bad cross reference---entry "DBLP:conf/crypto/BeierleJKL0PSSS16"
+refers to entry "DBLP:conf/crypto/2016-2", which doesn't exist
+Warning--I didn't find a database entry for "DBLP:conf/eurocrypt/99"
+Warning--I didn't find a database entry for "DBLP:conf/crypto/1990"
+Warning--I didn't find a database entry for "DBLP:conf/eurocrypt/93"
+Warning--I didn't find a database entry for "DBLP:conf/ches/2007"
+Warning--I didn't find a database entry for "DBLP:conf/ches/2017"
+Warning--I didn't find a database entry for "DBLP:conf/eurocrypt/94"
+Warning--I didn't find a database entry for "DBLP:conf/eurocrypt/2017-3"
+Warning--I didn't find a database entry for "DBLP:conf/asiacrypt/2016-1"
+Warning--I didn't find a database entry for "DBLP:conf/asiacrypt/2014-1"
+Warning--I didn't find a database entry for "DBLP:conf/cisc/2011"
+Warning--I didn't find a database entry for "DBLP:conf/crypto/2016-2"
+Warning--I didn't find a database entry for "DBLP:conf/crypto/2015-1"
+Warning--I didn't find a database entry for "DBLP:conf/cp/2005"
+You've used 35 entries,
+            2850 wiz_defined-function locations,
+            885 strings with 15950 characters,
+and the built_in function-call counts, 23235 in all, are:
+= -- 1963
+> -- 766
+< -- 49
++ -- 312
+- -- 274
+* -- 1510
+:= -- 2946
+add.period$ -- 83
+call.type$ -- 35
+change.case$ -- 280
+chr.to.int$ -- 0
+cite$ -- 35
+duplicate$ -- 2006
+empty$ -- 1994
+format.name$ -- 306
+if$ -- 5107
+int.to.chr$ -- 0
+int.to.str$ -- 35
+missing$ -- 412
+newline$ -- 111
+num.names$ -- 82
+pop$ -- 765
+preamble$ -- 1
+purify$ -- 202
+quote$ -- 0
+skip$ -- 646
+stack$ -- 0
+substring$ -- 1297
+swap$ -- 1181
+text.length$ -- 49
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 140
+warning$ -- 0
+while$ -- 196
+width$ -- 37
+write$ -- 415
+(There were 13 error messages)

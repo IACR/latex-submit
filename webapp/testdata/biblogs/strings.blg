@@ -1,0 +1,148 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: 00_main.aux
+The style file: abbrv.bst
+Database file #1: bib.bib
+Warning--string name "africacrypt18ed" is undefined
+--line 365 of file bib.bib
+Warning--string name "africacrypt18name" is undefined
+--line 366 of file bib.bib
+Warning--string name "africacrypt18vol" is undefined
+--line 367 of file bib.bib
+Warning--string name "africacrypt18addr" is undefined
+--line 368 of file bib.bib
+Warning--string name "africacrypt18month" is undefined
+--line 369 of file bib.bib
+Warning--string name "africacryptpub" is undefined
+--line 370 of file bib.bib
+Warning--string name "mylncs" is undefined
+--line 371 of file bib.bib
+Warning--string name "ieeesp20ed" is undefined
+--line 387 of file bib.bib
+Warning--string name "ieeesp20name" is undefined
+--line 388 of file bib.bib
+Warning--string name "ieeesp20addr" is undefined
+--line 389 of file bib.bib
+Warning--string name "ieeesp20month" is undefined
+--line 390 of file bib.bib
+Warning--string name "ieeesppub" is undefined
+--line 391 of file bib.bib
+Warning--string name "ccs17ed" is undefined
+--line 419 of file bib.bib
+Warning--string name "ccs17name" is undefined
+--line 420 of file bib.bib
+Warning--string name "ccs17addr" is undefined
+--line 421 of file bib.bib
+Warning--string name "ccs17month" is undefined
+--line 422 of file bib.bib
+Warning--string name "ccspub" is undefined
+--line 423 of file bib.bib
+Warning--string name "eurocrypt06ed" is undefined
+--line 433 of file bib.bib
+Warning--string name "eurocrypt06name" is undefined
+--line 434 of file bib.bib
+Warning--string name "eurocrypt06vol" is undefined
+--line 435 of file bib.bib
+Warning--string name "eurocrypt06addr" is undefined
+--line 436 of file bib.bib
+Warning--string name "eurocrypt06month" is undefined
+--line 437 of file bib.bib
+Warning--string name "eurocryptpub" is undefined
+--line 438 of file bib.bib
+Warning--string name "mylncs" is undefined
+--line 439 of file bib.bib
+Warning--string name "tcc17ed" is undefined
+--line 450 of file bib.bib
+Warning--string name "tcc17name1" is undefined
+--line 451 of file bib.bib
+Warning--string name "tcc17vol1" is undefined
+--line 452 of file bib.bib
+Warning--string name "tcc17addr" is undefined
+--line 453 of file bib.bib
+Warning--string name "tcc17month" is undefined
+--line 454 of file bib.bib
+Warning--string name "tccpub" is undefined
+--line 455 of file bib.bib
+Warning--string name "mylncs" is undefined
+--line 456 of file bib.bib
+Warning--string name "asiacrypt11ed" is undefined
+--line 470 of file bib.bib
+Warning--string name "asiacrypt11name" is undefined
+--line 471 of file bib.bib
+Warning--string name "asiacrypt11vol" is undefined
+--line 472 of file bib.bib
+Warning--string name "asiacrypt11addr" is undefined
+--line 473 of file bib.bib
+Warning--string name "asiacrypt11month" is undefined
+--line 474 of file bib.bib
+Warning--string name "asiacryptpub" is undefined
+--line 475 of file bib.bib
+Warning--string name "mylncs" is undefined
+--line 476 of file bib.bib
+Warning--string name "eurocrypt12ed" is undefined
+--line 487 of file bib.bib
+Warning--string name "eurocrypt12name" is undefined
+--line 488 of file bib.bib
+Warning--string name "eurocrypt12vol" is undefined
+--line 489 of file bib.bib
+Warning--string name "eurocrypt12addr" is undefined
+--line 490 of file bib.bib
+Warning--string name "eurocrypt12month" is undefined
+--line 491 of file bib.bib
+Warning--string name "eurocryptpub" is undefined
+--line 492 of file bib.bib
+Warning--string name "mylncs" is undefined
+--line 493 of file bib.bib
+Database file #2: abbrev3.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Warning--empty booktitle in SP:ABBGKLOS20
+Warning--empty booktitle in EC:BanPeiRos12
+Warning--empty booktitle in EC:BelRog06
+Warning--empty booktitle in AC:BDFLSZ11
+Warning--empty booktitle in CCS:CHHSv17
+Warning--empty booktitle in AFRICACRYPT:DKRV18
+Warning--empty booktitle in Duman2021FasterKA
+Warning--empty booktitle in TCC:HofHovKil17
+You've used 19 entries,
+            2118 wiz_defined-function locations,
+            13143 strings with 155412 characters,
+and the built_in function-call counts, 8260 in all, are:
+= -- 795
+> -- 423
+< -- 12
++ -- 169
+- -- 146
+* -- 547
+:= -- 1280
+add.period$ -- 62
+call.type$ -- 19
+change.case$ -- 128
+chr.to.int$ -- 0
+cite$ -- 27
+duplicate$ -- 333
+empty$ -- 627
+format.name$ -- 146
+if$ -- 1806
+int.to.chr$ -- 0
+int.to.str$ -- 19
+missing$ -- 17
+newline$ -- 99
+num.names$ -- 42
+pop$ -- 177
+preamble$ -- 1
+purify$ -- 109
+quote$ -- 0
+skip$ -- 275
+stack$ -- 0
+substring$ -- 479
+swap$ -- 125
+text.length$ -- 12
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 74
+warning$ -- 8
+while$ -- 74
+width$ -- 21
+write$ -- 208
+(There were 53 warnings)

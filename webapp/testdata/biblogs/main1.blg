@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2023)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: alphaurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: cryptobib/abbrev0.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Reallocated str_pool (elt_size=1) to 260000 items from 195000.
+Reallocated str_pool (elt_size=1) to 325000 items from 260000.
+Database file #2: cryptobib/crypto.bib
+Database file #3: dana_bib.bib
+Database file #4: misc_ref.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Warning--empty journal in kalman1960new
+Warning--can't use both volume and number fields in RAS:Khachiyan79
+You've used 54 entries,
+            3368 wiz_defined-function locations,
+            16555 strings with 272143 characters,
+and the built_in function-call counts, 36779 in all, are:
+= -- 3917
+> -- 1813
+< -- 53
++ -- 628
+- -- 618
+* -- 2499
+:= -- 5339
+add.period$ -- 225
+call.type$ -- 54
+change.case$ -- 429
+chr.to.int$ -- 53
+cite$ -- 56
+duplicate$ -- 1048
+empty$ -- 2849
+format.name$ -- 665
+if$ -- 8940
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 43
+newline$ -- 314
+num.names$ -- 206
+pop$ -- 733
+preamble$ -- 1
+purify$ -- 485
+quote$ -- 0
+skip$ -- 2258
+stack$ -- 0
+substring$ -- 1462
+swap$ -- 377
+text.length$ -- 113
+text.prefix$ -- 8
+top$ -- 0
+type$ -- 424
+warning$ -- 2
+while$ -- 271
+width$ -- 60
+write$ -- 834
+(There were 2 warnings)
