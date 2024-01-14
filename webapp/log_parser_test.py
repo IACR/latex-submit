@@ -135,7 +135,7 @@ def test_examples():
                 assert errs[i].filepath_line != 0
             if 'Package' in errs[i].text:
                 assert errs[i].package is not None
-
+                
 def test_no_citations():
     parser = LatexLogParser(wrap_len=2000)
     parser.parse_file(Path('testdata/logs/citations.log'))
@@ -285,6 +285,18 @@ def test_fontspec_error():
     parser.parse_file(Path('testdata/logs/fontawesome'))
     assert len(parser.errors) == 36
 
+def test_bib_count():
+    testcases = {'write$ -- 117\n(There was 1 warning)': ('1', 'warning'),
+                 '(width$ -- 49\nwrite$ -- 592\n(There were 3 warnings)': ('3', 'warning'),
+                 'foobar\nfeebar once error message\n(There was 1 error message)': ('1', 'error'),
+                 '(There were 5 error messages)': ('5', 'error')}
+    for testcase, result in testcases.items():
+        print(testcase)
+        m = re.search(BibTexLogParser.ERROR_COUNT_REGEX, testcase, re.MULTILINE)
+        assert m is not None
+        assert m.group(1) == result[0]
+        assert m.group(2) == result[1]
+
 def test_bib_singleline_warning():
     testdata = """STUFF here
 Warning--there's a number but no volume in fukushima1983neocognitron
@@ -341,6 +353,18 @@ Warning--string name "asiacrypt11addr" is undefined
     assert matches[1].group(2) == '473'
     assert matches[1].group(3) == 'bib.bib'
    
+def test_comma_error_regex():
+    m = re.search(BibTexLogParser.COMMA_ERROR_REGEX, 'Too many commas in name 1 of "Kay, Kevin, Karma and Biden, Joseph" for entry DK:78-3_5', re.MULTILINE)
+    assert m is not None
+    assert m.group(1) == '1'
+    assert m.group(2) == 'Kay, Kevin, Karma and Biden, Joseph'
+    assert m.group(3) == 'DK:78-3_5'
+    m = re.search(BibTexLogParser.COMMA_ERROR_REGEX, 'Too many commas in name 2 of "Biden, Joseph and Kay,, Kevin" for entry DK:zy78-3_5', re.MULTILINE)
+    assert m is not None
+    assert m.group(1) == '2'
+    assert m.group(3) == 'DK:zy78-3_5'
+    
+
 def test_bib_multiline_warning():
     multiline_data = """Some stuff
 Warning--entry type for "thesis_axel-mathieu-mahias" isn't style-file defined
@@ -401,6 +425,22 @@ I'm skipping whatever remains of this entry
     assert matches[0].group(1) == r"Illegal, another \bibstyle command"
     assert matches[0].group(2) == "197"
     assert matches[0].group(3) == "main.aux"
+    # ------------------------------------------------------------------------
+    testdata = """The style file: alphaurl.bst
+I couldn't open database file cryptobib/abbrev3.bib
+---line 147 of file main.aux
+ : \bibdata{cryptobib/abbrev3
+ :                           ,cryptobib/crypto,references}
+I'm skipping whatever remains of this command
+I found no database files---while reading file main.aux
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_COMMAND_ERROR_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == r"I couldn't open database file cryptobib/abbrev3.bib"
+    assert matches[0].group(2) == "147"
+    assert matches[0].group(3) == "main.aux"
+
    
 def test_bib_crossref_error():
     testdata = """
@@ -420,12 +460,20 @@ def test_bib_badcross():
         parser = BibTexLogParser()
         parser.parse_file(f, True)
         assert len(parser.errors) == 26
+        warnings = parser.warnings()
+        print(warnings)
+        print('error_count=', parser.error_count)
+        assert parser.error_count == 13
+        assert parser.warning_count == 0
 
 def test_bib_badtypes():
     with Path('testdata/biblogs/badtypes.blg') as f:
         parser = BibTexLogParser()
         parser.parse_file(f, True)
         assert len(parser.errors) == 6
+        warnings = parser.warnings()
+        assert len(warnings) == 6
+        assert parser.error_count == len(parser.errors) - len(warnings)
     
 def test_bib_badyears():
     with Path('testdata/biblogs/badyears.blg') as f:
@@ -434,14 +482,22 @@ def test_bib_badyears():
         assert len(parser.errors) == 37
         for w in parser.errors:
             assert w.filepath == 'bib.bib'
+        warnings = parser.warnings()
+        assert len(warnings) == 37
+        assert parser.error_count == 0
+        assert parser.warning_count == 37
     
 def test_bib_commas():
     with Path('testdata/biblogs/commas.blg') as f:
         parser = BibTexLogParser()
         parser.parse_file(f, True)
-        assert len(parser.errors) == 7 
+        assert len(parser.errors) == 11
         for w in parser.errors:
             assert w.filepath == 'references.bib'
+        warnings = parser.warnings()
+        assert len(warnings) == 7
+        assert parser.error_count == 4
+        assert parser.warning_count == 0
     
 def test_bib_comments():
     with Path('testdata/biblogs/comments.blg') as f:
@@ -545,12 +601,11 @@ def test_bib_whitespace():
         assert parser.errors[2].filepath_line == 73
         assert 'to sort, need author or key' in parser.errors[0].text
     
-def tst_bibtex1():
-    datadir = Path('testdata/biblogs/')
-    for logfile in datadir.glob('*.blg'):
+def test_bib_nofile():
+    with Path('testdata/biblogs/nofile.blg') as f:
         parser = BibTexLogParser()
-        print('---------------------------------', str(logfile), len(parser.errors))
-        parser.parse_file(logfile, True)
-        for error in parser.errors:
-            print(error)
-    assert len(parser.errors) > 5
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 27
+        assert parser.error_count == 2 # because we don't recognize "I found no database files---while reading file main.aux"
+        warnings = parser.warnings()
+        assert len(warnings) == 0

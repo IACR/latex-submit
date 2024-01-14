@@ -1,7 +1,7 @@
-r"""This file contains parsers for LaTeX logs. The goal is to produce
-a sequence of CompileError values from metadata/compilation.py that
-allows a UI to show where the error occurred in the source file and
-PDF file.
+r"""This file contains parsers for LaTeX logs and BibTeX logs. The goal
+is to produce a sequence of CompileError values from
+metadata/compilation.py that allows a UI to show where the error
+occurred in the source file and PDF file.
 
 Unfortunately, parsing logs is difficult because there is no defined
 structure. A package or class file or latex file can potentiallly spit
@@ -44,6 +44,7 @@ heuristics rather than a formal parser.
 NOTE: some errors span multiple lines, and we would need to lookahead
 to capture all of the information. These are relatively rare, but have
 been seen from microtype, Fonts, and hyperref.
+
 """
 
 import os
@@ -321,15 +322,23 @@ class BibTexLogParser:
     MULTILINE_ENTRY_WARNING_REGEX = r"""^(.*)---line (\d+) of file (.*)\n( .*\n)+(.*\n)?I'm skipping whatever remains of this entry$"""
     MULTILINE_COMMAND_ERROR_REGEX = r"^(.*)\n?---line (\d+) of file (.*)\n( .*\n)+(.*\n)?I'm skipping whatever remains of this command$"
     BAD_CROSS_REFERENCE_REGEX = r"""^(A bad cross reference---entry ".+?"\nrefers to entry.+?, which doesn't exist)$"""
+    ERROR_COUNT_REGEX = r"^\(There (?:were|was) (\d+) (error|warning)(?: message)?s?\)$"
+    COMMA_ERROR_REGEX = r'^Too many commas in name (\d+) of "(.*)" for entry ([-\w:]+)$'
 #    WHITESPACE_REGEX = r"""White space in argument---line (\d+) of file (.*)\n( : .*\n)*I'm skipping whatever remains of this command$"""
     def __init__(self):
         self.logstr = None
         self.errors = []
+        # WARNING: this count is not the same as what we count as the number of errors. Some things like
+        # a missing database entry are not counted as errors by bibtex.
+        self.error_count = 0
+        # WARNING: warning_count is only set if error_count is non-zero. This is inferred from the last
+        # line of the .blg file and may differ from len(self.errors()) because we don't recognize everything.
+        self.warning_count = 0
         # a map from character offset to where Database file: occurs, so
         # we can look up which file we are in by character offset.
         self.file_offsets = {}
 
-    def get_bibtex_file(self, offset):
+    def _get_bibtex_file(self, offset):
         if self.file_offsets:
             candidates = [k for k in self.file_offsets.keys() if k <=  offset]
             if candidates:
@@ -337,9 +346,12 @@ class BibTexLogParser:
                 return self.file_offsets[offset]
         return None
 
-    def get_lineno(self, match):
+    def _get_lineno(self, match):
         """Return the line number where a match starts."""
         return 1 + self.logstr[:match.start()].count('\n')
+
+    def warnings(self):
+        return [e for e in self.errors if e.error_type == ErrorType.BIBTEX_WARNING]
 
     def parse_file(self, log_file, debug=False):
         """May be called only once with a pathlib Path parameter."""
@@ -359,37 +371,48 @@ class BibTexLogParser:
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
                                               text='BibTeX warning in entry {}: {}'.format(m.group(2),
                                                                                          m.group(1)),
-                                              filepath=self.get_bibtex_file(m.start()),
-                                              logline=self.get_lineno(m)))
+                                              filepath=self._get_bibtex_file(m.start()),
+                                              logline=self._get_lineno(m)))
         for m in re.finditer(BibTexLogParser.SINGLELINE_ERROR_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                             text=m.group(1),
-                                            filepath=self.get_bibtex_file(m.start()),
-                                            logline=self.get_lineno(m)))
+                                            filepath=self._get_bibtex_file(m.start()),
+                                            logline=self._get_lineno(m)))
         for m in re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, self.logstr, re.MULTILINE):
             #print('MWARNING: ', m.group(1), m.group(2), m.group(3))
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
                                             text=m.group(1),
-                                            logline=self.get_lineno(m),
+                                            logline=self._get_lineno(m),
                                             filepath_line=m.group(2),
                                             filepath=m.group(3)))
         for m in re.finditer(BibTexLogParser.BAD_CROSS_REFERENCE_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                             text=m.group(1),
-                                            filepath=self.get_bibtex_file(m.start()),
-                                            logline=self.get_lineno(m)))
+                                            filepath=self._get_bibtex_file(m.start()),
+                                            logline=self._get_lineno(m)))
         for m in re.finditer(BibTexLogParser.MULTILINE_COMMAND_ERROR_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                             text=m.group(0),
                                             filepath_line=m.group(2),
                                             filepath=m.group(3),
-                                            logline=self.get_lineno(m)))
+                                            logline=self._get_lineno(m)))
+        for m in re.finditer(BibTexLogParser.COMMA_ERROR_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                            filepath=self._get_bibtex_file(m.start()),
+                                            logline=self._get_lineno(m),
+                                            text=m.group(0)))
         for m in re.finditer(BibTexLogParser.MULTILINE_ENTRY_WARNING_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
                                             text=m.group(1),
                                             filepath_line=m.group(2),
                                             filepath=m.group(3),
-                                            logline=self.get_lineno(m)))
+                                            logline=self._get_lineno(m)))
+        m = re.search(BibTexLogParser.ERROR_COUNT_REGEX, self.logstr, re.MULTILINE)
+        if m:
+            if m.group(2) == 'error':
+                self.error_count = int(m.group(1))
+            elif m.group(2) == 'warning':
+                self.warning_count = int(m.group(1))
         if debug:
             print('errors=',len(self.errors))
             for e in self.errors:
