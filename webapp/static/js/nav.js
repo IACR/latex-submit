@@ -1,5 +1,6 @@
 function showSource(el) {
   let filename = el.dataset.filepath;
+  console.log('filename=' + filename)
   if (filename in sources) {
     console.log('found source: ' + sources[filename]);
     fetch(sources[filename])
@@ -42,10 +43,14 @@ function showPage(pageno) {
   const pdfTab = document.querySelector('button[data-bs-target="#nav-pdf"]')
   bootstrap.Tab.getOrCreateInstance(pdfTab).show()
 }
-function showLogLine(line) {
+function showLogLine(error_type, line) {
   const logTab = document.querySelector('button[data-bs-target="#nav-log"]')
   bootstrap.Tab.getOrCreateInstance(logTab).show()
-  let logline = document.getElementById('logline-' + line);
+  let id = 'logline-' + line;
+  if (error_type == 'bibtex') {
+    id = 'bibtex-' + line;
+  }
+  let logline = document.getElementById(id);
   logline.scrollIntoView({behavior: 'smooth'});
   document.querySelectorAll('div.highlight_log_line').forEach((el) => {
     el.classList.remove('highlight_log_line');

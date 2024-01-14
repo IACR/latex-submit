@@ -78,6 +78,13 @@ def check_bib_entry(key: str, entry: Entry):
                                                                                   field))
     return errors
 
+# pybtex produces exceptions for parse errors and missing required fields.
+def _format_pybtex_exception(e):
+    context = e.get_context()
+    if not context:
+        context = 'Unknown error'
+    return 'BibTeX parse error: {}: {}'.format(context, str(e))
+
 def check_bibtex(compilation: Compilation):
     """Check aux and bibtex files for invalid references, and add
        CompileErrors to compilation."""
@@ -87,8 +94,19 @@ def check_bibtex(compilation: Compilation):
                                                   text='No bibtex extracted'))
         return
     try:
+        # pybtex has strange error handling. You can either throw exceptions
+        # (incuding just warnings), or it prints errors to stderr. Unfortunately
+        # the parser for pybtex is more strict than bibtex or biber itself,
+        # so some things that should be warnings become errors. We capture these
+        # and convert them to error_log entries.
         pybtex.errors.set_strict_mode(False)
-        bibdata = parse_string(compilation.bibtex, 'bibtex')
+        with pybtex.errors.capture() as captured_errors:
+            bibdata = parse_string(compilation.bibtex, 'bibtex')
+            if captured_errors:
+                for e in captured_errors:
+                    compilation.warning_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+                                                                logline=0,
+                                                                text=_format_pybtex_exception(e)))
         for key, entry in bibdata.entries.items():
             try:
                 warnings = check_bib_entry(key, entry)
@@ -175,11 +193,12 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
 
 
 def clean_abstract(text):
-    """Remove comments, todos, \begin{comment} from abstract. Convert
-     dangerous characters like <, >,  and & by their entity equivalents.
-     Convert \n\n to </p><p>. We could have used pylatexenc to convert
-     text entities to UTF-8 equivalents, but this destroys some inline
-    mathematics."""
+    """Remove comments, todos, \begin{comment} from abstract. Also replace
+    <, >, and & by their XML entity equivalents and replace \n\n by </p><p>.
+    This allows the abstract to be used in HTML or XML. We could have used
+    pylatexenc to convert text entities to UTF-8 equivalents, but this destroys
+    some inline mathematics.
+    """
     lines = text.splitlines(keepends=True)
     # There is some doubt about whether to include things like \textrm
     # in the commands_only_to_delete. It depends on how mathjax or
@@ -207,6 +226,4 @@ if __name__ == '__main__':
                            default = 'abstract.txt')
     args = argparser.parse_args()
     abstract = Path(args.file).read_text(encoding='UTF-8')
-    print(abstract)
-    print('====================================================================')
     print(clean_abstract(abstract))

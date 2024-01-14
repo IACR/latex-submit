@@ -162,7 +162,7 @@ class LatexLogParser:
         try:
             logstr = path.read_text(encoding='UTF-8', errors='replace')
         except Exception as e:
-            self.errors.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+            self.errors.append(CompileError(error_type=ErrorType.SERVER_WARNING,
                                             logline=0,
                                             text='log file is not UTF-8'))
             logstr = path.read_text(encoding='UTF-8', errors='replace')
@@ -306,6 +306,95 @@ class LatexLogParser:
                     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
                     print(error.model_dump_json(indent=2))
 
+class BibTexLogParser:
+    """This parses the blg file for bibtex errors. It only catches some of
+       them, and some will also show up in the log from latexmk and
+       parsing the extracted bibtex entries. The original source
+       bibtex.web contains patterns for error messages, and there are
+       some that we don't catch. See
+       https://github.com/TeX-Live/texlive-source/blob/trunk/texk/web2c/bibtex.web
+    """
+    DATABASE_FILE_REGEX = r'Database file #(?:\d+): (.*)$'
+    SINGLELINE_WARNING_REGEX = r'^Warning--(.+) in ([^\s]+)$'
+    SINGLELINE_ERROR_REGEX = r"""^Warning--(I didn't find a database entry .+)$"""
+    MULTILINE_WARNING_REGEX = r'^Warning--(.+)\n--line (\d+) of file (.+)$'
+    MULTILINE_ENTRY_WARNING_REGEX = r"""^(.*)---line (\d+) of file (.*)\n( .*\n)+(.*\n)?I'm skipping whatever remains of this entry$"""
+    MULTILINE_COMMAND_ERROR_REGEX = r"^(.*)\n?---line (\d+) of file (.*)\n( .*\n)+(.*\n)?I'm skipping whatever remains of this command$"
+    BAD_CROSS_REFERENCE_REGEX = r"""^(A bad cross reference---entry ".+?"\nrefers to entry.+?, which doesn't exist)$"""
+#    WHITESPACE_REGEX = r"""White space in argument---line (\d+) of file (.*)\n( : .*\n)*I'm skipping whatever remains of this command$"""
+    def __init__(self):
+        self.logstr = None
+        self.errors = []
+        # a map from character offset to where Database file: occurs, so
+        # we can look up which file we are in by character offset.
+        self.file_offsets = {}
+
+    def get_bibtex_file(self, offset):
+        if self.file_offsets:
+            candidates = [k for k in self.file_offsets.keys() if k <=  offset]
+            if candidates:
+                offset = max(candidates)
+                return self.file_offsets[offset]
+        return None
+
+    def get_lineno(self, match):
+        """Return the line number where a match starts."""
+        return 1 + self.logstr[:match.start()].count('\n')
+
+    def parse_file(self, log_file, debug=False):
+        """May be called only once with a pathlib Path parameter."""
+        if self.logstr != None:
+            raise RuntimeError('bibtex parse should be called only once')
+        try:
+            self.logstr = log_file.read_text(encoding='UTF-8', errors='replace')
+        except Exception as e:
+            self.errors.append(CompileError(error_type=ErrorType.SERVER_ERROR,
+                                            logline=0,
+                                            text='log file is not UTF-8'))
+            self.logstr = path.read_text(encoding='UTF-8', errors='replace')
+        # set file offsets for get_bibtex_file
+        for m in re.finditer(BibTexLogParser.DATABASE_FILE_REGEX, self.logstr, re.MULTILINE):
+                self.file_offsets[m.start()] = m.group(1)
+        for m in re.finditer(BibTexLogParser.SINGLELINE_WARNING_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
+                                              text='BibTeX warning in entry {}: {}'.format(m.group(2),
+                                                                                         m.group(1)),
+                                              filepath=self.get_bibtex_file(m.start()),
+                                              logline=self.get_lineno(m)))
+        for m in re.finditer(BibTexLogParser.SINGLELINE_ERROR_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                            text=m.group(1),
+                                            filepath=self.get_bibtex_file(m.start()),
+                                            logline=self.get_lineno(m)))
+        for m in re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, self.logstr, re.MULTILINE):
+            #print('MWARNING: ', m.group(1), m.group(2), m.group(3))
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
+                                            text=m.group(1),
+                                            logline=self.get_lineno(m),
+                                            filepath_line=m.group(2),
+                                            filepath=m.group(3)))
+        for m in re.finditer(BibTexLogParser.BAD_CROSS_REFERENCE_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                            text=m.group(1),
+                                            filepath=self.get_bibtex_file(m.start()),
+                                            logline=self.get_lineno(m)))
+        for m in re.finditer(BibTexLogParser.MULTILINE_COMMAND_ERROR_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                            text=m.group(0),
+                                            filepath_line=m.group(2),
+                                            filepath=m.group(3),
+                                            logline=self.get_lineno(m)))
+        for m in re.finditer(BibTexLogParser.MULTILINE_ENTRY_WARNING_REGEX, self.logstr, re.MULTILINE):
+            self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
+                                            text=m.group(1),
+                                            filepath_line=m.group(2),
+                                            filepath=m.group(3),
+                                            logline=self.get_lineno(m)))
+        if debug:
+            print('errors=',len(self.errors))
+            for e in self.errors:
+                print('error: ', e)
+
 if __name__ == '__main__':
     """This is just test code."""
     import argparse
@@ -318,9 +407,15 @@ if __name__ == '__main__':
                            default = 'iacrdoc.tex')
     argparser.add_argument('--log_file',
                            default = 'testdata/logs/iacrdoc.log')
+    argparser.add_argument('--bibtex',
+                           default=None)
     argparser.add_argument('--verbose',
                            action='store_true')
     args = argparser.parse_args()
+    if args.bibtex:
+        parser = BibTexLogParser()
+        parser.parse_file(Path(args.bibtex), debug=args.verbose)
+        sys.exit(0)
     parser = LatexLogParser(main_file=args.main_file, class_file=args.class_file)
     parser.parse_file(Path(args.log_file), debug=args.verbose)
     for error in parser.errors:

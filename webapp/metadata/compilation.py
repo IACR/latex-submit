@@ -195,7 +195,9 @@ class Meta(BaseModel):
                                     description='May contain LaTeX or HTML entities')
     abstract: str = Field(...,
                           title='Abstract of paper',
-                          description='This is an abstract of the paper. May contain minimal LaTeX but should not contain HTML.')
+                          description=('This is an abstract of the paper as extracted from LaTeX. We perform '
+                                       'only minimal cleanup to remove comments, replace <, >, and & by their XML '
+                                       'entity representations, and replace \n\n with </p><p>.'))
     license: License = Field(...,
                              title='License granted by authors',
                              description='When a paper is submitted, a license must be chosen. This field is required.')
@@ -236,6 +238,8 @@ class ErrorType(StrEnum):
     UNDERFULL_VBOX = 'underfull vbox'
     SERVER_WARNING = 'server warning' # produced by the server and not LaTeX itself.
     SERVER_ERROR = 'server error' # produced by the server and not LaTeX itself.
+    BIBTEX_ERROR = 'bibtex_error' # produced by running bibtex or biber.
+    BIBTEX_WARNING = 'bibtex_warning' # produced by running bibtex or biber.
 
 
 class CompileError(BaseModel):

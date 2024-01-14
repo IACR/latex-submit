@@ -12,7 +12,7 @@ from . import db, task_queue
 from .metadata.latex.iacrcc.parser import meta_parse
 from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
-from .log_parser import LatexLogParser
+from .log_parser import LatexLogParser, BibTexLogParser
 from .metadata.db_models import CompileRecord, TaskStatus, PaperStatus
 from sqlalchemy import select
 
@@ -24,7 +24,8 @@ def is_fatal(err):
     if err.error_type in (ErrorType.METADATA_ERROR,
                           ErrorType.LATEX_ERROR,
                           ErrorType.REFERENCE_ERROR,
-                          ErrorType.SERVER_ERROR):
+                          ErrorType.SERVER_ERROR,
+                          ErrorType.BIBTEX_ERROR):
         return True
     # if err.error_type == ErrorType.OVERFULL_HBOX and err.severity > 40:
     #     return True
@@ -97,6 +98,20 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                         compilation.status = CompileStatus.COMPILATION_ERRORS
                     else:
                         compilation.warning_log.append(error)
+                biblogfile = output_path / Path('main.blg')
+                if biblogfile.is_file():
+                    biblog_parser = BibTexLogParser()
+                    biblog_parser.parse_file(biblogfile)
+                    for error in biblog_parser.errors:
+                        if is_fatal(error):
+                            compilation.error_log.append(error)
+                            compilation.status = CompileStatus.COMPILATION_ERRORS
+                        else:
+                            compilation.warning_log.append(error)
+                else:
+                    compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                                              logline=0,
+                                                              text='Unable to parse bibtex/biber log'))
             if output.get('errors', []):
                 compilation.status = CompileStatus.COMPILATION_FAILED
             compilation.exit_code = output.get('exit_code', -1)
@@ -141,13 +156,13 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                             # Check authors to see if they have ORCID and affiliations.
                             for author in compilation.meta.authors:
                                 if not author.orcid:
-                                    compilation.warning_log.append(CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                logline=0,
-                                                                                text='author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name)))
+                                    compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                                                   logline=0,
+                                                                                   text='author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name)))
                                 if not author.affiliations:
-                                    compilation.warning_log.append(CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                logline=0,
-                                                                                text='author {} is lacking an affiliation'.format(author.name)))
+                                    compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                                                   logline=0,
+                                                                                   text='author {} is lacking an affiliation'.format(author.name)))
                             if compilation.meta.version != VersionEnum.FINAL:
                                 compilation.status = CompileStatus.WRONG_VERSION
                                 compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,

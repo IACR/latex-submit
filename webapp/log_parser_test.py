@@ -1,8 +1,9 @@
 from collections import Counter
 from pathlib import Path
 import pytest
+import re
 import sys
-from .log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re, l3msg_re
+from .log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re, l3msg_re, BibTexLogParser
 from .metadata.compilation import ErrorType
 
 def test_overfull():
@@ -283,3 +284,273 @@ def test_fontspec_error():
     parser = LatexLogParser()
     parser.parse_file(Path('testdata/logs/fontawesome'))
     assert len(parser.errors) == 36
+
+def test_bib_singleline_warning():
+    testdata = """STUFF here
+Warning--there's a number but no volume in fukushima1983neocognitron
+Warning--empty booktitle in gilbert2011testing
+You've used 111 entries,
+            2543 wiz_defined-function locations,
+            12964 strings with 167403 characters,
+"""
+    matches = list(re.finditer(BibTexLogParser.SINGLELINE_WARNING_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 2
+    assert matches[0].group(1) == "there's a number but no volume"
+    assert matches[0].group(2) == 'fukushima1983neocognitron'
+    assert matches[1].group(1) == 'empty booktitle'
+    assert matches[1].group(2) == 'gilbert2011testing'
+    
+def test_bib_singleline_error():
+    testdata = """STUFF here
+Warning--empty booktitle in gilbert2011testing
+Warning--I didn't find a database entry for "EC:BunFisSze20"
+Warning--there's a number but no volume in fukushima1983neocognitron
+You've used 111 entries,
+            2543 wiz_defined-function locations,
+            12964 strings with 167403 characters,
+"""
+    matches = list(re.finditer(BibTexLogParser.SINGLELINE_ERROR_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == ("I didn't find a database entry for "
+                                   '"EC:BunFisSze20"')
+    
+def test_bib_multiline_regex():
+    testdata = """This is a file
+Warning--foobar occurred
+--line 34 of file foobar.bib
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == 'foobar occurred'
+    assert matches[0].group(2) == '34'
+    assert matches[0].group(3) == 'foobar.bib'
+    
+    multiline_data = """Some stuff
+Warning--entry type for "thesis_axel-mathieu-mahias" isn't style-file defined
+--line 48 of file add.bib
+Some other line
+Warning--string name "asiacrypt11addr" is undefined
+--line 473 of file bib.bib
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, multiline_data, re.MULTILINE))
+    assert len(matches) == 2
+    assert matches[0].group(1) == """entry type for "thesis_axel-mathieu-mahias" isn't style-file defined"""
+    assert matches[0].group(2) == '48'
+    assert matches[0].group(3) == 'add.bib'
+    assert matches[1].group(1) == 'string name "asiacrypt11addr" is undefined'
+    assert matches[1].group(2) == '473'
+    assert matches[1].group(3) == 'bib.bib'
+   
+def test_bib_multiline_warning():
+    multiline_data = """Some stuff
+Warning--entry type for "thesis_axel-mathieu-mahias" isn't style-file defined
+--line 48 of file add.bib
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, multiline_data, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == """entry type for "thesis_axel-mathieu-mahias" isn't style-file defined"""
+    assert matches[0].group(2) == '48'
+    assert matches[0].group(3) == 'add.bib'
+
+def test_bib_multiline_entry_error():
+    testdata = """I'm skipping whatever remains of this entry
+You're missing a field name---line 246 of file bib.bib
+ :   
+ :   %pages     = {296},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Repeated entry---line 1347 of file extra.bib
+ : @misc{EPRINT:BIPPS22
+ :                     ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 1371 of file extra.bib
+ :       howpublished = {In Eurocrypt 2023}
+ :                                         .
+I'm skipping whatever remains of this entry
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_ENTRY_WARNING_REGEX, testdata, re.MULTILINE))
+    assert matches[0].group(1) == "You're missing a field name"
+    assert matches[0].group(2) == "246"
+    assert matches[0].group(3) == "bib.bib"
+    assert len(matches) == 3
+   
+def test_bib_multiline_warning():
+    multiline_data = """Some stuff
+Warning--entry type for "thesis_axel-mathieu-mahias" isn't style-file defined
+--line 48 of file add.bib
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_WARNING_REGEX, multiline_data, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == """entry type for "thesis_axel-mathieu-mahias" isn't style-file defined"""
+    assert matches[0].group(2) == '48'
+    assert matches[0].group(3) == 'add.bib'
+
+def test_bib_multiline_command_error():
+    testdata = r"""I'm skipping whatever remains of this command
+Illegal, another \bibstyle command---line 197 of file main.aux
+ : \bibstyle
+ :          {splncs04}
+I'm skipping whatever remains of this command
+I was expecting a `,' or a `}'---line 1371 of file extra.bib
+ :       howpublished = {In Eurocrypt 2023}
+ :                                         .
+I'm skipping whatever remains of this entry
+"""
+    matches = list(re.finditer(BibTexLogParser.MULTILINE_COMMAND_ERROR_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 1
+    assert matches[0].group(1) == r"Illegal, another \bibstyle command"
+    assert matches[0].group(2) == "197"
+    assert matches[0].group(3) == "main.aux"
+   
+def test_bib_crossref_error():
+    testdata = """
+A bad cross reference---entry "DBLP:conf/cisc/MouhaWGP11"
+refers to entry "DBLP:conf/cisc/2011", which doesn't exist
+A bad cross reference---entry "DBLP:conf/crypto/KolblLT15"
+refers to entry "DBLP:conf/crypto/2015-1", which doesn't exist
+"""
+    matches = list(re.finditer(BibTexLogParser.BAD_CROSS_REFERENCE_REGEX, testdata, re.MULTILINE))
+    assert len(matches) == 2
+    assert matches[0].group(1) == """A bad cross reference---entry "DBLP:conf/cisc/MouhaWGP11"
+refers to entry "DBLP:conf/cisc/2011", which doesn't exist"""
+
+
+def test_bib_badcross():
+    with Path('testdata/biblogs/badcross.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 26
+
+def test_bib_badtypes():
+    with Path('testdata/biblogs/badtypes.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 6
+    
+def test_bib_badyears():
+    with Path('testdata/biblogs/badyears.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 37
+        for w in parser.errors:
+            assert w.filepath == 'bib.bib'
+    
+def test_bib_commas():
+    with Path('testdata/biblogs/commas.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 7 
+        for w in parser.errors:
+            assert w.filepath == 'references.bib'
+    
+def test_bib_comments():
+    with Path('testdata/biblogs/comments.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 4
+        assert parser.errors[1].filepath == 'bib.bib'
+        assert parser.errors[1].filepath_line == 246
+        assert parser.errors[1].logline == 12
+    
+def test_bib_fieldname():
+    with Path('testdata/biblogs/fieldname.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 2
+        assert parser.errors[1].filepath == 'refs.bib'
+        assert parser.errors[1].filepath_line == 407
+        assert parser.errors[1].logline == 6
+        assert parser.errors[0].filepath == 'bibdiffpriv.bib'
+    
+def test_bib_greg2():
+    with Path('testdata/biblogs/greg2.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 1
+        assert parser.errors[0].filepath == 'main.bib'
+        assert parser.errors[0].filepath_line == 16
+        assert parser.errors[0].logline == 11
+    
+def test_bib_main1():
+    with Path('testdata/biblogs/main1.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 2
+        assert parser.errors[0].filepath == 'misc_ref.bib'
+        assert parser.errors[0].filepath_line == 0 # unknown
+        assert parser.errors[0].logline == 19
+    
+def test_bib_missing():
+    with Path('testdata/biblogs/missing.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 40
+        for e in parser.errors:
+            assert e.logline > 0
+    
+def test_bib_multiple():
+    with Path('testdata/biblogs/multiple.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 3
+        assert parser.errors[0].filepath_line == 38
+        assert parser.errors[0].logline == 6
+        assert parser.errors[1].logline == 10
+        assert parser.errors[2].logline == 14
+        for e in parser.errors:
+            assert e.logline > 0
+            assert e.filepath == 'MITM_bib.bib'
+    
+def test_bib_period():
+    with Path('testdata/biblogs/period.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 3
+        assert parser.errors[0].filepath_line == 1347
+        assert parser.errors[0].logline == 10
+        assert parser.errors[1].logline == 14
+        assert parser.errors[2].logline == 18
+        for e in parser.errors:
+            assert e.logline > 0
+            assert e.filepath == 'extra.bib'
+
+def test_bib_strings():
+    with Path('testdata/biblogs/strings.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 53
+        assert parser.errors[-1].logline == 94
+        assert len([e for e in parser.errors if 'booktitle' in e.text]) == 8
+        assert len([e for e in parser.errors if 'undefined' in e.text]) == 45
+        for i in range(8, len(parser.errors)):
+            e = parser.errors[i]
+            assert e.filepath_line > 0
+            assert e.logline > 0
+            assert e.filepath == 'bib.bib'
+    
+def test_bib_twostyles():
+    with Path('testdata/biblogs/twostyles.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 2
+    
+def test_bib_whitespace():
+    with Path('testdata/biblogs/whitespace.blg') as f:
+        parser = BibTexLogParser()
+        parser.parse_file(f, True)
+        assert len(parser.errors) == 3
+        assert parser.errors[1].filepath == 'main.aux'
+        assert parser.errors[2].filepath == 'main.aux'
+        assert parser.errors[1].filepath_line == 54
+        assert parser.errors[2].filepath_line == 73
+        assert 'to sort, need author or key' in parser.errors[0].text
+    
+def tst_bibtex1():
+    datadir = Path('testdata/biblogs/')
+    for logfile in datadir.glob('*.blg'):
+        parser = BibTexLogParser()
+        print('---------------------------------', str(logfile), len(parser.errors))
+        parser.parse_file(logfile, True)
+        for error in parser.errors:
+            print(error)
+    assert len(parser.errors) > 5

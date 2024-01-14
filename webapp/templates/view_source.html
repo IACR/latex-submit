@@ -1,6 +1,9 @@
 {# This is used to view either a single source file or a list of
    all source files. It is fetched via an ajax call.
 #}
+{% if message %}
+<div class="alert alert-warning">{{message}}</div>
+{% endif %}
 {% if input_files %}
 <div class="py-3">
   <ol>

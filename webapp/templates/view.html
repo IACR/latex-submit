@@ -18,10 +18,9 @@ This template is used to show the status of a compilation for iacrcc.cls
    max-height:80vh;
    font-family:monospace;
  }
- div#nav-log,  div#latexmk-log {
+ div#nav-log {
    overflow-y: scroll;
    max-height:80vh;
-   font-family:monospace;
  }
 </style>
 <script>
@@ -32,7 +31,7 @@ This template is used to show the status of a compilation for iacrcc.cls
  };
  var allSources = "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth)}}";
  </script>
- <script src="/js/nav.js?v=2"></script>
+ <script src="/js/nav.js?v=3"></script>
  {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
@@ -46,7 +45,7 @@ This template is used to show the status of a compilation for iacrcc.cls
       <div class="mb-3">
         <h5>Errors:</h5>
         {% for err in comp.error_log %}
-        <div class="error_log_entry" data-error_type="{{err.error_type.name}}"
+        <div class="error_log_entry {{err.error_type.name}}"
              {% if err.logline %}
              data-logline="{{err.logline}}"
              {% endif %}
@@ -69,7 +68,7 @@ This template is used to show the status of a compilation for iacrcc.cls
             {% endif %}
             {% endif %}
             <div class="col-4">
-              {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
+              {% if err.logline %} <span onclick="showLogLine('{{err.error_type[:6]}}', {{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
             </div>
             <div class="col-4">
               {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
@@ -103,8 +102,7 @@ This template is used to show the status of a compilation for iacrcc.cls
       <div>
         <h5>Warnings:</h5>
         {% for err in comp.warning_log %}
-        <div class="warning_log_entry"
-             data-error_type="{{err.error_type.name}}"
+        <div class="warning_log_entry {{err.error_type.name}}"
              {% if err.logline %}
              data-logline="{{err.logline}}"
              {% endif %}
@@ -127,7 +125,7 @@ This template is used to show the status of a compilation for iacrcc.cls
             {% endif %}
             {% endif %}
             <div class="col-4">
-              {% if err.logline %} <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to long line"> Log line {{err.logline}}</span>{% endif %}
+              {% if err.logline %} <span onclick="showLogLine('{{err.error_type[:6]}}', {{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
             </div>
             <div class="col-4">
               {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
@@ -157,9 +155,9 @@ This template is used to show the status of a compilation for iacrcc.cls
                   type="button" role="tab" aria-controls="nav-pdf" aria-selected="{%if comp.meta %}false{% else %}true{% endif %}">PDF</button>
           {% endif %}
           <button class="nav-link {% if not pdf %}active{% endif %}" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log"
-                  type="button" role="tab" aria-controls="nav-log" aria-selected="{% if not pdf %}true{% else %}false{% endif %}">LaTeX log</button>
-          <button class="nav-link" id="latexmk-log-tab" data-bs-toggle="tab" data-bs-target="#latexmk-log"
-                  type="button" role="tab" aria-controls="latexmk-log" aria-selected="false">Compilation log</button>
+                  type="button" role="tab" aria-controls="nav-log" aria-selected="{% if not pdf %}true{% else %}false{% endif %}">Compilation log</button>
+{#          <button class="nav-link" id="latexmk-log-tab" data-bs-toggle="tab" data-bs-target="#latexmk-log"
+                  type="button" role="tab" aria-controls="latexmk-log" aria-selected="false">Compilation log</button>#}
           <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source"
                   type="button" role="tab" aria-controls="nav-source" aria-selected="false">Inputs</button>
           <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta"
@@ -240,14 +238,29 @@ This template is used to show the status of a compilation for iacrcc.cls
 	</div>
 	{% endif %}
 	<div class="tab-pane {% if not comp.meta and not pdf %}active {% endif %}fade show p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
+          <p id="log-top">There are three logs below: The <i-mono>.log</i-mono> file from the last run of LaTeX,
+            the <a href="#bibtex-log"><i-mono>.blg</i-mono></a> log file from running bibtex or biber, and the
+            <a href="#latexmk-log">log from latexmk</a>.
+          </p>
+          <h4 id="latex-log">Latex log</h4>
+          <i-mono>
           {% for line in loglines %}
           <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
           {% endfor %}
-        </div>
-        <div class="tab-pane fade show p-3" id="latexmk-log" role="tabpanel" aria-labelledby="latexmk-log-tab">
+          </i-mono>
+          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
+          <h4 class="mt-3" id="bibtex-log">BibTeX/biber log</h4>
+          <i-mono>
+            {% for line in bibtex_log %}
+            <div id="bibtex-{{loop.index}}">{{loop.index}}: {{line}}</div>
+            {% endfor %}
+          </i-mono>
+          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
+          <h4 class="mt-3" id="latexmk-log">latexmk log</h4>
           <pre>
          {{comp.log}}
           </pre>
+          </i-mono>
         </div>
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
           <p><a href="/output/{{paperid}}/{{version}}">Download zip file of all sources</a> (Note: some files below may have been removed before compiling)</p>

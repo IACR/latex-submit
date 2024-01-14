@@ -80,7 +80,11 @@ def test_bibtex():
                         'zipfilename': 'submit.zip'}
     compilation = Compilation(**compilation_data)
     check_bibtex(compilation)
-    assert len(compilation.warning_log) == 56
+    for i in range(len(compilation.warning_log)):
+        print(i, compilation.warning_log[i].text)
+    assert len(compilation.warning_log) == 57
+    # note the typo in pybtex source. :/
+    assert compilation.warning_log[0].text == 'BibTeX parse error: Unknown error: repeated bibliograhpy entry: abed2006vlsi'
     output_path = Path('testdata/bibtex/cryptobib/bibexport.bib')
     compilation_data = {'paperid': 'abcdefg',
                         'status': CompileStatus.COMPILING,
@@ -96,7 +100,9 @@ def test_bibtex():
                         'zipfilename': 'submit.zip'}
     compilation = Compilation(**compilation_data)
     check_bibtex(compilation)
-    assert len(compilation.warning_log) == 1665
+    for i in range(len(compilation.warning_log)):
+        print(i, compilation.warning_log[i].text)
+    assert len(compilation.warning_log) == 1702
     assert len(compilation.error_log) == 0
 
 def test_scramble():

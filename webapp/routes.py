@@ -793,7 +793,7 @@ def view_results(paperid, version, auth):
                                title='Paper was not compiled',
                                error='Paper was not compiled: no directory {}. This is a bug that should not exist any more.'.format(str(output_path)))
     output_dir = paper_path / Path('output')
-    comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*') if p.is_file()])
+    comp.output_files = sorted([str(p.relative_to(str(output_dir))) for p in output_dir.rglob('*') if p.is_file() and p.name != 'main.pdf'])
     pdf_file = output_path / Path('main.pdf')
     log_file = output_path / Path('main.log')
     if pdf_file.is_file():
@@ -801,13 +801,18 @@ def view_results(paperid, version, auth):
     if log_file.is_file():
         try:
             data['latexlog'] = log_file.read_text(encoding='UTF-8', errors='replace')
-            data['loglines'] = data['latexlog'].splitlines()
         except Exception as e:
             logging.error('Unable to read log file as UTF-8: {}'.format(paperid))
             # If pdflatex is used, then it can sometimes create a log file that is not
             # readable as UTF-8 (in spite of the _input_ encoding being set to UTF-8).
             # see https://github.com/IACR/latex-submit/issues/26
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
+    data['loglines'] = data['latexlog'].splitlines()
+    bibtex_log = output_path / Path('main.blg')
+    if bibtex_log.is_file():
+        data['bibtex_log'] = bibtex_log.read_text(encoding='UTF-8', errors='replace').splitlines()
+    else:
+        data['bibtex_log'] = ['No bibtex log']
     pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
     data['submit_url'] = url_for('home_bp.show_submit_version',
                                  paperid=paperid,
@@ -884,6 +889,10 @@ def view_source(paperid, version, auth):
                                    title='Missing filename',
                                    error='Missing filename parameter')
         else:
+            if source_file.stat().st_size > 10000000:
+                data = {'input_files': output_files,
+                        'message': 'File is too large to view'}
+                return render_template('view_source.html', **data)
             try:
                 data = {'lines': source_file.read_text(encoding='UTF-8', errors='replace').splitlines()}
             except Exception as e:
