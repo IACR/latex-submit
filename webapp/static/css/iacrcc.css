@@ -125,3 +125,8 @@ img.eyes {
     border-left: 1px solid #888;
     border-right: 1px solid #888;
  }
+ img.orcidIcon {
+    margin-left: 8px;
+    width:1.2em;
+    height:1.2em;
+ }

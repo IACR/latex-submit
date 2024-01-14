@@ -22,6 +22,9 @@ This template is used to show the status of a compilation for iacrcc.cls
    overflow-y: scroll;
    max-height:80vh;
  }
+ span.keyword {
+   background-color: #d1e7dd !important;
+ }
 </style>
 <script>
  var sources = {
@@ -175,7 +178,7 @@ This template is used to show the status of a compilation for iacrcc.cls
 	      <div class="author">
 		<div class="authorname">{{author.name}}
 		  {% if author.orcid %}
-		  <a target="_blank" href="https://orcid.org/{{author.orcid}}"><img alt="ORCID" class="align-baseline orcidIcon" src="/images/orcid.svg"></a>
+		  <a target="_blank" href="https://orcid.org/{{author.orcid}}"><img alt="ORCID" class="align-baseline orcidIcon" src="/img/orcid.svg"></a>
 		  {% endif %}
 		</div>
 		<div class="ms-4 mb-2">
@@ -194,7 +197,7 @@ This template is used to show the status of a compilation for iacrcc.cls
 	    <div class="mb-3">
 	      <strong class="fs-4">Keywords: </strong>
 	      {% for keyword in meta.keywords %}
-	      <span class="badge p-2 text-bg-light keyword ms-2 my-1" alt="{{keyword}}" title="{{keyword}}"><a href="/search?q={{keyword|urlencode}}">{{keyword}}</a></span>
+	      <span class="badge p-2 text-bg-light keyword ms-2 my-1" alt="{{keyword}}" title="{{keyword}}"><a>{{keyword}}</a></span>
 	      {% endfor %}
 	    </div>
 	    {% endif %}
