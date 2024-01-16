@@ -8,7 +8,7 @@ in a separate task to compile the output.
 from flask import Flask, request, render_template, current_app
 
 def create_app(config):
-    app = Flask('searchapp', static_folder=config.STATIC_FOLDER, static_url_path='/')
+    app = Flask('searchapp')
     app.config.from_object(config)
     with app.app_context():
         from . import routes

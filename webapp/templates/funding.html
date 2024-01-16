@@ -298,7 +298,8 @@ This template is used to show search on fundreg.
      }
      controller = new AbortController();
      signal = controller.signal;
-     fetch("{{url_for('home_bp.get_results')}}?" + new URLSearchParams(args), {signal})
+     let search_url = "{{search_url}}" + "?" + new URLSearchParams(args);
+     fetch(search_url, {signal})
        .then((response) => response.json())
        .then((data) => {
          console.log(data);

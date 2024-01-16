@@ -19,7 +19,6 @@ import zipfile
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
-from .fundreg.search_lib import search
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
 from werkzeug.datastructures import MultiDict
 import logging
@@ -974,32 +973,26 @@ def download_iacrcc_zipfile():
 
 @home_bp.route('/funding')
 def show_funding():
-    return render_template('funding.html', title='Funding and affiliation data')
+    return render_template('funding.html',
+                           title='Funding and affiliation data',
+                           search_url=app.config['FUNDING_SEARCH_URL'])
 
 @home_bp.route('/funding/view/<id>')
 def view_funder(id):
-    result = search(app.config['XAPIAN_DB_PATH'],
-                    offset=0,
-                    textq='id:' + id,
-                    locationq=None,
-                    app=app)
-    if len(result.get('results')) > 0:
-        result = {'item': result.get('results')[0]}
-    else:
-        result = {'error': 'no such item'}
+    try:
+        r = requests.get(app.config['FUNDING_SEARCH_URL'], params={'textq': 'id:'+ id})
+        if r.status_code == 200:
+            results = r.json().get('results')
+            if len(results) > 0:
+                result = {'item': results[0]}
+            else:
+                result = {'error': 'No such item'}
+        else:
+            result = {'error': 'No search response'}
+    except Exception as e:
+        result = {'error': 'Exception while fetching: ' + str(e)}
+    result['search_url'] = app.config['FUNDING_SEARCH_URL']
     return render_template('funding.html', **result)
-
-@home_bp.route('/funding/search', methods=['GET'])
-def get_results():
-    args = request.args.to_dict()
-    if 'textq' not in args and 'locationq' not in args:
-        return json.jsonify({'error': 'missing queries'})
-    return json.jsonify(search(app.config['XAPIAN_DB_PATH'],
-                               offset=args.get('offset', 0),
-                               textq=args.get('textq'),
-                               locationq=args.get('locationq'),
-                               source=args.get('source'),
-                               app=app))
 
 @home_bp.route('/about', methods=['GET'])
 def about():

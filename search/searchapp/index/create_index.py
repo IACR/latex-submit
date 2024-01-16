@@ -74,7 +74,7 @@ def fetch_ror():
     with requests.get(latest_url, stream=True) as stream:
         stream.raise_for_status()
         with open('data/latest.ror.zip', 'wb') as f:
-            for chunk in stream.iter_content(chunk_size=8192):
+            for chunk in stream.iter_content(chunk_size=65536):
                 f.write(chunk)
     with ZipFile('data/latest.ror.zip', 'r') as zipObj:
         namelist = zipObj.namelist()

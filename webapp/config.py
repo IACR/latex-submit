@@ -17,7 +17,6 @@ class Config:
     SECRET_KEY = 'removed_in_checked_in_version'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
     UPLOAD_FOLDER = '/tmp'
-    XAPIAN_DB_PATH = 'webapp/fundreg/xapian.db'
     DATA_DIR = 'webapp/data'
     SITE_NAME = 'IACR Publishing Portal'
     SITE_SHORTNAME = 'IACR CiC'
@@ -27,6 +26,7 @@ class Config:
     TESTING = False
     WTF_CSRF_TIME_LIMIT = None
     EXPORT_PATH = '/tmp'
+    FUNDING_SEARCH_URL = '/searchapi/search'
     JOURNALS = [
         {
             'hotcrp_key': 'cic',
@@ -65,7 +65,6 @@ class Config:
 class ProdConfig(Config):
     FLASK_ENV = 'production'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
-    XAPIAN_DB_PATH = '/var/www/wsgi/latex-submit/webapp/fundreg/xapian.db'
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     RATELIMIT_STORAGE_URI = 'memcached://localhost:11211'
     EXPORT_PATH = '/var/www/wsgi/cicjournal/archive'
@@ -79,3 +78,4 @@ class DebugConfig(Config):
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]
+    FUNDING_SEARCH_URL = 'http://localhost:5001/searchapi/search'
