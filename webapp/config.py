@@ -68,13 +68,14 @@ class ProdConfig(Config):
     DATA_DIR = '/var/www/wsgi/latex-submit/webapp/data'
     RATELIMIT_STORAGE_URI = 'memcached://localhost:11211'
     EXPORT_PATH = '/var/www/wsgi/cicjournal/archive'
+    FUNDING_SEARCH_URL = 'https://publish.iacr.org/searchapi/search'
     
 class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
     # used by kevin.
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]
