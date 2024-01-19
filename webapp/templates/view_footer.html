@@ -21,6 +21,7 @@ function addAbstractError(jax, err) {
        inlineMath: [['$', '$'], ['\\(', '\\)']],
        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
        processEnvironments: true,
+       processHtmlClass: 'mathjax',
        formatError:
         (jax, err) => {
           console.log(jax.latex);
