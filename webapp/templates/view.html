@@ -240,7 +240,7 @@ This template is used to show the status of a compilation for iacrcc.cls
             <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#page=2"></iframe>
 	</div>
 	{% endif %}
-	<div class="tab-pane {% if not comp.meta and not pdf %}active {% endif %}fade show p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
+	<div class="tab-pane logtabcontent {% if not comp.meta and not pdf %}active {% endif %}fade show p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
           <p id="log-top">There are three logs below: The <i-mono>.log</i-mono> file from the last run of LaTeX,
             the <a href="#bibtex-log"><i-mono>.blg</i-mono></a> log file from running bibtex or biber, and the
             <a href="#latexmk-log">log from latexmk</a>.

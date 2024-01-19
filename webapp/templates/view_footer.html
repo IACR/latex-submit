@@ -16,19 +16,22 @@ function addAbstractError(jax, err) {
    abstract_log.append(div);
  }
   MathJax = {
-     tex: {
-     packages: {'[-]': ['noundefined']}, // so that errors are generated for unrecognized macros.
-       inlineMath: [['$', '$'], ['\\(', '\\)']],
-       displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-       processEnvironments: true,
-       processHtmlClass: 'mathjax',
-       formatError:
+    tex: {
+      packages: {'[-]': ['noundefined']}, // so that errors are generated for unrecognized macros.
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEnvironments: true,
+      formatError:
         (jax, err) => {
           console.log(jax.latex);
           addAbstractError(jax, err);
           jax.formatError(err)
         }
-     }
+     },
+    options: {
+      processHtmlClass: 'mathjax',
+      ignoreHtmlClass: 'logtabcontent'
+    }
   };
  console.log('marking')
  var instance = new Mark("div#nav-log");
