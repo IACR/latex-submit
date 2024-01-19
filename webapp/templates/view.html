@@ -86,8 +86,8 @@ This template is used to show the status of a compilation for iacrcc.cls
         </div>
         {% endfor %}
       </div>
-      {% else %} {# no errors #}
-      <div class="alert alert-success">
+      {% endif %} {# comp.error_log #}
+      <div id="success_alert" class="alert alert-success{% if comp.error_log %} d-none{% endif %}">
         Congratulations - your paper was compiled. The next steps are:
         <ol>
           <li>Check any warnings below. Some of them may be flagged by the copy editor for you to fix.</li>
@@ -100,7 +100,7 @@ This template is used to show the status of a compilation for iacrcc.cls
           </li>
         </ol>
       </div>
-      {% endif %} {# errors #}
+      <div class="d-none mb-3" id="abstract_log"></div>
       {% if comp.warning_log %}
       <div>
         <h5>Warnings:</h5>
@@ -260,7 +260,7 @@ This template is used to show the status of a compilation for iacrcc.cls
           </i-mono>
           <div class="mt-3 float-end"><a href="#log-top">top</a></div>
           <h4 class="mt-3" id="latexmk-log">latexmk log</h4>
-          <pre>
+          <pre id="latexLog">
          {{comp.log}}
           </pre>
           </i-mono>

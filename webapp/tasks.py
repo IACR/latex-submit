@@ -10,7 +10,7 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
+from .metadata.meta_parse import clean_abstract, validate_abstract, check_bibtex, extract_bibtex
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser, BibTexLogParser
 from .metadata.db_models import CompileRecord, TaskStatus, PaperStatus
@@ -109,9 +109,9 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                         else:
                             compilation.warning_log.append(error)
                 else:
-                    compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
-                                                              logline=0,
-                                                              text='Unable to parse bibtex/biber log'))
+                    compilation.warning_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
+                                                                logline=0,
+                                                                text='Unable to parse bibtex/biber log'))
             if output.get('errors', []):
                 compilation.status = CompileStatus.COMPILATION_FAILED
             compilation.exit_code = output.get('exit_code', -1)
@@ -140,6 +140,11 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                                                                           text='An abstract is required.'))
                             else:
                                 data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8', errors='replace'))
+                                if not validate_abstract(data['abstract']):
+                                    compilation.status = CompileStatus.MISSING_ABSTRACT
+                                    compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                                              logline=0,
+                                                                              text='The textabstract environment contains illegal macros or environments. See the HTML tab.'))
                             if 'license' not in data:
                                 compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                           logline=0,

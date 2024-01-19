@@ -11,6 +11,8 @@ import re
 import string
 import tempfile
 import xml.etree.ElementTree as ET
+from pylatexenc import latexwalker
+from pylatexenc.latex2text import LatexNodes2Text, get_default_latex_context_db, MacroTextSpec, EnvironmentTextSpec, SpecialsTextSpec
 
 try:
     from .compilation import CompileError, ErrorType, Compilation
@@ -192,12 +194,51 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
                                                   text='Error checking in extract_bibtex: {}. This may be a bug'.format(str(e))))
 
 
+def illegal_handler(n):
+    """output <span> to show that conversion failed."""
+    if n.isNodeType(latexwalker.LatexMacroNode):
+        return "<span class='text-danger'>Illegal macro in textabstract: '\\{}'</span>".format(n.macroname)
+    elif n.isNodeType(latexwalker.LatexEnvironmentNode):
+        return "<span class='text-danger'>Illegal environment in textabstract: '\\begin{{{}}}'</span>".format(n.environmentname)
+    return "<span class='text-danger'>Illegal latex construct in textabstract: '{}'</span>".format(n.latex_verbatim())
+
+def item_encoder(r, l2tobj):
+    return  (l2tobj.nodelist_to_text([r.nodeoptarg]) if r.nodeoptarg else '<br>⦁ ')
+
+def get_converter():
+    """Return a customized LatexNodes2Text for latex => text conversion. This outputs HTML to
+    signifify errors for the author when they use something not covered by the converter.
+    """
+    lt_context_db = get_default_latex_context_db().filter_context(
+        exclude_categories=['latex-placeholders'])
+    lt_context_db.add_context_category('stripper',
+                                       macros=[MacroTextSpec('item', simplify_repl=item_encoder),
+                                               MacroTextSpec('textsf', '%s'),
+                                               MacroTextSpec('href', simplify_repl=illegal_handler),
+                                               MacroTextSpec('sc', ''),
+                                               MacroTextSpec('boldmath', ''),
+                                               MacroTextSpec('bm', ''),
+                                               MacroTextSpec('sl', '')],
+                                       environments=[EnvironmentTextSpec('math', discard=False),
+                                                     EnvironmentTextSpec('itemize', simplify_repl='%s<br>'),
+                                                     EnvironmentTextSpec('enumerate', simplify_repl='%s<br>')],
+                                       specials= [
+                                           SpecialsTextSpec('&', '&'), # leave these alone since they may occur
+                                           # inside character entities like &gt;
+                                       ],
+                                       prepend=True)
+    lt_context_db.set_unknown_macro_spec(MacroTextSpec('', simplify_repl=illegal_handler))
+    lt_context_db.set_unknown_environment_spec(EnvironmentTextSpec('', simplify_repl=illegal_handler))
+    return LatexNodes2Text(math_mode='verbatim', latex_context=lt_context_db)
+
 def clean_abstract(text):
     """Remove comments, todos, \begin{comment} from abstract. Also replace
     <, >, and & by their XML entity equivalents and replace \n\n by </p><p>.
-    This allows the abstract to be used in HTML or XML. We could have used
-    pylatexenc to convert text entities to UTF-8 equivalents, but this destroys
-    some inline mathematics.
+    This allows the abstract to be used safely in HTML. If it encounters
+    illegal macros, then it emits a <span> with an error message. Note that this
+    can be used directly in HTML, but in order to convert it to XML we need
+    to remove <br> and convert the math mode parts to MATHML. We also need
+    to convert &lt; and $gt; back to < and > before calling latex2mathml.
     """
     lines = text.splitlines(keepends=True)
     # There is some doubt about whether to include things like \textrm
@@ -211,13 +252,18 @@ def clean_abstract(text):
     # for some reason, arxiv_latex_cleaner leaves % at end of line in order
     # to preserve LaTeX spacing. We remove it unless it is \%
     clean_text = re.sub(r'[^\\]%', '', clean_text)
-    clean_text = clean_text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    clean_text = clean_text.replace('&', '&amp; ').replace('<', '&lt;').replace('>', '&gt;')
     # If we were to use the text as an attribute, then we would need to replace
     # single and double quotes. We leave them for now.
     # clean_text = clean_text.replace('"', '&quot;').replace("'", '&apos;')
     clean_text = re.sub(r'\n\n', '</p><p>', clean_text)
     clean_text = re.sub(r'\n', ' ', clean_text)
-    return '<p>' + clean_text + '</p>'
+    clean_text = '<p>' + clean_text + '</p>'
+    converter = get_converter()
+    return converter.latex_to_text(clean_text)
+
+def validate_abstract(input: str):
+    return '</span>' not in input
 
 if __name__ == '__main__':
     import argparse

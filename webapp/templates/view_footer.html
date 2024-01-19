@@ -1,15 +1,36 @@
 {# this is included in endOfPage for anything containing the compilation log #}
 <script src="/js/resize.js"></script>
 <script>
+{# This may not be used any more, but its now a second level of protection
+   against abstracts that do not render under MathJax.
+#}
+function addAbstractError(jax, err) {
+   console.log(jax, err);
+   let abstract_log = document.getElementById('abstract_log');
+   abstract_log.classList.remove('d-none');
+   document.getElementById('success_alert').classList.add('d-none');
+   let div = document.createElement('div')
+   div.classList.add('error_log_entry');
+   div.classList.add('mb-2');
+   div.innerHTML = 'Illegal LaTeX in textabstract: ' + jax.latex;
+   abstract_log.append(div);
+ }
   MathJax = {
      tex: {
+     packages: {'[-]': ['noundefined']}, // so that errors are generated for unrecognized macros.
        inlineMath: [['$', '$'], ['\\(', '\\)']],
        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-       processEnvironments: false
+       processEnvironments: true,
+       formatError:
+        (jax, err) => {
+          console.log(jax.latex);
+          addAbstractError(jax, err);
+          jax.formatError(err)
+        }
      }
   };
  console.log('marking')
- var instance = new Mark("pre#latexLog");
+ var instance = new Mark("div#nav-log");
  instance.markRegExp(/LaTeX Warning/, {'accuracy': 'exact'});
  instance.markRegExp(/Error:|Emergency stop\.|Undefined control sequence/, {'accuracy': 'exact', 'className': 'latexError'});
 </script>

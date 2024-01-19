@@ -7,7 +7,7 @@ import random
 import sys
 sys.path.insert(0, '../')
 from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License
-from meta_parse import clean_abstract, check_bibtex
+from meta_parse import clean_abstract, validate_abstract, check_bibtex
 import datetime
 from pathlib import Path
 sys.path.insert(0, '../../')
@@ -16,35 +16,66 @@ from metadata import _alphabet, _scramble, _unscramble
 def test_abstract1():
     input = Path('testdata/abstracts/abstract1.txt').read_text(encoding='UTF-8')
     output = clean_abstract(input)
+    print(output)
     assert 'should be removed' not in output
-    assert output.count('</p><p>') == 1 # just two paragraphs.
+    assert output.count('</p><p>') == 2 # just three paragraphs.
     assert '\n\n' not in output
     assert '\n \n' not in output
     assert '\\begin{comment}' not in output
     assert 'comment environment' not in output
     # \footnote is removed.
-    assert 'bye not in output'
+    assert 'bye' not in output
     assert '%' in output
     assert ' %' not in output
     # \todo is removed.
     assert 'removable' not in output
     # We might wish to catch this in the future.
+    assert r"Illegal macro in textabstract: '\todo'" in output # because of \todo[inline]{...}
     assert 'so is this' in output
     assert 'false' not in output
 
 def test_abstract2():
     output = clean_abstract(Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8'))
+    print(output)
     assert 'just a comment' not in output
     assert output.count('</p><p>') == 3 # four paragraphs
     paragraphs = output.split('</p><p>')
-    print(json.dumps(paragraphs, indent=2))
+    #print(json.dumps(paragraphs, indent=2))
     assert len(paragraphs) == 4
     assert '\n\n' not in output
     assert 'a<b' not in output
     assert 'a&lt;b' in output
     assert 'a>b' not in output
-    assert 'a&gt;b' in output
+    assert 'a^2&gt;b' in output
+    assert r"Illegal environment in textabstract: '\begin{description}'" in output # because of description environment
+    assert output.count('<br>') == 3 # (two items in itemize)
     assert r'\begin{comment}' not in output
+
+def test_abstract3():
+    output = clean_abstract(r'Bad macro \texttt{This is gone}')
+    assert 'Illegal' in output
+    output = clean_abstract(r'Bold assertion \textbf{This is not gone}')
+    assert 'Illegal' not in output
+    assert 'This is not gone' in output
+    output = clean_abstract(r'Bold assertion \href{https://theonion.com}{This is text} for me.')
+    assert r"Illegal macro in textabstract: '\href'" in output
+    assert not validate_abstract(output)
+    assert 'gone' not in output
+    output = clean_abstract(r'Some \textsf{sans serif text} and \\ a \textsl{newline in tex}')
+    assert output == '<p>Some sans serif text and \n a newline in tex</p>'
+    output = clean_abstract(r'Some \texttt{monospace} text and \textsl{slanted} text.')
+    assert r"Illegal macro in textabstract: '\texttt'" in output
+    assert 'textsl' not in output
+    output = clean_abstract(r'Some {\bm stuff} in {\sl text} not {\sc small}.')
+    assert output == '<p>Some stuff in text not small.</p>'
+    output = clean_abstract(r'Some \begin{equation}a=b\end{equation} stuff.')
+    assert r'\begin{equation}a=b\end{equation}' in output
+    assert '\n' in output
+    output = clean_abstract(r'Some $a<b$ and $c>d$')
+    assert output == r'<p>Some $a&lt;b$ and $c&gt;d$</p>'
+    output = clean_abstract(r'Bad macro: \farout{now}')
+    assert 'gone' not in output
+
 
 def _test_bibtex_entry(case):
     output_path = Path('testdata/bibtex/{}'.format(case))

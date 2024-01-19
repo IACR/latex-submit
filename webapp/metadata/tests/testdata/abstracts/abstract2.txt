@@ -9,7 +9,7 @@ an $(x_1, ... x_n)$ is a vector in the
 abstract with short lines. This decreases by 10\%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 until it is smaller than 5\% again. Note that $a<b$ will be
-changed, as will $a>b$.
+changed, as will $a^2>b$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 Now see what happens if
@@ -19,3 +19,8 @@ Now see what happens if
 \end{itemize}
 
 another paragraph.
+\begin{description}
+\item[foobar] This is foobar
+\item[feebar] This is feebar
+\end{description}
+Following description.
