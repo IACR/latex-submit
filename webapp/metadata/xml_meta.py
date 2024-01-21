@@ -1,7 +1,10 @@
 from datetime import datetime
 from nameparser import HumanName
 from pathlib import Path
+import latex2mathml.converter
+import re
 from xml.etree import ElementTree as ET
+from xml.sax.saxutils import unescape
 import xmlschema
 from pybtex.database import parse_string, Entry
 try:
@@ -21,19 +24,6 @@ except Exception as e:
 
 # because of typing hints.
 assert sys.version_info >= (3,9)
-
-def _get_ref_attr(citation):
-    attr = {'publication-format': 'print'}
-    if citation.ptype == 'article':
-        attr['publication-type'] = 'journal'
-    else:
-        attr['publication-type'] = 'book'
-    if citation.ptype == 'online':
-        attr['publication-format'] = 'online'
-    elif citation.ptype == 'misc' and citation.url:
-        attr['publication-format'] = 'online'
-    return attr
-        
 
 def _add_jats_citation(index: int, ref_list: ET.Element, entry: Entry):
     ref = ET.SubElement(ref_list, 'ref', attrib={'id': 'ref{}'.format(index)})
@@ -166,6 +156,7 @@ def _add_crossref_citation(index: int, citation_list: ET.Element, entry: Entry):
         ET.SubElement(citation, 'article_title').text = entry.fields['title']
 
 def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.Element:
+    """TODO: tex-math contents should be CDATA to protect against < inside."""
     article = ET.Element('article', attrib={
         'xmlns:mml': 'http://www.w3.org/1998/Math/MathML',
         'xmlns:xlink': 'http://www.w3.org/1999/xlink',
@@ -227,9 +218,10 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})
     ET.SubElement(license, 'license-p').text = meta.license.label
-    abstract = ET.SubElement(article_meta, 'abstract')
-    for paragraph in meta.abstract.split('\n\n'):
-        ET.SubElement(abstract, 'p').text = paragraph
+    abstract_string = '<abstract>' + text_with_texmath(comp.meta.abstract) + '</abstract>'
+    from io import BytesIO
+    abstract_elem = ET.parse(BytesIO(abstract_string.encode('UTF-8'))).getroot()
+    article_meta.append(abstract_elem)
     if meta.keywords:
         kwd_group = ET.SubElement(article_meta, 'kwd-group', attrib={'kwd-group-type': 'author'})
         for kw in meta.keywords:
@@ -265,6 +257,132 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
             _add_jats_citation(counter, ref_list, entry) # this is complicated
     return article
 
+
+def _to_texmath(mathpart, disp):
+    if disp == 'block':
+        delim = '$$'
+    else:
+        delim = '$'
+    return '<tex-math><![CDATA[{}{}{}]]></tex-math>'.format(delim,
+                                                            mathpart.replace('&lt;', '<').replace('&gt;', '>'),
+                                                            delim)
+
+def _to_mathml(mathpart, disp):
+    r"""Convert a latex math segment to mathml.
+    Args:
+       mathpart: latex math-mode segment (without delimiters such as $, $$, or \(
+          Note that we expect mathpart to contain &lt; instead of <, and &gt; instead of >.
+       disp: 'inline' or 'block' to indicate whether the math is inline or display.
+    Returns:
+       mathml equivalent, with mml namespace identifier on all XML elements.
+    """
+    mathpart = mathpart.replace('&lt;', '>').replace('&gt;', '>')
+    elem = latex2mathml.converter.convert_to_element(mathpart, display=disp)
+    if 'xmlns' in elem.attrib:
+        del elem.attrib['xmlns']
+    if 'display' in elem.attrib and disp == 'inline':
+        del elem.attrib['display']
+    output = unescape(ET.tostring(elem, encoding='unicode'))
+    return re.sub(r'<(/?)([a-z ="]+)>', r'<\1mml:\2>', output)
+
+def text_with_mathml(input):
+    """Input is an abstract with <p> tags only and some HTML-safe latex. In particular
+    this means that < was converted to &lt; and > was converted to &gt;, so we need
+    to convert those back before running latex
+Convert parts in
+    LaTeX math mode to mathml. Note that we have to convert &lt; and &gt; back to
+    < and > before converting to mathml."""
+    input = input.replace('&lt;', '<').replace('&gt;', '>')
+    # Break apart at start and end of math mode.
+    matches = re.finditer(r'\$\$|\$|\\\(|\\\)|\\\[|\\\]', input)
+    last = 0
+    start = 0
+    end = 0
+    output = ''
+    in_math = None
+    for m in matches:
+        se = m.span()
+        start = se[0]
+        end = se[1]
+        previous = input[last:start]
+        delim = m.group()
+        if in_math:
+            output += _to_mathml(previous, in_math)
+        else:
+            output += previous
+        if delim == r'$$':
+            if in_math:
+                in_math = None
+            else:
+                in_math = 'block'
+        elif delim == r'$':
+            if in_math:
+                in_math = None
+            else:
+                in_math = 'inline'
+        elif delim == r'\(':
+            if in_math:
+                raise ValueError('invalid math mode: ' + previous)
+            else:
+                in_math = 'inline'
+        elif delim == r'\[':
+            if in_math:
+                raise ValueError('invalid math mode: ' + previous)
+            else:
+                in_math = 'block'
+        elif delim == r'\]' or delim == r'\)':
+            in_math = None
+        last = end
+    output += input[last:]
+    return output
+
+def text_with_texmath(input):
+    """Input is an abstract with <p> tags only and some HTML-safe latex. In particular
+    this means that < was converted to &lt; and > was converted to &gt;, so we need
+    to convert those back before running latex
+    """
+    # Break apart at start and end of math mode.
+    matches = re.finditer(r'\$\$|\$|\\\(|\\\)|\\\[|\\\]', input)
+    last = 0
+    start = 0
+    end = 0
+    output = ''
+    in_math = None
+    for m in matches:
+        se = m.span()
+        start = se[0]
+        end = se[1]
+        previous = input[last:start]
+        delim = m.group()
+        if in_math:
+            output += _to_texmath(previous, in_math)
+        else:
+            output += previous
+        if delim == r'$$':
+            if in_math:
+                in_math = None
+            else:
+                in_math = 'block'
+        elif delim == r'$':
+            if in_math:
+                in_math = None
+            else:
+                in_math = 'inline'
+        elif delim == r'\(':
+            if in_math:
+                raise ValueError('invalid math mode: ' + previous)
+            else:
+                in_math = 'inline'
+        elif delim == r'\[':
+            if in_math:
+                raise ValueError('invalid math mode: ' + previous)
+            else:
+                in_math = 'block'
+        elif delim == r'\]' or delim == r'\)':
+            in_math = None
+        last = end
+    output += input[last:]
+    return output
 
 def _add_crossref_article_meta(comp: Compilation,
                                journal_elem: ET.Element):
@@ -314,11 +432,10 @@ def _add_crossref_article_meta(comp: Compilation,
         if author.orcid:
             ET.SubElement(person_name, 'ORCID',
                           attrib={'authenticated': 'false'}).text = 'https://orcid.org/' + author.orcid
-    # I could not get the content to validate, perhaps because it needs at least one <p> element and one
-    # <sec> element. By contrast, These abstracts work against the JATS schema.
-    abstract = ET.SubElement(journal_article, 'abstract', attrib={'xmlns':'http://www.ncbi.nlm.nih.gov/JATS1'})
-    for paragraph in comp.meta.abstract.split('\n\n'):
-        ET.SubElement(abstract, 'p').text = paragraph
+    # There is some doubt about whether crossref accepts tex-math inside abstract, so we convert to MATHML.
+    abstract_string = '<jats:abstract xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:mml="http://www.w3.org/1998/Math/MathML">' + re.sub(r'<(/?)p>', r'<\1jats:p>', text_with_mathml(comp.meta.abstract)) + '</jats:abstract>'
+    abstract_elem = ET.fromstring(abstract_string)
+    journal_article.append(abstract_elem)
     publication_date = ET.SubElement(journal_article, 'publication_date', attrib={'media_type': 'online'})
     parts = datetime.now().strftime('%Y-%m-%d').split('-')
     ET.SubElement(publication_date, 'month').text = parts[1]
@@ -349,15 +466,14 @@ def get_crossref(batchid: str,
                  publisher_name: str,
                  publisher_email: str,
                  journal: Journal,
-                 compilations: list[Compilation]) -> ET.Element:
+                 compilations: list[Compilation]) -> ET.ElementTree:
     """Crossref XML file for registering a batch of DOIs."""
-    
+    ET.register_namespace('jats', 'http://www.ncbi.nlm.nih.gov/JATS1')
+    ET.register_namespace('mml', 'http://www.w3.org/1998/Math/MathML')
     doi_batch = ET.Element('doi_batch', attrib={'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
                                                 'xsi:schemaLocation': 'http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.1.xsd',
                                                 'xmlns': 'http://www.crossref.org/schema/5.3.1',
-                                                'xmlns:jats': 'http://www.ncbi.nlm.nih.gov/JATS1',
                                                 'xmlns:fr': 'http://www.crossref.org/fundref.xsd',
-                                                'xmlns:mml': 'http://www.w3.org/1998/Math/MathML',
                                                 'version': '5.3.1'})
     head = ET.SubElement(doi_batch, 'head')
     ET.SubElement(head, 'doi_batch_id').text = batchid
@@ -396,24 +512,16 @@ if __name__ == '__main__':
                        'name': 'Test Journal',
                        'publisher': 'Society of Nonsense',
                        'DOI_PREFIX': '10.1729'})
+    from lxml import etree
     article = get_jats(journal, '17/5', compilation)
-    #article = ET.parse('bmj_sample.xml').getroot()
     ET.indent(article, space='  ', level=1)
-    #article_str = ET.tostring(article, encoding='utf-8', xml_declaration=True).decode('utf-8')
     article_str = ET.tostring(article, encoding='utf-8').decode('utf-8')
     jats_file = Path(args.jats_file)
     if args.overwrite or not jats_file.is_file():
         jats_file.write_text(article_str, encoding='utf-8')
     else:
         print('not saving jats file')
-    #xsd = xmlschema.XMLSchema('tests/testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd')
-    #for err in xsd.iter_errors(article):
-    #    print(err)
-    #    if not err.reason.startswith("'xlink:href' attribute not allowed for element"):
-    #xsd.validate(article)
-    #print(xsd.is_valid(article))
 
-    from lxml import etree
     schema_root = etree.parse('tests/testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd')
     schema = etree.XMLSchema(schema_root)
     root = etree.fromstring(article_str)

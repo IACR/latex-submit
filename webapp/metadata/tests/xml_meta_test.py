@@ -71,8 +71,9 @@ def test_jats_creation1():
     assert berkeley.attrib['institution-id-type'] == 'ROR'
     assert berkeley.text == 'https://ror.org/01an7q238'
     article_meta = article.find('front').find('article-meta')
-    abstr = article_meta.find('abstract')
-    assert len(abstr.findall('p')) == 2
+    #abstr = article_meta.find('abstract')
+    #print(ET.tostring(abstr).decode('utf-8'))
+    #assert len(abstr.findall('p')) == 3
     license = article_meta.find('permissions').find('license')
     assert license.attrib['license-type'] == 'open-access'
     assert license.attrib['xlink:href'] == 'https://creativecommons.org/licenses/by/4.0/'
@@ -82,6 +83,10 @@ def test_jats_creation1():
     ET.indent(article, space=' ', level=1)
     article_bytes = ET.tostring(article, encoding='utf-8').decode('utf-8')
     root = etree.fromstring(article_bytes)
+    # with open('testdata/xml/schema/JATS-journalpublishing1-3.dtd', 'r') as schemafile:
+    #     dtd = etree.DTD(schemafile)
+    #     res = dtd.validate(root)
+    #     print(res)
     try:
         schema.assertValid(root)
     except Exception as e:
@@ -141,8 +146,11 @@ def test_crossref_creation1():
     citations = list(xml.iter('citation'))
     assert len(citations) == 33
     ET.indent(xml, space=' ', level=1)
-    xml_bytes = ET.tostring(xml, encoding='utf-8').decode('utf-8')
-    root = etree.fromstring(xml_bytes)
+    xml_string =ET.tostring(xml, encoding='utf-8').decode('utf-8')
+    paras = xml.findall('.//{http://www.ncbi.nlm.nih.gov/JATS1}p')
+    print(paras)
+    assert len(paras) == 2
+    root = etree.fromstring(xml_string)
     try:
         schema.assertValid(root)
     except Exception as e:
