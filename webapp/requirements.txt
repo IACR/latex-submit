@@ -41,6 +41,7 @@ sqlalchemy>=2.0
 # we need werkzeug for flask, flask_login, and MultiDict. The
 # version is pinned in order to maintain compatibility with flask_login
 werkzeug==2.3.7      
+latex2mathml
 # ##########################################################
 # Packages below can be installed from debian.
 lxml                 # from debian
