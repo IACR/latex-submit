@@ -349,7 +349,7 @@ def _register_hotcrp_upload(paperid: str):
     if status.hotcrp == NO_HOTCRP:
         return
     args = [status.hotcrp, status.hotcrp_id, status.email]
-    auth = hmac.new(current_app.config['HOTCRP_API_KEY'].encode('utf-8'),
+    auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
                     (''.join(args)).encode('utf-8'), hashlib.sha256).hexdigest()
     payload = {'auth': auth,
                'action': 'finalPaper',
