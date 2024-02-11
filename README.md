@@ -531,7 +531,7 @@ namely that it should fulfill the need for archiving. The CLOCKSS
 system is organized around an AU (Archival Unit) and in our case that
 corresponds to an issue. It would be nice to make our export format
 consistent with the format required by
-[CLOCKSS](https://lockss.github.io/clockss-file-transfer-guidelines.htmlhttps://lockss.github.io/clockss-file-transfer-guidelines.html)
+[CLOCKSS](https://lockss.github.io/clockss-file-transfer-guidelines.html)
 but unfortunately that format is rather vague. The format that we use
 is at least consistent with their requirements.
 

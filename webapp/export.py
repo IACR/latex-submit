@@ -1,20 +1,33 @@
-"""This is for exporting a bundle of papers for an issue. The format consists of a zip file with
-three components:
-1. a file issue.json that contains metadata.
+"""
+This is for exporting a bundle of papers for an issue. The format
+ consists of a zip file with several components:
+1. a issue.json file with metadata about the issue itself.
 2. a subdirectory named `paperno` for each paper.
-3. within each subdirectory it contains main.pdf, compilation.json, jats.xml, and all.zip
+4. within each subdirectory it contains main.pdf, compilation.json, jats.xml, and all.zip
    with the LaTeX sources.
 
-The compilation.json file is exported from
-metadta/compilation.py::Compilation, and there is a JSON schema to
-describe this as well as a python file to validate them. The jats.xml
-file is included because it has a well-established JATS 1.3 publishing
-tag set schema (see
-https://jats.nlm.nih.gov/publishing/tag-library/1.3/chapter/journal-tag-set-intro.html). It
-is derived from other metadata including the issue, and includes only
+The issue.json file will contain:
+  export: datetime
+  issue_number: name of the issue
+  volume_number: name of the volume
+  journal_name:
+The export schema for meta.json is an extension of the `compilation::Meta` object
+in which some elements of `Compilation` itself are pushd down:
+1. submitted
+2. accepted
+3. compiled
+4. paperid
+5. bibtex
+6. email as 'corresponding_author'
+
+The jats.xml file is included because it has a well-established JATS
+1.3 publishing tag set schema (see
+https://jats.nlm.nih.gov/publishing/tag-library/1.3/chapter/journal-tag-set-intro.html).
+It is derived from other metadata including the issue, and includes only
 the <front> and <back> elements of an article (not the content). Note
 that some metadata elements such as submission date and acceptance
 date are only in the compilation.json file.
+
 """
 
 from datetime import datetime
@@ -40,28 +53,33 @@ def _datetime_serialize(obj):
 def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
     """data_path is the DATA_DIR from app.config"""
     volume = issue.volume
+    journal = volume.journal
     now = datetime.now()
     issuedata = {'exported': now,
-                 'issue_name': issue.name,
-                 'volume_name': volume.name,
+                 'issue_number': issue.name,
+                 'volume_number': volume.name,
+                 'journal_name': journal.name,
+                 'journal_acronym': journal.acronym,
+                 'publisher': journal.publisher,
                  'year': now.year,
                  'paper_numbers': {}}
+    if journal.EISSN:
+        issuedata['EISSN'] = journal.EISSN
     if issue.hotcrp:
         issuedata['hotcrp'] = issue.hotcrp
     if issue.description:
         issuedata['issue_description'] = issue.description
-    # This assumes that all papers associated with the issue are ready to be published
-    for paperstatus in issue.papers:
-        if paperstatus.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
-            issuedata['paper_numbers'][paperstatus.paperid] = paperstatus.paperno
-    if issue.description:
-        issuedata['title'] = issue.description
     filename = '{}_{}.zip'.format(volume.name, issue.name)
     zip_path = output_path / Path(filename)
     zip_file = zipfile.ZipFile(zip_path, 'w')
-    zip_file.writestr('issue.json', json.dumps(issuedata, indent=2, default=_datetime_serialize))
-    # This assumes that all papers associated with the issue are ready to be published
+    # We only export papers in the issue that have status of COPY_EDIT_ACCEPT
+    # The UI should only show the export feature if this is true, but we check anyway.
+    export_papers = []
     for paperstatus in issue.papers:
+        if paperstatus.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
+            issuedata['paper_numbers'][paperstatus.paperid] = paperstatus.paperno
+            export_papers.append(paperstatus)
+    for paperstatus in export_papers:
         paper_path = data_path / Path(paperstatus.paperid) / Path(Version.FINAL.value)
         pdf_file = paper_path / Path('output/main.pdf')
         if not pdf_file.is_file():
@@ -75,15 +93,14 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         zip_file.write(str(pdf_file), arcname='{}/main.pdf'.format(paperstatus.paperno))
         zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
-        # Remove some fields from the compilation.
-        data = comp.model_dump(exclude={'email': True,
-                                        'status': True,
-                                        'exit_code': True,
-                                        'error_log': True,
-                                        'warning_log': True,
-                                        'zipfilename': True,
-                                        'output_files': True,
-                                        'meta': {'version': True}})
+        # build a json object from compilation.
+        data = comp.meta.model_dump(exclude={'version': True})
+        data['submitted'] = comp.submitted[:10]
+        data['accepted'] = comp.accepted[:10]
+        data['compiled'] = comp.compiled.strftime('%Y-%m-%d')
+        data['paperid'] = comp.paperid
+        data['bibtex'] = comp.bibtex
+        data['corresponding_author'] = comp.email
         zip_file.writestr('{}/meta.json'.format(paperstatus.paperno),
                           json.dumps(data, indent=2, default=_datetime_serialize))
         jats_elem = get_jats(issue.volume.journal, '{}/{}/{}'.format(issue.volume.name,
@@ -92,6 +109,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         ET.indent(jats_elem, space='  ', level=0)
         jats_str = ET.tostring(jats_elem, encoding='utf-8').decode('utf-8')
         zip_file.writestr('{}/jats.xml'.format(paperstatus.paperno), jats_str)
+    zip_file.writestr('issue.json', json.dumps(issuedata, indent=2, default=_datetime_serialize))
     zip_file.close()
     return now
 

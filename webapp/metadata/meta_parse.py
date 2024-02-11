@@ -68,16 +68,22 @@ def check_bib_entry(key: str, entry: Entry):
         for field in _required_fields.get(typ):
             if '/' in field:
                 alts = field.split('/')
-                if alts[0] not in entry.fields and alts[1] not in entry.fields:
+                if not entry.fields.get(alts[0], None) and not entry.fields.get(alts[1], None):
                     errors.append('bibtex entry {} ({}) should have {} field or {} field'.format(key,
                                                                                                  title,
                                                                                                  alts[0],
                                                                                                  alts[1]))
+                    # If this doesn't get fixed, it can cause problems downstream when
+                    # there is an empty entry.
+                    entry.fields[alts[0]] = '?'
             else:
-                if field not in entry.fields:
+                if not entry.fields.get(field, None):
                     errors.append('bibtex entry {} ({}) requires {} field'.format(key,
                                                                                   title,
                                                                                   field))
+                    # If this doesn't get fixed, it can cause problems downstream when
+                    # there is an empty entry.
+                    entry.fields[field] = '?'
     return errors
 
 # pybtex produces exceptions for parse errors and missing required fields.
