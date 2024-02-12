@@ -162,7 +162,10 @@ class VersionEnum(StrEnum):
     PREPRINT = 'preprint'
 
 class Meta(BaseModel):
-    """Metadata encoded in LaTeX files using iacrcc.cls."""
+    """Metadata encoded in LaTeX files using iacrcc.cls. Note that
+    the IACR/cicjournal repository has a PaperMeta class that extends
+    this, and the schemas must be kept in sync.
+    """
     schema_version: SchemaVersion = Field(default=SchemaVersion.VERSION1,
                                           title='Data format may evolve over time.',
                                           description=('The schema is serialized to disk, so that future versions can migrate '

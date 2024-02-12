@@ -47,7 +47,7 @@ except Exception as e:
 
 def _datetime_serialize(obj):
     if isinstance(obj, datetime):
-        return obj.strftime('%Y-%m-%d %H-%M-%S')
+        return obj.strftime('%Y-%m-%d %H:%M:%S')
     raise TypeError('Type {} is not serializable'.format(str(type(obj))))
 
 def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
@@ -93,11 +93,15 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         zip_file.write(str(pdf_file), arcname='{}/main.pdf'.format(paperstatus.paperno))
         zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
-        # build a json object from compilation.
+        # build a json object from compilation. The schema for this is in the
+        # IACR/cicjournal repository as PaperMeta, and tha tmust be kept in sync with
+        # what we export here. Ideally we would share the code for these, but I hate
+        # git submodules. We essentially create an extended Meta class that contains
+        # elements of Compilation.
         data = comp.meta.model_dump(exclude={'version': True})
-        data['submitted'] = comp.submitted[:10]
-        data['accepted'] = comp.accepted[:10]
-        data['compiled'] = comp.compiled.strftime('%Y-%m-%d')
+        data['submitted'] = comp.submitted
+        data['accepted'] = comp.accepted
+        data['compiled'] = comp.compiled.strftime('%Y-%m-%d %H:%M:%S')
         data['paperid'] = comp.paperid
         data['bibtex'] = comp.bibtex
         data['corresponding_author'] = comp.email
