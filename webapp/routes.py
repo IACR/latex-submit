@@ -306,8 +306,8 @@ def submit_version():
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
     if paper_status.issue:
-        metadata += '\\setvolume{' + str(paper_status.issue.volume.name) + '}\n'
-        metadata += '\\setnumber{' + str(paper_status.issue.name) + '}\n'
+        metadata += '\\def\\IACR@vol{' + str(paper_status.issue.volume.name) + '}\n'
+        metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
