@@ -46,10 +46,12 @@ function showPage(pageno) {
 function showLogLine(error_type, line) {
   const logTab = document.querySelector('button[data-bs-target="#nav-log"]')
   bootstrap.Tab.getOrCreateInstance(logTab).show()
+  console.log('line='+line);
   let id = 'logline-' + line;
   if (error_type == 'bibtex') {
     id = 'bibtex-' + line;
   }
+  console.log('id='+id);
   let logline = document.getElementById(id);
   logline.scrollIntoView({behavior: 'smooth'});
   document.querySelectorAll('div.highlight_log_line').forEach((el) => {
@@ -57,6 +59,18 @@ function showLogLine(error_type, line) {
   });
   logline.classList.add('highlight_log_line');
 }
+function scrollToBibtex(id) {
+  if (id) {
+    console.log(id);
+    bibentry = document.getElementById('bibtex:' + id);
+    if (bibentry) {
+      const inputTab = document.querySelector('button[data-bs-target="#nav-source"]');
+      bootstrap.Tab.getOrCreateInstance(inputTab).show();
+      bibentry.scrollIntoView({behavior: 'smooth'});
+    }
+  }
+}
+
 function showWhere(elem) {
   let data = elem.dataset;
   if ('pageno' in data) {

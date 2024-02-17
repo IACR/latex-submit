@@ -6,6 +6,7 @@ from flask_mail import Message
 import hmac
 import markdown
 import os
+import re
 from pathlib import Path
 import random
 import requests
@@ -20,6 +21,7 @@ from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
+from .bibmarkup import mark_bibtex
 from werkzeug.datastructures import MultiDict
 import hashlib
 import logging
@@ -814,6 +816,8 @@ def view_results(paperid, version, auth):
         data['bibtex_log'] = bibtex_log.read_text(encoding='UTF-8', errors='replace').splitlines()
     else:
         data['bibtex_log'] = ['No bibtex log']
+    if comp.bibtex:
+        data['marked_bibtex'] = mark_bibtex(comp.bibtex)
     pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
     data['submit_url'] = url_for('home_bp.show_submit_version',
                                  paperid=paperid,

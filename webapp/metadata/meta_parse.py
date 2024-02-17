@@ -46,9 +46,9 @@ _required_fields = {
     "proceedings": ["title", "year/date"],
     "inproceedings": ["author", "title", "booktitle", "year/date", "doi/url"],
     "thesis": ["author", "title", "type", "institution", "year/date"],
-    "phdthesis": ["author", "title", "type", "institution", "year/date"],
+    "phdthesis": ["author", "title", "school", "year/date"],
     "unpublished": ["author", "title", "year/date"],
-    "mastersthesis": ["author", "title", "institution", "year/date"],
+    "mastersthesis": ["author", "title", "school", "year/date"],
     "techreport": ["author", "title", "institution", "year/date"],
 }
 

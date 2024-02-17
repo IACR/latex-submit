@@ -1,0 +1,17 @@
+{# This is shared between view.html and admin/copyedit.html #}
+<p><a href="/output/{{paperid}}/{{version}}">Download zip file of all sources</a> (Note: some files below may have been removed before compiling)</p>
+          <div id="sourcefile">
+            {% if comp.output_files %}
+            <ol>
+              {% for f in comp.output_files %}
+              <li><span class="lognav" data-filepath="{{f}}" onclick="showSource(this)">{{f}}</span></li>
+              {% endfor %}
+            </ol>
+            {% endif %}
+          </div>
+          {% if marked_bibtex %}
+          <h5 class="mt-3">Extracted Bibliography</h5>
+          <pre style="overflow:hidden">{{marked_bibtex|safe}}</pre>
+          {% else %}
+          <h5 class="mt-3 text-danger">No bibliography extracted</h5>
+          {% endif %}

@@ -18,7 +18,7 @@ This template is used to show the status of a compilation for iacrcc.cls
    max-height:80vh;
    font-family:monospace;
  }
- div#nav-log {
+ div#nav-source, div#nav-log {
    overflow-y: scroll;
    max-height:80vh;
  }
@@ -134,10 +134,15 @@ This template is used to show the status of a compilation for iacrcc.cls
               {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
             </div>
             <div class="col-4">
+              {% if err.text.startswith('bibtex entry ') %}
+              {% set bibtex_key = err.text.split()[2] %}
+              <span class="lognav" onclick="scrollToBibtex('{{bibtex_key}}');">Show bibtex entry</span>
+              {% else %}
               {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
                                      {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
                                      class="lognav" title="Show source file">{{filepath}}
               {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
+              {% endif %}
             </div>
           </div>
         </div>
@@ -266,23 +271,7 @@ This template is used to show the status of a compilation for iacrcc.cls
           </i-mono>
         </div>
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
-          <p><a href="/output/{{paperid}}/{{version}}">Download zip file of all sources</a> (Note: some files below may have been removed before compiling)</p>
-          <div id="sourcefile">
-            {% if comp.output_files %}
-            <ol>
-              {% for f in comp.output_files %}
-              <li><span class="lognav" data-filepath="{{f}}" onclick="showSource(this)">{{f}}</span></li>
-              {% endfor %}
-            </ol>
-            {% endif %}
-          </div>
-          {% if comp.bibtex %}
-          <h5 class="mt-3">Extracted Bibliography</h5>
-          <p>Note: citations from cryptobib are not currently extracted</p>
-          <pre>{{comp.bibtex}}</pre>
-          {% else %}
-          <h5 class="mt-3 text-danger">No bibliography extracted</h5>
-          {% endif %}
+          {% include "nav_source_tab.html" %}
         </div>
         <div class="tab-pane fade show p-3" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab">
           {% if not comp.meta %}
