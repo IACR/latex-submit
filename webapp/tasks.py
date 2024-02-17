@@ -164,7 +164,7 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                                 if not author.orcid:
                                     compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
                                                                                    logline=0,
-                                                                                   help='See <a target="_blank" href="https://orcid.org/orcid-search/search?{}">ORCID search</a>'.format(urlencode({'searchQuery': author.name})),
+                                                                                   help='See <a target="_blank" href="https://orcid.org/orcid-search/search?{}">ORCID search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'searchQuery': author.name})),
                                                                                    text='author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name)))
                                 if not author.affiliations:
                                     compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
@@ -177,7 +177,7 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                                             compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
                                                                                            logline=0,
                                                                                            text='affiliation {} may have a ROR ID'.format(aff.name),
-                                                                                           help='See <a href="https://ror.org/search?{}" target="_blank">ROR search</a>'.format(urlencode({'query': aff.name}))))
+                                                                                           help='See <a href="https://ror.org/search?{}" target="_blank">ROR search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'query': aff.name}))))
                             if compilation.meta.version != VersionEnum.FINAL:
                                 compilation.status = CompileStatus.WRONG_VERSION
                                 compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
