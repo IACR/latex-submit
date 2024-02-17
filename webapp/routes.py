@@ -21,6 +21,7 @@ from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
 from werkzeug.datastructures import MultiDict
+import hashlib
 import logging
 
 ENGINES = {'lualatex': 'latexmk -g -recorder -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
@@ -308,6 +309,7 @@ def submit_version():
     if paper_status.issue:
         metadata += '\\def\\IACR@vol{' + str(paper_status.issue.volume.name) + '}\n'
         metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
+    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi={\IACR@DOI}\&domain=pdf\&date\_stamp={\IACR@Published}}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')

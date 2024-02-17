@@ -720,8 +720,9 @@ def change_issue():
     metadata += '\\def\\IACR@Received{' + compilation.submitted[:10] + '}\n'
     metadata += '\\def\\IACR@Accepted{' + compilation.accepted[:10] + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
-    metadata += '\\setvolume{' + str(volume.name) + '}\n'
-    metadata += '\\setnumber{' + str(issue.name) + '}\n'
+    metadata += '\\def\\IACR@vol{' + str(volume.name) + '}\n'
+    metadata += '\\def\\IACR@no{' + str(issue.name) + '}\n'
+    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi={\IACR@DOI}\&domain=pdf\&date\_stamp={\IACR@Published}}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     # Remove output from any previous run.
