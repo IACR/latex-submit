@@ -118,7 +118,7 @@ This template is used to show the status of a compilation for iacrcc.cls
              {% if filepath_line %}
              data-filepath_line="{{err.filepath_line}}"
              {% endif %}>
-          {{err.text}}{% if err.help %}<br><span class="lognav">{{ err.help }}</span>{% endif %}
+          {{err.text}}{% if err.help %}<br><span class="lognav">{{ err.help|safe }}</span>{% endif %}
           <div class="row">
             {% if err.filepath %}
             {% if err.filepath.startswith('/usr/') %}

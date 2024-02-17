@@ -846,7 +846,7 @@ def view_results(paperid, version, auth):
             form = NotifyFinalForm(formdata=formdata)
             data['form'] = form
             data['next_action'] = 'final review'
-    else:
+    else: # these do not go through peer review yet.
         formdata = MultiDict({'paperid': comp.paperid,
                               'email': comp.email,
                               'auth': create_hmac([comp.paperid,
