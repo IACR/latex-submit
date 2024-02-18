@@ -1,6 +1,7 @@
+import json
 from pathlib import Path
 import pytest
-from .bibmarkup import mark_bibtex
+from .bibmarkup import mark_bibtex, bibtex_to_html
 
 def test_markup():
     bibtex = r"""
@@ -71,5 +72,14 @@ def test_markup_file():
     marked = mark_bibtex(bibstr)
     print(marked)
     entries = marked.count('@')
+    assert entries == 86
     assert entries == bibstr.count('@')
     assert marked.count('<span') == entries
+
+def test_html():
+    bibfile = Path('testdata/test.bib')
+    bibstr = bibfile.read_text(encoding='UTF-8')
+    data = bibtex_to_html(bibstr)
+    print(json.dumps(data, indent=2))
+    assert len(data['errors']) == 0
+    assert len(data['references']) == 86

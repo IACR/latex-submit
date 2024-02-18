@@ -17,11 +17,11 @@ import string
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue, NO_HOTCRP
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus
+from .metadata.compilation import Compilation, CompileStatus, CompileError, ErrorType
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
-from .bibmarkup import mark_bibtex
+from .bibmarkup import mark_bibtex, bibtex_to_html
 from werkzeug.datastructures import MultiDict
 import hashlib
 import logging
@@ -818,6 +818,13 @@ def view_results(paperid, version, auth):
         data['bibtex_log'] = ['No bibtex log']
     if comp.bibtex:
         data['marked_bibtex'] = mark_bibtex(comp.bibtex)
+        htmlbib = bibtex_to_html(comp.bibtex)
+        if htmlbib['errors']:
+            for error in htmlbib['errors']:
+                comp.warning_log.append(CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                     logline=0,
+                                                     text='Error in converting bibtex to html: ' + error))
+        data['references'] = htmlbib['references']
     pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
     data['submit_url'] = url_for('home_bp.show_submit_version',
                                  paperid=paperid,

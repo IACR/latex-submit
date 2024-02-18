@@ -22,6 +22,9 @@ This template is used to show the status of a compilation for iacrcc.cls
    overflow-y: scroll;
    max-height:80vh;
  }
+ div#nav-html {
+   max-width: 800px;
+ }
  span.keyword {
    background-color: #d1e7dd !important;
  }
@@ -176,7 +179,10 @@ This template is used to show the status of a compilation for iacrcc.cls
 	{% if comp.meta %}
 	{% set meta = comp.meta %}
         <div class="tab-pane active fade show p-3 mathjax" id="nav-html" role="tabpanel" aria-labelledby="nav-html-tab">
-	  <h4>{{meta.title}}</h4>
+	  <p class="alert alert-info">
+            This is approximately what part of the HTML page will look like. Please check the abstract, title, and references.
+          </p>
+          <h3>{{meta.title}}</h3>
 	  <div>
 	    <div id="authorlist" class="authorlist">
 	      {% for author in meta.authors %}
@@ -207,11 +213,11 @@ This template is used to show the status of a compilation for iacrcc.cls
 	    </div>
 	    {% endif %}
 	    {%- if meta.abstract -%}
-	    <h3 class="mt-4">Abstract</h3>
+	    <h4 class="mt-4">Abstract</h4>
 	    {{meta.abstract|safe}}
 	    {% endif %}
 	    {% if references %}
-	    <h3 class="mb-3">References</h3>
+	    <h4 class="mb-3">References</h4>
 	    {% for entry in references %}
 	    <div class="d-flex">
 	      <div style="min-width:3rem;">[{{loop.index}}]</div>
