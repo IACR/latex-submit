@@ -111,6 +111,8 @@ def bibtex_to_html(bibstr):
             for entry in bibdata.entries.values():
                 if 'note' in entry.fields:
                     del entry.fields['note']
+                if 'howpublished' in entry.fields:
+                    del entry.fields['howpublished']
             style = BibStyle()
             backend = pybtex.plugin.find_plugin('pybtex.backends', 'html')()
             formatted = style.format_bibliography(bibdata)
