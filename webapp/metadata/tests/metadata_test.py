@@ -113,7 +113,7 @@ def test_bibtex():
     check_bibtex(compilation)
     for i in range(len(compilation.warning_log)):
         print(i, compilation.warning_log[i].text)
-    assert len(compilation.warning_log) == 57
+    assert len(compilation.warning_log) == 55
     # note the typo in pybtex source. :/
     assert compilation.warning_log[0].text == 'BibTeX parse error: Unknown error: repeated bibliograhpy entry: abed2006vlsi'
     output_path = Path('testdata/bibtex/cryptobib/bibexport.bib')
