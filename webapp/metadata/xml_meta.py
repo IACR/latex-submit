@@ -1,3 +1,7 @@
+"""Create JATS content for a paper. We used to create the crossref
+XML in this server, but we have now moved it to the hosting server
+that knows about the URLS being served.
+"""
 from datetime import datetime
 from nameparser import HumanName
 from pathlib import Path

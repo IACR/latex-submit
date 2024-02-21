@@ -176,9 +176,6 @@ class Meta(BaseModel):
     DOI: Optional[str] = Field(default=None,
                                title='The DOI of the official publication',
                                description='Omits any URL resolver part.')
-    URL: Optional[str] = Field(default=None,
-                               title='The permanent URL assigned to the paper after publication.',
-                               description='This should remain permanent.')
     authors: List[Author] = Field(...,
                                   min_length=1,
                                   title='List of authors of the paper',
@@ -331,6 +328,10 @@ class Compilation(BaseModel):
     bibtex: Optional[str] = Field(default=None,
                                   title='BibTeX entries that are cited',
                                   description='List of references cited from the paper in BibTeX format. These are not guaranteed to be valid, but are what the author supplied.')
+    model_config = ConfigDict(validate_default=True,
+                              validate_assignment=True,
+                              use_enum_values=True,
+                              extra="ignore")
     
 
 if __name__ == '__main__':

@@ -194,7 +194,6 @@ def test_affiliation():
 _meta_data = {
     'version': 'final',
     'DOI': '10.1729/az2lkj',
-    'URL': 'https://cic.iacr.org/p/1/44',
     'authors': [
         {
             'name': 'Fester Bestertester',
