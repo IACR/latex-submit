@@ -11,7 +11,8 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.meta_parse import clean_abstract, validate_abstract, check_bibtex, extract_bibtex
+from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
+from .metadata.xml_meta import validate_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser, BibTexLogParser
 from .metadata.db_models import CompileRecord, TaskStatus, PaperStatus
