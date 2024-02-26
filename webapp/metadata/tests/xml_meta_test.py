@@ -7,7 +7,8 @@ from lxml import etree
 sys.path.insert(0, '..')
 from compilation import Compilation, Meta
 from db_models import Journal
-from xml_meta import get_jats
+from meta_parse import clean_abstract, validate_abstract
+from xml_meta import get_jats, text_with_texmath, get_jats_abstract
 sys.path.insert(0, '../..')
 from config import DebugConfig
 
@@ -17,6 +18,80 @@ _journal = Journal({'EISSN': '1234-5678',
                     'DOI_PREFIX': '10.1729',
                     'acronym': 'CiC',
                     'publisher': 'Association of Morons'})
+def test_with_texmath():
+    input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list.</p>"
+    output = text_with_texmath(input)
+    assert output.count('<p>') == 2
+    assert '<tex-math><![CDATA[$a<b$]]></tex-math>' in output
+
+def test_get_jats_abstract():
+    input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list.</p>"
+    elem = get_jats_abstract(input)
+    print(ET.tostring(elem))
+    children = list(elem.iter())
+    assert len(children) == 10
+    assert children[0].tag == 'abstract'
+    assert children[1].tag == 'p'
+    assert children[2].tag == 'tex-math'
+    assert children[2].text == '$a<b$'
+    assert children[3].tag == 'p'
+    assert children[4].tag == 'list'
+    assert children[4].attrib['list-type'] == 'bullet'
+    assert children[5].tag == 'list-item'
+    assert children[6].tag == 'p'
+    assert children[6].text == 'first item'
+    assert children[7].tag == 'list-item'
+    assert children[8].tag == 'p'
+
+def test_jats_abstract2():
+    input = Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8')
+    clean = clean_abstract(input)
+    elem = get_jats_abstract(clean)
+    tags = list(elem.iter())
+    assert len(tags) == 17
+    for i in range(len(tags)):
+        print(i,tags[i].tag)
+    assert tags[0].tag == 'abstract'
+    assert tags[1].tag == 'p'
+    assert tags[2].tag == 'p'
+    assert tags[3].tag == 'tex-math'
+    assert tags[4].tag == 'tex-math'
+    assert tags[5].tag == 'tex-math'
+    assert tags[6].tag == 'tex-math'
+    assert tags[7].tag == 'tex-math'
+    assert tags[8].tag == 'p'
+    assert tags[9].tag == 'p'
+    assert tags[10].tag == 'list'
+    assert tags[11].tag == 'list-item'
+    assert tags[12].tag == 'p'
+    assert tags[13].tag == 'list-item'
+    assert tags[14].tag == 'p'
+    assert tags[15].tag == 'p'
+    assert tags[16].tag == 'span'
+
+def test_jats_abstract3():
+    input = Path('testdata/abstracts/abstract3.txt').read_text(encoding='UTF-8')
+    clean = clean_abstract(input)
+    elem = get_jats_abstract(clean)
+    tags = list(elem.iter())
+    assert len(tags) == 23
+    assert tags[3].tag == 'list'
+    assert tags[4].tag == 'list-item'
+    assert tags[5].tag == 'p'
+    assert tags[6].tag == 'list-item'
+    assert tags[12].tag == 'tex-math'
+    assert tags[13].tag == 'p'
+    assert tags[14].tag == 'p'
+    assert tags[15].tag == 'list'
+    assert tags[16].tag == 'list-item'
+    assert tags[17].tag == 'p'
+    assert tags[17].text == 'items are ordered when '
+    assert tags[18].tag == 'tex-math'
+    assert tags[19].tag == 'list-item'
+    assert tags[20].tag == 'p'
+    assert tags[21].tag == 'list-item'
+    assert tags[22].tag == 'p'
+
 def test_jats_creation1():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     json_file = Path('testdata/xml/compilation1.json')
@@ -97,6 +172,21 @@ def test_jats_creation1():
 def test_jats_creation2():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     json_file = Path('testdata/xml/compilation2.json')
+    compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
+    article = get_jats(_journal, '3/5', compilation)
+    ET.indent(article, space=' ', level=1)
+    article_str = ET.tostring(article, encoding='utf-8').decode('utf-8')
+    root = etree.fromstring(article_str)
+    try:
+        schema.assertValid(root)
+    except Exception as e:
+        print('error:' + str(e))
+        print(schema.error_log)
+    assert schema.validate(root) == True
+
+def test_jats_creation3():
+    schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
+    json_file = Path('testdata/xml/compilation3.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(_journal, '3/5', compilation)
     ET.indent(article, space=' ', level=1)

@@ -33,7 +33,7 @@ class Config:
             'acronym': 'CiC',
             'name': 'IACR Communications in Cryptology',
             'publisher': 'International Association for Cryptologic Research',
-            'EISSN': None,
+            'EISSN': '3006-5496',
             'DOI_PREFIX': '10.62056'
         },
         {

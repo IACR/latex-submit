@@ -9,10 +9,14 @@ import pybtex.errors
 import random
 import re
 import string
+import sys
 import tempfile
 import xml.etree.ElementTree as ET
 from pylatexenc import latexwalker
 from pylatexenc.latex2text import LatexNodes2Text, get_default_latex_context_db, MacroTextSpec, EnvironmentTextSpec, SpecialsTextSpec
+
+# because of arxiv_latex_cleaner
+assert sys.version_info >= (3,9)
 
 try:
     from .compilation import CompileError, ErrorType, Compilation
@@ -208,8 +212,44 @@ def illegal_handler(n):
         return "<span class='text-danger'>Illegal environment in textabstract: '\\begin{{{}}}'</span>".format(n.environmentname)
     return "<span class='text-danger'>Illegal latex construct in textabstract: '{}'</span>".format(n.latex_verbatim())
 
-def item_encoder(r, l2tobj):
-    return  (l2tobj.nodelist_to_text([r.nodeoptarg]) if r.nodeoptarg else '<br>⦁ ')
+# The code below is used for handling things like \begin{enumerate}\item first\item second\end{enumerate}
+class EnumContext:
+    """Used to keep track of being in an itemize or enumerate environment."""
+    def __init__(self, env=None, nest_level=0, item_no=0):
+        self.env = env # the name of the environment.
+        self.nest_level = nest_level # we do not support nesting of itemize or enumerate.
+        self.item_no = item_no # the item number in the list (starting at 1)
+
+def enum_environment_to_text(n, l2tobj):
+    if n.environmentname not in ('enumerate', 'itemize'):
+        # in particular we do not support description.
+        raise RuntimeError('environment must be "itemize" or "enumerate"')
+    try:
+        old_context = getattr(l2tobj, 'context_enum_environment', EnumContext())
+        if old_context.nest_level > 0:
+            return r"<span class='text-danger'>nesting of enumerate or itemize is not allowed</span>"
+        l2tobj.context_enum_environment = EnumContext(n.environmentname, old_context.nest_level+1, 0)
+        if n.environmentname == 'enumerate':
+            s = '</p><ol>' + l2tobj.nodelist_to_text(n.nodelist) + '</li></ol><p>'
+        else:
+            s = '</p><ul>' + l2tobj.nodelist_to_text(n.nodelist) + '</li></ul><p>'
+    finally:
+        l2tobj.context_enum_environment = old_context
+    return s
+
+def item_to_text(n, l2tobj):
+    enumcontext = getattr(l2tobj, 'context_enum_environment', EnumContext())
+    itemstr = ''
+    enumcontext.item_no += 1
+    if n.nodeoptarg:
+        itemstr = l2tobj.nodelist_to_text([n.nodeoptarg])
+    if enumcontext.env == 'itemize' or enumcontext.env == 'enumerate':
+        if enumcontext.item_no > 1:
+            itemstr += '</li>'
+        itemstr += '<li>'
+    else:
+        itemstr = r"<span class='text-danger'>\item only allowed inside enumerate or itemize environment in textabstract.</span>"
+    return itemstr
 
 def get_converter():
     """Return a customized LatexNodes2Text for latex => text conversion. This outputs HTML to
@@ -217,17 +257,24 @@ def get_converter():
     """
     lt_context_db = get_default_latex_context_db().filter_context(
         exclude_categories=['latex-placeholders'])
+    lt_context_db.add_context_category('enum-context',
+                                       macros=[
+                                           MacroTextSpec('item', simplify_repl=item_to_text)
+                                       ],
+                                       environments=[
+                                           EnvironmentTextSpec('enumerate', simplify_repl=enum_environment_to_text),
+                                           EnvironmentTextSpec('itemize', simplify_repl=enum_environment_to_text),
+                                       ],
+                                       prepend=True)
     lt_context_db.add_context_category('stripper',
-                                       macros=[MacroTextSpec('item', simplify_repl=item_encoder),
-                                               MacroTextSpec('textsf', '%s'),
+                                       macros=[MacroTextSpec('textsf', '%s'),
                                                MacroTextSpec('href', simplify_repl=illegal_handler),
                                                MacroTextSpec('sc', ''),
                                                MacroTextSpec('boldmath', ''),
                                                MacroTextSpec('bm', ''),
+                                               MacroTextSpec('todo', simplify_repl=illegal_handler),
                                                MacroTextSpec('sl', '')],
-                                       environments=[EnvironmentTextSpec('math', discard=False),
-                                                     EnvironmentTextSpec('itemize', simplify_repl='%s<br>'),
-                                                     EnvironmentTextSpec('enumerate', simplify_repl='%s<br>')],
+                                       environments=[EnvironmentTextSpec('math', discard=False)],
                                        specials= [
                                            SpecialsTextSpec('&', '&'), # leave these alone since they may occur
                                            # inside character entities like &gt;
@@ -238,20 +285,25 @@ def get_converter():
     return LatexNodes2Text(math_mode='verbatim', latex_context=lt_context_db)
 
 def clean_abstract(text):
-    """Remove comments, todos, \begin{comment} from abstract. Also replace
-    <, >, and & by their XML entity equivalents and replace \n\n by </p><p>.
-    This allows the abstract to be used safely in HTML. If it encounters
-    illegal macros, then it emits a <span> with an error message. Note that this
-    can be used directly in HTML, but in order to convert it to XML we need
-    to remove <br> and convert the math mode parts to MATHML. We also need
-    to convert &lt; and $gt; back to < and > before calling latex2mathml.
+    """The purpose of this method is to remove comments from the abstract
+    and convert to text that is safe to use within HTML. This means
+    that the mathematical operators < and > are changed to &lt; and
+    &gt; Paragraphs that are signified by a blank line in LaTeX are
+    replaced by </p><p>. Some LaTeX macros are changed into UTF-8, and
+    the enumerate and itemize environments are converted into <ol> and
+    <ul>. Raw mathematics is left intact so it can be handled by
+    MathJax. If it encounters illegal macros, then it emits a <span>
+    with an error message. Abstracts are converted from this format to
+    XML in the get_jats_abstract method.
     """
     lines = text.splitlines(keepends=True)
     # There is some doubt about whether to include things like \textrm
     # in the commands_only_to_delete. It depends on how mathjax or
     # katex is configured.
     args = {'commands_only_to_delete': [],
-            'commands_to_delete': ['todo', 'footnote']}
+            'commands_to_delete': [
+                'todo',
+                'footnote']}
     # This is an internal command, so we may have to change to our own code
     # or using it through subprocess.
     clean_text = arxiv_latex_cleaner._remove_comments_and_commands_to_delete(lines, args)
@@ -259,17 +311,13 @@ def clean_abstract(text):
     # to preserve LaTeX spacing. We remove it unless it is \%
     clean_text = re.sub(r'[^\\]%', '', clean_text)
     clean_text = clean_text.replace('&', '&amp; ').replace('<', '&lt;').replace('>', '&gt;')
-    # If we were to use the text as an attribute, then we would need to replace
-    # single and double quotes. We leave them for now.
-    # clean_text = clean_text.replace('"', '&quot;').replace("'", '&apos;')
     clean_text = re.sub(r'\n\n', '</p><p>', clean_text)
-    clean_text = re.sub(r'\n', ' ', clean_text)
+    clean_text = re.sub(r'\n', ' ', clean_text) # unwrap lines.
     clean_text = '<p>' + clean_text + '</p>'
     converter = get_converter()
-    return converter.latex_to_text(clean_text)
-
-def validate_abstract(input: str):
-    return '</span>' not in input
+    clean_text = converter.latex_to_text(clean_text)
+    patt = re.compile(r'<p>\s*</p>', re.MULTILINE) # remove empty paragraphs.
+    return patt.sub('', clean_text.strip())
 
 if __name__ == '__main__':
     import argparse

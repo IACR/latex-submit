@@ -696,7 +696,7 @@
       "Star-Networks"
     ],
     "title": "MPC With Delayed Parties Over Star-Like Networks",
-    "abstract": "<p>This is a text abstract.</p><p>Note also that $a&lt;b$ but also $a^2&gt;b$ for good luck.</p>",
+    "abstract": "<p>This is a text abstract.</p><p>Note also that $a&lt;b$ but also $$a^2&gt;b$$ for good luck.</p>",
     "license": {
       "name": "CC BY",
       "label": "Creative Commons Attribution",

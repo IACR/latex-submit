@@ -9,8 +9,8 @@ This is the second paragraph. \begin{comment}
 within comment environment.
 \end{comment}
 You may still~\footnote{Go bye bye} use percentages like 10\% of the content.
-We remove \todo{this is a removable todo} and \todo[inline]{so is this} but
-the last one is not removed because arxiv_latex_cleaner does not recognize it.
+We remove \todo{this is a removable todo} and \todo[inline]{so is this} -
+both are removed by arxiv-latex-cleaner.
 \iffalse
 This is also false so should be removed.
 \fi

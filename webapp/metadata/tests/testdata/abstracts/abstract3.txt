@@ -1,0 +1,14 @@
+This is an abstract. We prove that:
+\begin{itemize}
+\item Dogs are worse than cats
+\item Dogs are more annoying than fish.
+\item Cats are more loving than fish.
+\item Cats of $<10$ pounds do not have fleas.
+\end{itemize}
+
+We also show that
+\begin{enumerate}
+\item items are ordered when $a<b$
+\item there are two items
+\item oops there is a third item.
+\end{enumerate}

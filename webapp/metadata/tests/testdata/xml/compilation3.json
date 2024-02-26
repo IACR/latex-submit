@@ -1,0 +1,494 @@
+{
+  "paperid": "55i4rwg3",
+  "venue": "cic",
+  "status": "compilation_success",
+  "email": "skypark@digicrime.com",
+  "submitted": "2022-08-03 06:44:30",
+  "accepted": "2022-09-30 17:49:20",
+  "compiled": "2024-02-21T13:05:20.061219",
+  "compile_time": 19.93,
+  "engine": "pdflatex",
+  "command": "latexmk -g -recorder -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape\" main",
+  "log": "Rc files read:\n",
+  "error_log": [],
+  "warning_log": [
+    {
+      "error_type": "metadata warning",
+      "text": "author Christine van Vredendaal is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Christine+van+Vredendaal\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "metadata warning",
+      "text": "author Denise Verbakel is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Denise+Verbakel\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "metadata warning",
+      "text": "author Frank Custer is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Frank+Custer\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "server warning",
+      "text": "File iacrcc.cls was removed before compiling",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "server warning",
+      "text": "File iacrtrans2.cls was removed before compiling",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "LaTeX Warning: \\include should only be used after \\begin{document} on input line 56.",
+      "logline": 1311,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath": "main.tex",
+      "filepath_line": 56,
+      "severity": 0.0
+    },
+    {
+      "error_type": "underfull vbox",
+      "text": "Underfull \\vbox (badness 10000) has occurred while \\output is active []",
+      "logline": 1903,
+      "pageno": 1,
+      "pdf_line": 0,
+      "filepath": "background.tex",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "overfull hbox",
+      "text": "Overfull \\hbox (0.65787pt too wide) in paragraph at lines 260--263",
+      "logline": 1962,
+      "pageno": 9,
+      "pdf_line": 0,
+      "filepath": "stackstrats.tex",
+      "filepath_line": 260,
+      "severity": 0.65787
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5231) in paragraph at lines 28--36",
+      "logline": 2020,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5231.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 1189) in paragraph at lines 44--48",
+      "logline": 2026,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 1189.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 44--48",
+      "logline": 2032,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 44--48",
+      "logline": 2038,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 86--91",
+      "logline": 2046,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2052,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2058,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2064,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 3364) in paragraph at lines 137--141",
+      "logline": 2069,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 3364.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5490) in paragraph at lines 137--141",
+      "logline": 2075,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5490.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 137--141",
+      "logline": 2081,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 137--141",
+      "logline": 2087,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5741) in paragraph at lines 176--184",
+      "logline": 2093,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5741.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2538) in paragraph at lines 176--184",
+      "logline": 2099,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2538.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5578) in paragraph at lines 176--184",
+      "logline": 2105,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5578.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2608) in paragraph at lines 176--184",
+      "logline": 2111,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2608.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2359) in paragraph at lines 176--184",
+      "logline": 2117,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2359.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry K87 (Elliptic curve cryptosystems) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry NISTcfp (Post-Quantum Cryptography Standardization) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry BSI2020 ({Migration to Post Quantum Cryptography, Recommendations for action by the {BSI}}) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry ANSSI2022 (ANSSI VIEWS ON THE POST-QUANTUM CRYPTOGRAPHY TRANSITION) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry AIVD2022 (Prepare for the threat of quantum computers) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry BRS22 ({Dilithium for Memory Constrained Devices}) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry USENIX:ADPS16 (Post-quantum Key Exchange - {A} New Hope) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry strassen1969gaussian (Gaussian elimination is not optimal) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    }
+  ],
+  "exit_code": 0,
+  "zipfilename": "joppe.zip",
+  "meta": {
+    "schema_version": "1.0",
+    "version": "final",
+    "DOI": "10.62056/aklewlzf8",
+    "authors": [
+      {
+        "name": "Joppe W. Bos",
+        "familyName": "Bos",
+        "email": "joppe.bos@nxp.com",
+        "orcid": "0000-0003-1010-8157",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Olivier Bronchain",
+        "familyName": "Bronchain",
+        "email": "olivier.bronchain@nxp.com",
+        "orcid": "0000-0001-7595-718X",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Frank Custer",
+        "familyName": "Custer",
+        "email": "frank.custers_1@nxp.com",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Joost Renes",
+        "familyName": "Renes",
+        "email": "joost.renes@nxp.com",
+        "orcid": "0000-0003-1884-6330",
+        "affiliations": [
+          2
+        ]
+      },
+      {
+        "name": "Denise Verbakel",
+        "familyName": "Verbakel",
+        "email": "denise.verbakel@ru.nl",
+        "affiliations": [
+          2,
+          3
+        ]
+      },
+      {
+        "name": "Christine van Vredendaal",
+        "familyName": "van Vredendaal",
+        "email": "christine.cloostermans@nxp.com",
+        "affiliations": [
+          2
+        ]
+      }
+    ],
+    "affiliations": [
+      {
+        "name": "NXP Semiconductors",
+        "ror": "059be4e97",
+        "country": "Netherlands"
+      },
+      {
+        "name": "NXP Semiconductors",
+        "ror": "031v4g827",
+        "country": "Belgium"
+      },
+      {
+        "name": "Radboud University",
+        "ror": "016xsfp80",
+        "country": "Netherlands"
+      }
+    ],
+    "funders": [],
+    "keywords": [
+      "Post-Quantum Cryptography",
+      "Small-stack",
+      "FrodoKEM"
+    ],
+    "title": "Enabling FrodoKEM on Embedded Devices",
+    "abstract": "<p>FrodoKEM is a lattice-based Key Encapsulation Mechanism (KEM) based on unstructured lattices. This is a text abstract with some math $x \\mapsto \\frac{1}{2}^x \\cdot \\sqrt{x}$. It also contains display math: \n\\[ 3.7 \\cdot \\sum_{i=0}^n x^i \\]\n and a itemize  </p><ul><li>first</li><li>second</li></ul><p>Now enumerate: </p><ol><li>1</li><li>2</li></ol>",
+    "license": {
+      "name": "CC BY",
+      "label": "Creative Commons Attribution",
+      "reference": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "output_files": [
+    ".gitignore",
+    "CC-by.eps",
+    "CC-by.pdf",
+    "abbrev3.bib",
+    "background.tex",
+    "conclusion.tex",
+    "crypto.bib",
+    "disco_aes_table.tex",
+    "disco_shake_table.tex",
+    "disco_table.tex",
+    "discovery_table.tex",
+    "evaluation.tex",
+    "evaluation_freedom.tex",
+    "images/aes_tradeoffs.png",
+    "images/aes_tradeoffs_stm32.png",
+    "images/aes_tradeoffs_stm32_large.png",
+    "images/mul_AS.png",
+    "images/mul_Bp_1.png",
+    "images/mul_Bp_1_scaledtext.png",
+    "images/mul_Bp_2.png",
+    "images/mul_Bp_2_scaledtext.png",
+    "images/mul_V_1.png",
+    "images/shake_tradeoffs.png",
+    "images/shake_tradeoffs_stm32.png",
+    "images/shake_tradeoffs_stm32_large.png",
+    "images/stack_decaps_1.png",
+    "images/stack_decaps_1_large.png",
+    "images/stack_decaps_2.png",
+    "images/stack_decaps_2_large.png",
+    "images/stack_decaps_2_nohash.png",
+    "images/stack_decaps_2_nohash_large.png",
+    "images/stack_encaps_1.png",
+    "images/stack_encaps_1_large.png",
+    "images/stack_encaps_2.png",
+    "images/stack_encaps_2_large.png",
+    "images/stack_keygen_1.png",
+    "images/stack_keygen_1_large.png",
+    "images/stack_keygen_2.png",
+    "images/stack_keygen_2_large.png",
+    "intro.tex",
+    "macros.tex",
+    "main.abstract",
+    "main.aux",
+    "main.bbl",
+    "main.blg",
+    "main.fdb_latexmk",
+    "main.fls",
+    "main.iacrmetadata",
+    "main.log",
+    "main.meta",
+    "main.out",
+    "main.pdf",
+    "main.tex",
+    "main.tex~",
+    "nucleo_aes_table.tex",
+    "nucleo_shake_table.tex",
+    "nucleo_table.tex",
+    "paper.bib",
+    "paper.pdf",
+    "paper.synctex.gz",
+    "paper.tex",
+    "paper2.tex",
+    "stack_table.tex",
+    "stackstrats.tex"
+  ],
+  "bibtex": "\n\n@article{RSA78,\n  address =       {New York, NY, USA},\n  author =        {Rivest, R. L. and Shamir, A. and Adleman, L.},\n  journal =       {Commun. ACM},\n  month =         feb,\n  number =        {2},\n  pages =         {120-126},\n  publisher =     {Association for Computing Machinery},\n  title =         {{A Method for Obtaining Digital Signatures and\n                   Public-Key Cryptosystems}},\n  volume =        {21},\n  year =          {1978},\n  doi =           {10.1145/359340.359342},\n  issn =          {0001-0782},\n  url =           {https://doi.org/10.1145/359340.359342},\n}\n\n@article{K87,\n  author =        {N. Koblitz},\n  journal =       {Mathematics of Computation},\n  pages =         {203-209},\n  title =         {Elliptic curve cryptosystems},\n  volume =        {48},\n  year =          {1987},\n}\n\n@inproceedings{C:Miller85,\n  address =       {},\n  author =        {Victor S. Miller},\n  booktitle =     {CRYPTO'85},\n  editor =        {Hugh C. Williams},\n  month =         aug,\n  pages =         {417--426},\n  publisher =     {Springer, Heidelberg},\n  series =        {{LNCS}},\n  title =         {Use of Elliptic Curves in Cryptography},\n  volume =        {218},\n  year =          {1986},\n  doi =           {10.1007/3-540-39799-X_31},\n}\n\n@inproceedings{FOCS:Shor94,\n  address =       {},\n  author =        {Peter W. Shor},\n  booktitle =     {35th FOCS},\n  editor =        {},\n  month =         nov,\n  pages =         {124--134},\n  publisher =     {{IEEE} Computer Society Press},\n  title =         {Algorithms for Quantum Computation: Discrete\n                   Logarithms and Factoring},\n  year =          {1994},\n  doi =           {10.1109/SFCS.1994.365700},\n}\n\n@article{Proos:602816,\n  author =        {J. Proos and C. Zalka},\n  journal =       {Quantum Inf. Comput.},\n  pages =         {317--344},\n  title =         {Shor's discrete logarithm quantum algorithm for\n                   elliptic curves},\n  volume =        {3},\n  year =          {2003},\n  url =           {https://cds.cern.ch/record/602816},\n}\n\n@misc{NISTcfp,\n  author =        {{National Institute of Standards and Technology}},\n  howpublished =      {\\url{https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/Post-Quantum-Cryptography-Standardization}},\n  title =         {Post-Quantum Cryptography Standardization},\n}\n\n@misc{BSI2020,\n  author =          {{Federal Office for Information Security, Bonn, Germany}},\n  howpublished =      {\\url{https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Crypto/Migration_to_Post_Quantum_Cryptography.pdf?__blob=publicationFile&v=2}},\n  title =         {{Migration to Post Quantum Cryptography,\n                   Recommendations for action by the {BSI}}},\n}\n\n@misc{ANSSI2022,\n  author =          {{Agence nationale de la s\\'{e}curit\\'{e} des syst\\`{e}mes dínformation}},\n  howpublished =      {\\url{https://www.ssi.gouv.fr/uploads/2022/01/anssi-technical_position_papers-post_quantum_cryptography_transition.pdf}},\n  title =         {ANSSI VIEWS ON THE POST-QUANTUM CRYPTOGRAPHY\n                   TRANSITION},\n}\n\n@misc{AIVD2022,\n  author =          {{Netherlands National Communications Security Agency}},\n  howpublished =      {\\url{https://english.aivd.nl/binaries/aivd-en/documenten/publications/2022/01/18/prepare-for-the-threat-of-quantumcomputers/Prepare+for+the+threat+of+quantumcomputers.pdf}},\n  title =         {Prepare for the threat of quantum computers},\n}\n\n@techreport{FRODO20,\n  author =        {Erdem Alkim and Joppe W. Bos and L{\\'e}o Ducas and\n                   Karen Easterbrook and Brian LaMacchia, Patrick Longa and\n                   Ilya Mironov and Michael Naehrig and\n                   Valeria Nikolaenko and Chris Peikert and\n                   Ananth Raghunathan and Douglas Stebila},\n  institution =   {{N}ational {I}nstitute of {S}tandards and\n                   {T}echnology},\n  note =          {available at\n                       \\url{https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions}},\n  title =         {{FrodoKEM}},\n  year =          {2020},\n}\n\n@techreport{NISTPQC-R4:ClassicMcEliece22,\n  author =        {Martin R. Albrecht and Daniel J. Bernstein and\n                   Tung Chou and Carlos Cid and Jan Gilcher and\n                   Tanja Lange and Varun Maram and Ingo von Maurich and\n                   Rafael Misoczki and Ruben Niederhagen and\n                   Kenneth G. Paterson and Edoardo Persichetti and\n                   Christiane Peters and Peter Schwabe and\n                   Nicolas Sendrier and Jakub Szefer and Cen Jung Tjhai and\n                   Martin Tomlinson and Wen Wang},\n  institution =   {{N}ational {I}nstitute of {S}tandards and\n                   {T}echnology},\n  note =          {available at\n                       \\url{https://csrc.nist.gov/projects/post-quantum-cryptography/round-4-submissions}},\n  title =         {{Classic McEliece}},\n  year =          {2022},\n}\n\n@inproceedings{STOC:Regev05,\n  address =       {},\n  author =        {Oded Regev},\n  booktitle =     {37th ACM STOC},\n  editor =        {Harold N. Gabow and Ronald Fagin},\n  month =         may,\n  pages =         {84--93},\n  publisher =     {{ACM} Press},\n  title =         {On lattices, learning with errors, random linear\n                   codes, and cryptography},\n  year =          {2005},\n  doi =           {10.1145/1060590.1060603},\n}\n\n@techreport{NISTPQC:CRYSTALS-KYBER22,\n  author =        {Peter Schwabe and Roberto Avanzi and Joppe Bos and\n                   L{\\'e}o Ducas and Eike Kiltz and Tancr{\\`e}de Lepoint and\n                   Vadim Lyubashevsky and John M. Schanck and\n                   Gregor Seiler and Damien Stehl{\\'e} and Jintai Ding},\n  institution =   {{N}ational {I}nstitute of {S}tandards and\n                   {T}echnology},\n  note =          {available at\n                       \\url{https://csrc.nist.gov/Projects/post-quantum-cryptography/selected-algorithms-2022}},\n  title =         {{CRYSTALS-KYBER}},\n  year =          {2022},\n}\n\n@article{DBLP:journals/tches/HoweOKG18,\n  author =        {James Howe and Tobias Oder and Markus Krausz and\n                   Tim G{\\\"{u}}neysu},\n  journal =       {{IACR} Trans. Cryptogr. Hardw. Embed. Syst.},\n  number =        {3},\n  pages =         {372--393},\n  title =         {{Standard Lattice-Based Key Encapsulation on Embedded\n                   Devices}},\n  volume =        {2018},\n  year =          {2018},\n  biburl =        {https://dblp.org/rec/journals/tches/HoweOKG18.bib},\n  bibsource =     {dblp computer science bibliography, https://dblp.org},\n  doi =           {10.13154/tches.v2018.i3.372-393},\n  timestamp =     {Thu, 14 Oct 2021 08:53:57 +0200},\n  url =           {https://doi.org/10.13154/tches.v2018.i3.372-393},\n}\n\n@misc{DBLP:journals/iacr/BosFMOS18a,\n  author =        {Joppe W. Bos and Simon Friedberger and\n                   Marco Martinoli and Elisabeth Oswald and\n                   Martijn Stam},\n  howpublished =  {Cryptology ePrint Archive, Paper 2018/1116},\n  note =          {\\url{https://eprint.iacr.org/2018/1116}},\n  title =         {{Fly, you fool! Faster Frodo for the ARM Cortex-M4}},\n  year =          {2018},\n  url =           {https://eprint.iacr.org/2018/1116},\n}\n\n@inproceedings{DBLP:conf/cans/BosORSV21,\n  author =        {Joppe W. Bos and Maximilian Ofner and Joost Renes and\n                   Tobias Schneider and Christine van Vredendaal},\n  booktitle =     {Cryptology and Network Security - 20th International\n                   Conference, {CANS} 2021, Vienna, Austria, December\n                   13-15, 2021, Proceedings},\n  editor =        {Mauro Conti and Marc Stevens and Stephan Krenn},\n  pages =         {72--91},\n  publisher =     {Springer},\n  series =        {Lecture Notes in Computer Science},\n  title =         {The Matrix Reloaded: Multiplication Strategies in\n                   FrodoKEM},\n  volume =        {13099},\n  year =          {2021},\n  biburl =        {https://dblp.org/rec/conf/cans/BosORSV21.bib},\n  bibsource =     {dblp computer science bibliography, https://dblp.org},\n  doi =           {10.1007/978-3-030-92548-2\\_5},\n  timestamp =     {Tue, 14 Dec 2021 17:56:28 +0100},\n  url =           {https://doi.org/10.1007/978-3-030-92548-2\\_5},\n}\n\n@inproceedings{BRS22,\n  address =       {Cham},\n  author =        {Joppe W. Bos and Joost Renes and Amber Sprenkels},\n  booktitle =     {AFRICACRYPT 2022},\n  editor =        {Batina, Lejla and Daemen, Joan},\n  pages =         {217--235},\n  publisher =     {Springer Nature Switzerland},\n  title =         {{Dilithium for Memory Constrained Devices}},\n  year =          {2022},\n  isbn =          {978-3-031-17433-9},\n}\n\n@inproceedings{CCS:BCDMNN16,\n  address =       {},\n  author =        {Joppe W. Bos and Craig Costello and L{\\'e}o Ducas and\n                   Ilya Mironov and Michael Naehrig and\n                   Valeria Nikolaenko and Ananth Raghunathan and\n                   Douglas Stebila},\n  booktitle =     {ACM CCS 2016},\n  editor =        {Edgar R. Weippl and Stefan Katzenbeisser and\n                   Christopher Kruegel and Andrew C. Myers and\n                   Shai Halevi},\n  month =         oct,\n  pages =         {1006--1018},\n  publisher =     {{ACM} Press},\n  title =         {Frodo: Take off the Ring! {P}ractical, Quantum-Secure\n                   Key Exchange from {LWE}},\n  year =          {2016},\n  doi =           {10.1145/2976749.2978425},\n}\n\n@inproceedings{C:FujOka99,\n  address =       {},\n  author =        {Eiichiro Fujisaki and Tatsuaki Okamoto},\n  booktitle =     {CRYPTO'99},\n  editor =        {Michael J. Wiener},\n  month =         aug,\n  pages =         {537--554},\n  publisher =     {Springer, Heidelberg},\n  series =        {{LNCS}},\n  title =         {Secure Integration of Asymmetric and Symmetric\n                   Encryption Schemes},\n  volume =        {1666},\n  year =          {1999},\n  doi =           {10.1007/3-540-48405-1_34},\n}\n\n@inproceedings{USENIX:ADPS16,\n  address =       {},\n  author =        {Erdem Alkim and L{\\'e}o Ducas and\n                   Thomas P{\\\"o}ppelmann and Peter Schwabe},\n  booktitle =     {USENIX Security 2016},\n  editor =        {Thorsten Holz and Stefan Savage},\n  month =         aug,\n  pages =         {327--343},\n  publisher =     {{USENIX} Association},\n  title =         {Post-quantum Key Exchange - {A} New Hope},\n  year =          {2016},\n}\n\n@inproceedings{CCS:ABDGGH15,\n  address =       {},\n  author =        {David Adrian and Karthikeyan Bhargavan and\n                   Zakir Durumeric and Pierrick Gaudry and Matthew Green and\n                   J. Alex Halderman and Nadia Heninger and\n                   Drew Springall and Emmanuel Thom{\\'e} and\n                   Luke Valenta and Benjamin VanderSloot and\n                   Eric Wustrow and Santiago {Zanella-B{\\'e}guelin} and\n                   Paul Zimmermann},\n  booktitle =     {ACM CCS 2015},\n  editor =        {Indrajit Ray and Ninghui Li and Christopher Kruegel},\n  month =         oct,\n  pages =         {5--17},\n  publisher =     {{ACM} Press},\n  title =         {Imperfect Forward Secrecy: How {Diffie}-{Hellman}\n                   Fails in Practice},\n  year =          {2015},\n  doi =           {10.1145/2810103.2813707},\n}\n\n@inproceedings{huang2016strassen,\n  author =        {Jianyu Huang and Tyler M. Smith and Greg M. Henry and\n                   Robert A. van de Geijn},\n  booktitle =     {International Conference for High Performance\n                   Computing, Networking, Storage and Analysis -- {SC}},\n  editor =        {John West and Cherri M. Pancake},\n  pages =         {690--701},\n  publisher =     {{IEEE} Computer Society},\n  title =         {Strassen's algorithm reloaded},\n  year =          {2016},\n  doi =           {10.1109/SC.2016.58},\n  url =           {https://doi.org/10.1109/SC.2016.58},\n}\n\n@article{strassen1969gaussian,\n  author =        {Strassen, Volker},\n  journal =       {Numerische mathematik},\n  number =        {4},\n  pages =         {354--356},\n  publisher =     {Springer},\n  title =         {Gaussian elimination is not optimal},\n  volume =        {13},\n  year =          {1969},\n}\n\n@techreport{NISTPQC:FALCON22,\n  author =        {Thomas Prest and Pierre-Alain Fouque and\n                   Jeffrey Hoffstein and Paul Kirchner and\n                   Vadim Lyubashevsky and Thomas Pornin and\n                   Thomas Ricosset and Gregor Seiler and William Whyte and\n                   Zhenfei Zhang},\n  institution =   {{N}ational {I}nstitute of {S}tandards and\n                   {T}echnology},\n  note =          {available at\n                       \\url{https://csrc.nist.gov/Projects/post-quantum-cryptography/selected-algorithms-2022}},\n  title =         {{FALCON}},\n  year =          {2022},\n}\n\n"
+}

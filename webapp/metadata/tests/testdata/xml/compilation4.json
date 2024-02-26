@@ -1,0 +1,494 @@
+{
+  "paperid": "55i4rwg3",
+  "venue": "cic",
+  "status": "compilation_success",
+  "email": "skypark@digicrime.com",
+  "submitted": "2022-08-03 06:44:30",
+  "accepted": "2022-09-30 17:49:20",
+  "compiled": "2024-02-21T13:05:20.061219",
+  "compile_time": 19.93,
+  "engine": "pdflatex",
+  "command": "latexmk -g -recorder -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape\" main",
+  "log": "Rc files read:\n",
+  "error_log": [],
+  "warning_log": [
+    {
+      "error_type": "metadata warning",
+      "text": "author Christine van Vredendaal is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Christine+van+Vredendaal\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "metadata warning",
+      "text": "author Denise Verbakel is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Denise+Verbakel\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "metadata warning",
+      "text": "author Frank Custer is lacking an ORCID. They are strongly recommended for all authors.",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0,
+      "help": "See <a target=\"_blank\" href=\"https://orcid.org/orcid-search/search?searchQuery=Frank+Custer\">ORCID search</a> and <a target=\"_blank\" href=\"https://publish.iacr.org/iacrcc\">iacrcc latex documentation</a>."
+    },
+    {
+      "error_type": "server warning",
+      "text": "File iacrcc.cls was removed before compiling",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "server warning",
+      "text": "File iacrtrans2.cls was removed before compiling",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "LaTeX Warning: \\include should only be used after \\begin{document} on input line 56.",
+      "logline": 1311,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath": "main.tex",
+      "filepath_line": 56,
+      "severity": 0.0
+    },
+    {
+      "error_type": "underfull vbox",
+      "text": "Underfull \\vbox (badness 10000) has occurred while \\output is active []",
+      "logline": 1903,
+      "pageno": 1,
+      "pdf_line": 0,
+      "filepath": "background.tex",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "overfull hbox",
+      "text": "Overfull \\hbox (0.65787pt too wide) in paragraph at lines 260--263",
+      "logline": 1962,
+      "pageno": 9,
+      "pdf_line": 0,
+      "filepath": "stackstrats.tex",
+      "filepath_line": 260,
+      "severity": 0.65787
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5231) in paragraph at lines 28--36",
+      "logline": 2020,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5231.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 1189) in paragraph at lines 44--48",
+      "logline": 2026,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 1189.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 44--48",
+      "logline": 2032,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 44--48",
+      "logline": 2038,
+      "pageno": 20,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 86--91",
+      "logline": 2046,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2052,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2058,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 131--135",
+      "logline": 2064,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 3364) in paragraph at lines 137--141",
+      "logline": 2069,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 3364.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5490) in paragraph at lines 137--141",
+      "logline": 2075,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5490.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 137--141",
+      "logline": 2081,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 10000) in paragraph at lines 137--141",
+      "logline": 2087,
+      "pageno": 21,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 10000.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5741) in paragraph at lines 176--184",
+      "logline": 2093,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5741.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2538) in paragraph at lines 176--184",
+      "logline": 2099,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2538.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 5578) in paragraph at lines 176--184",
+      "logline": 2105,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 5578.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2608) in paragraph at lines 176--184",
+      "logline": 2111,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2608.0
+    },
+    {
+      "error_type": "underfull hbox",
+      "text": "Underfull \\hbox (badness 2359) in paragraph at lines 176--184",
+      "logline": 2117,
+      "pageno": 22,
+      "pdf_line": 0,
+      "filepath": "main.bbl",
+      "filepath_line": 0,
+      "severity": 2359.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry K87 (Elliptic curve cryptosystems) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry NISTcfp (Post-Quantum Cryptography Standardization) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry BSI2020 ({Migration to Post Quantum Cryptography, Recommendations for action by the {BSI}}) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry ANSSI2022 (ANSSI VIEWS ON THE POST-QUANTUM CRYPTOGRAPHY TRANSITION) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry AIVD2022 (Prepare for the threat of quantum computers) should have year field or date field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry BRS22 ({Dilithium for Memory Constrained Devices}) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry USENIX:ADPS16 (Post-quantum Key Exchange - {A} New Hope) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    },
+    {
+      "error_type": "Latex warning",
+      "text": "bibtex entry strassen1969gaussian (Gaussian elimination is not optimal) should have doi field or url field",
+      "logline": 0,
+      "pageno": 0,
+      "pdf_line": 0,
+      "filepath_line": 0,
+      "severity": 0.0
+    }
+  ],
+  "exit_code": 0,
+  "zipfilename": "joppe.zip",
+  "meta": {
+    "schema_version": "1.0",
+    "version": "final",
+    "DOI": "10.62056/aklewlzf8",
+    "authors": [
+      {
+        "name": "Joppe W. Bos",
+        "familyName": "Bos",
+        "email": "joppe.bos@nxp.com",
+        "orcid": "0000-0003-1010-8157",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Olivier Bronchain",
+        "familyName": "Bronchain",
+        "email": "olivier.bronchain@nxp.com",
+        "orcid": "0000-0001-7595-718X",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Frank Custer",
+        "familyName": "Custer",
+        "email": "frank.custers_1@nxp.com",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Joost Renes",
+        "familyName": "Renes",
+        "email": "joost.renes@nxp.com",
+        "orcid": "0000-0003-1884-6330",
+        "affiliations": [
+          2
+        ]
+      },
+      {
+        "name": "Denise Verbakel",
+        "familyName": "Verbakel",
+        "email": "denise.verbakel@ru.nl",
+        "affiliations": [
+          2,
+          3
+        ]
+      },
+      {
+        "name": "Christine van Vredendaal",
+        "familyName": "van Vredendaal",
+        "email": "christine.cloostermans@nxp.com",
+        "affiliations": [
+          2
+        ]
+      }
+    ],
+    "affiliations": [
+      {
+        "name": "NXP Semiconductors",
+        "ror": "059be4e97",
+        "country": "Netherlands"
+      },
+      {
+        "name": "NXP Semiconductors",
+        "ror": "031v4g827",
+        "country": "Belgium"
+      },
+      {
+        "name": "Radboud University",
+        "ror": "016xsfp80",
+        "country": "Netherlands"
+      }
+    ],
+    "funders": [],
+    "keywords": [
+      "Post-Quantum Cryptography",
+      "Small-stack",
+      "FrodoKEM"
+    ],
+    "title": "Enabling FrodoKEM on Embedded Devices",
+    "abstract": "<p>FrodoKEM is a lattice-based Key Encapsulation Mechanism (KEM) based on unstructured lattices. This is a text abstract with some math $x \\mapsto \\frac{1}{2}^x \\cdot \\sqrt{x}$. It also contains display math: \n\\[ 3.7 \\cdot \\sum_{i=0}^n x^i \\]\n and a itemize  <ul><li>first</li><li>second</li></ul></p><p>Now enumerate: <ol><li>1</li><li>2</li></ol></p>",
+    "license": {
+      "name": "CC BY",
+      "label": "Creative Commons Attribution",
+      "reference": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "output_files": [
+    ".gitignore",
+    "CC-by.eps",
+    "CC-by.pdf",
+    "abbrev3.bib",
+    "background.tex",
+    "conclusion.tex",
+    "crypto.bib",
+    "disco_aes_table.tex",
+    "disco_shake_table.tex",
+    "disco_table.tex",
+    "discovery_table.tex",
+    "evaluation.tex",
+    "evaluation_freedom.tex",
+    "images/aes_tradeoffs.png",
+    "images/aes_tradeoffs_stm32.png",
+    "images/aes_tradeoffs_stm32_large.png",
+    "images/mul_AS.png",
+    "images/mul_Bp_1.png",
+    "images/mul_Bp_1_scaledtext.png",
+    "images/mul_Bp_2.png",
+    "images/mul_Bp_2_scaledtext.png",
+    "images/mul_V_1.png",
+    "images/shake_tradeoffs.png",
+    "images/shake_tradeoffs_stm32.png",
+    "images/shake_tradeoffs_stm32_large.png",
+    "images/stack_decaps_1.png",
+    "images/stack_decaps_1_large.png",
+    "images/stack_decaps_2.png",
+    "images/stack_decaps_2_large.png",
+    "images/stack_decaps_2_nohash.png",
+    "images/stack_decaps_2_nohash_large.png",
+    "images/stack_encaps_1.png",
+    "images/stack_encaps_1_large.png",
+    "images/stack_encaps_2.png",
+    "images/stack_encaps_2_large.png",
+    "images/stack_keygen_1.png",
+    "images/stack_keygen_1_large.png",
+    "images/stack_keygen_2.png",
+    "images/stack_keygen_2_large.png",
+    "intro.tex",
+    "macros.tex",
+    "main.abstract",
+    "main.aux",
+    "main.bbl",
+    "main.blg",
+    "main.fdb_latexmk",
+    "main.fls",
+    "main.iacrmetadata",
+    "main.log",
+    "main.meta",
+    "main.out",
+    "main.pdf",
+    "main.tex",
+    "main.tex~",
+    "nucleo_aes_table.tex",
+    "nucleo_shake_table.tex",
+    "nucleo_table.tex",
+    "paper.bib",
+    "paper.pdf",
+    "paper.synctex.gz",
+    "paper.tex",
+    "paper2.tex",
+    "stack_table.tex",
+    "stackstrats.tex"
+  ],
+  "bibtex": "\n\n"
+}

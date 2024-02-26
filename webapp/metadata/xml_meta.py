@@ -3,6 +3,7 @@ XML in this server, but we have now moved it to the hosting server
 that knows about the URLS being served.
 """
 from datetime import datetime
+from io import BytesIO
 from nameparser import HumanName
 from pathlib import Path
 import latex2mathml.converter
@@ -127,6 +128,15 @@ def _add_jats_citation(index: int, ref_list: ET.Element, entry: Entry):
         if 'title' in entry.fields:
             ET.SubElement(citation, 'source').text = entry.fields['title']
             
+def get_jats_abstract(abstr: str) -> str:
+    """Take HTML abstract and parse to return JATS abstract element.
+    This may throw an exception if it cannot be parsed as XML."""
+    abstract_string = '<abstract>' + text_with_texmath(abstr) + '</abstract>'
+    abstract_string = abstract_string.replace('<ol>', '<p><list list-type="order">').replace('</ol>', '</list></p>')
+    abstract_string = abstract_string.replace('<ul>', '<p><list list-type="bullet">').replace('</ul>', '</list></p>')
+    abstract_string = abstract_string.replace('<li>', '<list-item><p>').replace('</li>', '</p></list-item>')
+    return ET.parse(BytesIO(abstract_string.encode('UTF-8'))).getroot()
+
 def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.Element:
     """TODO: tex-math contents should be CDATA to protect against < inside."""
     article = ET.Element('article', attrib={
@@ -190,10 +200,12 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})
     ET.SubElement(license, 'license-p').text = meta.license.label
-    abstract_string = '<abstract>' + text_with_texmath(comp.meta.abstract) + '</abstract>'
-    from io import BytesIO
-    abstract_elem = ET.parse(BytesIO(abstract_string.encode('UTF-8'))).getroot()
-    article_meta.append(abstract_elem)
+    try:
+        abstract_elem = get_jats_abstract(comp.meta.abstract)
+        article_meta.append(abstract_elem)
+    except Exception as e:
+        print(comp.meta.abstract)
+        raise ET.ParseError('unable to parse abstract: {}'.format(comp.meta.abstract))
     if meta.keywords:
         kwd_group = ET.SubElement(article_meta, 'kwd-group', attrib={'kwd-group-type': 'author'})
         for kw in meta.keywords:
@@ -309,9 +321,10 @@ Convert parts in
     return output
 
 def text_with_texmath(input):
-    """Input is an abstract with <p> tags only and some HTML-safe latex. In particular
-    this means that < was converted to &lt; and > was converted to &gt;, so we need
-    to convert those back before running latex
+    """Input is an abstract with HTML-safe LaTex and a few allowed HTML tags, namely <p>,
+    <ol>, <ul>, and <li>. In particular this means that mathematical uses of < and > were
+    converted to their HTML equivalents &lt; and &gt;. We convert those back to math operators
+    before converting the math blocks to <tex-math> blocks that can be used in JATS.
     """
     # Break apart at start and end of math mode.
     matches = re.finditer(r'\$\$|\$|\\\(|\\\)|\\\[|\\\]', input)
@@ -356,6 +369,15 @@ def text_with_texmath(input):
     output += input[last:]
     return output
 
+def validate_abstract(input: str):
+    if '</span>' in input:
+        return False
+    try:
+        elem = get_jats_abstract(input)
+    except Exception as e:
+        return False
+    return True
+
 if __name__ == '__main__':
     import argparse
     argparser = argparse.ArgumentParser(description='xml creator')
@@ -366,9 +388,8 @@ if __name__ == '__main__':
     argparser.add_argument('--overwrite',
                            action='store_true')
     args = argparser.parse_args()
-    json_file = Path('tests/testdata/xml/compilation1.json')
+    json_file = Path('tests/testdata/xml/compilation3.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
-    compilation.meta.URL = 'https://example.com/thepaper'
     journal = Journal({'EISSN': '1234-5678',
                        'hotcrp_key': 'testkey',
                        'acronym': 'TJ',
@@ -393,27 +414,5 @@ if __name__ == '__main__':
         print('jats was validated')
     except Exception as e:
         print('error in jats:' + str(e))
-        print(schema.error_log)
-    crossref = get_crossref('testbatch',
-                            'International Association for Cryptologic Research',
-                            'crossref@iacr.org',
-                            journal,
-                            [compilation])
-    ET.indent(crossref, space='  ', level=0)
-    crossref_str = ET.tostring(crossref, encoding='utf-8').decode('utf-8')
-    crossref_file = Path(args.crossref_file)
-    if args.overwrite or not crossref_file.is_file():
-        crossref_file.write_text(crossref_str,
-                                 encoding='utf-8')
-    else:
-        print('not saving crossref file')
-    schema_root = etree.parse('tests/testdata/xml/schema/crossref/schema-0.3.1/schemas/crossref5.3.1.xsd')
-    schema = etree.XMLSchema(schema_root)
-    root = etree.fromstring(crossref_str)
-    try:
-        schema.assertValid(root)
-        print('crossref was validated')
-    except Exception as e:
-        print('error in crossref: ' + str(e))
         print(schema.error_log)
                             

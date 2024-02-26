@@ -1,0 +1,13 @@
+This is \begin{itemize}
+\item first item
+\item second item
+\end{itemize}
+but also
+\begin{itemize}\item first\begin{enumerate}\item 1 \item 2\end{enumerate}
+\item second bullet
+\end{itemize}
+
+This starts a paragraph.
+
+This is another paragraph
+but it's the last one.
