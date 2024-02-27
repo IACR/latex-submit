@@ -15,7 +15,7 @@
 #
 # Some packages below are pinned by version. In each case we try to explain
 # why.
-arxiv-latex-cleaner
+arxiv-latex-cleaner>=v1.0.4
 # ##########################################
 # The flask package is frozen because we use flask-login. flask-login is barely being
 # maintained, and the flask developers seem to have no interest in maintaining backward

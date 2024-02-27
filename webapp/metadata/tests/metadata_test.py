@@ -7,7 +7,8 @@ import random
 import sys
 sys.path.insert(0, '../')
 from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License
-from meta_parse import clean_abstract, validate_abstract, check_bibtex
+from meta_parse import clean_abstract, check_bibtex
+from xml_meta import validate_abstract
 import datetime
 from pathlib import Path
 sys.path.insert(0, '../../')
