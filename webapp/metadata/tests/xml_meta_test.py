@@ -7,17 +7,17 @@ from lxml import etree
 sys.path.insert(0, '..')
 from compilation import Compilation, Meta
 from db_models import Journal
-from meta_parse import clean_abstract, validate_abstract
-from xml_meta import get_jats, text_with_texmath, get_jats_abstract
+from meta_parse import clean_abstract
+from xml_meta import get_jats, text_with_texmath, get_jats_abstract, validate_abstract
 sys.path.insert(0, '../..')
 from config import DebugConfig
 
-_journal = Journal({'EISSN': '1234-5678',
+_journal = Journal({'EISSN': '3006-5496',
                     'hotcrp_key': 'testhot',
-                    'name': 'Test Journal',
-                    'DOI_PREFIX': '10.1729',
+                    'name': 'IACR Communications in Cryptology',
+                    'DOI_PREFIX': '10.62056',
                     'acronym': 'CiC',
-                    'publisher': 'Association of Morons'})
+                    'publisher': 'International Association for Cryptologic Research'})
 def test_with_texmath():
     input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list.</p>"
     output = text_with_texmath(input)
@@ -25,11 +25,11 @@ def test_with_texmath():
     assert '<tex-math><![CDATA[$a<b$]]></tex-math>' in output
 
 def test_get_jats_abstract():
-    input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list.</p>"
+    input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list with $$a=b$$ and \\[c=\\alpha\\].</p>"
     elem = get_jats_abstract(input)
     print(ET.tostring(elem))
     children = list(elem.iter())
-    assert len(children) == 10
+    assert len(children) == 12
     assert children[0].tag == 'abstract'
     assert children[1].tag == 'p'
     assert children[2].tag == 'tex-math'
@@ -42,6 +42,10 @@ def test_get_jats_abstract():
     assert children[6].text == 'first item'
     assert children[7].tag == 'list-item'
     assert children[8].tag == 'p'
+    assert children[9].tag == 'p'
+    assert children[10].tag == 'tex-math'
+    assert children[11].tag == 'tex-math'
+    assert children[11].text == r'$$c=\alpha$$'
 
 def test_jats_abstract2():
     input = Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8')
@@ -99,14 +103,14 @@ def test_jats_creation1():
     article = get_jats(_journal, '1/19', compilation)
     journal_meta = article.find('front').find('journal-meta')
     issn = journal_meta.find('journal-id')
-    assert issn.text == '1234-5678'
+    assert issn.text == '3006-5496'
     assert issn.attrib['journal-id-type'] == 'issn'
     issn = journal_meta.find('issn')
     assert issn.attrib['publication-format'] == 'electronic'
-    assert issn.text == '1234-5678'
-    assert journal_meta.find('journal-title-group').find('journal-title').text == 'Test Journal'
+    assert issn.text == '3006-5496'
+    assert journal_meta.find('journal-title-group').find('journal-title').text == 'IACR Communications in Cryptology'
     assert journal_meta.find('journal-title-group').find('abbrev-journal-title').text == 'CiC'
-    assert journal_meta.find('publisher').find('publisher-name').text == 'Association of Morons'
+    assert journal_meta.find('publisher').find('publisher-name').text == 'International Association for Cryptologic Research'
     authors = list(article.iter('contrib'))
     assert len(authors) == 5
     assert authors[0].attrib['contrib-type'] == 'author'
