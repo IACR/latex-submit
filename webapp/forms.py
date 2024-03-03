@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp, Nu
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField, FieldList, Form, FormField
 from .metadata.db_models import Role, validate_version, Version
 from .metadata import validate_paperid
-from .metadata.compilation import dt_regex
+from .metadata.compilation import dt_regex, PubType
 import random, string # TODO - remove this
 from . import create_hmac, validate_hmac
 import logging
@@ -79,6 +79,18 @@ class ValidPaperId(object):
 
     def __call__(self, form, field):
         if not validate_paperid(field.data):
+            raise ValidationError(self.message)
+
+class ValidPubType(object):
+    """Validator to check for a valid pubtype field."""
+    def __init__(self, message=None):
+        if not message:
+            message = 'Invalid pubtype'
+        self.message = message
+
+    def __call__(self, form, field):
+        val = PubType.from_str(field.data)
+        if not val:
             raise ValidationError(self.message)
 
 class ValidVersion(object):
@@ -177,6 +189,15 @@ class SubmitForm(FlaskForm):
                            validators=[InputRequired('Accepted date is required'),
                                        Regexp(dt_regex, message='Format of accepted is YYYY-mm-dd HH:MM:SS')],
                            default='')
+    pubtype = HiddenField(id='pubtype',
+                          name='pubtype',
+                          validators=[InputRequired('pubtype field is required'),
+                                      ValidPubType()],
+                          default=PubType.RESEARCH.name)
+    errata_doi = HiddenField(id='errata_doi',
+                             name='errata_doi',
+                             validators=[Regexp('(^$|^10.[0-9]{4,9}/[-._/a-zA-Z0-9]+$)', message='DOI format must be empty or start with 10.')],
+                             default='')
     auth = HiddenField(id='auth',
                        name='auth',
                        validators = [InputRequired('auth field is required')])

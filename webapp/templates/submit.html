@@ -93,6 +93,8 @@
         <div class="form-text text-danger">{{msg}}</div>
         {% endfor %}
         {% endif %}
+	{{ form.pubtype }}
+	{{ form.errata_doi }}
         {{ form.issue }}
         <div class="form-group">
           <label for="venue" class="form-label">Select a Journal. At present only <span class="text-monospace">CiC with iacrcc</span> is fully supported.</label>
@@ -141,7 +143,6 @@
           <div class="alert alert-danger">{{ msg }}</div>
           {% endfor %}
           {% endif %}
-          <label for="paperid" class="form-label">Paper ID</label>
           {{ form.paperid(class_='form-control w-50', placeholder='paper ID', pattern='[-a-zA-Z0-9]{7,}') }}
         </div>
         <div class="form-group mt-4">

@@ -76,7 +76,17 @@ class DebugConfig(Config):
     TESTING = True
     # used by kevin.
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:mystuff@localhost/publication'
     USERS = [{'email': 'testing@example.com',
               'password': 'mypowers',
               'role': 'admin'}]
     FUNDING_SEARCH_URL = 'http://localhost:5001/searchapi/search'
+
+class TestConfig(Config):
+    FLASK_ENV = 'development'
+    DEBUG = True
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    USERS = [{'email': 'testing@example.com',
+              'password': 'mypowers',
+              'role': 'admin'}]

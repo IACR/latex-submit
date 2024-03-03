@@ -9,6 +9,10 @@ from sqlalchemy import Integer, String, Text, DateTime, UniqueConstraint, Foreig
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from typing import List, Optional
+try:
+    from .compilation import PubType
+except:
+    from compilation import PubType
 
 # This is used for testing for papers that are submitted without hotcrp.
 NO_HOTCRP = 'none'
@@ -140,6 +144,7 @@ class PaperStatus(Base):
     email: Mapped[str] = mapped_column(String(50), nullable=False)
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
+    pubtype: Mapped[PubType] = mapped_column(default=PubType.RESEARCH)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
     hotcrp: Mapped[str] = mapped_column(String(32),
                                         default=NO_HOTCRP,

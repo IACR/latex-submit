@@ -6,7 +6,7 @@ import pytest
 import random
 import sys
 sys.path.insert(0, '../')
-from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License
+from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License, PubType
 from meta_parse import clean_abstract, check_bibtex
 from xml_meta import validate_abstract
 import datetime
@@ -98,6 +98,7 @@ def _test_bibtex_entry(case):
                         'venue': 'eurocrypt',
                         'submitted': '2023-01-02 01:02:03',
                         'accepted': '2023-01-03 01:02:55',
+                        'pubtype': PubType.RESEARCH.name,
                         'compiled': datetime.datetime.now(),
                         'command': 'dummy command',
                         'error_log': [],
@@ -291,6 +292,7 @@ _compile_data = {
     'email': 'me@example.com',
     'submitted': '2023-10-02 22:13:02',
     'accepted': '2022-01-22 15:05:33',
+    'pubtype': PubType.RESEARCH.name,
     'compiled': datetime.datetime(2023, 9, 10, 17, 45, 0),
     'compile_time': 47.2,
     'command': 'lualatex',
@@ -378,3 +380,14 @@ def test_license():
     with pytest.raises(ValueError):
         license = LicenseEnum.license_from_iacrcc('PD')
 
+def test_pubtype():
+    comp = Compilation(**_compile_data)
+    assert comp.pubtype == PubType.RESEARCH
+    data = copy.deepcopy(_compile_data)
+    data['pubtype'] = PubType.ERRATA.name
+    data['errata_doi'] = '10.1791/foobar'
+    comp = Compilation(**data)
+    assert comp.pubtype == PubType.ERRATA
+    assert comp.errata_doi == '10.1791/foobar'
+    
+    

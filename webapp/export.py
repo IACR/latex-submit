@@ -10,6 +10,7 @@ The issue.json file will contain:
   export: datetime
   issue_number: name of the issue
   volume_number: name of the volume
+  issn: issn of journal
   journal_name:
 The export schema for meta.json is an extension of the `compilation::Meta` object
 in which some elements of `Compilation` itself are pushd down:
@@ -19,6 +20,8 @@ in which some elements of `Compilation` itself are pushd down:
 4. paperid
 5. bibtex
 6. email as 'corresponding_author'
+7. pubtype
+8. errata_doi (if present)
 
 The jats.xml file is included because it has a well-established JATS
 1.3 publishing tag set schema (see
@@ -102,6 +105,8 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         data['submitted'] = comp.submitted
         data['accepted'] = comp.accepted
         data['compiled'] = comp.compiled.strftime('%Y-%m-%d %H:%M:%S')
+        data['pubtype'] = comp.pubtype.name
+        data['errata_doi'] = comp.errata_doi
         data['paperid'] = comp.paperid
         data['bibtex'] = comp.bibtex
         data['corresponding_author'] = comp.email

@@ -17,7 +17,7 @@ import string
 from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
 from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue, NO_HOTCRP
 import zipfile
-from .metadata.compilation import Compilation, CompileStatus, CompileError, ErrorType
+from .metadata.compilation import Compilation, CompileStatus, CompileError, ErrorType, PubType
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
@@ -62,6 +62,7 @@ def show_submit_version():
         form.journal.data = 'cic'
         form.accepted.data = '2022-09-30 17:49:20'
         form.submitted.data = '2022-08-03 06:44:30'
+        form.pubtype.data = PubType.RESEARCH.name
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that
@@ -173,6 +174,7 @@ def submit_version():
     # send_mail keeps track of whether we should send an email to the author. This only
     # happens on the first upload of each version.
     send_mail = False
+    pubtype = PubType.from_str(form.pubtype.data)
     if not paper_status:
         papernum = db.session.execute(select(func.max(PaperStatus.paperno)).where(PaperStatus.issue_id==issue.id)).scalar_one_or_none()
         if papernum is None:
@@ -185,6 +187,7 @@ def submit_version():
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
+                                   pubtype=pubtype,
                                    journal_key=args.get('journal'),
                                    volume_key=args.get('volume'),
                                    issue_key=args.get('issue'),
@@ -279,6 +282,8 @@ def submit_version():
                         'venue': args.get('journal'),
                         'submitted': submitted,
                         'accepted': accepted,
+                        'pubtype': pubtype.name,
+                        'errata_doi': form.errata_doi.data,
                         'compiled': now,
                         'engine': args.get('engine'),
                         'command': command,
@@ -458,6 +463,8 @@ def compile_for_copyedit():
                                  'email': version_compilation.email,
                                  'submitted': version_compilation.submitted,
                                  'accepted': version_compilation.accepted,
+                                 'pubtype': version_compilation.pubtype.name,
+                                 'errata_doi': version_compilation.errata_doi,
                                  'compiled': now,
                                  'engine': version_compilation.engine,
                                  'command': version_compilation.command,

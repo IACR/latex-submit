@@ -13,9 +13,9 @@ from xml.sax.saxutils import unescape
 import xmlschema
 from pybtex.database import parse_string, Entry
 try:
-    from .compilation import Compilation, Meta
+    from .compilation import Compilation, Meta, PubType
 except Exception as e:
-    from compilation import Compilation, Meta
+    from compilation import Compilation, Meta, PubType
     
 try:
     from .countries import country_lookup
@@ -143,7 +143,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
         'xmlns:mml': 'http://www.w3.org/1998/Math/MathML',
         'xmlns:xlink': 'http://www.w3.org/1999/xlink',
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'article-type': 'research-article',
+        'article-type': 'correction' if comp.pubtype == PubType.ERRATA else 'research-article',
         'dtd-version': '1.3',
         'xml:lang': 'en'})
     front = ET.SubElement(article, 'front')
@@ -200,6 +200,13 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})
     ET.SubElement(license, 'license-p').text = meta.license.label
+    if comp.pubtype == PubType.ERRATA and comp.errata_doi:
+        ET.SubElement(article_meta,
+                      'related-article',
+                      attrib={'xlink:href': comp.errata_doi,
+                              'related-article-type': 'corrected-article',
+                              'ext-link-type': 'doi',
+                              'xlink:type': 'simple'})
     try:
         abstract_elem = get_jats_abstract(comp.meta.abstract)
         article_meta.append(abstract_elem)
@@ -388,7 +395,7 @@ if __name__ == '__main__':
     argparser.add_argument('--overwrite',
                            action='store_true')
     args = argparser.parse_args()
-    json_file = Path('tests/testdata/xml/compilation3.json')
+    json_file = Path('tests/testdata/xml/compilation1.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     journal = Journal({'EISSN': '1234-5678',
                        'hotcrp_key': 'testkey',

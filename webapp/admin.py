@@ -526,6 +526,8 @@ def request_more_changes():
                                  'email': last_compilation.email,
                                  'submitted': last_compilation.submitted,
                                  'accepted': last_compilation.accepted,
+                                 'pubtype': last_compilation.pubtype.name,
+                                 'errata_doi': last_compilation.errata_doi,
                                  'compiled': now,
                                  'command': last_compilation.command,
                                  'error_log': [],

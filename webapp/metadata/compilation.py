@@ -161,6 +161,12 @@ class VersionEnum(StrEnum):
     SUBMISSION = 'submission'
     PREPRINT = 'preprint'
 
+class PubType(StrEnum):
+    """This must be kept in sync with what HotCRP provides and what cic.iacr.org shows."""
+    RESEARCH = 'RESEARCH'
+    SOK = 'SOK'
+    ERRATA = 'ERRATA'
+
 class Meta(BaseModel):
     """Metadata encoded in LaTeX files using iacrcc.cls. Note that
     the IACR/cicjournal repository has a PaperMeta class that extends
@@ -294,6 +300,12 @@ class Compilation(BaseModel):
     accepted: Annotated[str, StringConstraints(pattern=dt_regex)] = Field(...,
                                                title='When the paper was accepted for publication',
                                                description = 'Authenticated upon acceptance.')
+    pubtype: PubType = Field(default=PubType.RESEARCH,
+                             title='Type of publication',
+                             description='Originates in review system')
+    errata_doi: Optional[str] = Field(default=None,
+                                      title='If pubtype is errata, this holds the DOI of original paper.',
+                                      description='Should start with 10.')
     compiled: datetime = Field(...,
                                title='When the article was last compiled',
                                description='Last compilation date')

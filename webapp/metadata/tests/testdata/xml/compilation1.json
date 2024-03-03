@@ -5,6 +5,8 @@
   "email": "iacrcc@digicrime.com",
   "submitted": "2022-08-03 06:44:30",
   "accepted": "2022-09-30 17:49:20",
+  "pubtype": "ERRATA",
+  "errata_doi": "10.1729/foobar",
   "compiled": "2023-08-06T17:30:54.635519",
   "compile_time": 22.25,
   "command": "latexmk -g -recorder -pdf -pdflatex=\"pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape\" main",
