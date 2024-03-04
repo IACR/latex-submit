@@ -13,37 +13,21 @@
   </nav>
   <div class="tab-content" id="nav-tabContent" style="background-color:#ffffff;">
     <div class="tab-pane fade show active p-3" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
-      <div class="row">
-        <div class="col-6">
-          {% if form.version.data == 'final' %}
-          <p class="alert alert-success">
-	    You are about to submit your final version, which should incorporate changes requested
-            by the copy editor. Once you finalize this, it will go back to the copy editor for a
-            final check.
-          </p>
-          {% else %}
-          <p class="alert alert-warning">
-	    Warning: this site is for testing purposes only. Ordinarily a submission would need
-	    to be authenticated as accepted by the review process. You can submit anything you
-            like as a test right now. Only the admins will see your submission, but we have
-            a sense of humor.
-          </p>
-        </div>
-        <div class="col-6">
-	  <p class="alert alert-info">
-            Papers submitted to the IACR Communications in Cryptology will be required to use the
-	    <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class. At
-	    the present time we also support uploads for other publishing venues, but the main purpose
-	    of this site is to support a new generation of LaTeX document classes.
-          </p>
-          {% endif %}
-        </div>
-      </div>
-      <div class="alert alert-light w-75 mx-auto">
-        <strong>Instructions:</strong> Use this form to upload the final version of your paper. All fields
+      {% if form.version.data == 'final' %}
+      <p class="w-75 alert alert-success">
+	You are about to submit your final version, which should incorporate changes requested
+        by the copy editor. Once you finalize this, it will go back to the copy editor for a
+        final check.
+      </p>
+      {% else %}
+      <div class="alert alert-success w-75 mx-auto">
+        <strong>Instructions:</strong>  Papers submitted to the IACR Communications in Cryptology
+        are required to use the <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
+        document class. Use this form to upload the final version of your paper. All fields
         are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
         for hints on how to avoid problems.
       </div>
+      {% endif %}
       {% if form.errors %}
       {% for field_name, field_errors in form.errors|dictsort if field_errors %}
       {% for error in field_errors %}
