@@ -55,13 +55,14 @@ def show_submit_version():
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-        form.volume.data = 9999
-        form.issue.data = 4
         form.hotcrp.data = NO_HOTCRP
         form.hotcrp_id.data = NO_HOTCRP
-        form.journal.data = 'cic'
+        form.version.data = 'candidate'
         form.accepted.data = '2022-09-30 17:49:20'
         form.submitted.data = '2022-08-03 06:44:30'
+        form.journal.data = 'cic'
+        form.volume.data = '1111'
+        form.issue.data = '4'
         form.pubtype.data = PubType.RESEARCH.name
         form.generate_auth()
     else:
@@ -598,7 +599,11 @@ def view_copyedit(paperid, auth):
                                                            paper_status.hotcrp_id,
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
-                                                           paper_status.accepted]))
+                                                           paper_status.accepted,
+                                                           paper_status.journal_key,
+                                                           paper_status.volume_key,
+                                                           paper_status.issue_key,
+                                                           paper_status.pubtype.name]))
             return render_template('view_copyedit.html', **data)
         else:
             # TODO: handle the other cases like SUBMITTED or PENDING.
@@ -650,7 +655,11 @@ def respond_to_comment(paperid, itemid, auth):
                                                            paper_status.hotcrp_id,
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
-                                                           paper_status.accepted]))
+                                                           paper_status.accepted,
+                                                           paper_status.journal_key,
+                                                           paper_status.volume_key,
+                                                           paper_status.issue_key,
+                                                           paper_status.pubtype.name]))
         return jsonify(response)
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -843,7 +852,16 @@ def view_results(paperid, version, auth):
                                  issue=pstatus.issue_key,
                                  submitted=pstatus.submitted,
                                  accepted=pstatus.accepted,
-                                 auth=create_hmac([paperid, pstatus.hotcrp, pstatus.hotcrp_id, version, comp.submitted, comp.accepted]),
+                                 auth=create_hmac([paperid,
+                                                   pstatus.hotcrp,
+                                                   pstatus.hotcrp_id,
+                                                   version,
+                                                   comp.submitted,
+                                                   comp.accepted,
+                                                   pstatus.journal_key,
+                                                   pstatus.volume_key,
+                                                   pstatus.issue_key,
+                                                   pstatus.pubtype.name]),
                                  email=pstatus.email,
                                  engine=comp.engine)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:

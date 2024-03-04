@@ -32,6 +32,7 @@ def paper_key(paperid, version):
 def get_json_path(paperid, version):
     """Path to a paper version, where compilation.json is located."""
     return Path(current_app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('compilation.json')
+
 def create_hmac(args: list[str], key=None):
     """Create hmac used for validating local URLs."""
     if not key:

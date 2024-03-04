@@ -138,13 +138,7 @@ class SubmitForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         """Set auth value from other fields."""
         super(SubmitForm, self).__init__(*args, **kwargs)
-        if not self.auth.data:
-            self.auth.data = create_hmac([self.paperid.data,
-                                          self.hotcrp.data,
-                                          self.hotcrp_id.data,
-                                          self.version.data,
-                                          self.submitted.data,
-                                          self.accepted.data])
+
     paperid = HiddenField(label='Paper ID',
                           id='paperid',
                           name='paperid',
@@ -224,7 +218,11 @@ class SubmitForm(FlaskForm):
                               self.hotcrp_id.data,
                               self.version.data,
                               self.submitted.data,
-                              self.accepted.data],
+                              self.accepted.data,
+                              self.journal.data,
+                              self.volume.data,
+                              self.issue.data,
+                              self.pubtype.data],
                              self.auth.data)
 
     # TODO: remove this. It's only for testing.
@@ -234,7 +232,11 @@ class SubmitForm(FlaskForm):
                                       self.hotcrp_id.data,
                                       self.version.data,
                                       self.submitted.data,
-                                      self.accepted.data])
+                                      self.accepted.data,
+                                      self.journal.data,
+                                      self.volume.data,
+                                      self.issue.data,
+                                      self.pubtype.data])
 
     def validate(self, extra_validators=None):
         if not super(FlaskForm, self).validate():
