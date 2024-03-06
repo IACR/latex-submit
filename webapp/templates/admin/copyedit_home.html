@@ -8,8 +8,9 @@
 </div>
 {% endfor %}
 <p>
-  This shows papers that are in various stages of copy editing.
-  The UI and workflow is still TBD.
+  This shows papers that are in various stages of copy editing. When a copy editor is
+  assigned, they have the ability to send the list of remarks to the editor. Any editor
+  can still add comments to a paper, even if they are not assigned.
 </p>
 {% if papers %}
 <table class="table sortable" id="paperlist">
@@ -24,9 +25,22 @@
   </thead>
   <tbody>
     {% for paper in papers %}
-    <tr><td><a href="{{paper.url}}">{{paper.paperid}}</a></td>
+    <tr class="align-middle">
+      <td><a href="{{paper.url}}">{{paper.paperid}}</a></td>
       <td>{{paper.status.value}}</td>
-      <td>{{paper.copyeditor}}</td>
+      <td style="width:20rem;">
+        <div class="align-items-center d-flex">
+          {{paper.copyeditor}}
+          {% if not paper.copyeditor == current_user.email %}
+        <form method="POST" action="{{url_for('admin_file.claimcopyedit')}}">
+          {{claimform.csrf_token}}
+          {{claimform.paperid(value=paper.paperid)}}
+          {{claimform.copyeditor}}
+          <button type='submit' class='btn btn-sm btn-outline-primary ms-2'>Claim</button>
+        </form>
+        {% endif %}
+      </div>
+      </td>
       <td>{{paper.lastmodified}}</td>
       <td>{{paper.email}}</td>
     </tr>

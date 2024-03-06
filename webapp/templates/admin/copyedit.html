@@ -574,10 +574,24 @@
             <div class="discussionTabs">
               <div id="discussion" class="list-group mt-3">
               </div>
+              <div class="d-flex align-middle">
+              {% if not paper.copyeditor %}
+                <span class="text-primary me-3">No copy editor assigned</span>
+              <form METHOD="post" action="{{url_for('admin_file.claimcopyedit')}}">
+                {{claimform.csrf_token}}
+                {{claimform.paperid(value=paperid)}}
+                {{claimform.copyeditor(value=current_user.email)}}
+                <button type='submit' class='btn btn-sm btn-outline-primary' title='You can still add comments without being the assigned copy editor'>Claim as copy editor</button>
+              </form>
+              {% elif paper.copyeditor == current_user.email %}
               <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
                 <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
                 <button class="my-4 btn btn-success btn-sm" type="submit">Finish and send to author(s)</button>
               </form>
+              {% else %}
+              <span class="text-primary">This paper has been assigned to {{paper.copyeditor}} for copy editing. You may still add comments until they send it to to the authors.</span>
+              {% endif %}
+              </div>
               <div id="archived" class="list-group mt-3">
               </div>
             </div>

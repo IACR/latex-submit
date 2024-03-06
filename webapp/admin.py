@@ -22,7 +22,7 @@ from . import db, create_hmac, mail, generate_password, task_queue, paper_key, e
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event, NO_HOTCRP
-from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm
+from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm, CopyeditClaimForm
 from .tasks import run_latex_task
 from .routes import context_wrap
 from .bibmarkup import mark_bibtex, bibtex_to_html
@@ -221,8 +221,10 @@ def copyedit(paperid):
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     comp_path = paper_path / Path('compilation.json')
     compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
+    claimform = CopyeditClaimForm(paperid=paperid,copyeditor=current_user.email)
     data = {'title': 'Copy edit on {} {}'.format(paperid, paper_status.title),
             'comp': compilation,
+            'claimform': claimform,
             'paperid': paperid,
             'input_files': input_files,
             'version': Version.CANDIDATE.value,
@@ -581,6 +583,7 @@ def copyedit_home():
     for paper in papers:
         paper['url'] = _copyedit_url(paper['paperid'], paper['status']['name'])
     data = {'title': 'Papers for copy editing',
+            'claimform': CopyeditClaimForm(copyeditor=current_user.email),
             'papers': papers}
     return render_template('admin/copyedit_home.html', **data)
 
@@ -821,3 +824,20 @@ def change_paperno():
             flash('There is a bug in paper numbers. They were reset')
     db.session.commit()
     return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)
+
+@admin_bp.route('/admin/claimcopyedit', methods=['POST'])
+@login_required
+@admin_required
+def claimcopyedit():
+    form = CopyeditClaimForm()
+    if not form.validate_on_submit():
+        for key, value in form.errors.items():
+            flash('Invalid form: {}:{}'.format(key, value))
+        return admin_message('Invalid form submission. This is a bug.')
+    flash('Changed copy editor on {} to {}'.format(form.paperid.data,
+                                                   form.copyeditor.data))
+    sql = select(PaperStatus).filter_by(paperid=form.paperid.data)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status.copyeditor = form.copyeditor.data
+    db.session.commit()
+    return redirect(url_for('admin_file.copyedit_home'))

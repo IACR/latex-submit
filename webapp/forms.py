@@ -355,3 +355,10 @@ class ChangePaperNumberForm(FlaskForm):
     paperid = HiddenField(name='paperid', validators=[InputRequired()])
     upbutton = SubmitField(name='up', label='⇑')
     downbutton = SubmitField(name='down', label='⇓')
+
+class CopyeditClaimForm(FlaskForm):
+    """Used to claim a paper for copy editing."""
+    paperid = HiddenField(name='paperid',
+                          validators=[InputRequired(),
+                                      ValidPaperId()])
+    copyeditor = HiddenField(name='copyeditor', validators=[InputRequired()])
