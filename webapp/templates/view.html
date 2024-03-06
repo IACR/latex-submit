@@ -28,6 +28,10 @@ This template is used to show the status of a compilation for iacrcc.cls
  span.keyword {
    background-color: #d1e7dd !important;
  }
+ .table th {
+   width: 12rem;
+   text-align: right !important;
+ }
 </style>
 <script>
  var sources = {
@@ -294,45 +298,67 @@ This template is used to show the status of a compilation for iacrcc.cls
             LaTeX source and submit it again. We will not publish email addresses.
           </p>
           <div class="mx-3">
-            <div class="elem" id="paperid"><div class="elem_title">paper id:</div> {{comp.paperid}}</div>
-            <div class="elem" id="venue"><div class="elem_title">venue:</div> {{comp.venue}}</div>
-            <div class="elem" id="paper_title"><div class="elem_title">Title:</div> {{comp.meta.title}}</div>
-{#            <div class="elem" id="abstract"><div class="elem_title">Abstract:</div><div class="w-75">{{comp.meta.abstract|safe}}</div></div>#}
-            <div class="elem" id="error_log" style="background-color:red;">
-            </div>
-            <h5 class="mt-3">Authors</h5>
-            <div class="list-group">
-              {% for author in comp.meta.authors %}
-              <div class="author list-group-item">
-                <div class="d-flex author_name"><div class="elem_title">name:</div> {{author.name}}</div>
-                <div class="d-flex author_surname"><div class="elem_title">surname:</div>{% if author.familyName %}{{author.familyName}}{% else %}<span class="text-danger">None</span>{% endif %}</div>
-                <div class="d-flex author_email"><div class="elem_title">email:</div> {{author.email}}</div>
-                <div class="d-flex author_orcid"><div class="elem_title">orcid:</div>
-                  {% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None (<a target="_blank" href="https://orcid.org/orcid-search/search?searchQuery={{author.name|urlencode}}">search</a>)</span>{% endif %}</div>
-                <div class="d-flex"><div class="elem_title">Affiliations:</div>
-                  {% if author.affiliations %}
-                  <div class="list-group">
-                    {% for affil in author.affiliations %}
-                    <div class="affiliation list-group-item">
-                      {% set aff=comp.meta.affiliations[affil-1] %}
-                      <div class="elem"><div class="elem_title">name:</div> {{aff.name}}</div>
-                      <div class="elem"><div class="elem_title">ROR:</div> {% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</div>
-                        <div class="elem"><div class="elem_title">Street:</div> {{aff.street}}</div>
-                        <div class="elem"><div class="elem_title">City:</div> {{aff.city}}</div>
-                        <div class="elem"><div class="elem_title">Post code:</div> {{aff.postcode}}</div>
-                        <div class="elem"><div class="elem_title">Country:</div> {{aff.country}}</div>
-                    </div>
-                    {% endfor %}
-                  </div>
-                  {% else %}
-                  <span class="text-danger">None</a>
-                    {% endif %}
-                </div>
-              </div>
-              {% endfor %}
-            </div>
             <table class="table ms-3 mt-2 table-bordered">
               <tbody>
+                <tr>
+                  <th>Paper ID</th>
+                  <td>{{comp.paperid}}</td>
+                </tr>
+                <tr>
+                  <th>Title</th>
+                  <td>{{comp.meta.title}}</td>
+                </tr>
+                <tr>
+                  <th>DOI</th>
+                  <td>{{comp.meta.DOI}}</td>
+                </tr>
+                <tr>
+                  <th>Authors</th>
+                  <td>
+                    <div class="list-group">
+                      {% for author in comp.meta.authors %}
+                      <div class="author list-group-item">
+                        <div class="d-flex author_name"><div class="elem_title">name:</div> {{author.name}}</div>
+                        <div class="d-flex author_surname"><div class="elem_title">surname:</div>{% if author.familyName %}{{author.familyName}}{% else %}<span class="text-danger">None</span>{% endif %}</div>
+                        <div class="d-flex author_email"><div class="elem_title">email:</div> {{author.email}}</div>
+                        <div class="d-flex author_orcid"><div class="elem_title">orcid:</div>
+                          {% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None (<a target="_blank" href="https://orcid.org/orcid-search/search?searchQuery={{author.name|urlencode}}">search</a>)</span>{% endif %}</div>
+                        <div class="d-flex"><div class="elem_title">Affiliations:</div>
+                          {% if author.affiliations %}
+                          <div class="list-group">
+                            {% for affil in author.affiliations %}
+                            <div class="affiliation list-group-item">
+                              {% set aff=comp.meta.affiliations[affil-1] %}
+                              <div class="elem"><div class="elem_title">name:</div> {{aff.name}}</div>
+                              <div class="elem"><div class="elem_title">ROR:</div> {% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</div>
+                                <div class="elem"><div class="elem_title">Street:</div> {{aff.street}}</div>
+                                <div class="elem"><div class="elem_title">City:</div> {{aff.city}}</div>
+                                <div class="elem"><div class="elem_title">Post code:</div> {{aff.postcode}}</div>
+                                <div class="elem"><div class="elem_title">Country:</div> {{aff.country}}</div>
+                            </div>
+                            {% endfor %}
+                          </div>
+                          {% else %}
+                          <span class="text-danger">None</a>
+                            {% endif %}
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Zip filename</th>
+                  <td> {{comp.zipfilename}}</td>
+                </tr>
+                <tr>
+                  <th>Submitted</th>
+                  <td>{{comp.submitted}}</td>
+                </tr>
+                <tr>
+                  <th>Accepted</th>
+                  <td>{{comp.accepted}}</td>
+                </tr>
                 <tr>
                   <th>Date compiled:</th>
                   <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
@@ -342,21 +368,19 @@ This template is used to show the status of a compilation for iacrcc.cls
                   <td>{{comp.compile_time}} seconds</td>
                 </tr>
                 <tr>
-                  <th>Return code from latexmk:</th>
-                  <td>{{comp.exit_code}}</td>
+                  <th>Status</th>
+                  <td>{{comp.status}}</td>
+                </tr>
+                <tr>
+                  <th>Contact email</th>
+                  <td>{{comp.email}}</td>
+                </tr>
+                <tr>
+                  <th>BibTeX</th>
+                  <td>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</td>
                 </tr>
               </tbody>
             </table>
-            <div class="elem" id="status"><div class="elem_title">status:</div> {{comp.status.value}}</div>
-            {#  <div class="elem" id="exit_code"><div class="elem_title">exit code:</div> {{comp.exit_code}}</div>#}
-            <div class="elem" id="email"><div class="elem_title">email:</div> {{comp.email}}</div>
-            <div class="elem" id="bibtex"><div class="elem_title">BibTeX:</div>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</div>
-            <div class="elem" id="submitted"><div class="elem_title">submitted:</div> {{comp.submitted}}</div>
-            <div class="elem" id="accepted"><div class="elem_title">accepted:</div> {{comp.accepted}}</div>
-            <div class="elem" id="compiled"><div class="elem_title">compiled:</div> {{comp.compiled}}</div>
-            <div class="elem" id="compile_time"><div class="elem_title">compile_time:</div> {{comp.compile_time}} seconds</div>
-            <div class="elem" id="doi"><div class="elem_title">DOI:</div> {{comp.meta.DOI}}</div>
-            <div class="elem" id="zipfile"><div class="elem_title">zip filename:</div> {{comp.zipfilename}}</div>
           </div>
           {% if form %}
           <div class="alert alert-info mt-3">

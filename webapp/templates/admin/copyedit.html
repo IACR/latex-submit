@@ -73,6 +73,10 @@
  div[data-status="DECLINED"] {
    background-color: #fff3cd;
  }
+ .table th {
+   width: 12rem;
+   text-align: right !important;
+ }
 </style>
 {# this template is used for generating notes from javascript. #}
 {% raw %}
@@ -80,8 +84,13 @@
   <alert class="alert list-group-item list-group-item-secondary fade show" id="item-{{id}}">
     <div class="d-flex justify-content-between">
       <div class="d-flex flex-column justify-content-between w-100">
-        <div>Page <span id="pageno-{{id}}">{{pageno}}</span>,
-          line <span id="lineno-{{id}}">{{lineno}}</span><br>
+        <div>
+          <div class="d-flex justify-content-between">
+            <div>Page <span id="pageno-{{id}}">{{pageno}}</span>,
+              line <span id="lineno-{{id}}">{{lineno}}</span>
+            </div>
+            <span class="me-2">Creator: {{creator}}</span>
+          </div>
           <span id="text-{{id}}">{{text}}</span>
         </div>
         <div class="d-flex justify-content-between">
@@ -97,7 +106,7 @@
         </div>
       </div>
       <div class="ps-2 d-flex flex-column align-items-end">
-        <img src="/img/delete-icon.svg" class="icon" onclick="deleteNote({{id}})">
+        <img src="/img/delete-icon.svg" class="icon" onclick="deleteNote({{id}})" title="Delete">
         {{#if archived }}<span class="mt-3 badge text-bg-warning">Archived</span>{{/if}}
       </div>
     </div>
@@ -192,7 +201,7 @@
                'pageno': +document.getElementById('pageno').value,
                'lineno': +document.getElementById('lineno').value,
                'text': document.getElementById('text').value,
-               'creator_id': +document.getElementById('creator_id').value};
+               'creator_email': document.getElementById('copyedit_email').value};
    if (document.getElementById('source_select').value) {
      data['source_file'] = document.getElementById('source_select').value;
    }
@@ -262,6 +271,8 @@
  };
  </script>
  <script src="/js/nav.js"></script>
+ <script id="MathJax-script" async src="/js/mathjax/tex-chtml.js"></script>
+ <script src="/js/mark.min.js"></script>
 {% endblock %}
 {% block extraMenu %}
 <li class="nav-item">
@@ -269,168 +280,370 @@
 </li>
 {% endblock %}
 {% block content %}
-  <main id="adminContent" class="container-fluid">
-    <div id="splitView" class="d-flex w-100">
-      <div class="left-column">
-        <ul class="nav nav-tabs" id="editTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf" type="button" role="tab" aria-controls="nav-pdf" aria-selected="true">PDF</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log" type="button" role="tab" aria-controls="nav-log" aria-selected="false">Log</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source" type="button" role="tab" aria-controls="nav-source" aria-selected="false">LaTeX</button>
-          </li>
-        </ul>
-        <div class="tab-content" id="editTabContent">
-          <div class="tab-pane fade show active" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab" tabindex="0">
-            <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#page=1"></iframe>
-          </div>
-          <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
-            {% for line in loglines %}
-            <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
-            {% endfor %}
-          </div>
-          <div class="tab-pane fade" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab" tabindex="0">
-            <div class="px-5 py-3">
-              {% include "nav_source_tab.html" %}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="resizer"></div>
-  <div class="right-column">
-    <div class="d-flex flex-column" style="height:90vh;">
-      <p class="form-text">
-        <strong class="my-2 text-center">Copy edit on {{paper.paperid}}</strong><br>
-        Status: {{paper.status.value}}, Venue: {{paper.venue}}, contact: {{paper.email}}
-      </p>
-      {#  tabs for discussion and warnings from compilation #}
-      <ul class="nav nav-tabs" id="myTab" role="tablist">
+<main id="adminContent" class="container-fluid">
+  <div id="splitView" class="d-flex w-100">
+    <div class="left-column">
+      <ul class="nav nav-tabs" id="editTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Your feedback</button>
+          <button class="nav-link active" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf" type="button" role="tab" aria-controls="nav-pdf" aria-selected="true">PDF</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="warning-tab" data-bs-toggle="tab" data-bs-target="#warning" type="button" role="tab" aria-controls="warning" aria-selected="false">Warnings</button>
+          <button class="nav-link" id="nav-html-tab" data-bs-toggle="tab" data-bs-target="#nav-html" type="button" role="tab" aria-controls="nav-html" aria-selected="false">HTML</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log" type="button" role="tab" aria-controls="nav-log" aria-selected="false">Log</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source" type="button" role="tab" aria-controls="nav-source" aria-selected="false">LaTeX</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta" type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
         </li>
       </ul>
-      {# tabs to be shown on right #}
-      <div id="tabContent" class="tab-content p-3">
-        <div class="tab-pane fade show active" id="feedback" role="tabpanel" aria-labelledby="feedback-tab" tabindex="0">
-          <input type="hidden" id="paperid" value="{{paper.paperid}}">
-          <input type="hidden" id="logline" value="">
-          <input type="hidden" id="creator_id" name="creator_id" value="{{current_user.id}}">
-          <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
-          <input type="hidden" id="warning_id" value="">
-          <div class="row">
-            <div class="col-6">
-              <label for="pageno" class="form-label">Page number</label>
-              <input id="pageno" name="pageno" required type="number" class="form-control form-control-sm" placeholder="Page number is required">
-            </div>
-            <div class="col-6">
-              <label for="lineno" class="form-label">Line number</label>
-              <input id="lineno" name="lineno" required type="number" class="form-control form-control-sm" placeholder="Line number is required">
-            </div>
+      <div class="tab-content" id="editTabContent">
+        <div class="tab-pane fade show active" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab" tabindex="0">
+          <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#page=1"></iframe>
+        </div>
+        <div class="tab-pane fade show p-3 mathjax" id="nav-html" role="tabpanel" aria-labelledby="nav-html-tab">
+	  {% set meta = comp.meta %}
+	  <p class="alert alert-info">
+            This is approximately what part of the HTML page will look like. Please check the title, authors, abstract,
+            and references. Note that HTML rendering of references may be malformed by using <tt>\url</tt> inside the
+            <tt>howpublished</tt> field. Google scholar and eprint links are approximate, so they need not point to the paper.
+          </p>
+          <div style="max-width:800px;" class="mx-auto">
+          <h3>{{meta.title}}</h3>
+	  <div id="authorlist" class="authorlist">
+	    {% for author in meta.authors %}
+	    <div class="author">
+	      <div class="authorname">{{author.name}}
+		{% if author.orcid %}
+		<a target="_blank" href="https://orcid.org/{{author.orcid}}"><img alt="ORCID" class="align-baseline orcidIcon" src="/img/orcid.svg"></a>
+		{% endif %}
+	      </div>
+	      <div class="ms-4 mb-2">
+		{% for i in author.affiliations %}
+		{% set aff = meta.affiliations[i-1] %}
+		{{aff.name}}{% if aff.city %}, {{aff.city}}{% endif %}, {{aff.country}}<br>
+		{% endfor %}
+		{% if author.email %}
+		<span class="font-monospace">{{author.email|replace('@', ' at ')|replace('.', ' dot ')}}</span>
+		{% endif %}
+	      </div>
+	    </div>
+	    {% endfor %}
+	  </div>
+	  {% if meta.keywords %}
+	  <div class="mb-3">
+	    <strong class="fs-4">Keywords: </strong>
+	    {% for keyword in meta.keywords %}
+	    <span class="badge p-2 text-bg-light keyword ms-2 my-1" alt="{{keyword}}" title="{{keyword}}"><a>{{keyword}}</a></span>
+	    {% endfor %}
+	  </div>
+	  {% endif %}
+	  {%- if meta.abstract -%}
+	  <h4 class="mt-4">Abstract</h4>
+	  {{meta.abstract|safe}}
+	  {% endif %}
+	  {% if references %}
+	  <h4 class="mb-3">References</h4>
+	  {% for entry in references %}
+	  <div class="d-flex">
+	    <div style="min-width:3rem;">[{{loop.index}}]</div>
+	    <div>{{entry.text|safe}}</div>
+	    {# {% if entry.scholar %}
+	    <a href="{{entry.scholar}}" target="_blank" class="ms-3"><img src="/images/Google_Scholar_logo.svg" alt="Google Scholar" title="Google Scholar" class="icon"></a>
+	    {% endif %}
+	    {% if entry.eprint %}
+	    <a href="{{entry.eprint}}" target="_blank" class="ms-2"><img src="/images/iacrlogo_small.svg" class="icon" title="IACR ePrint archive" alt="IACR ePrint archive"></a>
+	    {% endif %}#}
+	  </div>
+	  <div class="text-end mb-4">
+	    {% if entry.scholar %}
+	    <a href="{{entry.scholar}}" target="_blank" class="ms-3">
+	      {# <img src="/images/Google_Scholar_logo.svg" alt="Google Scholar" title="Google Scholar" class="icon">#}
+	      Google Scholar</a>
+	    {% endif %}
+	    {% if entry.eprint %}
+	    <a href="{{entry.eprint}}" target="_blank" class="ms-2">{#<img src="/images/iacrlogo_small.svg" class="icon" title="IACR ePrint archive" alt="IACR ePrint archive">#}
+	      ePrint</a>
+	    {% endif %}
+	  </div>
+	  {% endfor %} {# end of references #}
+	  {% endif %}
           </div>
-          <div class="row mt-2">
-            <div class="col-6">
-              <label for="source_select" class="form-label">Source file (optional)</label>
-              <select id="source_select" name="sourcefile" type="number" class="form-select form-select-sm" placeholder="Optional source file">
-                <option selected></option>
-                {% for f in input_files %}
-                <option value="{{f}}">{{f}}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-6">
-              <label for="sourceline" class="form-label">Source line (optional)</label>
-              <input id="sourceline" name="sournceline" type="number" class="form-control form-control-sm" placeholder="Optional source line number">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <label for="text" class="form-label mt-2">Note to author</label>
-            </div>
-            <div class="col-12">
-              <textarea id="text" name="text" class="form-control form-control-sm" placeholder="Enter text instructions for the author"></textarea>
-            </div>
-          </div>
-          <div id="error_msg" class="text-danger d-none"></div>
-          <button type="submit" class="mt-3 btn btn-primary btn-sm" onclick="addComment()">Add comment</button>
-          <button type="submit" class="ms-3 mt-3 btn btn-secondary btn-sm" onclick="resetForm()">Clear</button>
-          <div class="discussionTabs">
-            <div id="discussion" class="list-group mt-3">
-            </div>
-            <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
-              <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
-              <button class="my-4 btn btn-success btn-sm" type="submit">Finish and send to author(s)</button>
-            </form>
-            <div id="archived" class="list-group mt-3">
-            </div>
-          </div>
-          <div class="alert alert-info alert-dismissible fade show" role="alert">
-            Start with the tab showing the compile warnings. Some might need escalation to have the author fix them.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+        <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
+          {% for line in loglines %}
+          <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
+          {% endfor %}
+        </div>
+        <div class="tab-pane fade" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab" tabindex="0">
+          <div class="px-5 py-3">
+            {% include "nav_source_tab.html" %}
           </div>
         </div>
-        <div class="tab-pane fade" id="warning" role="tabpanel" aria-labelledby="warning-tab" tabindex="0">
-          <p>Authors have already seen these, but apparently
-            ignored them. You can request them to fix individual items.
-          </p>
-          <div class="list-group discussionTabs">
-            {% if comp.warning_log %}
-            {% for err in comp.warning_log %}
-            <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show"
-                 {% if err.filepath %}
-                 {% if err.filepath.startswith('/usr/') %}
-                 {% set filepath = err.filepath.split('/')[-1] %}
-                 {% else %}
-                 {% set filepath = err.filepath %}
-                 data-sourcefile={{filepath}} data-sourceline={{err.filepath_line}}
-                 {% endif %}
-                 {% endif %}
-                 {% if err.pageno %}
-                 data-pageno={{err.pageno}}
-                 {% endif %}
-            >
-              <div class="d-flex flex-column justify-content-between w-100">
-                <div id="warning-text-{{loop.index}}">{{err.text}}</div>
-                <div class="d-flex justify-content-between">
-                  <div class="">
-              {% if err.text.startswith('bibtex entry ') %}
-              {% set bibtex_key = err.text.split()[2] %}
-              <span class="lognav" onclick="scrollToBibtex('{{bibtex_key}}');">Show bibtex entry</span>
-              {% else %}
-              {% if err.logline %}<span onclick="showLogLine('{{err.error_type[:6]}}', {{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
-              {% endif %}
+        <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab" tabindex="0">
+          <table class="table mt-3 mx-3">
+            <tbody>
+              <tr>
+                <th>Paper ID:</th>
+                <td>{{comp.paperid}}</td>
+              </tr>
+              <tr>
+                <th>DOI:</th>
+                <td>{{comp.meta.DOI}}</dtd>
+              </tr>
+              <tr>
+                <th>Status:</th>
+                <td>{{comp.status}}</td>
+              </tr>
+              <tr>
+                <th>Title:</th>
+                <td>{{comp.meta.title}}</td>
+              </tr>
+              <tr>
+                <th>Authors:</th>
+                <td>
+                  <div class="list-group">
+                    {% for author in comp.meta.authors %}
+                    <div class="author list-group-item">
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <th>Name:</th>
+                            <td>{{author.name}}</td>
+                          </tr>
+                          <tr>
+                            <th>Surname:</th>
+                            <td>{% if author.familyName %}{{author.familyName}}{% else %}<span class="text-danger">None</span>{% endif %}</td>
+                          </tr>
+                          <tr>
+                            <th>Email:</th>
+                            <td>{{author.email}}</td>
+                          </tr>
+                          <tr>
+                            <th>ORCID:</th>
+                            <td>{% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None (<a target="_blank" href="https://orcid.org/orcid-search/search?searchQuery={{author.name|urlencode}}">search</a>)</span>{% endif %}</td>
+                          </tr>
+                          <tr>
+                            <th>
+                              Affiliations:
+                            </th>
+                            <td>
+                              {% if author.affiliations %}
+                              <div class="list-group">
+                                {% for affil in author.affiliations %}
+                                <div class="affiliation list-group-item">
+                                  {% set aff=comp.meta.affiliations[affil-1] %}
+                                  <table class="table">
+                                    <tbody>
+                                      <tr>
+                                        <th>name</th>
+                                        <td>{{aff.name}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>ROR</th>
+                                        <td>{% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Street</th>
+                                        <td>{{aff.street}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>City</th>
+                                        <td>{{aff.city}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Postal code</th>
+                                        <td>{{aff.postcode}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Country</th>
+                                        <td> {{aff.country}}</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div> {# list-group-item #}
+                                {% endfor %}{# affiliations #}
+                              </div> {# end of list-group for affiliations #}
+                              {% else %}
+                              <span class="text-danger">None</span>
+                              {% endif %}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div> {# list-group-item for author #}
+                    {% endfor %}
                   </div>
-                  <div class="">
-                    {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
-                  </div>
-                  <div class="text-end">
-                    {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
-                                           {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
-                                           class="lognav" title="Show source file">{{filepath}}
-                    {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
-                  </div>
-                </div>
+                </td>
+              </tr>
+              <tr>
+                <th>Date compiled</th>
+                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+              </tr>
+              <tr>
+                <th>Compile time</th>
+                <td>{{comp.compile_time}} seconds</dtd>
+              </tr>
+              <tr>
+                <th>Contact email</th>
+                <td>{{comp.email}}</td>
+              </tr>
+              <tr>
+                <th>BibTeX</th>
+                <td>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</td>
+              </tr>
+              <tr>
+                <th>Submitted</th>
+                <td>{{comp.submitted}}</td>
+              </tr>
+              <tr>
+                <th>Accepted</th>
+                <td>{{comp.accepted}}</td>
+              </tr>
+              <tr>
+                <th>Compiled</th>
+                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+              </tr>
+              <tr>
+                <th>Zip filename</th>
+                <td>{{comp.zipfilename}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> {# end of tab-content #}
+    </div> {# end left-column #}
+    <div class="resizer"></div>
+    <div class="right-column">
+      <div class="d-flex flex-column" style="height:90vh;">
+        {#  tabs for discussion and warnings from compilation #}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Your feedback</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="warning-tab" data-bs-toggle="tab" data-bs-target="#warning" type="button" role="tab" aria-controls="warning" aria-selected="false">Warnings</button>
+          </li>
+        </ul>
+        {# tabs to be shown on right #}
+        <div id="tabContent" class="tab-content p-3">
+          <div class="tab-pane fade show active" id="feedback" role="tabpanel" aria-labelledby="feedback-tab" tabindex="0">
+            <input type="hidden" id="paperid" value="{{paper.paperid}}">
+            <input type="hidden" id="logline" value="">
+            <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
+            <input type="hidden" id="warning_id" value="">
+            <div class="row">
+              <div class="col-6">
+                <label for="pageno" class="form-label">Page number</label>
+                <input id="pageno" name="pageno" required type="number" class="form-control form-control-sm" placeholder="Page number is required">
               </div>
-              <div class="ms-3 d-flex flex-column align-items-end">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Remove if unimportant"></button>
-                <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Include</button>
+              <div class="col-6">
+                <label for="lineno" class="form-label">Line number</label>
+                <input id="lineno" name="lineno" required type="number" class="form-control form-control-sm" placeholder="Line number is required">
               </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="alert alert-info">There were no warnings from the compilation.</div>
-            {% endif %}
+            <div class="row mt-2">
+              <div class="col-6">
+                <label for="source_select" class="form-label">Source file (optional)</label>
+                <select id="source_select" name="sourcefile" type="number" class="form-select form-select-sm" placeholder="Optional source file">
+                  <option selected></option>
+                  {% for f in input_files %}
+                  <option value="{{f}}">{{f}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="sourceline" class="form-label">Source line (optional)</label>
+                <input id="sourceline" name="sournceline" type="number" class="form-control form-control-sm" placeholder="Optional source line number">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <label for="text" class="form-label mt-2">Note to author</label>
+              </div>
+              <div class="col-12">
+                <textarea id="text" name="text" class="form-control form-control-sm" placeholder="Enter text instructions for the author"></textarea>
+              </div>
+            </div>
+            <div id="error_msg" class="text-danger d-none"></div>
+            <button type="submit" class="mt-3 btn btn-primary btn-sm" onclick="addComment()">Add comment</button>
+            <button type="submit" class="ms-3 mt-3 btn btn-secondary btn-sm" onclick="resetForm()">Clear</button>
+            <div class="discussionTabs">
+              <div id="discussion" class="list-group mt-3">
+              </div>
+              <form METHOD="post" action="{{url_for('admin_file.finish_copyedit')}}">
+                <input type="hidden" id="paperid" name="paperid" value="{{paper.paperid}}">
+                <button class="my-4 btn btn-success btn-sm" type="submit">Finish and send to author(s)</button>
+              </form>
+              <div id="archived" class="list-group mt-3">
+              </div>
+            </div>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+              Start with the tab showing the compile warnings. Some might need escalation to have the author fix them.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="warning" role="tabpanel" aria-labelledby="warning-tab" tabindex="0">
+            <p>Authors have already seen these, but apparently
+              ignored them. You can request them to fix individual items.
+            </p>
+            <div class="list-group discussionTabs">
+              {% if comp.warning_log %}
+              {% for err in comp.warning_log %}
+              <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show"
+                   {% if err.filepath %}
+                   {% if err.filepath.startswith('/usr/') %}
+                   {% set filepath = err.filepath.split('/')[-1] %}
+                   {% else %}
+                   {% set filepath = err.filepath %}
+                   data-sourcefile={{filepath}} data-sourceline={{err.filepath_line}}
+                   {% endif %}
+                   {% endif %}
+                   {% if err.pageno %}
+                   data-pageno={{err.pageno}}
+                   {% endif %}
+              >
+                <div class="d-flex flex-column justify-content-between w-100">
+                  <div id="warning-text-{{loop.index}}">{{err.text}}</div>
+                  <div class="d-flex justify-content-between">
+                    <div class="">
+                      {% if err.text.startswith('bibtex entry ') %}
+                      {% set bibtex_key = err.text.split()[2] %}
+                      <span class="lognav" onclick="scrollToBibtex('{{bibtex_key}}');">Show bibtex entry</span>
+                      {% else %}
+                      {% if err.logline %}<span onclick="showLogLine('{{err.error_type[:6]}}', {{err.logline}})" class="lognav" title="Scroll to log line"> Log line {{err.logline}}</span>{% endif %}
+                      {% endif %}
+                    </div>
+                    <div class="">
+                      {% if err.pageno %}<span onclick="showPage({{err.pageno}})" class="lognav" title="Scroll to PDF page {{err.pageno}}">PDF page &ge;{{err.pageno}}</span>{% endif %}
+                    </div>
+                    <div class="text-end">
+                      {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
+                                             {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
+                                             class="lognav" title="Show source file">{{filepath}}
+                      {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="ms-3 d-flex flex-column align-items-end">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Hide"></button>
+                  <button class="mt-2 btn btn-warning" onclick="requestFix({{loop.index}})" title="Request a fix from the author">Include</button>
+                </div>
+              </div>
+              {% endfor %}
+              {% else %}
+              <div class="alert alert-info">There were no warnings from the compilation.</div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>  
+</main>
 {# modal for help. #}
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">

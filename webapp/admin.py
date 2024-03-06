@@ -25,7 +25,8 @@ from .metadata.db_models import Role, User, validate_version, PaperStatus, Paper
 from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm
 from .tasks import run_latex_task
 from .routes import context_wrap
-from .bibmarkup import mark_bibtex
+from .bibmarkup import mark_bibtex, bibtex_to_html
+
 from functools import wraps
 import shutil
 import urllib
@@ -220,8 +221,9 @@ def copyedit(paperid):
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     comp_path = paper_path / Path('compilation.json')
     compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
-    data = {'title': 'Viewing {}'.format(paperid),
+    data = {'title': 'Copy edit on {} {}'.format(paperid, paper_status.title),
             'comp': compilation,
+            'paperid': paperid,
             'input_files': input_files,
             'version': Version.CANDIDATE.value,
             'warnings': compilation.warning_log,
@@ -233,6 +235,8 @@ def copyedit(paperid):
     data['loglines'] = latexlog.splitlines()
     if compilation.bibtex:
         data['marked_bibtex'] = mark_bibtex(compilation.bibtex)
+        htmlbib = bibtex_to_html(compilation.bibtex)
+        data['references'] = htmlbib['references']
     return render_template('admin/copyedit.html', **data)
 
 @admin_bp.route('/admin/approve_final', methods=['POST'])
@@ -526,7 +530,7 @@ def request_more_changes():
                                  'email': last_compilation.email,
                                  'submitted': last_compilation.submitted,
                                  'accepted': last_compilation.accepted,
-                                 'pubtype': last_compilation.pubtype.name,
+                                 'pubtype': last_compilation.pubtype,
                                  'errata_doi': last_compilation.errata_doi,
                                  'compiled': now,
                                  'command': last_compilation.command,
@@ -604,7 +608,7 @@ def comment():
             return jsonify({'id': data['id']})
         elif action == 'add':
             d = Discussion(paperid=data['paperid'],
-                           creator_id=data['creator_id'],
+                           creator=data['creator_email'],
                            pageno=data['pageno'],
                            lineno=data['lineno'],
                            text=data['text'])

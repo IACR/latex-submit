@@ -464,7 +464,7 @@ def compile_for_copyedit():
                                  'email': version_compilation.email,
                                  'submitted': version_compilation.submitted,
                                  'accepted': version_compilation.accepted,
-                                 'pubtype': version_compilation.pubtype.name,
+                                 'pubtype': version_compilation.pubtype,
                                  'errata_doi': version_compilation.errata_doi,
                                  'compiled': now,
                                  'engine': version_compilation.engine,

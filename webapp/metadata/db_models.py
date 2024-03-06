@@ -114,7 +114,7 @@ class Discussion(Base):
     warning_id: Mapped[Optional[int]] = mapped_column(Integer,
                                                       comment='Optional index of item from compilation.error_log that was escalated.')
     paperid: Mapped[str] = mapped_column(ForeignKey('paper_status.paperid', ondelete='CASCADE'), nullable=False)
-    creator_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    creator: Mapped[str] = mapped_column(ForeignKey('user.email', ondelete='CASCADE'), nullable=False)
     created: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=func.now())
     pageno: Mapped[int] = mapped_column(Integer, nullable=True)
     lineno: Mapped[int] = mapped_column(Integer, nullable=True) # line number in pdf
@@ -157,7 +157,7 @@ class PaperStatus(Base):
                                             comment='Original volume::hotcrp_key. Should not be changed.')
     issue_key: Mapped[str] = mapped_column(String(32), nullable=False,
                                            comment='Original issue::hotcrp_key. Should not be changed.')
-    issue_id: Mapped[Optional[int]] = mapped_column(ForeignKey('issue.id'),
+    issue_id: Mapped[Optional[int]] = mapped_column(ForeignKey('issue.id', ondelete='SET NULL'),
                                                     nullable=True,
                                                     comment='May be changed if moved to another issue for the journal')
     issue: Mapped['Issue'] = relationship(back_populates='papers')
@@ -171,6 +171,7 @@ class PaperStatus(Base):
                                                    server_default=func.now())
     title: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded title')
     authors: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded, comma-delimited list of authors')
+    copyeditor: Mapped[str] = mapped_column(ForeignKey('user.email', ondelete='SET NULL'), default=None, nullable=True)
 
 class LogEvent(Base):
     __tablename__ = 'log_event'

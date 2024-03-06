@@ -17,16 +17,16 @@
     <tr>
       <th>Paper ID</th>
       <th>Status</th>
-      <th>Journal</th>
+      <th>Assigned</th>
       <th>Last modified</th>
-      <th>Email</th>
+      <th>Corresponding author</th>
     </tr>
   </thead>
   <tbody>
     {% for paper in papers %}
     <tr><td><a href="{{paper.url}}">{{paper.paperid}}</a></td>
       <td>{{paper.status.value}}</td>
-      <td>{{paper.journal_key}}</td>
+      <td>{{paper.copyeditor}}</td>
       <td>{{paper.lastmodified}}</td>
       <td>{{paper.email}}</td>
     </tr>
