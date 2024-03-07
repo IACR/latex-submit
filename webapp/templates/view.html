@@ -46,8 +46,10 @@ This template is used to show the status of a compilation for iacrcc.cls
 {% block content %}
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
   <div id="splitView" class="d-flex w-100">
-    <div class="left-column">
+    <div class="left-column pt-3">
+      {% if paper.status.name == 'PENDING' %}
       <a class="btn btn-primary my-3" href="{{submit_url}}">You may still resubmit your paper</a>
+      {% endif %}
       {% if comp.error_log %}
       <div class="border border-danger p-3 mb-3 border-3 rounded">
         Unfortunately the compilation of your paper has encountered errors.
@@ -94,6 +96,7 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endfor %}
       </div>
       {% endif %} {# comp.error_log #}
+      {% if paper.status.name == 'PENDING' %}
       <div id="success_alert" class="alert alert-success{% if comp.error_log %} d-none{% endif %}">
         Congratulations - your paper was compiled. The next steps are:
         <ol>
@@ -107,6 +110,15 @@ This template is used to show the status of a compilation for iacrcc.cls
           </li>
         </ol>
       </div>
+      {% elif paper.status.name == 'EDIT_PENDING' %}
+      <p class="alert alert-success">
+        Your paper has been submitted for copy editing.
+      </p>
+      {% else %}
+      <p class="alert alert-success">
+        Your paper has status: {{paper.status.name}}.
+      </p>
+      {% endif %}
       <div class="d-none mb-3" id="abstract_log"></div>
       {% if comp.warning_log %}
       <div>

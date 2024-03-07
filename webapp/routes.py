@@ -842,6 +842,7 @@ def view_results(paperid, version, auth):
                                                      text='Error in converting bibtex to html: ' + error))
         data['references'] = htmlbib['references']
     pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    data['paper'] = pstatus
     data['submit_url'] = url_for('home_bp.show_submit_version',
                                  paperid=paperid,
                                  version=version,

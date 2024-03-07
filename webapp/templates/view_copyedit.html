@@ -63,9 +63,12 @@ This template is used to show the status of a compilation for copyedit
       </div>
       <p class="alert alert-info alert-dismissible fade show" role="alert"> Please
         reply to each item below (use this page as a checklist to
-        update your LaTeX). Try to confine your changes to only these
-        issues.  Once you respond to all items, the button above will
-        allow you to upload the final version.
+        update your LaTeX). You can
+        <a href="{{url_for('home_bp.download_output_zipfile', version='candidate', paperid=paperid)}}">download the
+          previous zip file if you like.</a>
+        Try to confine your changes to only these
+        issues.  Once you respond to all items, a button will appear that
+        allows you to upload the final version.
         <button type="button" title="Answer all items below" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
       </p>
       <div id="responses">
