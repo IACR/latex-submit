@@ -72,8 +72,8 @@ def show_submit_version():
             logging.warning('{}:{}:{} form not authenticated'.format(form.paperid.data,
                                                                      form.version.data,
                                                                      form.auth.data))
-            for error in form.errors:
-                print(error)
+            for key, value in form.errors.items():
+                flash('{}:{}'.format(key,value))
             return render_template('message.html',
                                    title='This submission is not authorized.',
                                    error='The token for this request is invalid')
@@ -817,6 +817,8 @@ def view_results(paperid, version, auth):
     log_file = output_path / Path('main.log')
     if pdf_file.is_file():
         data['pdf'] = get_pdf_url(paperid, version)
+    else:
+        data['pdf'] = ''
     if log_file.is_file():
         try:
             data['latexlog'] = log_file.read_text(encoding='UTF-8', errors='replace')
@@ -826,6 +828,8 @@ def view_results(paperid, version, auth):
             # readable as UTF-8 (in spite of the _input_ encoding being set to UTF-8).
             # see https://github.com/IACR/latex-submit/issues/26
             data['latexlog'] = log_file.read_text(encoding='iso-8859-1', errors='replace')
+    else:
+        data['latexlog'] = ''
     data['loglines'] = data['latexlog'].splitlines()
     bibtex_log = output_path / Path('main.blg')
     if bibtex_log.is_file():
