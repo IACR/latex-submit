@@ -243,7 +243,7 @@ def submit_version():
                 buffer = tmpzip.read(item.filename)
                 filename = str(item.filename)
                 # remove __MACOSX and .DS_Store detritus created from an apple filesystem.
-                if filename != '__MACOSX' and filename != '.DS_Store':
+                if not (filename.startswith('__MACOSX') or filename.startswith('.DS_Store')):
                     allzip.writestr(item, buffer)
         allzip.close()
         tmpzip_path.unlink()
