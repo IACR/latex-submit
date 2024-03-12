@@ -47,8 +47,12 @@ This template is used to show the status of a compilation for iacrcc.cls
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
   <div id="splitView" class="d-flex w-100">
     <div class="left-column pt-3">
-      {% if paper.status.name == 'PENDING' %}
-      <a class="btn btn-primary my-3" href="{{submit_url}}">You may still resubmit your paper</a>
+      {% if paper.status.name == 'PENDING' or paper.status.name == 'EDIT_FINISHED' or paper.status.name == 'EDIT_REVISED' %}
+      {% if comp.error_log %}
+      <a class="btn btn-warning my-3" href="{{submit_url}}">Resubmit after you fix errors</a>
+      {% else %} {# only warnings #}
+      <a class="btn btn-success my-3" href="{{submit_url}}">You may still resubmit your paper to fix warnings</a>
+      {% endif %} {# end of 'if comp.error_log' #}
       {% endif %}
       {% if comp.error_log %}
       <div class="border border-danger p-3 mb-3 border-3 rounded">
@@ -110,7 +114,7 @@ This template is used to show the status of a compilation for iacrcc.cls
           </li>
         </ol>
       </div>
-      {% elif paper.status.name == 'EDIT_PENDING' %}
+      {% elif paper.status.name == 'EDIT_PENDING' or paper.status.name == 'SUBMITTED' or paper.status.name == 'FINAL_SUBMITTED' %}
       <p class="alert alert-success">
         Your paper has been submitted for copy editing.
       </p>
