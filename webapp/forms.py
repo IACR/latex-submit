@@ -361,4 +361,5 @@ class CopyeditClaimForm(FlaskForm):
     paperid = HiddenField(name='paperid',
                           validators=[InputRequired(),
                                       ValidPaperId()])
+    view = HiddenField('view the paper', default='')
     copyeditor = HiddenField(name='copyeditor', validators=[InputRequired()])

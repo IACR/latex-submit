@@ -37,6 +37,7 @@
         <form method="POST" action="{{url_for('admin_file.claimcopyedit')}}">
           {{claimform.csrf_token}}
           {{claimform.paperid(value=paper.paperid)}}
+          {{claimform.view}}
           {{claimform.copyeditor}}
           <button type='submit' class='btn btn-sm btn-outline-primary ms-2'>Claim</button>
         </form>

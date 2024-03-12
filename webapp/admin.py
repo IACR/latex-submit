@@ -221,7 +221,9 @@ def copyedit(paperid):
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
     comp_path = paper_path / Path('compilation.json')
     compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
-    claimform = CopyeditClaimForm(paperid=paperid,copyeditor=current_user.email)
+    claimform = CopyeditClaimForm(paperid=paperid,
+                                  copyeditor=current_user.email,
+                                  view='y')
     data = {'title': 'Copy edit on {} {}'.format(paperid, paper_status.title),
             'comp': compilation,
             'claimform': claimform,
@@ -574,17 +576,18 @@ def request_more_changes():
 @admin_required
 def copyedit_home():
     """Show the list of papers with pending copy edit actions."""
-    sql = select(PaperStatus.paperid,
-                 PaperStatus.status,
-                 PaperStatus.email,
-                 PaperStatus.lastmodified,
-                 PaperStatus.copyeditor,
-                 func.count(Discussion.id).label('issues')).join(Discussion).where(
-                     or_(PaperStatus.status == PaperStatusEnum.EDIT_PENDING,
-                         PaperStatus.status == PaperStatusEnum.EDIT_REVISED,
-                         PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
-                         PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).group_by(Discussion.paperid).order_by(desc(PaperStatus.lastmodified))
-    papers = db.session.execute(sql).all()
+    sql = select(PaperStatus).where(
+        or_(PaperStatus.status == PaperStatusEnum.EDIT_PENDING,
+            PaperStatus.status == PaperStatusEnum.EDIT_REVISED,
+            PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
+            PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).order_by(desc(PaperStatus.lastmodified))
+    statuses = db.session.execute(sql).scalars().all()
+    papers = [p.as_dict() for p in statuses]
+    rows = db.session.execute(select(Discussion.paperid, func.count(Discussion.id).label('issues')).group_by(Discussion.paperid)).all()
+    counts = {row.paperid: row.issues for row in rows}
+    for paper in papers:
+        paper['url'] = _copyedit_url(paper['paperid'], paper['status']['name'])
+        paper['issues'] = counts.get(paper['paperid'], 0)
     data = {'title': 'Papers for copy editing',
             'claimform': CopyeditClaimForm(copyeditor=current_user.email),
             'papers': papers}
@@ -843,4 +846,7 @@ def claimcopyedit():
     paper_status = db.session.execute(sql).scalar_one_or_none()
     paper_status.copyeditor = form.copyeditor.data
     db.session.commit()
+    if form.view.data:
+        return redirect(url_for('admin_file.copyedit',
+                                paperid=form.paperid.data))
     return redirect(url_for('admin_file.copyedit_home'))

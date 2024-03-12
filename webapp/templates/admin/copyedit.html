@@ -580,6 +580,7 @@
               <form METHOD="post" action="{{url_for('admin_file.claimcopyedit')}}">
                 {{claimform.csrf_token}}
                 {{claimform.paperid(value=paperid)}}
+                {{claimform.view}}
                 {{claimform.copyeditor(value=current_user.email)}}
                 <button type='submit' class='btn btn-sm btn-outline-primary' title='You can still add comments without being the assigned copy editor'>Claim as copy editor</button>
               </form>
