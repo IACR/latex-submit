@@ -288,6 +288,7 @@ def approve_final():
         mail.send(author_msg)
     except Exception as e:
         flash('Error in sending author email: ' + str(e))
+    flash('Paper {} was approved for publication and author was notified'.format(paperid))
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
 @admin_bp.route('/admin/view_journal/<jid>', methods=['GET'])

@@ -96,7 +96,7 @@ This template is used to show the status of a compilation for iacrcc.cls
         {% endfor %}
       </div>
       {% endif %} {# comp.error_log #}
-      {% if paper.status.name == 'PENDING' %}
+      {% if paper.status.name == 'PENDING' or paper.status.name == 'EDIT_FINISHED' %}
       <div id="success_alert" class="alert alert-success{% if comp.error_log %} d-none{% endif %}">
         Congratulations - your paper was compiled. The next steps are:
         <ol>
