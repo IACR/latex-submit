@@ -441,15 +441,46 @@ def finish_copyedit():
     paper_status = db.session.execute(sql).scalar_one_or_none()
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
+    numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()
+    issue = paper_status.issue
+    volume = issue.volume
+    journal = volume.journal
+    if not numitems:
+        # in this case, the paper has no issues for the author to
+        # respond to, so we copy the candidate over to the final
+        # version and tell the author that they are finished.
+        paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT.value
+        paper_status.lastmodified = datetime.now()
+        db.session.add(paper_status)
+        db.session.commit()
+        paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
+        candidate_dir = paper_dir / Path(Version.CANDIDATE.value)
+        final_dir = paper_dir / Path(Version.FINAL.value)
+        shutil.copytree(candidate_dir,
+                        final_dir)
+        maildata = {'paperid': paperid,
+                    'paper_title': paper_status.title,
+                    'journal_name': journal.name,
+                    'volume': volume.name,
+                    'issue': issue.name}
+        author_msg = Message('Copy edit changes approved for {}'.format(paperid),
+                             sender=app.config['EDITOR_EMAILS'],
+                             recipients=[paper_status.email])
+        author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
+        if app.config['TESTING']:
+            print(author_msg.body)
+        mail.send(author_msg)
+        log_event(db, paperid, 'Copy edit was finished and author notified')
+        flash('Author of {} was notified of acceptance'.format(paperid));
+        return redirect(url_for('admin_file.copyedit_home'), code=302)
     paper_status.status = PaperStatusEnum.EDIT_FINISHED.value
     paper_status.lastmodified = datetime.now()
     db.session.add(paper_status)
     db.session.commit()
-    numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()
     msg = Message('Copy editing was finished on your paper',
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[paper_status.email])
-    maildata = {'journal_name': app.config['SITE_NAME'],
+    maildata = {'journal_name': journal.name,
                 'paperid': paperid,
                 'numitems': numitems,
                 'pdf_auth': create_hmac([paperid, 'copyedit']),
@@ -460,6 +491,7 @@ def finish_copyedit():
         print(msg.body)
     mail.send(msg)
     log_event(db, paperid, 'Copy edit was finished and author notified')
+    flash('Author of {} was notified to review the copy editor suggestions'.format(paperid));
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
 ## This method is used if a paper is being sent back to the author for
@@ -840,8 +872,6 @@ def claimcopyedit():
         for key, value in form.errors.items():
             flash('Invalid form: {}:{}'.format(key, value))
         return admin_message('Invalid form submission. This is a bug.')
-    flash('Changed copy editor on {} to {}'.format(form.paperid.data,
-                                                   form.copyeditor.data))
     sql = select(PaperStatus).filter_by(paperid=form.paperid.data)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     paper_status.copyeditor = form.copyeditor.data
@@ -849,4 +879,6 @@ def claimcopyedit():
     if form.view.data:
         return redirect(url_for('admin_file.copyedit',
                                 paperid=form.paperid.data))
+    flash('Changed copy editor on {} to {}'.format(form.paperid.data,
+                                                   form.copyeditor.data))
     return redirect(url_for('admin_file.copyedit_home'))

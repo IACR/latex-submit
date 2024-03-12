@@ -1,8 +1,8 @@
-The copy editing on your paper # {{paperid}} titled
+The final review on your paper # {{paperid}} titled
 
   {{paper_title}}
 
-for the journal {{journal_name}} has been finalized and it now
+for the journal {{journal_name}} has been finished and it now
 scheduled to be published in volume {{volume}}, issue {{issue}}.  You
 will receive a final confirmation once the issue containing your paper
-is published.
+is published. No further action is required from you.

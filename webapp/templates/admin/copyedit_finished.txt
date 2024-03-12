@@ -1,6 +1,6 @@
 The copy editing on your paper # {{paperid}}
 for the journal {{journal_name}} has been finished and there
-are {{numitems}} issues to address. Once you address these
+are {{numitems}} issue(s) to address. Once you address these
 issues, you can find the way to upload the final version of
 your paper here:
 

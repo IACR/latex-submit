@@ -243,6 +243,11 @@
     <div class="resizable ps-3 right-column">
       <div class="d-flex flex-column" style="height:90vh;">
         <p>Status: {{paper.status.value}}, Venue: {{paper.journal}}, author email: {{paper.email}}</p>
+        {% if paper.status.name == 'COPY_EDIT_ACCEPT' %}
+        <p class="alert alert-success" role="alert">
+          This paper has been approved for publishing.
+        </p>
+        {% else %}
         <p class="alert alert-info alert-dismissible fade show mb-0" role="alert">
           The author has now responded to your original
           requests. Unless they have introduced a new problem or
@@ -261,6 +266,7 @@
             <a class="my-4 btn btn-warning" href="#" data-bs-toggle="modal" data-bs-target="#moreChangesModal">Request more changes</a>
           </div>
         </div>
+        {% endif %}
         {#  tabs for discussion and warnings from compilation #}
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
