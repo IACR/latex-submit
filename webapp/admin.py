@@ -8,7 +8,7 @@ except Exception as e:
     from export import export_issue
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
-from sqlalchemy import select, or_, and_
+from sqlalchemy import select, or_, and_, desc
 from sqlalchemy.sql import func
 from flask_login import login_required, current_user
 from flask_mail import Message
@@ -574,14 +574,17 @@ def request_more_changes():
 @admin_required
 def copyedit_home():
     """Show the list of papers with pending copy edit actions."""
-    sql = select(PaperStatus).where(or_(PaperStatus.status == PaperStatusEnum.EDIT_PENDING,
-                                        PaperStatus.status == PaperStatusEnum.EDIT_REVISED,
-                                        PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
-                                        PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).order_by(PaperStatus.lastmodified)
-    statuses = db.session.execute(sql).scalars().all()
-    papers = [p.as_dict() for p in statuses]
-    for paper in papers:
-        paper['url'] = _copyedit_url(paper['paperid'], paper['status']['name'])
+    sql = select(PaperStatus.paperid,
+                 PaperStatus.status,
+                 PaperStatus.email,
+                 PaperStatus.lastmodified,
+                 PaperStatus.copyeditor,
+                 func.count(Discussion.id).label('issues')).join(Discussion).where(
+                     or_(PaperStatus.status == PaperStatusEnum.EDIT_PENDING,
+                         PaperStatus.status == PaperStatusEnum.EDIT_REVISED,
+                         PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
+                         PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).group_by(Discussion.paperid).order_by(desc(PaperStatus.lastmodified))
+    papers = db.session.execute(sql).all()
     data = {'title': 'Papers for copy editing',
             'claimform': CopyeditClaimForm(copyeditor=current_user.email),
             'papers': papers}
