@@ -57,7 +57,7 @@
       </form>
       {% endif %}
     </td>
-    <td>
+    <td style="min-width:6rem;">
       <form method="POST" action="{{url_for('admin_file.change_paperno')}}">
         <span class="pe-2">{{status.paperno}}</span>
         {{ papernoform.csrf_token }}
