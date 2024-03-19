@@ -8,18 +8,18 @@ RUN apt-get update -q \
     && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TexLive
+# Install TexLive 2023. See https://tex.stackexchange.com/questions/688544/seeking-step-by-step-instructions-to-install-an-old-version-of-tex-live
 RUN echo "Building with documentation: $DOCFILES" && \
     echo "Building with sources: $SRCFILES" && \
     echo "Building with scheme: $SCHEME"; \
-    wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz; \
-    mkdir /install-tl-unx; \
-    tar -xvf install-tl-unx.tar.gz -C /install-tl-unx --strip-components=1; \
-    echo "selected_scheme scheme-$SCHEME" >> /install-tl-unx/texlive.profile && \
-    if [ "$DOCFILES" = "no" ]; then echo "tlpdbopt_install_docfiles 0" >> /install-tl-unx/texlive.profile; fi && \
-    if [ "$SRCFILES" = "no" ]; then echo "tlpdbopt_install_srcfiles 0" >> /install-tl-unx/texlive.profile; fi && \
-    /install-tl-unx/install-tl -profile /install-tl-unx/texlive.profile; \
-    rm -r /install-tl-unx; rm install-tl-unx.tar.gz
+    wget https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2023/tlnet-final/install-tl-unx.tar.gz; \
+    mkdir install-tl-unx; \
+    tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
+    echo "selected_scheme scheme-$SCHEME" >> install-tl-unx/texlive.profile && \
+    if [ "$DOCFILES" = "no" ]; then echo "tlpdbopt_install_docfiles 0" >> install-tl-unx/texlive.profile; fi && \
+    if [ "$SRCFILES" = "no" ]; then echo "tlpdbopt_install_srcfiles 0" >> install-tl-unx/texlive.profile; fi && \
+    install-tl-unx/install-tl -repository ftp://tug.org/historic/systems/texlive/2023/tlnet-final -profile install-tl-unx/texlive.profile; \
+    rm -r install-tl-unx; rm install-tl-unx.tar.gz
 
 ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
@@ -27,7 +27,8 @@ ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 
 # Install latex packages
 # NOTE: minted requires a shell escape, and is not supported.
-RUN tlmgr install mwe orcidlink llncs  # TODO: Remove this later
+# TODO: Remove this later
+RUN tlmgr install mwe orcidlink llncs
 RUN tlmgr install latexmk multirow xstring hyperxmp ifmtarg sectsty biblatex lastpage fancyvrb floatrow caption float lineno microtype tocloft sttools relsize import enumitem xargs ieeetran comment pgfplots pgf-blur calculator todonotes adjustbox collectbox currfile gincltex svn-prov filemod biber tikzscale pbox forloop varwidth bigfoot environ ntheorem breakcites ifoddpage bbm cleveref bbm-macros blindtext tcolorbox pdfcol doublestroke paralist glossaries mfirstuc xfor datatool mdframed zref needspace lipsum placeins thmtools tocbibind mmap qtree pict2e tree-dvips braket qcircuit xypic dashbox was threeparttable booktabs cases ascmac cancel autonum etextools textpos everypage apptools boxedminipage chngcntr framed hanging ncctools tablefootnote xifthen subfigure tikz-cd appendix diagbox makecell ifsym capt-of bbold esvect totcount supertabular fifo-stack tikzmark fixmath here tabu hyphenat wrapfig changepage cjhebrew luabidi endnotes xurl seqsplit newunicodechar minibox mathabx quantikz lettrine minifp bbding fontawesome5 tabto-ltx xpatch marginnote morefloats yfonts tabulary pdfsync csquotes printlen csvsimple kantlipsum babel-greek datetime2 spverbatim subfiles version rotfloat ellipsis calrsfs tkz-euclide imakeidx academicons anyfontsize scalerel titlesec fixme blkarray circuitikz multibib sidecap mathalpha outlines graphbox eqparbox epigraph nextpage gensymb newtx dblfloatfix spath3 stmaryrd
 RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopts esint ltablex acro translations breakurl msc picture accsupp accessibility axessibility nag quoting mleftright subdepth tikzpeople stackengine savesym
 RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk biblatex-trad biblatex-ext marginfix sidenotes doclicense ccicons leftidx tokcycle
@@ -35,9 +36,11 @@ RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj v
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
 RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile nomencl mnsymbol arydshln
+RUN tlmgr install upquote urwchancal
+RUN tlmgr uninstall authblk
 
 # people use pdfpages to bypass uploading LaTeX.
-# RUN tlmgr remove pdfpages pdfjam
+RUN tlmgr uninstall pdfpages pdfjam
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
 # COPY compiler/texmf.cnf /usr/local/texlive/2023/texmf.cnf
