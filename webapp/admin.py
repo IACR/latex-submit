@@ -25,7 +25,7 @@ from .metadata.db_models import Role, User, validate_version, PaperStatus, Paper
 from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm, CopyeditClaimForm
 from .tasks import run_latex_task
 from .routes import context_wrap
-from .bibmarkup import mark_bibtex, bibtex_to_html
+from .bibmarkup import mark_bibtex
 
 from functools import wraps
 import shutil
@@ -239,8 +239,6 @@ def copyedit(paperid):
     data['loglines'] = latexlog.splitlines()
     if compilation.bibtex:
         data['marked_bibtex'] = mark_bibtex(compilation.bibtex)
-        htmlbib = bibtex_to_html(compilation.bibtex)
-        data['references'] = htmlbib['references']
     return render_template('admin/copyedit.html', **data)
 
 @admin_bp.route('/admin/approve_final', methods=['POST'])

@@ -1,0 +1,21 @@
+license: CC-by
+author:
+  name: Jiaxin Pan
+  affil: 1
+  email: jiaxin.pan@uni-kassel.de
+  orcid: 0000-0002-7459-6850
+author:
+  name: Benedikt Wagner
+  affil: 2
+  orcid: 0000-0002-4620-7264
+affiliation:
+  name: University of Kassel
+  city: Kassel
+  country: Germany
+affiliation:
+  name: CISPA Helmholtz Center for Information Security
+  city: Saarbrücken
+  country: Germany
+version: final
+title: Toothpicks: \\ More Efficient Fork-Free Two-Round Multi-Signatures
+keywords: Multi-Signatures, Tightness, Commitment Scheme, Lossy Identification

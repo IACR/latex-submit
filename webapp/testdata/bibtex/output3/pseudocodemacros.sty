@@ -1,0 +1,35 @@
+\newenvironment{nicodemus}[1][\thenicolinenr]{%  % parameter controls initial line number
+	\begin{enumerate}[
+		topsep=0ex,
+		label=\nicolinenrformat\PaddingUp*,
+		ref=\nicorefprefix\PaddingUp*,
+		align=right,
+		leftmargin=0em,
+		itemindent=!,
+		labelindent=0em,
+		labelwidth=\nicolinenrwidth,
+		labelsep=\nicolinenrsep,
+		listparindent=\parindent,
+		noitemsep,
+		]%
+		\setcounter{enumi}{#1}%
+		\addtocounter{enumi}{-1}%
+	}{%
+	\end{enumerate}%
+	\addtocounter{enumi}{1}%
+	\setcounter{nicolinenr}{\theenumi}%
+}
+
+\providecommand{\cgame}{\ensuremath{\mathbf{Game}}\xspace}
+\providecommand{\cdistribution}{\ensuremath{\mathbf{Dist}}\xspace}
+\providecommand{\calgo}{\ensuremath{\mathbf{Alg}}\xspace}
+\providecommand{\coracle}{\ensuremath{\mathbf{Oracle}}\xspace}
+\providecommand{\ccircuit}{\ensuremath{\mathbf{Circuit}}\xspace}
+
+\providecommand{\creturn}{\ensuremath{\mathbf{return}}\xspace}
+\providecommand{\cif}{\ensuremath{\mathbf{if}}\xspace}
+\providecommand{\cfor}{\ensuremath{\mathbf{for}}\xspace}
+\providecommand{\cwhile}{\ensuremath{\mathbf{while}}\xspace}
+\providecommand{\cparse}{\ensuremath{\mathbf{parse}}\xspace}
+\providecommand{\clet}{\ensuremath{\mathbf{let}}\xspace}
+

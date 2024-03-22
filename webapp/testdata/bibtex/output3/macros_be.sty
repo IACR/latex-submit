@@ -1,0 +1,1393 @@
+%Benedikt's Macro File: Really Messy. Sorry for that.
+
+
+
+%Die version of randfrom
+\def\YYYdie{\mbox{\begin{tikzpicture}[scale=0.85,x=1em,y=1em,radius=0.09]
+		\draw[rounded corners=1,line width=.25pt] (0,0) rectangle (1,1);\fill (0.275,0.275) circle;\fill (0.725,0.725) circle;\fill (0.5,0.5) circle;\fill (0.275,0.725) circle;\fill (0.725,0.275) circle;
+		\end{tikzpicture}}}
+	
+	
+\newcommand{\heading}[1]{\noindent \textsc{#1}}
+\newcommand{\jpnote}[1]{\authnote{JP}{#1}}
+\newcommand{\bwnote}[1]{\authnote{BW}{#1}}
+\newcommand{\advA}{\adversary}
+\newcommand{\advB}{\mathcal{B}}
+\newcommand{\advR}{\mathcal{R}}
+
+% typeset
+\newcommand{\introheading}[1]{\heading{#1}}
+\crefname{appendix}{Supplementary Material Section}{chapters}
+\providecommand{\gamedes}[1]{\noindent\underline{\textbf{Game $\GAME_{#1}$:}}}
+\providecommand{\gamedesfromto}[2]{\noindent\underline{\textbf{Games $\GAME_{#1}$-$\GAME_{#2}$:}}}
+
+% Macros in intro
+\newcommand{\OSSch}{\text{OS}}
+\newcommand{\IDOS}{\mathsf{ID}_{\mathsf{OS}}}
+\newcommand{\IDS}{\mathsf{ID}_{\mathsf{Sch}}}
+\newcommand{\Listcom}{\mathcal{L}}
+%\newcommand{\comment}{def}
+\newcommand{\chv}{h}
+\newcommand{\introcvm}{C_{\mes}}
+\newcommand{\introtsig}{\tilde{\sigma}}
+\newcommand{\introU}{\mathsf{U}}
+\newcommand{\introS}{\mathsf{S}}
+\newcommand{\mes}{\mathsf{m}}
+\newcommand{\ID}{\mathsf{ID}}
+\newcommand{\GS}{\text{GS}}
+\newcommand{\ROM}{\text{ROM}}
+\newcommand{\etal}{et al.}
+\newcommand{\BigO}{O}
+\newcommand{\QSb}{Q_{\mathsf{S}_2}}
+\newcommand{\QH}{Q_{\mathsf{H}}}
+\newcommand{\introSPS}{\text{SPS}}
+\newcommand{\introSPSEQ}{\text{SPS-EQ}}
+
+% JP's macros
+\newcommand{\xxx}{\mathsf{XXX}}
+\newcommand{\yyy}{\mathsf{YYY}}
+\newcommand{\kr}{\mathsf{KR}}
+\newcommand{\imp}{\mathsf{IMP}}
+\newcommand{\koa}{\mathsf{KOA}}
+\newcommand{\ca}{\mathsf{CA}}
+\newcommand{\pa}{\mathsf{PA}}
+\newcommand{\introSS}{$\mathsf{SS}$}
+\newcommand{\introHVZK}{HVZK}
+\newcommand{\ctransa}{(\com^*,\chv^*,(R^*,\omega^*,s^*))}
+%\newcommand{\ctransb}{(\widehat{\com^*},\widehat{\chv}^*,(\widehat{R}^*,\widehat{\omega}^*,\widehat{s}^*))}
+\newcommand{\ctransb}{(\widehat \com^*,\widehat \chv^*,(\widehat R^*,\widehat \omega^*,\widehat s^*))}
+\newcommand{\ccom}{\com^*}
+\newcommand{\cchv}{\chv^*}
+\newcommand{\cchvb}{\widehat \chv^*}
+\newcommand{\ma}{\mathsf{cmt}}
+\newcommand{\mb}{\mathsf{ch}}
+\newcommand{\mc}{\mathsf{rs}}
+\newcommand{\acc}{\mathsf{acc}}
+\newcommand{\res}{\mathsf{res}}
+\newcommand{\run}{\mathsf{run}}
+\newcommand{\rtapeP}{\rho'}
+\newcommand{\rtapeA}{\rho}
+\newcommand{\rtapePSp}{\mathcal{R}_{\mathsf{P}}}
+\newcommand{\rtapeASp}{\mathcal{R}_{\advA}}
+\newcommand{\pSid}{\mu}
+\newcommand{\vSid}{v}
+\newcommand{\PTran}{\mathsf{pTran}}
+\newcommand{\VTran}{\mathsf{vTran}}
+\newcommand{\undefine}{\bot}
+%\newcommand{\emptystr}{\undefine}
+\newcommand{\pState}{pSt}
+\newcommand{\cma}{\ma^*}
+\newcommand{\cmb}{\mb^*}
+\newcommand{\cmc}{\mc^*}
+\newcommand{\ci}{i^*}
+\newcommand{\cR}{R^*}
+\newcommand{\copen}{\omega^*}
+\newcommand{\cs}{s^*}
+\newcommand{\ti}{\tilde{i}}
+\newcommand{\td}{\trap}
+
+\newcommand{\PfSch}{\Pi}
+\newcommand{\tSt}{tSt}
+%\newcommand{\PfSch}{\PS}
+
+\newcommand{\introsucc}{\varepsilon}
+\newcommand{\introtime}{t}
+\newcommand{\introRed}{\advR}
+\newcommand{\introloss}{\ell}
+\newcommand{\UFCMA}{\text{EUF-CMA}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\matr}[1]{\vec{#1}}
+\newcommand{\ListKey}{{\ensuremath{\mathcal{L}_{sk}}}\xspace}
+\newcommand{\ListSig}{{\ensuremath{\mathcal{L}_{sig}}}\xspace}
+\newcommand{\ListID}{{\ensuremath{{\mathcal{L}_{id}}}}\xspace}
+\newcommand{\ListIDMessage}{{\ensuremath{{\mathcal{L}_{m}}}}\xspace}
+\newcommand{\ListHashID}{{\ensuremath{\mathcal{H}_{id}}}\xspace}
+\newcommand{\ListHashIDMessage}{{\ensuremath{\mathcal{H}_{m}}}\xspace}
+
+\newcommand{\ListHash}{{\ensuremath{\mathcal{L}_{h}}}\xspace}
+\newcommand{\Hash}{\mathsf{H}}
+\newcommand{\randombit}{``random-bit''}
+
+
+
+% RSR
+\newcommand{\RSR}{\mathsf{RSR}}
+\newcommand{\rerand}{\mathsf{Rerand}}
+\newcommand{\derand}{\mathsf{Derand}}
+\newcommand{\tran}{\mathsf{Tran}}
+
+% assumptions and sec definition
+\providecommand{\ddh}{\ensuremath{\mathsf{DDH}}\xspace}
+\providecommand{\dlog}{\ensuremath{\mathsf{DLOG}}\xspace}
+\providecommand{\omdl}{\ensuremath{\mathsf{OMDL}}\xspace}
+\providecommand{\rsa}{\ensuremath{\mathsf{RSA}}\xspace}
+\providecommand{\factoring}{\ensuremath{\mathsf{FAC}}\xspace}
+\providecommand{\sd}{\ensuremath{\mathsf{SD}}\xspace}
+\providecommand{\cdh}{\ensuremath{\mathsf{CDH}}\xspace}
+\providecommand{\kermdh}{\ensuremath{\mathsf{KerMDH}}\xspace}
+\providecommand{\mddh}{\ensuremath{\mathsf{MDDH}}\xspace}
+\providecommand{\sxdh}{\ensuremath{\mathsf{SXDH}}\xspace}
+\providecommand{\bdd}{\ensuremath{\mathsf{BDD}}\xspace}
+\providecommand{\add}{\ensuremath{\mathsf{BDD}}\xspace}
+\providecommand{\cvp}{\ensuremath{\mathsf{CVP}}\xspace}
+\providecommand{\sivp}{\ensuremath{\mathsf{SIVP}}\xspace}
+\providecommand{\gapsvp}{\ensuremath{\mathsf{GapSVP}}\xspace}
+\providecommand{\svp}{\ensuremath{\mathsf{SVP}}\xspace}
+\providecommand{\sis}{\ensuremath{\mathsf{SIS}}\xspace}
+\providecommand{\insis}{\ensuremath{\mathsf{InSIS}}\xspace}
+\providecommand{\lwe}{\ensuremath{\mathsf{LWE}}\xspace}
+\providecommand{\dlwe}{\ensuremath{\mathsf{dLWE}}\xspace}
+\providecommand{\slwe}{\ensuremath{\mathsf{sLWE}}\xspace}
+\providecommand{\approxsis}{\ensuremath{\mathsf{Approx.SIS}}\xspace}
+\providecommand{\approxinsis}{\ensuremath{\mathsf{Approx.InSIS}}\xspace}
+\providecommand{\rsis}{\ensuremath{\mathsf{RSIS}}\xspace}
+\providecommand{\rlwe}{\ensuremath{\mathsf{RLWE}}\xspace}
+\providecommand{\rlwenf}{\ensuremath{\mathsf{RLWENF}}\xspace}
+\providecommand{\mlwe}{\ensuremath{\mathsf{MLWE}}\xspace}
+\providecommand{\mlwenf}{\ensuremath{\mathsf{MLWENF}}\xspace}
+
+\providecommand{\binding}{\ensuremath{\mathsf{bind}}\xspace}
+\providecommand{\wi}{\ensuremath{\mathsf{wi}}\xspace}
+\providecommand{\woi}{\ensuremath{\mathsf{woi}}\xspace}
+\providecommand{\hiding}{\ensuremath{\mathsf{hide}}\xspace}
+\providecommand{\collision}{\ensuremath{\mathsf{coll}}\xspace}
+\providecommand{\oneway}{\ensuremath{\mathsf{ow}}\xspace}
+\providecommand{\dEnhOneway}{\ensuremath{\mathsf{d\text{-}enh\text{-}ow}}\xspace}
+\providecommand{\advantage}[2]{{\ensuremath{\mathsf{Adv}_{#1}^{#2}}}\xspace}
+
+\providecommand{\indcpa}{\ensuremath{\mathsf{IND\text{-}CPA}}\xspace}
+\providecommand{\indcca}{\ensuremath{\mathsf{IND\text{-}CCA}}\xspace}
+\providecommand{\indccaone}{\ensuremath{\mathsf{IND\text{-}CCA1}}\xspace}
+\providecommand{\indccatwo}{\ensuremath{\mathsf{IND\text{-}CCA2}}\xspace}
+\providecommand{\impkoa}{\ensuremath{\mathsf{IMP\text{-}KOA}}\xspace}
+\providecommand{\pimpkoa}{\ensuremath{\mathsf{PIMP\text{-}KOA}}\xspace}
+\providecommand{\pimppa}{\ensuremath{\mathsf{PIMP\text{-}PA}}\xspace}
+\providecommand{\kraa}{\ensuremath{\mathsf{KR\text{-}AA}}\xspace}
+\providecommand{\pimpaa}{\ensuremath{\mathsf{PIMP\text{-}AA}}\xspace}
+\providecommand{\pimpca}{\ensuremath{\mathsf{PIMP\text{-}CA}}\xspace}
+\providecommand{\impaa}{\ensuremath{\mathsf{IMP\text{-}AA}}\xspace}
+\providecommand{\impca}{\ensuremath{\mathsf{IMP\text{-}CA}}\xspace}
+\newcommand{\hvzk}{\mathsf{HVZK}}
+\providecommand{\omuf}{\ensuremath{\mathsf{OMUF}}\xspace}
+\providecommand{\blind}{\ensuremath{\mathsf{blind}}\xspace}
+\providecommand{\ommim}{\ensuremath{\mathsf{OMMIM}}\xspace}
+\providecommand{\mim}{\ensuremath{\mathsf{MIM}}\xspace}
+\providecommand{\krpa}{\ensuremath{\mathsf{KR\text{-}PA}}\xspace}
+\providecommand{\krkoa}{\ensuremath{\mathsf{KR\text{-}KOA}}\xspace}
+\providecommand{\eufcma}{\ensuremath{\mathsf{UF\text{-}CMA}}\xspace}
+\providecommand{\eufkma}{\ensuremath{\mathsf{EUF\text{-}KMA}}\xspace}
+\providecommand{\CORRCMA}{\gamestyle{UF\text{-}CMA\text{-}{Corr}}\xspace}
+\providecommand{\corrcma}{\ensuremath{\mathsf{UF\text{-}CMA\text{-}{Corr}}}\xspace}
+%\providecommand{\SCORRCMA}{\gamestyle{sMU\text{-}EUF\text{-}CMA\text{-}{Corr}}\xspace}
+%\providecommand{\scorrcma}{\ensuremath{\mathsf{sMU\text{-}EUF\text{-}CMA\text{-}{Corr}}}\xspace}
+\providecommand{\MUCMA}{\gamestyle{UF\text{-}CMA}\xspace}
+\providecommand{\mucma}{\ensuremath{\mathsf{UF\text{-}CMA}}\xspace}
+%\providecommand{\SMUCMA}{\gamestyle{sMU\text{-}EUF\text{-}CMA}\xspace}
+%\providecommand{\smucma}{\ensuremath{\mathsf{sMU\text{-}EUF\text{-}CMA}}\xspace}
+\providecommand{\FWCMA}{\gamestyle{FW\text{-}EUF\text{-}CMA}\xspace}
+\providecommand{\fwcma}{\ensuremath{\mathsf{FW\text{-}EUF\text{-}CMA}}\xspace}
+\providecommand{\SFWCMA}{\gamestyle{sFW\text{-}EUF\text{-}CMA}\xspace}
+\providecommand{\sfwcma}{\ensuremath{\mathsf{sFW\text{-}EUF\text{-}CMA}}\xspace}
+
+
+\providecommand{\circuitprivacy}{\ensuremath{\mathsf{circ\text{-}priv}}\xspace}
+\providecommand{\crsindistinguish}{\ensuremath{\mathsf{crs\text{-}ind}}\xspace}
+
+\newcommand{\tab}{\-\hspace{0.4cm}}
+\providecommand{\gamestyle}[1]{\mathbf{#1}}
+
+\providecommand{\WI}{\gamestyle{WI}\xspace}
+\providecommand{\BINDING}{\gamestyle{BIND}\xspace}
+\providecommand{\BLIND}{\gamestyle{BLIND}\xspace}
+\providecommand{\OMUF}{\gamestyle{OMUF}\xspace}
+\providecommand{\MIM}{\gamestyle{MIM}\xspace}
+\providecommand{\OMMIM}{\gamestyle{OMMIM}\xspace}
+\providecommand{\HIDING}{\gamestyle{HIDE}\xspace}
+\providecommand{\PIMPAA}{\gamestyle{PIMP\text{-}AA}\xspace}
+\providecommand{\PIMPCA}{\gamestyle{PIMP\text{-}CA}\xspace}
+\newcommand{\IMPCA}{\gamestyle{IMP\mbox{-}CA}\xspace}
+\providecommand{\PIMPPA}{\gamestyle{PIMP\text{-}PA}\xspace}
+\providecommand{\PIMPKOA}{\gamestyle{PIMP\text{-}KOA}\xspace}
+\providecommand{\KRCA}{\gamestyle{KR\text{-}CA}\xspace}
+\providecommand{\KRAA}{\gamestyle{KR\text{-}AA}\xspace}
+\providecommand{\KRPA}{\gamestyle{KR\text{-}PA}\xspace}
+\providecommand{\KRKOA}{\gamestyle{KR\text{-}KOA}\xspace}
+\providecommand{\PIMPYYY}{\gamestyle{PIMP\text{-}YYY}\xspace}
+\providecommand{\KRYYY}{\gamestyle{KR\text{-}YYY}\xspace}
+\providecommand{\OMSIS}{\gamestyle{OMSIS}\xspace}
+\providecommand{\OMDL}{\gamestyle{OMDL}\xspace}
+\providecommand{\EUFCMA}{\gamestyle{EUF\text{-}CMA}\xspace}
+\providecommand{\INDCPA}{\gamestyle{IND\text{-}CPA}\xspace}
+\providecommand{\INDCCA}{\gamestyle{IND\text{-}CCA}\xspace}
+\providecommand{\CIRCPRIV}{\gamestyle{CIRC\text{-}PRIV}\xspace}
+
+
+%algorithm running time
+\newcommand{\AlgTime}{\mathbf{T}}
+
+%linear function families
+\newcommand{\LFFamily}{{\ensuremath{\mathsf{LF}}}\xspace}
+\newcommand{\LFunction}{{\ensuremath{\mathsf{F}}}\xspace}
+\newcommand{\LFFun}{f}
+\newcommand{\ringC}{\mathcal{C}}
+\newcommand{\domain}{\mathcal{D}}
+\newcommand{\domaindot}{\cdot}
+\newcommand{\domainadd}{+}
+\newcommand{\range}{\mathcal{R}}
+\newcommand{\rangedot}{\cdot}
+\newcommand{\rangeadd}{+}
+
+
+
+
+%non-interactive proof systems
+\providecommand{\PS}{{\ensuremath{\mathsf{PS}}}\xspace}
+\providecommand{\PGen}{{\ensuremath{\mathsf{PGen}}}\xspace}
+\providecommand{\PGenHiding}{{\ensuremath{\mathsf{PGenHiding}}}\xspace}
+\providecommand{\PGenBinding}{{\ensuremath{\mathsf{PGenBinding}}}\xspace}
+\providecommand{\PProve}{{\ensuremath{\mathsf{PProve}}}\xspace}
+\providecommand{\PVer}{{\ensuremath{\mathsf{PVer}}}\xspace}
+\providecommand{\PTrapGen}{{\ensuremath{\mathsf{PTrapGen}}}\xspace}
+\providecommand{\PSim}{{\ensuremath{\mathsf{PSim}}}\xspace}
+\providecommand{\PExt}{{\ensuremath{\mathsf{PExt}}}\xspace}
+\providecommand{\trap}{{\ensuremath{\mathsf{td}}}\xspace}
+\providecommand{\keydist}{\ensuremath{\mathsf{keydist}}\xspace}
+
+%obfuscation
+%\providecommand{\iO}{{\ensuremath{i\OOO}}\xspace}
+%\providecommand{\bbO}{{\ensuremath{bb\OOO}}\xspace}
+
+\providecommand{\iO}{{\ensuremath{\mathsf{iO}}}\xspace}
+\providecommand{\bbO}{{\ensuremath{\mathsf{bbO}}}\xspace}
+\providecommand{\iodist}{\ensuremath{\mathsf{iodist}}\xspace}
+\providecommand{\IODIST}{\gamestyle{IODIST}\xspace}
+
+\providecommand{\circuit}{\ensuremath{\mathsf{C}}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\dotproduct}[2]{\ensuremath{\langle}{#1},{#2}\rangle}
+
+
+%KDM security
+\providecommand{\UKDMCPA}{\gamestyle{uKDM\text{-}CPA}\xspace}
+\providecommand{\ukdmcpa}{\ensuremath{\mathsf{uKDM\text{-}CPA}}\xspace}
+\providecommand{\MKDMCPA}{\gamestyle{mKDM\text{-}CPA}\xspace}
+\providecommand{\mkdmcpa}{\ensuremath{\mathsf{mKDM\text{-}CPA}}\xspace}
+\providecommand{\MKDMCCA}{\gamestyle{mKDM\text{-}CCA}\xspace}
+\providecommand{\mkdmcca}{\ensuremath{\mathsf{mKDM\text{-}CCA}}\xspace}
+\providecommand{\KDMOracle}{{\ensuremath{\textsc{Kdm}}}\xspace}
+\providecommand{\ChallengeOracle}{{\ensuremath{\textsc{Ch}}}\xspace}
+\providecommand{\DecOracle}{{\ensuremath{\textsc{Dec}}}\xspace}
+\providecommand{\RegistrationOracle}{{\ensuremath{\textsc{Reg}}}\xspace}
+
+\newcommand{\ListKDM}{{\ensuremath{{\mathcal{L}_{kdm}}}}\xspace}
+\newcommand{\ListCiphertext}{{\ensuremath{{\mathcal{L}_{ct}}}}\xspace}
+
+
+
+
+
+
+%------------------------lattices
+\newcommand{\ContGaussian}[1]{\ensuremath{D_{{#1}}}}
+\newcommand{\Gaussian}[2]{{\ensuremath{D_{{#1},{#2}}}}}
+\newcommand{\GaussianCenter}[3]{{\ensuremath{D_{{#1},{#2},{#3}}}}}
+\newcommand{\GaussianPower}[3]{{\ensuremath{D^{#3}_{{#1},{#2}}}}}
+%\newcommand{\CosetGaussian}[3]{{\ensuremath{D_{{#1},{#2},{#3}}}}\xspace}
+\newcommand{\smoothingpar}[2]{{\ensuremath{\eta_{#1}({#2})}}\xspace}
+
+%Lattice Trapdoor algorithms
+\newcommand{\GenTrap}{{\ensuremath{\mathsf{GenTrap}}}\xspace}
+\newcommand{\DelTrap}{{\ensuremath{\mathsf{DelTrap}}}\xspace}
+\newcommand{\Invert}{{\ensuremath{\mathsf{Invert}}}\xspace}
+\newcommand{\SampleD}{{\ensuremath{\mathsf{SampleD}}}\xspace}
+%Lattice Approximate Trapdoor algorithms
+\newcommand{\GenApproxTrap}{{\ensuremath{\mathsf{Approx.GenTrap}}}\xspace}
+\newcommand{\DelApproxTrap}{{\ensuremath{\mathsf{Approx.DelTrap}}}\xspace}
+\newcommand{\SampleApproxPre}{{\ensuremath{\mathsf{Approx.SampleD}}}\xspace}
+
+%Lossy Mode of LWE
+\newcommand{\LossyLWE}{{\ensuremath{\mathsf{LossyLWE}}}\xspace}
+
+\newcommand{\Lattice}{\ensuremath{\mathrm{\Lambda}}}
+
+\newcommand{\LatticeOfMatrix}[2]{\ensuremath{\Lattice_{#1}(#2)}}
+\newcommand{\PerpLatticeOfMatrix}[2]{\ensuremath{\Lattice^\perp_{#1}(#2)}}
+\newcommand{\PerpLatticeCosetOfMatrix}[3]{\ensuremath{\Lattice^\perp_{#2}(#3)}}
+
+
+\newcommand{\succminimum}[2]{\ensuremath{\lambda_{#1}(#2)}}
+
+
+
+\newcommand{\Ring}{{\ensuremath{{R}}}\xspace}
+%Lattice Trapdoor algorithms for ring sis
+\newcommand{\GenTrapR}{{\ensuremath{\mathsf{GenTrapR}}}\xspace}
+\newcommand{\DelTrapR}{{\ensuremath{\mathsf{DelTrapR}}}\xspace}
+\newcommand{\SampleDR}{{\ensuremath{\mathsf{SampleDR}}}\xspace}
+
+\newcommand{\ringtoZ}{{\ensuremath{\mathfrak{cf}}}\xspace}
+\newcommand{\ringtoZMat}{{\ensuremath{\mathfrak{rot}}}\xspace}
+
+\newcommand{\RingGaussian}[1]{\Gaussian{\Ring}{#1}}
+\newcommand{\RingGaussianPower}[2]{\GaussianPower{\Ring}{#1}{#2}}
+
+
+\newcommand{\ringconstantZero}{{\ensuremath{C_{0,r}}}\xspace}
+\newcommand{\ringconstantOne}{{\ensuremath{C_{1,r}}}\xspace}
+
+
+
+%-------------------------------------------------------------------------------
+%
+%% crypto --- style file for crypto papers
+%%
+%% Author: Alex J. Malozemoff < amaloz@cs.umd.edu >
+%%
+
+\NeedsTeXFormat{LaTeX2e}
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{%
+  family=crypto,%
+  prefix=crypto@%
+}
+
+\DeclareBoolOption[false]{color}
+\DeclareBoolOption[false]{draft}
+\DeclareBoolOption[false]{reflinks}
+\DeclareBoolOption[false]{lncs}
+\DeclareBoolOption[false]{submission}
+\DeclareStringOption[n]{secparam}
+\ProcessKeyvalOptions{crypto}
+\providecommand{\secparam}{{\ensuremath{\crypto@secparam}}\xspace}
+
+\ifcrypto@color%
+  \RequirePackage{color}
+\fi
+
+\ifcrypto@reflinks%
+  \ifcrypto@color%
+    \RequirePackage[colorlinks=true]{hyperref}
+  \else%
+    \RequirePackage{hyperref}
+  \fi
+\fi
+
+\RequirePackage{amsfonts,amsmath,amssymb}
+\RequirePackage{booktabs}
+\RequirePackage{mdframed}
+\RequirePackage{url}
+\RequirePackage{xspace}
+
+\ifcrypto@draft%
+  \usepackage{fancyhdr}
+  \pagestyle{fancy}
+  \fancyhead{}
+  \chead{--- DRAFT ---}
+  \providecommand{\headrulewidth}{0pt}
+  \providecommand{\footrulewidth}{0pt}
+  \let\ps@plain\ps@fancy%
+\fi%
+
+\ifcrypto@submission%
+  \providecommand{\authnote}[2]{}
+  \providecommand{\TODO}[1]{}
+  \providecommand{\FINISH}{}
+  \providecommand{\verified}{}
+\else%
+  \ifcrypto@color%
+    \providecommand{\authnote}[3]{\textcolor{#3}{\footnotesize\textbf{[#1: #2]}}}
+    \providecommand{\TODO}[1]{\noindent\textcolor{red}{\footnotesize\textbf{TODO\@: {#1}}}}
+    \providecommand{\FINISH}{\textcolor{red}{\footnotesize\textbf{FINISH}}}
+  \else
+    \providecommand{\authnote}[3]{{\footnotesize\textbf{[#1: #2]}}}
+    \providecommand{\TODO}[1]{\noindent{\footnotesize\textbf{TODO\@: {#1}}}}
+    \providecommand{\FINISH}{\footnotesize\textbf{FINISH}}
+  \fi
+  \providecommand{\verified}[1]{\begin{center}\fbox{{\bf\small Verified: #1}}\end{center}}
+\fi
+
+
+\providecommand\BB{\ensuremath{\mathbb B}\xspace}
+\providecommand\CC{\ensuremath{\mathbb C}\xspace}
+\providecommand\DD{\ensuremath{\mathbb D}\xspace}
+\providecommand\EE{\ensuremath{\mathbb E}\xspace}
+\providecommand\FF{\ensuremath{\mathbb F}\xspace}
+\providecommand\GG{\ensuremath{\mathbb G}\xspace}
+\providecommand\HH{\ensuremath{\mathbb H}\xspace}
+\providecommand\II{\ensuremath{\mathbb I}\xspace}
+\providecommand\NN{\ensuremath{\mathbb N}\xspace}
+\providecommand\PP{\ensuremath{\mathbb P}\xspace}
+\providecommand\QQ{\ensuremath{\mathbb Q}\xspace}
+\providecommand\RR{\ensuremath{\mathbb R}\xspace}
+\providecommand\VV{\ensuremath{\mathbb V}\xspace}
+\providecommand\XX{\ensuremath{\mathbb X}\xspace}
+\providecommand\ZZ{\ensuremath{\mathbb Z}\xspace}
+
+\providecommand\AAA{\ensuremath{\mathcal A}\xspace}
+\providecommand\BBB{\ensuremath{\mathcal B}\xspace}
+\providecommand\CCC{\ensuremath{\mathcal C}\xspace}
+\providecommand\DDD{\ensuremath{\mathcal D}\xspace}
+\providecommand\EEE{\ensuremath{\mathcal E}\xspace}
+\providecommand\FFF{\ensuremath{\mathcal F}\xspace}
+\providecommand\GGG{\ensuremath{\mathcal G}\xspace}
+\providecommand\HHH{\ensuremath{\mathcal H}\xspace}
+\providecommand\III{\ensuremath{\mathcal I}\xspace}
+\providecommand\JJJ{\ensuremath{\mathcal J}\xspace}
+\providecommand\KKK{\ensuremath{\mathcal K}\xspace}
+\providecommand\LLL{\ensuremath{\mathcal L}\xspace}
+\providecommand\MMM{\ensuremath{\mathcal M}\xspace}
+\providecommand\NNN{\ensuremath{\mathcal N}\xspace}
+\providecommand\OOO{\ensuremath{\mathcal O}\xspace}
+\providecommand\PPP{\ensuremath{\mathcal P}\xspace}
+\providecommand\QQQ{{\ensuremath{\mathcal Q}}\xspace}
+\providecommand\RRR{\ensuremath{\mathcal R}\xspace}
+\providecommand\SSS{\ensuremath{\mathcal S}\xspace}
+\providecommand\TTT{\ensuremath{\mathcal T}\xspace}
+\providecommand\UUU{\ensuremath{\mathcal U}\xspace}
+\providecommand\VVV{\ensuremath{\mathcal V}\xspace}
+\providecommand\WWW{\ensuremath{\mathcal W}\xspace}
+\providecommand\XXX{\ensuremath{\mathcal X}\xspace}
+\providecommand\YYY{\ensuremath{\mathcal Y}\xspace}
+\providecommand\ZZZ{\ensuremath{\mathcal Z}\xspace}
+
+%
+% Generic macros
+%
+
+
+\providecommand{\bool}[1][\relax]{{\ensuremath{{\{0,1\}}^{#1}}}\xspace}
+\providecommand{\boolstar}{\bool[*]}
+\providecommand{\one}[1][\relax]{{\ensuremath{1^{#1}}}\xspace}
+\providecommand{\oneton}{\ensuremath{\{1,\ldots,n\}}}
+\providecommand{\oneto}[1]{\ensuremath{\{1,\ldots,#1\}}}
+\providecommand{\zeroton}{\ensuremath{\{0,\ldots,n\}}}
+\providecommand{\zeroto}[1]{\ensuremath{\{0,\ldots,#1\}}}
+
+\providecommand{\to}{\ensuremath{\rightarrow}}
+\providecommand{\from}{\ensuremath{\leftarrow}}
+%\providecommand{\randfrom}{\ensuremath{{\,\from\raisebox{0.5pt}{\!\!\tiny\$}\,}}}
+%\providecommand{\randfrom}{\ensuremath{\xleftarrow{\tiny{\YYYdie}}}}
+\providecommand{\randfrom}{\getsr}
+\providecommand{\adversary}{\ensuremath{\mathcal{A}}}
+
+
+\providecommand{\intersection}{\ensuremath{\cap}}
+\providecommand{\union}{\ensuremath{\cup}}
+
+\providecommand{\xor}{\ensuremath{\oplus}}
+\providecommand{\Xor}{\ensuremath{\bigoplus}}
+
+\providecommand{\bra}{\ensuremath{\langle}}
+\providecommand{\ket}{\ensuremath{\rangle}}
+
+\providecommand{\eps}{\ensuremath{\epsilon}}
+
+\providecommand{\randin}{\ensuremath{\in_R}}
+\providecommand{\eqdef}{\stackrel{\textrm{def}}{=}}
+\providecommand{\eqq}{\stackrel{\textrm{?}}{=}}
+\providecommand{\inq}{\stackrel{\textrm{?}}{\in}}
+
+\providecommand{\angles}[1]{\ensuremath{\langle{#1}\rangle}}
+\providecommand{\ceil}[1]{\ensuremath{\lceil{#1}\rceil}}
+\providecommand{\floor}[1]{\ensuremath{\lfloor{#1}\rfloor}}
+\providecommand{\round}[1]{\ensuremath{\lfloor{#1}\rceil}}
+\providecommand{\pair}[2]{\ensuremath{\langle{#1,#2}\rangle}}
+\providecommand{\evalBool}[1]{\ensuremath{\llbracket{#1}\rrbracket}}
+
+\providecommand{\abs}[1]{\ensuremath{\lvert{#1}\rvert}}
+\providecommand{\Abs}[1]{\ensuremath{\left\lvert{#1}\right\rvert}}
+\providecommand{\brac}[1]{\ensuremath{[#1]}}
+\providecommand{\Brac}[1]{\ensuremath{\left[#1\right]}}
+\providecommand{\norm}[1]{\ensuremath{\lVert{#1}\rVert}}
+\providecommand{\Norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\paren}[1]{\ensuremath{(#1)}}
+\providecommand{\Paren}[1]{\ensuremath{\left(#1\right)}}
+\providecommand{\set}[1]{\ensuremath{\{#1\}}}
+\providecommand{\Set}[1]{\ensuremath{\left\{#1\right\}}}
+
+\providecommand{\kernel}[1]{{\ker({#1})}}
+\providecommand{\Prob}[1]{{\Pr\left[{#1}\right]}}
+\DeclareMathOperator*{\ExpOp}{\mathbb{E}}
+\providecommand{\Expect}[1]{{\ExpOp\left[{#1}\right]}}
+\providecommand{\ProbWith}[2]{{\Pr_{#1}\left[{#2}\right]}}
+\providecommand{\ExpectWith}[2]{{\ExpOp_{#1}\left[{#2}\right]}}
+\providecommand{\Succ}{\ensuremath{\mathsf{Succ}}\xspace}
+
+
+%entropies and statistical distance
+\providecommand{\statdist}[2]{\Delta\left({#1},{#2}\right)}
+\providecommand{\minentropy}[1]{{H_\infty\left({#1}\right)}}
+\providecommand{\epsminentropy}[2]{{H^{#1}_\infty\left({#2}\right)}}
+\providecommand{\avcondminentropy}[2]{{\tilde{H}_\infty\left({#1}\middle|{#2}\right)}}
+\providecommand{\epsavcondminentropy}[3]{{\tilde{H}^{#1}_\infty\left({#2}\middle|{#3}\right)}}
+
+\providecommand{\bigo}[1]{\ensuremath{O\Paren{#1}}}
+\providecommand{\bigotilde}[1]{\ensuremath{\widetilde{O}\Paren{#1}}}
+\providecommand{\ppt}{{\text{PPT}}\xspace}
+\providecommand{\PPT}{{\text{PPT}}\xspace}
+\providecommand{\poly}{\ensuremath{\mathsf{poly}}}
+\providecommand{\inv}{^{-1}}
+
+\providecommand{\ind}{\ensuremath{\approx}}
+\providecommand{\cind}{\stackrel{\textrm{c}}{\ind}}
+\providecommand{\dind}{\stackrel{\textrm{d}}{\ind}}
+\providecommand{\sind}{\stackrel{\textrm{s}}{\ind}}
+
+% http://www.matthewflickinger.com/blog/archives/2005/02/20/latex_mod_spacing.asp
+\providecommand{\imod}[1]{\allowbreak\mkern10mu({\operator@font mod}\,\,#1)}
+
+% Complexity classes
+\providecommand{\NCone}{{\ensuremath{\mathbf{NC}^1}}\xspace}
+\providecommand{\Ptime}{{\ensuremath{\mathbf{P}}}\xspace}
+\providecommand{\NP}{{\ensuremath{\mathbf{NP}}}\xspace}
+\providecommand{\coNP}{{\ensuremath{\mathbf{coNP}}}\xspace}
+\providecommand{\Ppoly}{{\ensuremath{ \nicefrac{\mathbf{P}}{\mathbf{poly}}    }}\xspace}
+
+
+
+% Party macros
+\providecommand{\Party}[1][\relax]{{\ensuremath{P_{#1}}}\xspace}
+\providecommand{\Partym}[1][\relax]{{\ensuremath{Pc}}\xspace}
+\providecommand{\PA}{{\Party[1]}\xspace}
+\providecommand{\PB}{{\Party[2]}\xspace}
+\providecommand{\PC}{{\Party[3]}\xspace}
+\providecommand{\PAm}{{\Partym[1]}\xspace}
+\providecommand{\PBm}{{\Partym[2]}\xspace}
+\providecommand{\PCm}{{\Partym[3]}\xspace}
+
+\providecommand{\Sim}[1][\relax]{{\ensuremath{\mathsf{Sim}_{#1}}}\xspace}
+\newcommand{\HVZKSim}{\mathsf{Sim}}
+\newcommand{\HVZK}{\mathsf{HVZK}}
+\newcommand{\State}{St}
+\providecommand{\Adv}[1][\relax]{{{\ensuremath{\mathcal{A}_{#1}}}}\xspace}
+\providecommand{\Aenc}{{\ensuremath{\mathcal{A}^{\textbf{Enc}}}}\xspace}
+\providecommand{\InitOracle}{{\ensuremath{\textsc{Init}}}\xspace}
+\providecommand{\Oracle}{{\ensuremath{\textsc{O}}}\xspace}
+\providecommand{\ProverOracle}{{\ensuremath{\textsc{Pro}}}\xspace}
+\providecommand{\ProofOracle}{{\ensuremath{\textsc{Prf}}}\xspace}
+\newcommand{\POa}{\ProverOracle_1}
+\newcommand{\POb}{\ProverOracle_2}
+\newcommand{\SetupOracle}{{\ensuremath{\textsc{Setup}}}\xspace}
+\providecommand{\KeyOracle}{{\ensuremath{\textsc{Key}}}\xspace}
+\providecommand{\SigningOracle}{{\ensuremath{\textsc{Sig}}}\xspace}
+\providecommand{\SignerOracle}{{\ensuremath{\textsc{Signer}}}\xspace}
+\providecommand{\InitOracle}{{\ensuremath{\textsc{Init}}}\xspace}
+\providecommand{\UserOracle}{{\ensuremath{\textsc{User}}}\xspace}
+\providecommand{\ChallengeOracle}{{\ensuremath{\textsc{CH}}}\xspace}
+\providecommand{\VerifyOracle}{{\ensuremath{\textsc{Ver}}}\xspace}
+\newcommand{\VOa}{\VerifyOracle_1}
+\newcommand{\VOb}{\VerifyOracle_2}
+
+\providecommand{\Hybrid}[1][\relax]{\ensuremath{\mathbf{Hybrid_{#1}}}\xspace}
+\providecommand{\Real}{\ensuremath{\mathbf{Real}}\xspace}
+\providecommand{\Ideal}{\ensuremath{\mathbf{Ideal}}\xspace}
+
+% Groups and algebra, linear algebra and geometry
+\newcommand{\transpose}{{\ensuremath{t}}\xspace}
+\providecommand{\primes}{{\ensuremath{\mathbb{P}}}\xspace}
+\providecommand{\Zp}{{\ensuremath{\ZZ_p}}\xspace}
+\providecommand{\Zq}{{\ensuremath{\ZZ_q}}\xspace}
+\providecommand{\Zn}{{\ensuremath{\ZZ_N}}\xspace}
+\providecommand{\ZpStar}{{\ensuremath{\ZZ_p^{*}}}\xspace}
+\providecommand{\ZnStar}{{\ensuremath{\ZZ_N^{*}}}\xspace}
+\providecommand{\Group}{{\ensuremath{\mathbb{G}}}\xspace}
+\providecommand{\mddhdistribution}{{\ensuremath{\mathbb{D}}}\xspace}
+\providecommand{\eulertot}{{\ensuremath{\mathsf{\varphi}}}\xspace}
+
+
+% Bilinear groups
+\providecommand{\egg}{{\ensuremath{{e(g,g)}}}\xspace}
+\providecommand{\pairinggroup}{{\ensuremath{\mathcal{PG}}}\xspace}
+%
+% Reference macros
+%
+\ifcrypto@reflinks%
+  \providecommand{\sref}[2]{\hyperref[#2]{#1~\ref*{#2}}}
+\else
+  \providecommand{\sref}[2]{#1~\ref{#2}}
+\fi
+\providecommand{\refalg}[1]{\sref{Algorithm}{#1}}
+\providecommand{\refapx}[1]{\sref{Appendix}{#1}}
+\providecommand{\refconst}[1]{\sref{Construction}{#1}}
+\providecommand{\refdef}[1]{\sref{Definition}{#1}}
+\providecommand{\refeqn}[1]{\sref{Equation}{#1}}
+\providecommand{\reffact}[1]{\sref{Fact}{#1}}
+\providecommand{\reffig}[1]{\sref{Figure}{#1}}
+\providecommand{\reflemma}[1]{\sref{Lemma}{#1}}
+\providecommand{\refcor}[1]{\sref{Corollary}{#1}}
+\providecommand{\refprop}[1]{\sref{Property}{#1}}
+\providecommand{\refprot}[1]{\sref{Protocol}{#1}}
+\providecommand{\refsec}[1]{\sref{Section}{#1}}
+\providecommand{\refstep}[1]{\sref{Step}{#1}}
+\providecommand{\reftab}[1]{\sref{Table}{#1}}
+\providecommand{\refthm}[1]{\sref{Theorem}{#1}}
+\ifcrypto@lncs%
+\providecommand{\refeqn}[1]{\ref{(#1)}}
+\providecommand{\reffig}[1]{\sref{Fig.}{#1}}
+\providecommand{\refsec}[1]{\sref{Sect.}{#1}}
+\fi
+
+% Bellare, Hoang, Rogaway notation
+\providecommand{\Gb}{{\ensuremath{\mathsf{Gb}}}\xspace}
+\providecommand{\En}{{\ensuremath{\mathsf{En}}}\xspace}
+\providecommand{\De}{{\ensuremath{\mathsf{De}}}\xspace}
+\providecommand{\ev}{{\ensuremath{\mathsf{ev}}}\xspace}
+\providecommand{\Ev}{{\ensuremath{\mathsf{Ev}}}\xspace}
+\providecommand{\Ve}{{\ensuremath{\mathsf{Ve}}}\xspace}
+\providecommand{\nins}{\ensuremath{\mathsf{n}}\xspace}
+\providecommand{\ngates}{\ensuremath{\mathsf{q}}\xspace}
+\providecommand{\nouts}{\ensuremath{\mathsf{m}}\xspace}
+\providecommand{\lfn}{\ensuremath{L}\xspace}
+\providecommand{\rfn}{\ensuremath{R}\xspace}
+\providecommand{\gfn}{\ensuremath{G}\xspace}
+\providecommand{\pfn}{\ensuremath{P}\xspace}
+
+
+
+%ABE, IBE and HIBE and IBS
+\providecommand{\ABE}{{\ensuremath{\mathsf{ABE}}}\xspace}
+\providecommand{\IBE}{{\ensuremath{\mathsf{IBE}}}\xspace}
+\providecommand{\IBS}{{\ensuremath{\mathsf{IBS}}}\xspace}
+\providecommand{\HIBE}{{\ensuremath{\mathsf{HIBE}}}\xspace}
+\providecommand{\Setup}{{\ensuremath{\mathsf{Setup}}}\xspace}
+\providecommand{\KeyExt}{{\ensuremath{\mathsf{KeyExt}}}\xspace}
+
+\providecommand{\mpk}{{\ensuremath{\mathsf{mpk}}}\xspace}
+\providecommand{\msk}{{\ensuremath{\mathsf{msk}}}\xspace}
+\providecommand{\id}{{\ensuremath{\mathsf{id}}}\xspace}
+\providecommand{\idspace}{{\ensuremath{\mathcal{ID}}}\xspace}
+
+
+\providecommand{\KeyVer}{\ensuremath{\mathsf{VerK}}\xspace}
+\providecommand{\KeyVerMSK}{\ensuremath{\mathsf{VerMK}}\xspace}
+
+
+% Generate
+\providecommand{\DerivePK}{{\ensuremath{\mathsf{DerivePK}}}\xspace}
+\providecommand{\gen}{{\ensuremath{\mathsf{gen}}}\xspace}
+\providecommand{\Gen}{{\ensuremath{\mathsf{Gen}}}\xspace}
+\providecommand{\GGen}{{\ensuremath{\mathsf{GGen}}}\xspace}
+\providecommand{\RSAGen}{{\ensuremath{\mathsf{RSAGen}}}\xspace}
+\providecommand{\GenModulus}{{\ensuremath{\mathsf{GenMod}}}\xspace}
+\providecommand{\PGGen}{{\ensuremath{\mathsf{PGGen}}}\xspace}
+\providecommand{\CPGGen}{{\ensuremath{\mathsf{CPGGen}}}\xspace}
+\providecommand{\IGen}{{\ensuremath{\mathsf{IGen}}}\xspace}
+\providecommand{\KeyGen}{{\ensuremath{\mathsf{KeyGen}}}\xspace}
+\providecommand{\parameters}{{\ensuremath{\mathsf{par}}}\xspace}
+
+% Encrypt
+\providecommand{\PKE}{{\ensuremath{\mathsf{PKE}}}\xspace}
+\providecommand{\SKE}{{\ensuremath{\mathsf{SKE}}}\xspace}
+\providecommand{\enc}{{\ensuremath{\mathsf{enc}}}\xspace}
+\providecommand{\ek}{{\ensuremath{\mathsf{ek}}}\xspace}
+\providecommand{\Enc}{{\ensuremath{\mathsf{Enc}}}\xspace}
+\providecommand{\Encrypt}{{\ensuremath{\mathsf{Encrypt}}}\xspace}
+
+\providecommand{\ciphertext}{{\ensuremath{\mathsf{ct}}}\xspace}
+
+% Decrypt
+\providecommand{\dec}{{\ensuremath{\mathsf{dec}}}\xspace}
+\providecommand{\Dec}{{\ensuremath{\mathsf{Dec}}}\xspace}
+\providecommand{\Decrypt}{{\ensuremath{\mathsf{Decrypt}}}\xspace}
+
+% FHE
+\providecommand{\FHE}{{\ensuremath{\mathsf{FHE}}}\xspace}
+\providecommand{\CRSFake}{{\ensuremath{\mathsf{CRSFake}}}\xspace}
+\providecommand{\Eval}{{\ensuremath{\mathsf{Eval}}}\xspace}
+\providecommand{\TrapDec}{{\ensuremath{\mathsf{TrapDec}}}\xspace}
+
+% Signatures
+\providecommand{\FSIG}{{\ensuremath{\mathsf{FSIG}}}\xspace}
+\providecommand{\SIG}{{\ensuremath{\mathsf{SIG}}}\xspace}
+\providecommand{\Sign}{{\ensuremath{\mathsf{Sig}}}\xspace}
+\providecommand{\Verify}{{\ensuremath{\mathsf{Ver}}}\xspace}
+\providecommand{\Update}{{\ensuremath{\mathsf{Update}}}\xspace}
+\providecommand{\eufcma}{\textsf{EUF-CMA}\xspace}
+\providecommand{\eufkma}{\textsf{EUF-KMA}\xspace}
+\providecommand{\Sigforge}[3]{\ensuremath{\mathsf{Sig\text{-}forge}_{#2,#3}^{\mathsf{\scriptstyle{#1}}}}\xspace}
+
+% Commitments
+\newcommand{\COMSch}{\mathsf{CMT}}
+\providecommand{\Com}{{\ensuremath{\mathsf{Com}}}\xspace}
+\providecommand{\TrapSetup}{{\ensuremath{\mathsf{TSetup}}}\xspace}
+\providecommand{\TrapCom}{{\ensuremath{\mathsf{TCom}}}\xspace}
+\providecommand{\TrapGen}{{\ensuremath{\mathsf{TGen}}}\xspace}
+\providecommand{\TrapCol}{{\ensuremath{\mathsf{TCol}}}\xspace}
+\providecommand{\Open}{{\ensuremath{\mathsf{Open}}}\xspace}
+\providecommand{\ck}{{\ensuremath{\mathsf{ck}}}\xspace}
+\providecommand{\com}{\ensuremath{\mathsf{com}}\xspace}
+\providecommand{\dcom}{\ensuremath{\mathsf{dcom}}\xspace}
+\providecommand{\Combind}[3]{\ensuremath{\mathsf{Com\text{-}bind}_{#2,#3}^{\mathsf{\scriptstyle{#1}}}}\xspace}
+\providecommand{\Comhide}[3]{\ensuremath{\mathsf{Com\text{-}hide}_{#2,#3}^{\mathsf{\scriptstyle{#1}}}}\xspace}
+\providecommand{\GSNIWIProof}{{\ensuremath{\mathsf{GSNIWIProof}}}\xspace}
+\providecommand{\GSNIWIVer}{{\ensuremath{\mathsf{GSNIWIVer}}}\xspace}
+
+
+% Zero-knowledge
+\providecommand{\Prv}{{\ensuremath{\mathsf{Prv}}}\xspace}
+\providecommand{\Ver}{{\ensuremath{\mathsf{Ver}}}\xspace}
+
+% Public key
+\providecommand{\pk}{{\ensuremath{\mathsf{pk}}}\xspace}
+\providecommand{\PK}{{\ensuremath{\textsc{pk}}}\xspace}
+\providecommand{\ck}{{\ensuremath{\mathsf{ck}}}\xspace}
+
+
+% Private key
+\providecommand{\sk}{{\ensuremath{\mathsf{sk}}}\xspace}
+\providecommand{\SK}{{\ensuremath{\textsc{sk}}}\xspace}
+
+% Verification key
+\providecommand{\vk}{{\ensuremath{\mathsf{vk}}}\xspace}
+
+
+%  stuff
+\providecommand{\crs}{{\ensuremath{\mathsf{crs}}}\xspace}
+\providecommand{\CRSGen}{{\ensuremath{\mathsf{CRSGen}}}\xspace}
+
+% Other
+\providecommand{\PrivK}{{\ensuremath{\mathsf{PrivK}}}\xspace}
+\providecommand{\PubK}{{\ensuremath{\mathsf{PubK}}}\xspace}
+\providecommand{\proc}{{\ensuremath{\mathbf{procedure}}}\xspace}
+\providecommand{\negl}{\ensuremath{\mathsf{negl}}\xspace}
+\providecommand{\aux}{{\ensuremath{\mathsf{aux}}}\xspace}
+\providecommand{\Eval}{{\ensuremath{\mathsf{Eval}}}\xspace}
+\providecommand{\Samp}{{\ensuremath{\mathsf{Samp}}}\xspace}
+\providecommand{\PrvInd}{{\ensuremath{\mathrm{PrvInd}}}\xspace}
+\providecommand{\PrvSim}{{\ensuremath{\mathrm{PrvSim}}}\xspace}
+\providecommand{\Setup}{\ensuremath{\mathsf{Setup}}\xspace}
+\providecommand{\ISetup}{\ensuremath{\mathsf{ISetup}}\xspace}
+\providecommand{\out}{{\ensuremath{\mathsf{out}}}\xspace}
+\providecommand{\trans}{{\ensuremath{\mathsf{trans}}}\xspace}
+
+\providecommand{\PRF}{\ensuremath{\mathsf{PRF}}\xspace}
+\providecommand{\PRG}{\ensuremath{\mathsf{PRG}}\xspace}
+\providecommand{\PRP}{\ensuremath{\mathsf{PRP}}\xspace}
+
+% Security parameters
+\providecommand{\secpar}{\secparam}
+\providecommand{\csp}{\secpar}
+\providecommand{\ssecparam}{\ensuremath{\rho}\xspace}
+\providecommand{\ssecpar}{\ssecparam}
+\providecommand{\ssp}{\ssecpar}
+\newcommand{\seclam}{1^{\csp}}
+
+\providecommand{\adv}{{\ensuremath{\textsf{Adv}}}\xspace}
+
+\providecommand{\boolsec}{\ensuremath{\bool^\secparam}\xspace}
+\providecommand{\onesec}{\ensuremath{1^\secparam}\xspace}
+
+\newcommand{\imply}[1]{\xrightarrow{#1}}
+\newcommand{\condimply}[2]{\xrightarrow[\raisebox{.5mm}{ \scriptsize #2}]{\raisebox{.5mm}{ \scriptsize #1}}}
+\newcommand{\nimply}[2]{\centernot{\xrightarrow[\raisebox{.5mm}{ \scriptsize #2}]{\raisebox{.5mm}{ \scriptsize #1}}}}
+\newcommand{\nimplyt}[1]{\centernot{\xrightarrow{\raisebox{-1mm}{ \scriptsize #1}}}}
+
+
+% Blind signature scheme name
+\newcommand{\OS}{\mathsf{OS}}
+\newcommand{\OGQ}{\mathsf{OGQ}}
+%\newcommand{\OFS}{\mathsf{OFS}}
+%\newcommand{\PS}{\mathsf{PS}}
+\newcommand{\FS}{\mathsf{FS}}
+
+% Oblivious Transfer
+\providecommand{\genot}[4]{{\ensuremath{\binom{#2}{#1}\text{-OT}_{#3}^{#4}}}\xspace}
+\providecommand{\ot}[2]{\genot{1}{2}{#1}{#2}}
+
+% Functionalities/Protocols
+\providecommand{\Func}[1][\relax]{\ensuremath{\mathcal{F}_\mathbf{#1}}\xspace}
+\providecommand{\Prot}[1][\relax]{\ensuremath{\Pi_\mathbf{#1}}\xspace}
+
+\providecommand{\Fot}{\Func[\mathsf{OT}]}
+\providecommand{\Fpki}{\Func[\mathsf{PKI}]}
+
+
+% Other
+\providecommand{\accept}{{\ensuremath{\mathsf{accept}}}\xspace}
+\providecommand{\reject}{{\ensuremath{\mathsf{reject}}}\xspace}
+\providecommand{\mask}{\ensuremath{\lambda}\xspace}
+\providecommand{\onehalf}{\ensuremath{\frac{1}{2}}\xspace}
+\providecommand{\len}{\ensuremath{\ell}\xspace}
+
+\providecommand{\vct}[1]{\ensuremath{\mathbf{#1}}\xspace}
+
+\providecommand{\party}[1]{\ensuremath{^{(#1)}}}
+\providecommand{\step}[2]{{\bfseries [#1: #2]}}
+\providecommand{\noti}{{\bar{\imath}}}
+
+\providecommand{\header}[1]{\noindent{\bfseries #1:}}
+\providecommand{\tweak}{\ensuremath{T}}
+
+\providecommand{\Fail}[1]{\ensuremath{\mathsf{Fail}_{#1}}}
+\providecommand{\vect}[1]{\ensuremath{\mathbf{#1}}}
+%sigma protocols
+\providecommand{\cmtSet}{{\ensuremath{\mathsf{CmtSet}}}\xspace}
+\providecommand{\chSet}{{\ensuremath{\mathsf{ChSet}}}\xspace}
+\providecommand{\rspSet}{{\ensuremath{\mathsf{RspSet}}}\xspace}
+\providecommand{\Prover}{{\ensuremath{\mathsf{P}}}\xspace}
+\newcommand{\Provera}{\Prover_1}
+\newcommand{\Proverb}{\Prover_2}
+\providecommand{\PONE}{{\ensuremath{\mathsf{P_1}}}\xspace}
+\providecommand{\PTWO}{{\ensuremath{\mathsf{P_2}}}\xspace}
+\providecommand{\V}{{\ensuremath{\mathsf{V}}}\xspace}
+\providecommand{\ID}{{\ensuremath{\mathsf{ID}}}\xspace}
+\newcommand{\PSOURFROM}[2]{\PS'[{#1},{#2}]}
+\newcommand{\IDOURFROM}[2]{\ID'[{#1},{#2}]}
+\newcommand{\IDOUR}{\IDOURFROM{\COMSch}{\ID}}
+\providecommand{\Ext}{{\ensuremath{\mathsf{Ext}}}\xspace}
+\providecommand{\KnowlExt}{{\ensuremath{\mathsf{KnowlExt}}}\xspace}
+\providecommand{\Rerand}{{\ensuremath{\mathsf{Rerand}}}\xspace}
+
+
+\providecommand{\BS}{{\ensuremath{\mathsf{BS}}}\xspace}
+\providecommand{\Signer}{{\ensuremath{\mathsf{S}}}\xspace}
+\providecommand{\User}{{\ensuremath{\mathsf{U}}}\xspace}
+%
+% Environments
+%
+
+\newlength{\saveparindent}
+\setlength{\saveparindent}{\parindent}
+\newlength{\saveparskip}
+\setlength{\saveparskip}{\parskip}
+
+\newcounter{ctr}
+\newcounter{savectr}
+\newcounter{ectr}
+
+\newenvironment{tiret}{%
+  \begin{list}
+    {\hspace{1pt}\rule[0.5ex]{6pt}{1pt}\hfill}
+    {\labelwidth=15pt%
+      \labelsep=3pt%
+      \leftmargin=18pt%
+      \topsep=1pt%
+      \setlength{\listparindent}{\saveparindent}%
+      \setlength{\parsep}{\saveparskip}%
+      \setlength{\itemsep}{1pt}}
+}{%
+  \end{list}
+}
+
+\newenvironment{venum}{%
+  \begin{list}
+    {{\rmfamily \arabic{ctr}.}\hfill}
+    {\usecounter{ctr}%
+      \labelwidth=17pt%
+      \labelsep=6pt%
+      \leftmargin=23pt%
+      \topsep=.5pt%
+      %% \setlength{\listparindent}{\saveparindent}%
+      \setlength{\parsep}{\saveparskip}%
+      \setlength{\itemsep}{1pt}}
+}{%
+  \end{list}
+}
+
+\newenvironment{cenumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+}{
+  \end{enumerate}
+}
+
+\newenvironment{citemize}{
+  \begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+}{
+  \end{itemize}
+}
+
+\newenvironment{nfbox}{%
+  \footnotesize
+  \begin{mdframed}
+    \begin{minipage}{\linewidth}
+}{%
+    \end{minipage}
+  \end{mdframed}
+}
+
+\newenvironment{nfprot}[1]{%
+  \footnotesize
+  \begin{mdframed}
+    \begin{minipage}{\linewidth}
+      {\begin{center}\underline{\textbf{Protocol} #1}\end{center}}
+}{%
+    \end{minipage}
+  \end{mdframed}
+}
+
+\newenvironment{nffunc}[1]{%
+  \footnotesize
+  \begin{mdframed}
+    \begin{minipage}{\linewidth}
+      {\begin{center}\underline{\textbf{Functionality} #1}\end{center}}
+}{%
+    \end{minipage}
+  \end{mdframed}
+}
+
+%
+% bibtex stuff
+%
+
+\providecommand{\FullVersion}[1]{Full version available at \url{#1}}
+\providecommand{\ProceedingsVersion}[1]{Proceedings version available at \url{#1}}
+
+%---------------------------------------------------------------------------------------------
+
+%%
+%% game --- style file for game-based proofs
+%%
+%% Author: Alex J. Malozemoff < amaloz@cs.umd.edu >
+%%
+
+\NeedsTeXFormat{LaTeX2e}
+
+\renewcommand{\gets}{:=}
+%\newcommand{\getsr}{{\:{\leftarrow{\hspace*{-3pt}\raisebox{.75pt}{$\scriptscriptstyle\$$}}}\:}}
+\newcommand{\then}{;\;}
+\newcommand{\andthen}{\colon\;}
+
+\newcommand{\kwfont}{\textbf}
+\newcommand{\constfont}[1]{{\textsf{#1}}}
+
+
+
+\newcommand{\AND}{\mbox{\kwfont{and}}\xspace}
+\newcommand{\NOT}{\mbox{\kwfont{not}}\xspace}
+\newcommand{\AS}{\mbox{\kwfont{as}}\xspace}
+\newcommand{\DO}{\mbox{\kwfont{do}}\xspace}
+\newcommand{\IF}{\mbox{\kwfont{if}}\xspace}
+\newcommand{\FI}{\mbox{\kwfont{fi}}\xspace}
+\newcommand{\ELSE}{\mbox{\kwfont{else}}\xspace}
+\newcommand{\ELSEIF}{\mbox{\kwfont{elseif}}\xspace}
+\newcommand{\FOR}{\mbox{\kwfont{for}}\xspace}
+\newcommand{\GAME}{\mbox{\kwfont{G}}\xspace}
+\newcommand{\INITIALIZE}{\mbox{\kwfont{Initialize}}\xspace}
+\newcommand{\OD}{\mbox{\kwfont{od}}\xspace}
+\newcommand{\OR}{\mbox{\kwfont{or}}\xspace}
+\newcommand{\ORACLE}{\mbox{\kwfont{oracle}}\xspace}
+\newcommand{\PARSE}{\mbox{\kwfont{parse}}\xspace}
+\newcommand{\PROCEDURE}{\mbox{\kwfont{proc}}\xspace}
+\newcommand{\PRIVATE}{\mbox{\kwfont{private}}\xspace}
+\newcommand{\RETURN}{\mbox{\kwfont{return}}\xspace}
+\newcommand{\SELECT}{\mbox{\kwfont{select}}\xspace}
+\newcommand{\THEN}{\mbox{\kwfont{then}}\xspace}
+\newcommand{\WHERE}{\mbox{\kwfont{where}}\xspace}
+\newcommand{\TO}{\mbox{\kwfont{to}}\xspace}
+%\newcommand{\comment}[1]{~\mbox{\;\;\,/\hspace{-0.1ex}/\;\small\textrm{#1}}}
+%\newcommand{\comment}[1]{#1}
+\newcommand{\concat}{\:\|\:}
+\newcommand{\commentt}[1]{~\mbox{/\hspace{-0.1ex}/\;~\small\textrm{#1}}}
+
+\newenvironment{code}[2]{
+  \small
+  \begin{center}
+    \fbox{\parbox{#1\textwidth}{%
+        \vspace{-13pt}
+        \begin{tabular}{l}
+          \hspace{-7pt}
+          \parbox[t]{\textwidth}{%
+          #2
+          }
+        \end{tabular}
+        \vspace{-3ex}
+      }
+    }
+}{%
+  \end{center}
+  \vspace{-3ex}
+}
+
+\newenvironment{codetwo}[3]{%
+  \small
+  \begin{center}
+    \begin{tabular}{l}
+      \fbox{\parbox[t]{#1\textwidth}{%
+      #2
+      }}
+      \\
+      \fbox{\parbox[t]{#1\textwidth}{%
+      #3
+      }}
+}{%
+    \end{tabular}
+    \vspace{-3ex}
+  \end{center}
+}
+
+\newenvironment{codethree}[4]{%
+  \small
+  \begin{center}
+    \begin{tabular}{l}
+      \fbox{\parbox[t]{#1\textwidth}{%
+      #2
+      }}
+      \\
+      \fbox{\parbox[t]{#1\textwidth}{%
+      #3
+      }}
+      \\
+      \fbox{\parbox[t]{#1\textwidth}{%
+      #4
+      }}
+}{%
+    \end{tabular}
+    \vspace{-3ex}
+  \end{center}
+}
+
+%------------------------------------------------------------------------
+%----------------------------------------------------------------------
+% this is: protocol.sty   v1.3   93/09/06   Peter de Rooij
+%----------------------------------------------------------------------
+% Modified by Juan Garay to support broken arrows 
+% Modified by Mihir to add a new macro protocolm which has an extra
+% left hand side column for flow names. July 7, 1995.
+%----------------------------------------------------------------------
+% ARROWFILL WITH \textstyle SUPERSCRIPT.
+% use in math-mode:
+%  \sends{a^b} makes a `rightarrowfill' with $a^b$ on top.
+%  \Sends[n]{a^b} idem but spans n columns
+%  \receives{a^b}, \Receives[n]{a^b}  idem for leftarrowfill
+%  \exchange{a^b}, \Exchange[n]{a^b}  idem for lefrightarrowfill
+%
+%  \bsends (resp., \bSends) and \breceives (resp., \bReceives) produce
+%          broken-line versions of sends & receives
+%  \dsends (resp., \dSends) and \dreceives (resp., \dReceives) produce
+%          double-line versions of sends & receives
+%  \tsends (resp., \tSends) and \treceives (resp., \tReceives) produce
+%          triple-line versions of sends & receives
+%----------------------------------------------------------------------
+
+
+\newcommand{\Pdash}{\begin{picture}(6,4)
+\thinlines\put(0,2){\line(1,0){6}}\end{picture}}
+\newcommand{\Pdotteddash}{\begin{picture}(10,4)
+\thinlines\put(0,2){\line(1,0){5}}\end{picture}}
+\newcommand{\Prightarrow}{\begin{picture}(6,4)
+\thinlines\put(0,2){\vector(1,0){6}}\end{picture}}
+\newcommand{\Pleftarrow}{\begin{picture}(6,4)
+\thinlines\put(6,2){\vector(-1,0){6}}\end{picture}}
+
+\newcommand{\Pdoubledash}{\begin{picture}(6,10)
+\thinlines\put(0,2){\line(1,0){6}}
+\put(0,8){\line(1,0){6}}
+\end{picture}}
+\newcommand{\Pdoubleleftarrow}{\begin{picture}(12,10)
+\thinlines\put(5,2){\line(1,0){8}}
+\put(5,8){\line(1,0){8}}
+\put(0,5){\line(3,2){10}}
+\put(0,5){\line(3,-2){10}}
+\end{picture}}
+\newcommand{\Pdoublerightarrow}{\begin{picture}(12,10)
+\thinlines\put(7,2){\line(-1,0){8}}
+\put(7,8){\line(-1,0){8}}
+\put(12,5){\line(-3,2){10}}
+\put(12,5){\line(-3,-2){10}}
+\end{picture}}
+
+\newcommand{\Ptripledash}{\begin{picture}(6,8)
+\thinlines\put(0,2){\line(1,0){6}}
+\put(0,4){\line(1,0){6}}
+\put(0,6){\line(1,0){6}}
+\end{picture}}
+
+\newcommand{\Ptriplerightarrow}{\begin{picture}(12,8)
+    \thinlines\put(0,2){\vector(1,0){12}}
+    \thinlines\put(12,4){\line(-1,0){12}}
+    \thinlines\put(0,6){\vector(1,0){12}}
+\end{picture}}
+\newcommand{\Ptripleleftmidarrow}{\begin{picture}(12,8)
+    \thinlines\put(0,2){\line(1,0){12}}
+    \thinlines\put(12,4){\vector(-1,0){12}}
+    \thinlines\put(0,6){\line(1,0){12}}
+\end{picture}}
+
+\newcommand{\Ptripleleftarrow}{\begin{picture}(12,8)
+    \thinlines\put(12,2){\vector(-1,0){12}}
+    \thinlines\put(0,4){\line(1,0){12}}
+    \thinlines\put(12,6){\vector(-1,0){12}}
+\end{picture}}
+\newcommand{\Ptriplerightmidarrow}{\begin{picture}(12,8)
+    \thinlines\put(12,2){\line(-1,0){12}}
+    \thinlines\put(0,4){\vector(1,0){12}}
+    \thinlines\put(12,6){\line(-1,0){12}}
+\end{picture}}
+
+% \newcommand{\Ptwowaysuperarrow}{\begin{picture}(74,4)
+% \thinlines\put(72,2){\vector(-1,0){72}}
+% \thinlines\put(2,2){\vector(1,0){72}}\end{picture}}
+
+
+% shorthand for lowering the arrows
+\def\@r@al{\raise\arrowlower}
+
+% rulefill made up of lowered $-$'s
+\def\@lrulefill{\cleaders\hbox{$\mkern-2mu\@r@al\hbox{\Pdash}\mkern-2mu$}\hfill}
+
+% broken rulefill made up of lowered $-~$'s
+\def\@blrulefill{\cleaders\hbox{$\mkern-2mu\@r@al\hbox{\Pdotteddash}\mkern-2mu$}\hfill}
+%\def\@blrulefill{\cleaders\hbox{$\mkern-2mu\@r@al\hbox{\rule{0.1cm}{0.1cm}}\mkern-2mu$}\hfill}
+
+% double rulefill made up of lowered $=$'s
+\def\@dlrulefill{\cleaders\hbox{$\mkern-3mu\@r@al\hbox{\Pdoubledash}\mkern-3mu$}\hfill}
+
+% triple rulefill made up of lowered triple dashes
+\def\@tlrulefill{\cleaders\hbox{$\mkern-3mu\@r@al\hbox{\Ptripledash}\mkern-3mu$}\hfill}
+
+% end of rule (overlaps with arrowheads):
+\def\@lendofrule{\@r@al\hbox{\Pdash}\mkern-4mu} 
+\def\@rendofrule{\mkern-4mu\@r@al\hbox{\Pdash}} 
+
+% double end of rule (overlaps with arrowheads):
+\def\@dlendofrule{\@r@al\hbox{\Pdoubledash}\mkern-4mu} 
+\def\@drendofrule{\mkern-4mu\@r@al\hbox{\Pdoubledash}} 
+
+% triple end of rule (overlaps with arrowheads):
+\def\@tlendofrule{\@r@al\hbox{\Ptripledash}\mkern-4mu} 
+\def\@trendofrule{\mkern-4mu\@r@al\hbox{\Ptripledash}} 
+
+% ends of arrows:
+\def\@rafill{\mkern-6mu\@lrulefill\@rendofrule\@r@al\llap{\Prightarrow}}
+\def\@lafill{\m@th\@r@al\rlap{\Pleftarrow}\@lendofrule\@lrulefill\mkern-6mu}
+\def\@rdfill{\mkern-6mu\@lrulefill\@rendofrule}
+\def\@ldfill{\m@th\@lendofrule\@lrulefill\mkern-6mu}
+
+% ends of broken arrows:
+\def\@brafill{\mkern-6mu\@blrulefill\@rendofrule\@r@al\llap{\Prightarrow}}
+\def\@blafill{\m@th\@r@al\rlap{\Pleftarrow}\@lendofrule\@blrulefill\mkern-6mu}
+\def\@brdfill{\mkern-6mu\@blrulefill\@rendofrule}
+\def\@bldfill{\m@th\@lendofrule\@blrulefill\mkern-6mu}
+
+% ends of double arrows:
+\def\@drafill{\mkern-6mu\@dlrulefill\@r@al\hbox{\Pdoublerightarrow}}
+\def\@dlafill{\m@th\@r@al\hbox{\Pdoubleleftarrow}\@dlrulefill\mkern-6mu}
+\def\@drdfill{\mkern-6mu\@dlrulefill\@drendofrule}
+\def\@dldfill{\m@th\@dlendofrule\@dlrulefill\mkern-6mu}
+% \def\@drafill{\mkern-6mu\@dlrulefill\@drendofrule\@r@al\llap{\Pdoublerightarrow}}
+% \def\@dlafill{\m@th\@r@al\rlap{\Pdoubleleftarrow}\@dlendofrule\@dlrulefill\mkern-6mu}
+
+% ends of triple arrows:
+\def\@trafill{\mkern-6mu\@tlrulefill\@r@al\hbox{\Ptriplerightarrow}}
+\def\@tlafill{\m@th\@r@al\hbox{\Ptripleleftarrow}\@tlrulefill\mkern-6mu}
+\def\@trdfill{\mkern-6mu\@tlrulefill\@r@al\hbox{\Ptriplerightmidarrow}}
+\def\@tldfill{\m@th\@r@al\hbox{\Ptripleleftmidarrow}\@tlrulefill\mkern-6mu}
+%\def\@trdfill{\mkern-6mu\@tlrulefill\@trendofrule}
+%\def\@tldfill{\m@th\@tlendofrule\@tlrulefill\mkern-6mu}
+
+% ends of thick arrows:
+%\def\@brafill{\mkern-6mu\@blrulefill\@rendofrule\@r@al\llap{$\rightarrow$}}
+%\def\@blafill{\m@th\@r@al\rlap{$\lhd$}\@lendofrule\@blrulefill\mkern-6mu}
+%\def\@brdfill{\mkern-6mu\@blrulefill\@rendofrule}
+%\def\@bldfill{\m@th\@lendofrule\@blrulefill\mkern-6mu}
+
+\newdimen\minarrowwidth   \minarrowwidth=0pt
+\newdimen\arrowwidth
+\newdimen\arrowlower      \arrowlower=-4pt
+
+\def\@showmessage#1{\setbox\@tempboxa\hbox{$#1$}
+  \ifdim\wd\@tempboxa<\minarrowwidth 
+    \arrowwidth\minarrowwidth 
+  \else 
+    \arrowwidth\wd\@tempboxa 
+  \fi
+  \hbox{$\m@th\displaystyle\mathop{\hbox to \arrowwidth
+    {$\m@th\@lrulefill$}}\limits^{\hfill\box\@tempboxa\hfill}$}}
+
+% for broken arrows
+\def\@bshowmessage#1{\setbox\@tempboxa\hbox{$#1$}
+  \ifdim\wd\@tempboxa<\minarrowwidth 
+    \arrowwidth\minarrowwidth 
+  \else 
+    \arrowwidth\wd\@tempboxa 
+  \fi
+  \hbox{$\m@th\displaystyle\mathop{\hbox to \arrowwidth
+    {$\m@th\@blrulefill$}}\limits^{\hfill\box\@tempboxa\hfill}$}}
+
+
+% for double arrows
+\def\@dshowmessage#1{\setbox\@tempboxa\hbox{$#1$}
+  \ifdim\wd\@tempboxa<\minarrowwidth 
+    \arrowwidth\minarrowwidth 
+  \else 
+    \arrowwidth\wd\@tempboxa 
+  \fi
+  \hbox{$\m@th\displaystyle\mathop{\hbox to \arrowwidth
+    {$\m@th\@dlrulefill$}}\limits^{\hfill\box\@tempboxa\hfill}$}}
+
+% for triple arrows
+\def\@tshowmessage#1{\setbox\@tempboxa\hbox{$#1$}
+  \ifdim\wd\@tempboxa<\minarrowwidth 
+    \arrowwidth\minarrowwidth 
+  \else 
+    \arrowwidth\wd\@tempboxa 
+  \fi
+  \hbox{$\m@th\displaystyle\mathop{\hbox to \arrowwidth
+    {$\m@th\@tlrulefill$}}\limits^{\hfill\box\@tempboxa\hfill}$}}
+
+\def\sends{\@sends}
+\def\Sends[#1]#2{\multispan{#1}$\@sends{#2}$}
+\def\@sends#1{\@ldfill\@showmessage{#1}\@rafill}
+
+% broken send
+\def\bsends{\@bsends}
+\def\bSends[#1]#2{\multispan{#1}$\@bsends{#2}$}
+\def\@bsends#1{\@bldfill\@bshowmessage{#1}\@brafill}
+
+% double send
+\def\dsends{\@dsends}
+\def\dSends[#1]#2{\multispan{#1}$\@dsends{#2}$}
+\def\@dsends#1{\@dldfill\@dshowmessage{#1}\@drafill}
+
+% triple send
+\def\tsends{\@tsends}
+\def\tSends[#1]#2{\multispan{#1}$\@tsends{#2}$}
+\def\@tsends#1{\@tldfill\@tshowmessage{#1}\@trafill}
+ 
+\def\receives{\@receives}
+\def\Receives[#1]#2{\multispan{#1}$\@receives{#2}$}
+\def\@receives#1{\@lafill\@showmessage{#1}\@rdfill}
+
+% broken receive
+\def\breceives{\@breceives}
+\def\bReceives[#1]#2{\multispan{#1}$\@breceives{#2}$}
+\def\@breceives#1{\@blafill\@bshowmessage{#1}\@brdfill}
+
+% double receive
+\def\dreceives{\@dreceives}
+\def\dReceives[#1]#2{\multispan{#1}$\@dreceives{#2}$}
+\def\@dreceives#1{\@dlafill\@dshowmessage{#1}\@drdfill}
+ 
+% triple receive
+\def\treceives{\@treceives}
+\def\tReceives[#1]#2{\multispan{#1}$\@treceives{#2}$}
+\def\@treceives#1{\@tlafill\@tshowmessage{#1}\@trdfill}
+ 
+\def\exchange{\@exchange}
+\def\Exchange[#1]#2{\multispan{#1}$\@exchange{#2}$}
+\def\@exchange#1{\@lafill\@showmessage{#1}\@rafill}
+
+%----------------------------------------------------------------------
+% NARROWING COLUMNS
+% \narrowcol{ARG} produces ARG centered in an \hbox that is 2em too
+% narrow for its contents. ARG is still in math-mode!
+% \Narrowcol does the same with the double amount of shrinking.
+% \phantomcol does the same with a column of zero width
+% BUG: cannot be used for \send and relatives!
+
+\def\narrowcol#1{\hbox{\hskip-1em$#1$\hskip-1em}}
+\def\Narrowcol#1{\hbox{\hskip-2em$#1$\hskip-2em}}
+\def\phantomcol#1{\hbox to 0pt{\hss$#1$\hss}}
+
+%----------------------------------------------------------------------
+% A PROTOCOL ENVIRONMENT. 
+% args: #1: number of parties
+% essentially, an array with # columns depending on the argument.
+% furthermore, a macro \participants with the correct number of args 
+% is defined. \participants{A}{B}[{C}...] puts A resp. B (and C...) centered 
+% over columns 1 resp. 3 (resp. 5...)
+% BUG: PARTICIPANTS CAN BE USED ONLY ONCE PER PROTOCOL!
+% \protocolheader{#1} puts #1 in an \hbox centered over the entire
+% array.
+%
+% use: 
+%  \begin{protocol}{2}
+%    \protocolheader{HEADER}\\
+%    \participants{Alice}{Bob}\\
+%    y := x^2\\
+%       & \sends{y}\\
+%       &       & \mbox{verify if $y=x^2$}\\
+%       & \receives{\mbox{OK!}}\\
+%    \mbox{be happy}
+%  \end{protocol}       
+%  yields:
+%                 HEADER
+%
+%      Alice                 Bob
+%
+%       y=x^2
+%               y
+%            ------>
+%                     verify if $y=x^2$
+%              OK!
+%            <------
+%    be happy
+%
+\newcount\@ncols    \@ncols=3
+\newcount\@nccols   \@nccols=1
+\newcount\@nparties \@nparties=2
+\newcount\@npartic 
+
+\def\protocolheader#1{\multicolumn{\the\@ncols}{c}{\hbox{#1}}\\}
+\def\participants{% initialize:
+  \noalign{\global\@npartic\@nparties\gdef\@more{}}
+  % and do the real stuff:
+  \@participants}
+\def\@participants#1{% print next participant:
+  \@more\multicolumn{1}{c}{\hbox{#1}}
+  % next time, first put in &&:
+  \gdef\@more{&&}
+  \global\advance\@npartic by \m@ne
+  % if there's more to do:
+  \ifnum\@npartic>0 \let\next\@participants
+  \else\let\next\\\fi\next
+}
+
+\newenvironment{protocol}[1]{% arg: # of parties
+  \relax\ifnum #1 < 2 
+    \typeout{Only n-party protocols for n>1 implemented!}
+    \typeout{I'll assume n=2.}
+    \@nparties=2
+  \else
+    \@nparties=#1
+  \fi 
+  % # of cols = 2 * (# of parties) - 1
+  \@ncols = \@nparties 
+  \multiply \@ncols by 2 
+  \advance \@ncols by -1
+  % # of centered cols = 2 * (# of parties) - 3
+  \@nccols = \@ncols
+  \advance \@nccols by -2
+  % arrowwidth based on # of columns:
+  \minarrowwidth = .5\textwidth 
+  \divide\minarrowwidth by \@ncols
+  % lower all arrows halfway down to baseline:
+  \setbox\@tempboxa\hbox{$\leftarrow$}
+  \arrowlower-.5\ht\@tempboxa
+  $\begin{array}{r*{\@nccols}{c}l}
+}{\end{array}$}
+
+\newenvironment{protocolm}[1]{% arg: # of parties
+  \relax\ifnum #1 < 2 
+    \typeout{Only n-party protocols for n>1 implemented!}
+    \typeout{I'll assume n=2.}
+    \@nparties=2
+  \else
+    \@nparties=#1
+  \fi 
+  % # of cols = 2 * (# of parties) - 1
+  \@ncols = \@nparties 
+  \multiply \@ncols by 2 
+  \advance \@ncols by -1
+  % # of centered cols = 2 * (# of parties) - 3
+  \@nccols = \@ncols
+  \advance \@nccols by -2
+  % arrowwidth based on # of columns:
+  \minarrowwidth = .5\textwidth 
+  \divide\minarrowwidth by \@ncols
+  % lower all arrows halfway down to baseline:
+  \setbox\@tempboxa\hbox{$\leftarrow$}
+  \arrowlower-.5\ht\@tempboxa
+  $\begin{array}{lr*{\@nccols}{c}l}
+}{\end{array}$}
+
+\newcommand{\pcfetch}{\textbf{fetch}}
+\newcommand{\cnt}{\texttt{cnt}}

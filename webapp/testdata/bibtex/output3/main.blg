@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2022)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: alphaurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: main.bib
+Database file #2: cryptobib/abbrev0.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Reallocated str_pool (elt_size=1) to 195000 items from 130000.
+Reallocated str_pool (elt_size=1) to 260000 items from 195000.
+Reallocated str_pool (elt_size=1) to 325000 items from 260000.
+Database file #3: cryptobib/crypto.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 50 entries,
+            3368 wiz_defined-function locations,
+            16514 strings with 269040 characters,
+and the built_in function-call counts, 38653 in all, are:
+= -- 4336
+> -- 1615
+< -- 82
++ -- 529
+- -- 523
+* -- 2746
+:= -- 5388
+add.period$ -- 241
+call.type$ -- 50
+change.case$ -- 354
+chr.to.int$ -- 50
+cite$ -- 50
+duplicate$ -- 1220
+empty$ -- 3066
+format.name$ -- 570
+if$ -- 9546
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 47
+newline$ -- 303
+num.names$ -- 232
+pop$ -- 611
+preamble$ -- 1
+purify$ -- 404
+quote$ -- 0
+skip$ -- 2456
+stack$ -- 0
+substring$ -- 1840
+swap$ -- 570
+text.length$ -- 172
+text.prefix$ -- 4
+top$ -- 0
+type$ -- 400
+warning$ -- 0
+while$ -- 322
+width$ -- 56
+write$ -- 868

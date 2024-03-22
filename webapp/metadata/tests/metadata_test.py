@@ -7,7 +7,7 @@ import random
 import sys
 sys.path.insert(0, '../')
 from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License, PubType
-from meta_parse import clean_abstract, check_bibtex
+from meta_parse import clean_abstract
 from xml_meta import validate_abstract
 import datetime
 from pathlib import Path
@@ -89,66 +89,6 @@ def test_abstract4():
     output = clean_abstract(abs_file.read_text(encoding='UTF-8'))
     print(output)
     assert output == "<p>This is </p><ul> <li>first item </li><li>second item </li></ul><p> but also </p><ul><li>first<span class='text-danger'>nesting of enumerate or itemize is not allowed</span> </li><li>second bullet </li></ul><p>This starts a paragraph.</p><p>This is another paragraph but it's the last one. </p>"
-
-def _test_bibtex_entry(case):
-    output_path = Path('testdata/bibtex/{}'.format(case))
-    compilation_data = {'paperid': 'abcdefg',
-                        'status': CompileStatus.COMPILING,
-                        'email': 'foo@example.com',
-                        'venue': 'eurocrypt',
-                        'submitted': '2023-01-02 01:02:03',
-                        'accepted': '2023-01-03 01:02:55',
-                        'pubtype': PubType.RESEARCH.name,
-                        'compiled': datetime.datetime.now(),
-                        'command': 'dummy command',
-                        'error_log': [],
-                        'warning_log': [],
-                        'bibtex': output_path.read_text(encoding='UTF-8'),
-                        'zipfilename': 'submit.zip'}
-    compilation = Compilation(**compilation_data)
-    check_bibtex(compilation)
-    return compilation
-
-def test_bibtex():
-    output_path = Path('testdata/bibtex/ex1/bibitem.bib')
-    compilation_data = {'paperid': 'abcdefg',
-                        'status': CompileStatus.COMPILING,
-                        'email': 'foo@example.com',
-                        'venue': 'eurocrypt',
-                        'submitted': '2023-01-02 01:02:03',
-                        'accepted': '2023-01-03 01:02:55',
-                        'compiled': datetime.datetime.now(),
-                        'command': 'dummy command',
-                        'error_log': [],
-                        'warning_log': [],
-                        'bibtex': output_path.read_text(encoding='UTF-8'),
-                        'zipfilename': 'submit.zip'}
-    compilation = Compilation(**compilation_data)
-    check_bibtex(compilation)
-    for i in range(len(compilation.warning_log)):
-        print(i, compilation.warning_log[i].text)
-    assert len(compilation.warning_log) == 55
-    # note the typo in pybtex source. :/
-    assert compilation.warning_log[0].text == 'BibTeX parse error: Unknown error: repeated bibliograhpy entry: abed2006vlsi'
-    output_path = Path('testdata/bibtex/cryptobib/bibexport.bib')
-    compilation_data = {'paperid': 'abcdefg',
-                        'status': CompileStatus.COMPILING,
-                        'email': 'foo@example.com',
-                        'venue': 'eurocrypt',
-                        'submitted': '2023-01-02 01:02:03',
-                        'accepted': '2023-01-03 01:02:55',
-                        'compiled': datetime.datetime.now(),
-                        'command': 'dummy command',
-                        'error_log': [],
-                        'warning_log': [],
-                        'bibtex': output_path.read_text(encoding='UTF-8'),
-                        'zipfilename': 'submit.zip'}
-    compilation = Compilation(**compilation_data)
-    check_bibtex(compilation)
-    for i in range(len(compilation.warning_log)):
-        print(i, compilation.warning_log[i].text)
-    assert len(compilation.warning_log) == 1702
-    assert len(compilation.error_log) == 0
 
 def test_scramble():
     for l in range(3, 12):

@@ -35,6 +35,9 @@
    background-color: #e0e0e0;
    padding: 5px 5px 5px 20px;
  }
+ div#reviewTabsContent {
+   background-color: white;
+ }
  div[data-status="PENDING"] {
    display:none;
   }
@@ -201,10 +204,13 @@
 <main id="adminContent" class="container-fluid px-md-4">
   <div class="d-flex">
     <div class="resizable left-column" style="height:90vh;overflow-y:scroll;">
+      <div class="nav-text me-5"><h2 class="mb-2">Final copy edit check for {{paper.paperid}}</h2></div>
       <ul class="nav nav-tabs align-items-end" id="reviewTabs" role="tablist">
-        <div class="nav-text me-5"><h2 class="mb-2">Final copy edit check for {{paper.paperid}}</h2></div>
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="pdfs-tab" data-bs-toggle="tab" data-bs-target="#pdfs" type="button" role="tab" aria-controls="pdfs" aria-selected="true">PDFs</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#htmlview" type="button" role="tab" aria-controls="htmlview" aria-selected="false">HTML</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="diffs-tab" data-bs-toggle="tab" data-bs-target="#diffs" type="button" role="tab" aria-controls="diffs" aria-selected="false">Diffs</button>
@@ -226,6 +232,12 @@
               <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=fitH">
             </div>
           </div>
+        </div>
+        <div class="tab-pane fade p-2" id="htmlview" role="tabpanel" aria-labelledby="html-tab" tabindex="0">
+          <p class="alert alert-info">
+            This is approximately what part of the HTML page will look like. Please check the abstract, title, and references.
+          </p>
+          {% include "html.html" %}
         </div>
         <div class="tab-pane fade" id="diffs" role="tabpanel" aria-labelledby="diffs-tab" tabindex="0">
           <h4 class="p-2 mb-0">Differences are shown only for tex files.</h4>

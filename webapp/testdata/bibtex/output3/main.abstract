@@ -1,0 +1,11 @@
+Tightly secure cryptographic schemes can be implemented with standardized parameters, while still having a sufficiently high security level backed up by their analysis.
+In a recent work, Pan and Wagner (Eurocrypt 2023) presented the first tightly secure two-round multi-signature scheme without pairings, called Chopsticks.
+While this is an interesting first theoretical step, Chopsticks is much less efficient than its non-tight counterparts.
+
+In this work, we close this gap by proposing a new tightly secure two-round multi-signature scheme that is as efficient as non-tight schemes.
+Our scheme is based on the DDH assumption without pairings.
+Compared to Chopsticks, we reduce the signature size by more than a factor of 3 and the communication complexity by more than a factor of 2.
+
+Technically, we achieve this as follows: (1) We develop a new pseudorandom path technique, as opposed to the pseudorandom matching technique in Chopsticks. (2) We construct a more efficient commitment scheme with suitable properties, which is an important primitive in both our scheme and Chopsticks.
+Surprisingly, we observe that the commitment scheme does not have to be binding, enabling our efficient construction.
+

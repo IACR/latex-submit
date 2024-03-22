@@ -1,0 +1,2141 @@
+\def\submission{1}
+\def\llncs{1}
+\def\llncsqedsymbol{1}
+\def\anonymous{0}
+\def\acknowledgments{0}
+\def\pagelimit{100}
+\def\papertype{0}
+\def\fullpage{0}
+\def\LNCSpreview{0}
+\def\overflow{0}
+\def\showlabels{0}
+\def\authnotes{1}
+\def\dieordollar{0}
+\def\choosebibstyle{alpha}
+\ifnum\LNCSpreview=1
+ \def\llncs{1}
+\fi
+
+\ifnum\llncs=1
+\documentclass[version=final]{iacrcc}
+%	\documentclass[runningheads,orivec]{llncs}
+\license{CC-by}
+\else
+	\ifnum\papertype=0
+		\documentclass[a4paper,10pt]{article}
+	\else
+		\documentclass[letterpaper,10pt]{article}
+	\fi
+
+	\ifnum\fullpage=1
+		\usepackage{fullpage}
+	\fi
+\fi
+
+\def\stuffedtitlepage{0}
+\def\abbrevref{0}
+\def\allowbreaks{0}				
+
+\title{Toothpicks: \\ More Efficient Fork-Free Two-Round Multi-Signatures}
+%\def\titletext{Toothpicks: \\ More Efficient Fork-Free Two-Round Multi-Signatures
+%}
+%\def\runningtitle{Toothpicks: More Efficient Fork-Free Two-Round Multi-Signatures
+%}
+
+%\date{\today}					
+
+
+
+\def\choosepubinfo{5}			
+
+\def\pubinfoYEAR{}				\def\pubinfoSUBMISSIONDATE{}	\def\pubinfoDOI{}				\def\pubinfoBIBDATA{}			\def\pubinfoCONFERENCE{}		
+
+%\def\pubinfoEPRINT{}			\def\pubinfoindividual{\ifnum\llncs=1\else\noindent \copyright IACR 2024. This is the full version of an article that will be published in the proceedings of EUROCRYPT 2024.\fi
+%}
+
+%% \makeatletter
+%% \expandafter\newcommand{\createauthor}[5]{\@namedef{#1name}{#2}\@namedef{#1running}{#3}\@namedef{#1institute}{#4}\@namedef{#1thanks}{#5}}
+%% \expandafter\newcommand{\createinstitute}[4]{\@namedef{#1instname}{#2}\@namedef{#1mail}{#3}\@namedef{#1number}{#4}}
+%% \makeatother
+%% \newcounter{authorcount}
+%% \newcommand{\newauthor}[4]{
+%% 	\stepcounter{authorcount}
+%% 	\createauthor{\theauthorcount}{#1}{#2}{#3}{#4}
+%% }
+%% \newcounter{institutecount}
+%% \newcommand{\newinstitute}[3]{
+%% 	\stepcounter{institutecount}
+%% 	\createinstitute{\theinstitutecount}{#1}{#2}{#3}
+%% }
+\usepackage{paralist}
+%\usepackage{orcidlink}
+\addauthor[email={jiaxin.pan@uni-kassel.de},inst={1},orcid={0000-0002-7459-6850}]{Jiaxin Pan}
+\addauthor[inst={2},orcid={0000-0002-4620-7264}]{Benedikt Wagner}
+\addaffiliation[country={Germany},city={Kassel}]{University of Kassel}
+\addaffiliation[country={Germany},city={Saarbrücken}]{CISPA Helmholtz Center for Information Security}
+
+
+
+\genericfootnote{Benedikt Wagner was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – 507237585.}
+
+\usepackage{amsmath,amssymb,amsfonts}
+%% \ifnum\llncs=0\usepackage{amsthm}\fi
+%% \ifnum\submission=1
+%% 	\usepackage[pdfpagelabels=true,linktocpage=true,colorlinks=true]{hyperref}
+%% \else
+%% 	\usepackage[pdfpagelabels=true,linktocpage=true,pagebackref,colorlinks=true]{hyperref}
+%% 	\ifnum\llncs=0
+%% 		\renewcommand*{\backref}[1]{(Cited on page~#1.)}
+%% 	\fi
+%% \fi 
+
+%% \def\titleofpdf{\titletext}		\def\authorsofpdf{\ifcsname 5name\endcsname
+%% 	\csname 1name\endcsname~et~al.
+%% \else
+%% 	\ifcsname 1name\endcsname
+%% 		\csname 1name\endcsname
+%% 		\ifcsname 3name\endcsname
+%% 			,\ \csname 2name\endcsname
+%% 			\ifcsname 4name\endcsname
+%% 				,\ \csname 3name\endcsname\ and \csname 4name\endcsname
+%% 			\else \ and\ \csname 3name\endcsname
+%% 			\fi
+%% 		\else
+%% 			\ifcsname 2name\endcsname
+%% 				\csname 2name\endcsname
+%% 			\fi
+%% 		\fi
+%% 	\fi
+%% \fi
+%% }
+
+%% \ifnum\submission=1 \hypersetup{
+%% 	pdftitle={\titleofpdf}, pdfauthor=\ifnum\anonymous=0{\authorsofpdf}\else{}\fi, linkcolor=[rgb]{0,0,0}, urlcolor=[rgb]{0,0,0},  citecolor=[rgb]{0,0,0}  }
+%% \else
+%% 	\hypersetup{
+%% 	pdftitle={\titleofpdf},
+%% 	pdfauthor=\ifnum\anonymous=0{\authorsofpdf}\else{}\fi,
+%% 	linkcolor=[rgb]{0,0,0.5},
+%% 	urlcolor=[rgb]{0,0,0.5},
+%% 	citecolor=[rgb]{0,0,0.5}
+%% 	}
+%% \fi
+
+
+\ifnum\abbrevref=0
+%	\usepackage[capitalise,noabbrev]{cleveref}
+\else
+	\usepackage[capitalise]{cleveref}
+\fi
+
+\usepackage{nicodemus}
+\usepackage[absolute]{textpos}	\usepackage{everypage}			
+
+
+
+\ifnum\LNCSpreview=1 \usepackage[paperwidth=152mm,paperheight=235mm,textwidth=122mm,textheight=193mm]{geometry}
+	\AddEverypageHook{
+		\begin{textblock}{1}[1,1](0.5,0.9)
+			\centering\Large
+			\textcolor{lightgray}{\textbf{LNCS Preview mode active.}}
+		\end{textblock}
+	}
+	\def\choosepubinfo{0}
+\fi
+
+\ifnum\overflow=1
+	\overfullrule=2mm
+\fi
+
+\ifnum\allowbreaks=1
+	\allowdisplaybreaks
+\fi
+
+\ifnum\showlabels=1
+	\usepackage{showkeys}
+\fi
+
+\ifnum\submission=1
+	\def\authnotes{0}
+\fi
+
+\ifnum\anonymous=1
+	\def\authnotes{0}
+\fi
+
+\ifx\pagelimit\empty \else
+	\newcounter{pagewarning}
+	\setcounter{pagewarning}{\pagelimit}
+	\AddEverypageHook{
+		\ifnum\thepage>\thepagewarning
+			\ifnum\LNCSpreview=0
+				\begin{textblock}{1}[0.5,0](0,-13.5)
+			\else
+				\begin{textblock}{1}[0.5,0](0,-11.95)
+			\fi
+				\centering\Large
+				\textcolor{red}{\textbf{This page is exceeding the page limit.}}
+			\end{textblock}
+		\fi
+}
+\fi
+
+\def\notesindocument{0}
+
+\newlength{\strutdepth}\settodepth{\strutdepth}{\strutbox}
+
+\newcommand{\notes}[3]{ \ifnum\authnotes=1
+	\def\notesindocument{1}\noindent{\color{#1}{#3}\color{#1}}\strut\vadjust{\kern-\strutdepth \vtop to \strutdepth{\baselineskip\strutdepth \vss\llap{{\large\color{#1}\textbf{#2}\quad\color{black}}}\null }}\fi
+}
+
+\ifnum\LNCSpreview=0
+	\newcommand{\todo}[1]{\notes{Red}{TODO}{#1}}
+	\newcommand{\new}[1]{\notes{ForestGreen}{NEW}{#1}}
+	\newcommand{\alert}[1]{\notes{Red}{ALERT}{#1}}
+	\newcommand{\authornote}[1]{\notes{black}{NOTE}{#1}}
+\else
+	\newcommand{\todo}[1]{\notes{Red}{Todo\hspace{-1.5ex}}{#1}}
+	\newcommand{\new}[1]{\notes{ForestGreen}{New\hspace{-1.5ex}}{#1}}
+	\newcommand{\alert}[1]{\notes{Red}{Alert\hspace{-1.5ex}}{#1}}
+	\newcommand{\authornote}[1]{\notes{black}{Note\hspace{-1.5ex}}{#1}}
+\fi
+
+\newcommand{\authnote}[2]{ \ifnum\authnotes=1
+		\def\notesindocument{1}
+		\begin{center}
+			\fbox{\begin{minipage}{.98\textwidth}
+					\textbf{#1 says:} #2\authornote{}
+				\end{minipage}}
+		\end{center}
+	\fi
+}
+
+\ifnum\llncs=1
+	\ifnum\llncsqedsymbol=1
+		\let\oldproof\proof
+		\renewenvironment{proof}{\begin{oldproof}}{\qed\end{oldproof}}
+	\fi
+\fi
+
+\ifnum\llncs=0				\newtheoremstyle{mytheorem}
+  {\topsep} {\topsep} {\itshape} {} {\bfseries} {} {.5em} {\thmname{#1}\thmnumber{ #2}\thmnote{ {\bfseries (#3)}}.} 
+
+\newtheoremstyle{myplain}
+  {\topsep} {\topsep} {\itshape} {} {\bfseries} {} {.5em} {\thmname{#1}\thmnumber{ #2}\thmnote{ {\normalfont(#3)}}.} 
+
+\newtheoremstyle{mydefinition}
+  {} {} {} {} {\bfseries} {} {.5em} {\thmname{#1}\thmnumber{ #2}\thmnote{ {\normalfont(#3)}}.} 
+
+\newtheoremstyle{myremark}
+  {} {} {} {} {\itshape} {} {.5em} {\thmname{#1}\thmnumber{ #2}\thmnote{ {\normalfont(#3)}}.} 
+
+	\theoremstyle{mytheorem}				\newtheorem{theorem}{Theorem}
+
+	\theoremstyle{myplain}
+	\newtheorem{lemma}{Lemma}
+	\newtheorem{corollary}{Corollary}
+	\newtheorem{proposition}{Proposition}
+	\newtheorem{construction}{Construction}
+	\newtheorem{conjecture}{Conjecture}
+
+	\theoremstyle{mydefinition}
+	\newtheorem{definition}{Definition}
+	\newtheorem{claim}{Claim}
+	\newtheorem{assumption}{Assumption}
+	\newtheorem{fact}{Fact}
+
+	\theoremstyle{myremark}
+	\newtheorem{remark}{Remark}
+	\newtheorem{example}{Example}
+	\newtheorem{note}{Note}
+	\newtheorem{observation}{Observation}
+\else
+%\spnewtheorem{construction}[theorem]{Construction}{\bfseries}{}
+	\newtheorem{assumption}[theorem]{}{\bfseries}{}
+	\newtheorem{fact}[theorem]{Fact}{\bfseries}{}
+
+	\newtheorem{observation}[theorem]{Observation}{\itshape}{}
+\fi
+
+\newenvironment{theo}{\begin{theorem}}{\end{theorem}}
+\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
+\newenvironment{lemm}{\begin{lemma}}{\end{lemma}}
+\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
+\newenvironment{coro}{\begin{corollary}}{\end{corollary}}
+\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
+\newenvironment{prop}{\begin{proposition}}{\end{proposition}}
+\newenvironment{conj}{\begin{conjecture}}{\end{conjecture}}
+\newenvironment{clai}{\begin{claim}}{\end{claim}}
+\newenvironment{defi}{\begin{definition}}{\end{definition}}
+\newenvironment{defn}{\begin{definition}}{\end{definition}}
+\newenvironment{assu}{\begin{assumption}}{\end{assumption}}
+\newenvironment{rema}{\begin{remark}}{\end{remark}}
+\newenvironment{rem}{\begin{remark}}{\end{remark}}
+\newenvironment{cons}{\begin{construction}}{\end{construction}}
+\newenvironment{obse}{\begin{observation}}{\end{observation}}
+\newenvironment{fct}{\begin{fact}}{\end{fact}}
+
+
+\ifnum\abbrevref=0
+\else
+%% \crefname{assumption}{Ass.}{Ass.}
+%% 	\crefname{construction}{Constr.}{Constr.}
+%% 	\crefname{corollary}{Cor.}{Cor.}
+%% 	\crefname{conjecture}{Conj.}{Conj.}
+%% 	\crefname{definition}{Def.}{Def.}
+%% 	\crefname{exmaple}{Ex.}{Ex.}
+%% 	\crefname{lemma}{Lem.}{Lem.}
+%% 	\crefname{observation}{Obs.}{Obs.}
+%% 	\crefname{proposition}{Prop.}{Prop.}
+%% 	\crefname{remark}{Rem.}{Rem.}
+%% 	\crefname{theorem}{Thm.}{Thms.}
+\fi
+
+
+\def\YYYSMcoin{\mbox{\begin{tikzpicture}[scale=0.0125]
+\definecolor{coinbrown}{HTML}{D89E36}\definecolor{coindarkyellow}{HTML}{F8D81E}\definecolor{coinyellow}{HTML}{F8F800}\fill[coinyellow] (3,-1) rectangle (9,9);\fill(0,0) rectangle (1,8);\fill(1,8) rectangle (2,10);\fill(2,10) rectangle (4,11);\fill(4,11) rectangle (8,12);\fill(8,11) rectangle (10,10);\fill(10,10) rectangle (11,8);\fill(11,8) rectangle (12,0);\fill(10,-2) rectangle (11,0);\fill(8,-3) rectangle (10,-2);\fill(4,-4) rectangle (8,-3);\fill(2,-3) rectangle (4,-2);\fill(1,0) rectangle (2,-2);\fill (5,-1) rectangle (7,0);\fill (7,0) rectangle (8,8);\fill[coinbrown] (9,8) rectangle (10,10);\fill[coinbrown] (10,0) rectangle (11,8);\fill[coinbrown] (9,-2) rectangle (10,0);\fill[coinbrown] (8,-2) rectangle (9,-1);\fill[coinbrown] (4,-3) rectangle (8,-2);\fill[coindarkyellow] (2,-2) rectangle (3,8);\fill[coindarkyellow] (3,-2) rectangle (8,-1);\fill[coindarkyellow] (8,-1) rectangle (9,0);\fill[coindarkyellow] (9,0) rectangle (10,8);\fill[coindarkyellow] (8,8) rectangle (9,10);\fill[coindarkyellow] (4,9) rectangle (8,10);\fill[coindarkyellow] (3,8) rectangle (4,9);\fill[coindarkyellow] (5,0) rectangle (7,2);\fill[coindarkyellow] (6,2) rectangle (7,8);\fill[white] (4,0) rectangle (5,8);\fill[white] (5,8) rectangle (7,9);
+\end{tikzpicture}}}
+
+\def\YYYdie{\mbox{\begin{tikzpicture}[scale=0.85,x=1em,y=1em,radius=0.09]
+\draw[rounded corners=1,line width=.25pt] (0,0) rectangle (1,1);\fill (0.275,0.275) circle;\fill (0.725,0.725) circle;\fill (0.5,0.5) circle;\fill (0.275,0.725) circle;\fill (0.725,0.275) circle;
+\end{tikzpicture}}}
+
+\newcommand{\getsr}{
+	\ifnum\dieordollar=0
+		\mathrel{\vbox{\offinterlineskip\ialign{
+			\hfil##\hfil\cr
+			\hspace{0.1em}$\scriptscriptstyle\$$\cr
+			$\leftarrow$\cr
+		}}}
+	\fi
+	\ifnum\dieordollar=1
+		\mathrel{\vbox{\offinterlineskip\ialign{
+			\hfil##\hfil\cr
+			{\scalebox{0.5}{\hspace{0.4em}\YYYdie}}\cr
+			\noalign{\kern0.05ex}
+			$\leftarrow$\cr
+		}}}
+	\fi
+	\ifnum\dieordollar=2
+		\mathrel{\vbox{\offinterlineskip\ialign{
+			\hfil##\hfil\cr
+			\hspace{0.1em}$\YYYSMcoin$\cr
+			$\leftarrow$\cr
+		}}}
+	\fi
+}
+
+\newcommand{\testequal}{
+	\mathrel{\vbox{\offinterlineskip\ialign{
+			\hfil##\hfil\cr
+			\hspace{0.1em}$\scriptscriptstyle?$\cr
+			$\leftarrow$\cr
+		}}}
+}
+\newcommand{\checkfornotes}{
+	\ifnum\notesindocument=1
+		\ifnum\LNCSpreview=1
+			\begin{textblock}{1}[0.5,0](0,0.25)
+		\else
+			\begin{textblock}{1}[0.5,0](0,0.85)
+		\fi
+		\centering
+		\textcolor{red}{\large \textbf{There are still unresolved comments in this document.}}
+		\end{textblock}
+	\fi
+}
+
+
+
+
+
+\newcommand{\varfont}[1]{\mathit{#1}}
+\newcommand{\algfont}[1]{\mathsf{#1}}
+\newcommand{\termfont}[1]{\mathsf{#1}}
+\newcommand{\orfont}[1]{{\ensuremath{\textsc{#1}}}\xspace}
+\newcommand{\eventfont}[1]{\mathsf{#1}}
+\newcommand{\mat}[1]{\vec{#1}}
+
+
+\newcommand{\KDM}{\termfont{KDM}}
+\newcommand{\ListOWCPA}{\termfont{List}\text{-}\owcpa}
+\newcommand{\otcpa}{\termfont{OT}\text{-}\termfont{CPA}}
+\newcommand{\QNum}[1]{\varfont{Q}_{#1}}
+\newcommand{\setfont}[1]{\mathcal{#1}}
+\newcommand{\Tran}{{\!\scriptscriptstyle{\top}}}
+\newcommand{\Orth}{{\!\scriptscriptstyle{\bot}}}
+\newcommand{\Dist}{\mathcal{D}}
+\newcommand{\resp}{\textit{resp.}~}
+\newcommand{\eg}{\textit{e.g.}~}
+\newcommand{\QNumHash}{\QNum{\hash}}
+\newcommand{\QNumKdm}{Q_C}
+\newcommand{\List}[1][]{\setfont{L}_{#1}}
+\newcommand{\lenMes}{\ell}
+\newcommand{\lenRnd}{\lenMes}
+
+\newcommand{\Hyb}{_{\algfont{H}}}
+\newcommand{\Fo}{_{\algfont{FO}}}
+\newcommand{\hash}{\algfont{H}}
+\newcommand{\KdmF}[3]{{f}_{#1}^{#2}(#3)}
+\newcommand{\FuncF}{\algfont{f}}
+\newcommand{\ZeroF}[1]{\algfont{0}^{|\algfont{f}_{#1}(\cdot)|}}
+\newcommand{\hashG}{\algfont{G}}
+\newcommand{\hashGA}{\hashG}
+\newcommand{\hashGB}{\hashG^\star}
+\newcommand{\hashGC}{\hat{\hashG}}
+\newcommand{\hashA}{\hash}
+\newcommand{\hashB}{\hash^\star}
+\newcommand{\hashC}{\hat{\hash}}
+\newcommand{\ListGA}{\List[\hashGA]}
+\newcommand{\ListGB}{\List[\hashGB]}
+\newcommand{\ListHA}{\List[\hashA]}
+\newcommand{\ListHB}{\List[\hashB]}
+\newcommand{\MaxSizeList}{\varfont{Q}}
+\newcommand{\OKdm}{\orfont{Kdm}}
+
+
+
+\newcommand{\EvSuc}{\eventfont{SUC}}
+\newcommand{\EvCol}{\eventfont{COL}}
+\newcommand{\EvBHQ}{\eventfont{BHQ}}
+\newcommand{\EvSMTH}{\eventfont{SMTH}}
+\newcommand{\EvBDQ}{\eventfont{BDQ}}
+\newcommand{\OwAttack}{\varfont{\Sigma}}
+
+
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\IPFE}{\algfont{IPFE}}
+\newcommand{\IBIPFE}{\algfont{IB}\text{-}\IPFE}
+\newcommand{\LWEGen}{\algfont{LWEGen}}
+\newcommand{\PreSamp}{\algfont{PreSample}}
+\newcommand{\SimSec}{\termfont{SIM}}
+\newcommand{\IndSec}{\termfont{IND}}
+\newcommand{\OtSim}{\termfont{OT}\text{-}\SimSec}
+\newcommand{\state}{\varfont{st}}
+\newcommand{\msg}{\varfont{\mu}}
+\newcommand{\VecLen}{\varfont{\ell}}
+\newcommand{\auxVecLen}{\varfont{L}}
+\newcommand{\parm}{\varfont{m}}
+\newcommand{\parn}{\varfont{n}}
+\newcommand{\paralpha}{\varfont{\alpha}}
+\newcommand{\partau}{\varfont{\tau}}
+\newcommand{\parp}{\varfont{p}}
+\newcommand{\parq}{\varfont{q}}
+\newcommand{\park}{\varfont{k}}
+\newcommand{\varr}{\varfont{r}}
+
+
+
+\newcommand{\CHE}{\algfont{CHE}}
+\newcommand{\COTSE}{\algfont{OTSE}}
+
+\newcommand{\ConstSmooth}{\varepsilon}
+
+\newcommand{\SKE}{\algfont{SKE}}
+\newcommand{\SKGen}{\algfont{K}}
+\newcommand{\SEnc}{\algfont{E}}
+\newcommand{\SDec}{\algfont{D}}
+
+
+
+\newcommand{\GGen}{\algfont{GGen}}
+\newcommand{\ListHID}{\List{\id}}
+
+\newcommand{\GA}{\mathbb{G}}
+\newcommand{\GB}{\hat{\mathbb{G}}}
+\newcommand{\GT}{\mathbb{G}_\mathsf{T}}
+
+\newcommand{\Ghash}{\mathcal{H}}
+\newcommand{\GhashT}{\hash_\mathsf{T}}
+\newcommand{\GhashG}{\mathcal{G}}
+\newcommand{\pairing}{\algfont{e}}
+
+ 
+\usepackage{lmodern}
+%\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+%\usepackage[final]{microtype}
+
+
+\usepackage[lambda]{cryptocode}
+\usepackage{pseudocodemacros}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}\newcommand{\xmark}{\ding{55}}\usepackage{tikz-cd}
+\usetikzlibrary{shapes.multipart}
+\usepackage[procnames]{listings}
+\usepackage{color}
+
+%% \ifnum\llncs=1	
+%% 	\crefname{appendix}{Supplementary Material}{Supplementary Material}
+%% \else 
+%% 	\crefname{appendix}{Appendix}{Appendices}
+%% \fi
+
+\begin{document}
+\maketitle
+\keywords{Multi-Signatures, Tightness, Commitment Scheme, Lossy Identification}
+\begin{abstract}
+Tightly secure cryptographic schemes can be implemented with standardized parameters, while still having a sufficiently high security level backed up by their analysis.
+In a recent work, Pan and Wagner (Eurocrypt 2023) presented the first tightly secure two-round multi-signature scheme without pairings, called Chopsticks.
+While this is an interesting first theoretical step, Chopsticks is much less efficient than its non-tight counterparts.
+
+\quad In this work, we close this gap by proposing a new tightly secure two-round multi-signature scheme that is as efficient as non-tight schemes. 
+Our scheme is based on the \ddh assumption without pairings.
+Compared to Chopsticks, we reduce the signature size by more than a factor of 3 and the communication complexity by more than a factor of 2.
+
+\quad Technically, we achieve this as follows: (1) We develop a new pseudorandom path technique, as opposed to the pseudorandom matching technique in Chopsticks. (2) We construct a more efficient commitment scheme with suitable properties, which is an important primitive in both our scheme and Chopsticks. 
+Surprisingly, we observe that the commitment scheme does not have to be binding, enabling our efficient construction. 
+
+\end{abstract}
+\begin{textabstract}
+Tightly secure cryptographic schemes can be implemented with standardized parameters, while still having a sufficiently high security level backed up by their analysis.
+In a recent work, Pan and Wagner (Eurocrypt 2023) presented the first tightly secure two-round multi-signature scheme without pairings, called Chopsticks.
+While this is an interesting first theoretical step, Chopsticks is much less efficient than its non-tight counterparts.
+
+In this work, we close this gap by proposing a new tightly secure two-round multi-signature scheme that is as efficient as non-tight schemes. 
+Our scheme is based on the DDH assumption without pairings.
+Compared to Chopsticks, we reduce the signature size by more than a factor of 3 and the communication complexity by more than a factor of 2.
+
+Technically, we achieve this as follows: (1) We develop a new pseudorandom path technique, as opposed to the pseudorandom matching technique in Chopsticks. (2) We construct a more efficient commitment scheme with suitable properties, which is an important primitive in both our scheme and Chopsticks. 
+Surprisingly, we observe that the commitment scheme does not have to be binding, enabling our efficient construction. 
+
+\end{textabstract}
+
+
+
+%% \newcount\authorcounter
+%% \newcommand{\provideauthors}{\ifnum\authorcounter<\theauthorcount \csname\the\authorcounter name\endcsname \expandafter\ifx\csname\the\authorcounter thanks\endcsname\empty \else
+%% 				\thanks{\csname\the\authorcounter thanks\endcsname}\fi \inst{\csname\the\authorcounter institute\endcsname} \and \global\advance\authorcounter by 1 \provideauthors \else \csname\the\authorcounter name\endcsname \expandafter\ifx\csname\the\authorcounter thanks\endcsname\empty \else
+%% 				\thanks{\csname\the\authorcounter thanks\endcsname} \fi \inst{\csname\the\authorcounter institute\endcsname} \fi
+%% }
+
+%% \def\atleastoneauthorplaced{0}
+%% \newcommand{\providerunning}{\ifnum\authorcounter<\theauthorcount \expandafter\ifx\csname\the\authorcounter running\endcsname\empty
+%% 		\else
+%% 			\ifnum\authorcounter>1
+%% 				\ifnum\atleastoneauthorplaced=1
+%% 					\and \fi
+%% 			\fi
+%% 			\csname\the\authorcounter running\endcsname
+%% 			\def\atleastoneauthorplaced{1}
+%% 		\fi
+%% 		\global\advance\authorcounter by 1
+%% 		\providerunning \else \expandafter\ifx\csname\the\authorcounter running\endcsname\empty
+%% 		\else
+%% 			\ifnum\authorcounter>1
+%% 				\ifnum\atleastoneauthorplaced=1
+%% 					\and \fi
+%% 			\fi
+%% 			\csname\the\authorcounter running\endcsname
+%% 		\fi
+%% 	\fi
+%% }
+
+%% \newcount\institutecounter
+
+%% \newcommand{\provideinstitutes}{\ifnum\institutecounter<\theinstitutecount \ifnum\llncs=0
+%% 			$^{\csname\the\institutecounter number\endcsname}$
+%% 		\fi
+%% 		\csname\the\institutecounter instname\endcsname
+		
+%% 		\email{
+%% 			\ifx\contactmail\empty
+%% 				\csname\the\institutecounter mail\endcsname
+%% 			\else
+%% 				\href{mailto:\contactmail}{\csname\the\institutecounter mail\endcsname}
+%% 			\fi
+%% 		}
+		
+%% 		\and \global\advance\institutecounter by 1
+%% 		\provideinstitutes \else \ifnum\llncs=0
+%% 			\ifcsname 1name\endcsname
+%% 				$^{\csname\the\institutecounter number\endcsname}$
+%% 			\fi
+%% 		\fi
+%% 		\csname\the\institutecounter instname\endcsname
+		
+%% 		\email{
+%% 			\ifx\contactmail\empty
+%% 				\csname\the\institutecounter mail\endcsname
+%% 			\else
+%% 				\href{mailto:\contactmail}{\csname\the\institutecounter mail\endcsname}
+%% 			\fi
+%% 		}
+%% 	\fi
+%% }
+
+%% \title{
+%% 	\ifnum\stuffedtitlepage=1
+%% 		\ifnum\llncs=1
+%% 			\vspace*{-7ex}
+%% 		\else
+%% 		\vspace*{-3ex}
+%% 		\fi
+%% 		\textbf{\titletext}
+%% 		\ifnum\llncs=1
+%% 			\vspace*{-2ex}
+%% 		\else
+%% 			\vspace*{-1ex}
+%% 		\fi
+%% 	\else
+%% 		\textbf{\titletext}
+%% 	\fi
+%% }
+%% \ifnum\anonymous=1
+%% 	\author{}
+%% \else
+%% 	\ifnum\llncs=0
+%% 		\newcommand{\inst}[1]{{
+%% 			\ifcsname 1name\endcsname
+%% 				$^{#1}$
+%% 			\fi
+%% 			}}
+%% 	\fi
+%% 	\ifcsname 1name\endcsname
+%% 		\author{
+%% 			\global\authorcounter 1
+%% 			\provideauthors
+%% 		}
+%% 	\fi
+%% \fi
+
+%% \ifnum\llncs=1
+%% 	\titlerunning{\runningtitle}
+%% 	\ifnum\anonymous=1
+%% 		\institute{}
+%% 		\authorrunning{}
+%% 	\else
+%% 		\ifcsname 1instname\endcsname{
+%% 			\institute{
+%% 				\global\institutecounter 1
+%% 				\provideinstitutes
+%% 			}
+%% 		\fi
+%% 		\ifcsname 1name\endcsname{
+%% 			\authorrunning{
+%% 				\global \authorcounter 1
+%% 				\providerunning
+%% 			}
+%% 		\fi
+%% 	\fi
+%% \fi
+%% \maketitle
+%% \ifnum\stuffedtitlepage=1
+%% 	\ifnum\llncs=0
+%% 		\vspace{-4ex}
+%% 	\fi
+%% \fi
+
+%% \ifnum\llncs=0
+%% 	\ifnum\anonymous=0
+%% 		\newcommand{\email}[1]{
+%% 			\texttt{
+%% 				\ifx\contactmail\empty
+%% 					#1
+%% 				\else
+%% 					\href{mailto:\contactmail}{#1}
+%% 				\fi
+%% 			}
+%% 		}
+%% 		\newcommand{\and}{}
+%% 		\ifnum\stuffedtitlepage=1
+%% 			\ifnum\llncs=0
+%% 				\vspace{-2ex}
+%% 			\fi
+%% 		\fi
+%% 		\begin{small}
+%% 			\begin{center}
+%% 				\global \institutecounter 1
+%% 				\provideinstitutes
+%% 			\end{center}
+%% 		\end{small}
+%% 	\fi
+%% \fi
+
+%% \ifnum\stuffedtitlepage=1
+%% 	\ifnum\llncs=1
+%% 		\vspace*{-4ex}
+%% 	\else
+%% 		\vspace*{-2ex}
+%% 	\fi
+%% \fi
+
+%% \begin{abstract}
+%% 	\abstracttext
+%% 	\vspace{1ex}
+
+%% 	\textbf{Keywords\ifnum\llncs=1{.}\else{:}\fi} \keywords
+%% \end{abstract}
+%% \ifnum\stuffedtitlepage=1
+%% 	\ifnum\llncs=1
+%% 		\vspace*{-2ex}
+%% 	\fi
+%% \fi
+
+%% \ifnum\llncs=0
+%% 	\vspace{1ex}
+%% \fi
+
+%% \ifx\choosepubinfo\empty\else
+%% 	\ifnum\choosepubinfo=1
+%% 	\def\pubinfo{\small
+%% 			\noindent \copyright\ IACR 
+%% 			\ifx\pubinfoYEAR\empty \textcolor{red}{year missing}\else \pubinfoYEAR\fi.
+%% 			This article is a minor revision of the version published by Springer-Verlag in the proceedings of \ifx\pubinfoCONFERENCE\empty \textcolor{red}{conference missing}\else \pubinfoCONFERENCE\fi, eventually available at \url{http://link.springer.com}
+%% 	}
+%% 	\fi
+	
+%% 	\ifnum\choosepubinfo=2
+%% 		\def\pubinfo{\small
+%% 			\noindent \copyright\ IACR 
+%% 			\ifx\pubinfoYEAR\empty \textcolor{red}{year missing}\else \pubinfoYEAR\fi.
+%% 			This article is the final version submitted by the author(s) to the IACR and to Springer-Verlag on
+%% 			\ifx\pubinfoSUBMISSIONDATE\empty \textcolor{red}{submission date missing}\else \pubinfoSUBMISSIONDATE\fi.
+%% 			The version published by Springer-Verlag is available at
+%% 			\ifx\pubinfoDOI\empty \textcolor{red}{DOI missing}\else \pubinfoDOI\fi.
+%% 		}
+%% 	\fi
+	
+%% 	\ifnum\choosepubinfo=3
+%% 		\def\pubinfo{\small
+%% 			\noindent \copyright\ IACR
+%% 			\ifx\pubinfoYEAR\empty \textcolor{red}{year missing}\else \pubinfoYEAR\fi.
+%% 			This article is a minor revision of the version published by Springer-Verlag available at
+%% 			\ifx\pubinfoDOI\empty \textcolor{red}{DOI missing}\else \pubinfoDOI\fi.
+%% 		}
+%% 	\fi
+	
+%% 	\ifnum\choosepubinfo=4
+%% 		\def\pubinfo{\small
+%% 			\noindent This article is based on an earlier article:
+%% 			\ifx\pubinfoBIBDATA\empty \textcolor{red}{bibliographic data missing}\else \pubinfoBIBDATA\fi,
+%% 			\copyright\ IACR
+%% 			\ifx\pubinfoYEAR\empty \textcolor{red}{year missing}\else \pubinfoYEAR\fi,
+%% 			\ifx\pubinfoDOI\empty \textcolor{red}{DOI missing}\else \pubinfoDOI\fi.
+%% 		}
+%% 	\fi
+	
+%% 	\ifnum\choosepubinfo=5
+%% 			\def\pubinfo{\small
+%% 				\noindent \pubinfoindividual
+%% 			}
+%% 		\fi
+%% \fi
+
+%% \textblockorigin{0.5\paperwidth}{0.9\paperheight}
+%% \setlength{\TPHorizModule}{\textwidth}
+
+%% \newlength{\pubinfolength}
+%% \ifx\choosepubinfo\empty\else
+%% 	\ifnum\choosepubinfo=0
+%% 	\else
+%% 		\settowidth{\pubinfolength}{\pubinfo}
+%% 		\begin{textblock}{1}[0.5,0](0,.25)
+%% 			 \ifnum\pubinfolength<\textwidth
+%% 				\centering
+%% 			\fi
+%% 			\pubinfo
+%% 		\end{textblock}
+%% 	\fi
+%% \fi
+%% \thispagestyle{empty} 
+\section{Introduction}
+A multi-signature scheme~\cite{itakura1983public,CCS:BelNev06} allows a group of signers to jointly sign a message.
+Naively, every signer could sign the message locally, and we concatenate the resulting signatures.
+As the number of signers grows large, this results in impractical signature sizes, and so we aim for a more clever solution with compact signatures, potentially at the cost of introducing interaction.
+Early constructions of multi-signatures have been presented and analyzed in a variety of models~\cite{CCS:MicOhtRey01,PKC:Boldyreva03,EC:LOSSW06,SP:DEFKLNS19,EPRINT:CriKomMal21}, mostly differing in how keys are generated, registered, and verified.
+Nowadays, the accepted de facto standard for multi-signatures is the plain public key model~\cite{CCS:BelNev06}, where each signer generates his key pair independently.
+In this work, we focus on constructions in the said model, proven in the random oracle model~\cite{CCS:BelRog93} from assumptions over cyclic groups without pairings.
+We look at this problem from the perspective of concrete security, which we explain next.
+
+\smallskip\noindent\textbf{Concrete Security.} 
+Cryptographic security proofs follow a common approach: 
+Assuming the existence of an adversary with advantage $\epsilon_{\mathsf{S}}$ against the security of a construction ${\mathsf{S}}$, we construct a reduction with roughly the same running time that solves some hard underlying problem $\Pi$ with probability $\epsilon_\Pi$.
+Typically, $\epsilon_\Pi$ and $\epsilon_{\mathsf{S}}$ are related via a bound of the form $\epsilon_{\mathsf{S}} \leq L\cdot \epsilon_\Pi$, where $L$ is called the \emph{security loss}.
+
+
+
+On the one hand, this bound can be treated as a purely qualitative and asymptotic statement, and any polynomial (in the security parameter) $L$ is sufficient to show security.
+On the other hand, interpreting the bound as a quantitative statement about the concrete security level, it is desirable to minimize $L$.
+In the optimal case, $L$ is a small constant, and we call the proof \emph{tight}.
+There are two ways to interpret the security bound quantitatively: 
+In the first interpretation, we want to achieve $128$ bits of security for ${\mathsf{S}}$.
+Then, we need to set our parameters such that cryptanalytic results suggest that $\Pi$ is $128+\log(L)$ bits hard.
+Such parameters include, for example, groups over which we implement the scheme.
+In the second interpretation, we fix parameters for which we believe that $\Pi$ is $128$-bit hard.
+Then, we are confident in having $128-\log(L)$ bits of security for our scheme ${\mathsf{S}}$, according to the concrete security bound.
+While the first interpretation compensates for the security loss and results in more secure schemes in theory, it is far from what is done in practice, where
+practitioners use standardized parameters to implement schemes, because these parameters are well-understood and there are highly optimized implementations for them.
+Using a different cyclic group for every scheme is just not feasible. 
+For that reason, we stick to the second interpretation.
+
+\smallskip\noindent\textbf{The Price of Tightness.}
+A large body of research is centered around the concept of tightness, and many primitives have been studied in this regard.
+Prominent examples include public-key encryption~\cite{EC:BelBolMic00,C:HofJag12,EC:BJLS16,EC:GHKW16,EC:Hofheinz17} and key exchange~\cite{TCC:BHJKL15,C:GjoJag18,AC:LLGW20,C:HJKLPRS21,ACNS:DavGun21}, as well as signatures~\cite{CCS:KatWan03,C:HofJag12,EC:AFLT12,PKC:BKKP15,EC:BJLS16,AC:BoyLi16,C:KilMasPan16,PKC:DGJL21,PKC:PanWag22} and related primitives~\cite{C:CheWee13,C:BlaKilPan14,EC:GHKP18,AC:LanPan20,EC:PanWag23}.
+Unfortunately, tightness often comes at a price in terms of efficiency. This is particularly true for the first tightly secure constructions of some primitive.
+For instance, in the first public-key encryption scheme with tight security against chosen-ciphertext attacks, due to Hofheinz and Jager~\cite{C:HofJag12}, 
+ciphertexts contain a linear (in the security parameter) number of group elements as overhead\footnote{The ciphertext overhead is the size of the ciphertext minus the size of the message.}, while the respective non-tight scheme~\cite{C:KurDes04} has a constant ciphertext overhead.
+Clearly, such an overhead is not acceptable in practice, and so researchers strive for the holy grail of concrete security: Tightly secure constructions with minimal efficiency penalty.
+
+\smallskip\noindent\textbf{Two-Round Multi-Signatures.} 
+In their seminal work~\cite{CCS:BelNev06}, Bellare and Neven not only introduced the plain public key model but also presented constructions of three-round multi-signatures.
+Their first scheme is based on Schnorr identification~\cite{JC:Schnorr91}.
+As typical for Schnorr-based constructions, a rewinding and guessing strategy is used to prove security from the Discrete Logarithm Assumption (\dlog), resulting in a highly non-tight scheme. 
+Their second scheme is tightly secure based on the Decisional Diffie-Hellman (\ddh) Assumption.
+In subsequent works, three-round schemes with so-called key aggregation have been proposed~\cite{DBLP:journals/dcc/MaxwellPSW19,AC:BonDriNev18,DBLP:journals/ijnc/FukumitsuH21}.
+With this extension, it is possible to compute a short aggregated key from a set of keys, which can later be used to verify signatures.
+More recent works concentrate on two-round signing protocols~\cite{CCS:NRSW20,C:NicRufSeu21,AC:BelDai21,C:AlpBur21,EPRINT:CriKomMal21,PKC:DOTT21,C:BosTakTib22,EC:TesZhu23a}.
+On the downside, many of these schemes require interactive assumptions~\cite{C:NicRufSeu21,EPRINT:CriKomMal21,C:AlpBur21}, and all of them fail to provide meaningful concrete security guarantees due to the use of (double) rewinding\footnote{We do not consider proofs in the (idealized) algebraic group model~\cite{C:FucKilLos18}.}.
+
+In a recent result, Pan and Wagner~\cite{EC:PanWag23} constructed the first tightly secure multi-signature scheme, called \ChopsticksTwo.
+In particular, their scheme neither relies on rewinding, nor on any guessing argument.
+However, the price of tightness is high: Signatures and communication complexity in \ChopsticksTwo are about $5$ times and $3$ times as large as in one of the most efficient non-tight two-round schemes, \HBMS, respectively.
+
+\smallskip\noindent\textbf{Our Goal.} 
+We aim to reduce the efficiency gap between tight and non-tight two-round multi-signatures.
+Concretely, we aim for two-round multi-signatures in the pairing-free discrete logarithm setting, based on well-studied assumptions in the random oracle model. Our constructions should have a minimal security loss, and be efficient in terms of signature size and communication complexity. \subsection{Our Contribution}
+We reach our goal by constructing a new two-round multi-signature scheme that achieves the best of two worlds:
+\begin{itemize}
+	\item \emph{Tightness.} Our scheme is tightly secure based on the \ddh assumption.
+	When instantiated over a standardized $128$-bit secure group, its security guarantee is $126$-bit, which is formally supported by our proofs. 
+  In contrast, non-tight schemes relying on rewinding do not guarantee any meaningful security level.
+
+	\item \emph{Efficiency.} Our scheme is as efficient as the state-of-the-art non-tight schemes.
+	Concretely, the communication complexity per signer for our scheme is comparable to \HBMS~\cite{AC:BelDai21} and about $1.5$ times smaller than \TZ~\cite{EC:TesZhu23a} and \MusigTwo~\cite{C:NicRufSeu21}. 
+  The signature size is only about $1.5$ times larger than for the non-tight schemes.
+	Compared to \ChopsticksTwo~\cite{EC:PanWag23}, this significantly reduces the efficiency cost of tightness. Concretely, our scheme outperforms \ChopsticksTwo by a factor of more than $3$ and $2$ in terms of signature size and communication complexity, respectively.
+\end{itemize}
+In addition, we present a non-tight scheme with an acceptable security loss, namely, linear in the number of signing queries. 
+The advantage of this scheme is that it supports key aggregation.
+A similar but much less efficient scheme, \ChopsticksOne, has been proposed in \cite{EC:PanWag23}.
+We compare our schemes with previous schemes in terms of security (see \cref{table:toothpicks:comparison:qualitative}) and asymptotic (see \cref{table:toothpicks:comparison:asymptoticefficiency}) and concrete (see \cref{table:toothpicks:comparison:concrete}) efficiency.
+
+From a technical perspective, our first contribution is a new pseudorandom path technique, as opposed to the pseudorandom matching technique in Chopsticks~\cite{EC:PanWag23}.
+This new technique allows us to reduce the size of signatures and communication by a factor of two.
+Our second technical insight is that, somewhat surprisingly, we do not need a binding commitment as in Chopsticks~\cite{EC:PanWag23}. 
+Instead, we can significantly relax the binding property of our commitment to hold up to cosets of a certain subspace.
+This enables more efficient instantiations, further improving the efficiency of our schemes.
+To show that this relaxation does not introduce problems in terms of security, we identify a strong soundness property many natural lossy identification schemes~\cite{CCS:KatWan03,EC:AFLT12,C:KilMasPan16} have.
+We are confident that this combination of a weak commitment with lossy identification is of independent interest.
+\begin{table}
+\centering
+\begin{tabular}{lccccclcl}\toprule
+  Scheme&~~&Rounds&~~&Key Aggregation&~~&Assumption&~~&Loss\\\midrule
+  \BN \cite{CCS:BelNev06} &&3&&\xmark &&\dlog && $\Theta(Q_H/\epsilon)$\\ 
+  \BNTight \cite{CCS:BelNev06} &&3&&\xmark&& \ddh && $\Theta(1)$\\ 
+  \Musig  \cite{DBLP:journals/dcc/MaxwellPSW19,AC:BonDriNev18} &&3&&\cmark&&\dlog && $\Theta(Q_H^3/\epsilon^3)$ \\  
+  \MusigTight  \cite{DBLP:journals/ijnc/FukumitsuH21} &&3&&\cmark&& \ddh && $\Theta(1)$\\  
+  \MusigTwo \cite{C:NicRufSeu21} &&2&&\cmark && \aomdl && $\Theta(Q_H^3/\epsilon^3)$\\  
+  \HBMS  \cite{AC:BelDai21}      &&2&&\cmark && \dlog &&  $\Theta(Q_S^4 Q_H^3/\epsilon^3)$\\  
+  \TZ \cite{EC:TesZhu23a}        &&2&&\cmark && \dlog &&  $\Theta(Q_H^3/\epsilon^3)$ \\  
+  \TSSHO \cite{EPRINT:TSSHO23}   &&2&&\cmark && \ddh  &&  $\Theta(Q_S)$ \\
+  \ChopsticksOne \cite{EC:PanWag23}&&2&&\cmark && \ddh && $\Theta(Q_S)$\\
+  \ChopsticksTwo \cite{EC:PanWag23}&&2&&\xmark && \ddh && $\Theta(1)$\\
+  \cref{sec:toothpicks:constructionkeyagg:shorttext}&&2&&\cmark && \ddh && $\Theta(Q_S)$\\
+  \cref{sec:toothpicks:constructiontight}&&2&&\xmark && \ddh && $\Theta(1)$\\ \bottomrule
+  \ifnum\llncs=1\\\fi
+\end{tabular}
+\caption{Comparison of multi-signature schemes in the discrete logarithm setting without pairings in the plain public key model. We compare the number of rounds, whether the schemes support key aggregation, the assumption the schemes rely on, and the security loss, where $Q_H,Q_S$ denote the number of random oracle and signing queries, respectively, and $\epsilon$ denotes the advantage of an adversary against the scheme. 
+For the security loss, we do not consider proofs in the algebraic group model. We do not list \cite{CCS:NRSW20} as it is prohibitively inefficient due to the use of heavy cryptographic machinery.}
+\label{table:toothpicks:comparison:qualitative}
+\end{table}
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccclcl}\toprule
+  Scheme&Rounds&~~&Public Key&~~&Communication&~~&Signature\\\midrule
+  \BN \cite{CCS:BelNev06} &3&&$1\bitsize{\Group}$ && $1\bitsize{\Group}+1\bitsize{\ZZ_p}+2\secpar$&&$1\bitsize{\Group}+1\bitsize{\ZZ_p}$\\ 
+  \BNTight \cite{CCS:BelNev06} &3&&$2\bitsize{\Group}$ && $2\bitsize{\Group}+1\bitsize{\ZZ_p}+2\secpar$&&$2\bitsize{\Group}+1\bitsize{\ZZ_p}$\\ 
+  \Musig  \cite{DBLP:journals/dcc/MaxwellPSW19,AC:BonDriNev18} &3&& $1\bitsize{\Group}$ && $1\bitsize{\Group}+1\bitsize{\ZZ_p}+2\secpar$&&$1\bitsize{\Group}+1\bitsize{\ZZ_p}$  \\ 
+  \MusigTight  \cite{DBLP:journals/ijnc/FukumitsuH21} &3&& $2\bitsize{\Group}$ && $2\bitsize{\Group}+1\bitsize{\ZZ_p}+2\secpar$ && $2\bitsize{\ZZ_p}$\\ 
+  \MusigTwo \cite{C:NicRufSeu21} & 2  &&$1\bitsize{\Group}$&&$4\bitsize{\Group} + 1\bitsize{\ZZ_p}$ &&$1\bitsize{\Group} + 1\bitsize{\ZZ_p}$\\
+  \HBMS  \cite{AC:BelDai21}& 2   && $1\bitsize{\Group}$ && $1\bitsize{\Group} + 2\bitsize{\ZZ_p}$ && $1\bitsize{\Group} + 2\bitsize{\ZZ_p}$ \\
+  \TZ \cite{EC:TesZhu23a} & 2  && $1\bitsize{\Group}$&& $4\bitsize{\Group} + 2\bitsize{\ZZ_p}$ && $1\bitsize{\Group} + 2\bitsize{\ZZ_p}$  \\ \midrule 
+  \TSSHO \cite{EPRINT:TSSHO23} & 2  && $2\bitsize{\Group}$ && $2\bitsize{\Group} + 2\bitsize{\ZZ_p}$ && $3\bitsize{\ZZ_p}$\\
+  \ChopsticksOne \cite{EC:PanWag23}& 2  &&$2\bitsize{\Group}$&& $3\bitsize{\Group}+1\bitsize{\ZZ_p}+\secpar$ && $3\bitsize{\Group}+4\bitsize{\ZZ_p}$ \\ 
+  \ChopsticksTwo \cite{EC:PanWag23} & 2 && $4\bitsize{\Group}$&&$6\bitsize{\Group}+2\bitsize{\ZZ_p}+\secpar+1$ && $6\bitsize{\Group}+8\bitsize{\ZZ_p}+N$\\ 
+  \cref{sec:toothpicks:constructionkeyagg:shorttext}& 2 &&$2\bitsize{\Group}$&&$2\bitsize{\Group} + 1\bitsize{\ZZ_p} + \secpar$&&$3\bitsize{\ZZ_p}+2\secpar$  \\ 
+  \cref{sec:toothpicks:constructiontight} & 2 &&$4\bitsize{\Group}$&&$2\bitsize{\Group} + 1\bitsize{\ZZ_p}+\secpar+1$&&$3\bitsize{\ZZ_p}+2\secpar+N$\\ \bottomrule
+  \ifnum\llncs=1\\\fi
+\end{tabular}
+}
+\caption{Asymptotic efficiency comparison of multi-signature schemes in the discrete logarithm setting without pairings in the plain public key model. We compare the number of rounds, the size of public keys, the communication complexity per signer, and the signature size. 
+We denote the size of a group element by $\bitsize{\Group}$ and the size of a field element by $\bitsize{\ZZ_p}$. Here, $\secpar$ is a statistical security parameter, and $N$ is the number of signers. Schemes below the line have two rounds and avoid rewinding, see \cref{table:toothpicks:comparison:qualitative}. We do not list \cite{CCS:NRSW20} as it is prohibitively inefficient due to the use of heavy cryptographic machinery.
+}
+\label{table:toothpicks:comparison:asymptoticefficiency}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{lcrcrcrcr}\toprule
+ Scheme         &~~& Security   &~~& Public Key&~~& Communication   &~~& Signature   \\\midrule
+ \MusigTwo      && 9    && 33  && 164  && 65          \\
+ \HBMS          && -11  && 33  && 97   && 97          \\
+ \TZ            && 8    && 33  && 196  && 97          \\
+ \TSSHO         && 106  && 66  && 130  && 96          \\
+ \ChopsticksOne && 106  && 66  && 147  && 227         \\
+ \ChopsticksTwo && 126  && 132 && 278  && 470         \\
+ \cref{sec:toothpicks:constructionkeyagg:shorttext} && 106 && 66 && 114 && 128 \\
+ \cref{sec:toothpicks:constructiontight} && 125             && 132  && 114 && 144         \\
+\bottomrule
+\ifnum\llncs=1\\\fi
+\end{tabular}
+\caption{Concrete efficiency and security comparison of two-round multi-signature schemes in the discrete logarithm setting without pairings in the plain public key model. We compare the security level guaranteed by the security bound in the random oracle model assuming the underlying assumption is $128$-bit hard, the size of public keys, the communication complexity per signer, and the signature size. Sizes are given in bytes and rounded. We do not list \cite{CCS:NRSW20} as it is prohibitively inefficient due to the use of heavy cryptographic machinery.}
+\label{table:toothpicks:comparison:concrete}
+\end{table}
+
+ \subsection{Technical Overview}
+In this paper, we introduce two major technical improvements to the Chopsticks schemes, namely, a novel overall construction strategy and a more efficient commitment scheme that can be used both in Chopsticks and in our schemes.
+
+\smallskip\noindent\textbf{Background.}
+We start with lossy identification schemes~\cite{CCS:KatWan03,EC:AFLT12,C:KilMasPan16}.
+In such a scheme, there are two ways to set up public keys $\pk$.
+As usual, one can set up $\pk$ with a secret key $\sk$.
+Alternatively, one can set up $\pk$ in lossy mode. 
+In this mode, not even an unbounded prover can make the verifier accept, which is called lossy soundness.
+This paradigm turns out to be useful when constructing tighly secure Fiat-Shamir style signatures~\cite{CCS:KatWan03,EC:AFLT12,C:KilMasPan16} or three-round multi-signatures~\cite{CCS:BelNev06,DBLP:journals/ijnc/FukumitsuH21}.
+To apply it in the two-round setting, Pan and Wagner~\cite{EC:PanWag23} leveraged a homomorphic dual-mode commitment.
+Concretely, such a commitment has two ways of setting up commitment keys $\ck$. In the hiding mode, $\ck$ is generated in combination with a (weak) equivocation trapdoor. 
+In the other mode, commitments are statistically binding.
+Given such a commitment and a lossy identification scheme, a signature for a message $\mes$ contains transcripts of the lossy identification scheme, where some parts are given in a committed form.
+For these parts, the signature also contains the respective opening information.
+Importantly, the commitment key is derived from $\mes$, e.g., as $\ck := \Hash(\mes)$, where $\Hash$ is a random oracle.
+Abstractly, Pan and Wagner~\cite{EC:PanWag23} identified the following properties: 
+\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+	\item \emph{Simulation via Secret Keys.} A reduction can simulate the signing oracle using the secret key if $\pk$ is in the normal mode. The mode of $\ck$ is not relevant.
+	\item \emph{Simulation via Trapdoors.} A reduction can simulate the signing oracle using the trapdoor if $\ck$ is in the hiding mode. The mode of $\pk$ is not relevant.
+	\item \emph{Forgery.} To show security without rewinding, the adversary must output a forgery with respect to a lossy $\pk$ and a binding $\ck$.
+\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+
+
+\smallskip\noindent\textbf{The Chopsticks Approach: Pseudorandom Matching.}
+In the proof of their first scheme, Pan and Wagner \cite{EC:PanWag23} use these properties by sampling all commitment keys with a trapdoor, allowing them to simulate signing even if the public key is lossy.
+Only for the forgery message the associated commitment key $\ck^*$ is set up to be binding. 
+Then, the proof can be finished without rewinding.
+On the downside, this approach requires guessing the query defining $\ck^*$, leading to a security loss. 
+
+A well-known trick to avoid such a guessing argument is the Katz-Wang approach \cite{JC:GJKW07}.
+Here, each message would specify two commitment keys $\ck_0 := \Hash(0,\mes)$ and $\ck_1 := \Hash(1,\mes)$, and a signer individually would pick a pseudorandom bit $b_\mes$ for each message and then use $\ck_{b_\mes}$.
+It turns out that this trick is not applicable here, as each signer has to use the same commitment key.
+
+
+To overcome this obstacle, Pan and Wagner proposed the pseudorandom matching technique.
+Namely, each signer has two public keys $\pk_0,\pk_1$, and both message-dependent commitment keys $\ck_0$ and $\ck_1$ are used. 
+That is, the protocol is run twice in parallel and the signature now contains two transcripts instead of one.
+Importantly, each signer uses the pseudorandom bit $b_\mes$ to decide which public key to match with which commitment key. 
+We illustrate the pseudorandom matching technique in \cref{figure:toothpicks:techoverview:illustration} (top).
+\begin{figure}[t]
+	\centering
+	\begin{tikzpicture}
+		\node at (0,0.8) (ChopsNormal) {\scriptsize normal};
+		\node at (0,0) (ChopsLossy)  {\scriptsize  lossy};
+		\node at (2,0.8) (ChopsPkZero) {\scriptsize $\pk_0$};
+		\node at (2,0) (ChopsPkOne)  {\scriptsize $\pk_1$};
+		\node at (5,0.8) (ChopsCkZero) {\scriptsize $\ck_0$};
+		\node at (5,0) (ChopsCkOne)  {\scriptsize $\ck_1$};
+		\node at (8,0.8) (ChopsBinding){\scriptsize binding};
+		\node at (8,0) (ChopsTrap)   {\scriptsize hiding};
+
+		\draw[dashed] (ChopsNormal) -- (ChopsPkZero);
+		\draw[dashed] (ChopsLossy)  -- (ChopsPkOne);
+		\draw         (ChopsPkZero) -- node[midway,above]{\tiny $b_\mes = 0$} (ChopsCkZero);
+		\draw         (ChopsPkZero) -- (ChopsCkOne);
+		\draw         (ChopsPkOne)  -- (ChopsCkZero);
+		\draw         (ChopsPkOne)  -- node[midway,below]{\tiny $b_\mes = 0$}(ChopsCkOne);
+		\draw[dashed] (ChopsCkZero) -- node[midway,above]{\tiny $b_\mes = 0$}(ChopsBinding);
+		\draw[dashed] (ChopsCkZero) -- (ChopsTrap);
+		\draw[dashed] (ChopsCkOne)  -- (ChopsBinding);
+		\draw[dashed] (ChopsCkOne)  -- node[midway,below]{\tiny $b_\mes = 0$}(ChopsTrap);
+
+		\node at (2.7,0.4) {\tiny $b_\mes = 1$};
+		\node at (5.7,0.4) {\tiny $b_\mes = 1$};
+	\end{tikzpicture}\\\hrule
+	\begin{tikzpicture}
+		\node at (0,0.8) (ToothNormal) {\scriptsize normal};
+		\node at (0,0) (ToothLossy)  {\scriptsize lossy};
+		\node at (2,0.8) (ToothPkZero) {\scriptsize $\pk_0$};
+		\node at (2,0) (ToothPkOne)  {\scriptsize $\pk_1$};
+		\node at (5,0.4) (ToothCk)   {\scriptsize $\ck$};
+		\node at (8,0.8) (ToothBinding){\scriptsize binding};
+		\node at (8,0) (ToothTrap)   {\scriptsize hiding};
+
+		\draw[dashed] (ToothNormal) -- node[midway,above]{\tiny $b^* = 0$}(ToothPkZero);
+		\draw[dashed] (ToothNormal) -- (ToothPkOne);
+		\draw[dashed] (ToothLossy)  -- (ToothPkZero);
+		\draw[dashed] (ToothLossy)  -- node[midway,below]{\tiny $b^* = 0$}(ToothPkOne);
+		\draw (ToothPkZero) -- node[midway,above]{\tiny $b_\mes = 0$} (ToothCk);
+		\draw (ToothPkOne) -- node[midway,below]{\tiny $b_\mes = 1$} (ToothCk);
+		\draw[dashed] (ToothCk) -- node[midway,above]{\tiny $b_\mes = b^*$} (ToothBinding);
+		\draw[dashed] (ToothCk) -- node[midway,below]{\tiny $b_\mes \neq b^*$} (ToothTrap);
+
+		\node at (1.65,0.4) {\tiny $b^* = 1$};
+
+	\end{tikzpicture}
+	\caption{Visualization of the pseudorandom matching technique from Chopsticks~\cite{EC:PanWag23} (top), and our new pseudorandom path technique (bottom). Here, $b^*$ is a random bit sampled by the game, $b_\mes$ is the pseudorandom bit that the signer chooses for message $\mes$, normal edges indicate how keys are paired in the scheme, and dotted edges indicate how keys are set up in the proof.}
+	\label{figure:toothpicks:techoverview:illustration}
+\end{figure}
+In the proof, one can set $\pk_1$ to lossy and always match it with the trapdoor commitment key $\ck_{1-b_\mes}$ for signing queries.
+In this way, it is possible to simulate the $(\pk_1,\ck_{1-b_\mes})$ side via the trapdoor, and the $(\pk_0,\ck_{b_\mes})$ side via the secret key.
+At the same time, with probability $1/2$, the adversary will match the lossy $\pk_1$ with the binding $\ck_{b_\mes}$ for the forgery, finishing the proof.
+While this is an elegant trick, it introduces a significant overhead for both signature size and communication complexity.
+
+\smallskip\noindent\textbf{Our Approach: Pseudorandom Paths.} 
+We avoid this overhead by using our new pseudorandom path technique, as illustrated in \cref{figure:toothpicks:techoverview:illustration} (bottom).
+Our first observation is that for the argument used to finish the proof in Chopsticks, only one of the two paths, namely the $(\pk_1,\ck_{b_\mes})$ path, is used. 
+Instead of simply omitting one of the paths, which leads to problems similar to the naive Katz-Wang approach, let us see what happens if we go back to a solution in which there is only one commitment key $\ck$ per message $\mes$.
+If we also reduce the number of keys per signer back to one, we end up with the guessing-based solution again.
+So, we keep the two keys $\pk_0,\pk_1$ per signer, and let each signer pseudorandomly decide which key $\pk_{b_\mes}$ to use in the signing interaction. 
+In our proof, we can set up $\ck$ with a trapdoor if the lossy key $\pk_1$ is used, and we can set it up in binding mode if the normal key $\pk_0$ is used.
+Unfortunately, without additional tricks, this strategy is doomed: 
+The adversary could always use $\pk_0$ in its forgery, which is not lossy.
+In our final solution, we therefore pick a bit $b^*$ at random at the beginning of our simulation.
+Then, we set $\pk_{b^*}$ to normal and $\pk_{1-b^*}$ to lossy.
+We adapt the sampling of $\ck$ accordingly. 
+By carrying out all arguments in the correct order, we can argue that in one of four cases, the adversary used the lossy key $\pk_{1-b^*}$ with a binding commitment key in its forgery.
+Let us explain the idea for that with our illustration (\cref{figure:toothpicks:techoverview:illustration}, bottom) at hand.
+Every signature corresponds to a pseudorandom path from the left to the right. 
+The bits are set up in a way that ensures the following: 
+\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+	\item \emph{Simulation of Signing.} If $\pk_{b_\mes}$ is used, the path connects the lossy vertex to the trapdoor vertex, or the normal vertex to the binding vertex. In both cases, we can simulate.
+	\item \emph{Forgery.} The probability that the path associated with the forgery starts at the lossy vertex is $1/2$ and conditioned on that, the probability that the path ends at the binding vertex is also $1/2$.
+\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+With this technique, communication and signatures now only consist of one transcript of the lossy identification scheme, as opposed to two transcripts in the pseudorandom matching technique.
+
+\smallskip\noindent\textbf{The Chopsticks Commitment.}
+So far, we have reduced the size of signatures and communication by a factor of two.
+At this point, the size is mostly dominated by the size of commitments $\com$ and openings $\varphi$.
+It is therefore instructive to recall the commitment instantiation from~\cite{EC:PanWag23} and see if we can optimize it. 
+The instantiation from~\cite{EC:PanWag23} allows to commit to pairs of group elements $(R_1,R_2) \in \Group^2$ via the equation \[
+	\com = (C_0,C_1,C_2) \in \Group^3, \text{ where } \begin{pmatrix}C_0 \\ C_1 \\ C_2\end{pmatrix} :=  \begin{pmatrix} &A_{1,1}^\alpha \cdot A_{1,2}^\beta \cdot A_{1,3}^\gamma \\ R_1\cdot&A_{2,1}^\alpha \cdot A_{2,2}^\beta \cdot A_{2,3}^\gamma \\ R_2\cdot&A_{3,1}^\alpha \cdot A_{3,2}^\beta \cdot A_{3,3}^\gamma\end{pmatrix}. \] 
+Here, $\varphi = (\alpha,\beta,\gamma) \in \ZZ_p^3$ is the commitment randomness and the $A_{i,j} \in \Group$ form the commitment key.
+In terms of exponents, the commitment has the form
+	\[
+		\vec{E}\cdot \begin{pmatrix}\alpha\\ \beta \\ \gamma\end{pmatrix} + \begin{pmatrix}0 \\ r_1 \\ r_2\end{pmatrix}
+	\] for a matrix $\vec{E} \in \ZZ_p^{3\times 3}$ that determines the commitment key.
+Now, one can prove that this is statistically hiding if $\vec{E}$ has full rank, and it is statistically binding if $\vec{E}$ has rank $1$.
+It is one of the main technical contributions of~\cite{EC:PanWag23} to introduce a weak equivocation trapdoor for this commitment, i.e., a trapdoor that allows to open commitments to messages $(R_1,R_2)$ of a certain structure.
+
+\smallskip\noindent\textbf{Strawman Commitment.}
+In terms of efficiency, note that the $3 \times 3$ commitment key leads to three group elements per commitment and three exponents per opening.
+To improve it, our naive idea is to replace this $3 \times 3$ structure with a $2\times 2$ structure, thereby saving one group element and exponent.
+Concretely, we could try to drop the first row of the commitment equation, leading to 
+	\[
+		\vec{E}\cdot \begin{pmatrix}\beta \\ \gamma\end{pmatrix}  + \begin{pmatrix}r_1 \\ r_2\end{pmatrix}
+	\] for a matrix $\vec{E} \in \ZZ_p^{2\times 2}$. 
+Implemented carefully, this is still perfectly hiding with a weak equivocation trapdoor if $\vec{E}$ has full rank.
+Unfortunately, we fail when analyzing the statistically binding mode\footnote{If we only have a computationally binding mode, the resulting multi-signature scheme needs to rely on rewinding.
+Therefore, we have to insist on a statistically binding mode.} if $\vec{E}$ has rank $1$.
+Concretely, an (unbounded) adversary against binding could output $(r_1,r_2)$ with opening $(\beta,\gamma)$ on the one hand, and $(r_1,r_2) + (\beta,\gamma)\vec{E}^\transpose$ with opening $(0,0)$ on the other hand.
+The first row in the $3\times 3$ scheme prevents this.
+To save our $2\times 2$ construction without reintroducing such a first row, we thus need additional insights.
+
+\smallskip\noindent\textbf{Coset Binding.}
+As we have seen, our $2\times 2$ scheme is not (statistically) binding, and as such it is not suitable to instantiate the multi-signature construction.
+However, we make the crucial observation that the scheme is binding \emph{up to a difference in the span of }$\vec{E}$.
+In other words, if we interpret the commitment as a commitment to cosets of the span of $\vec{E}$, the scheme is binding. 
+We call this property \emph{coset binding}.
+It is instructive to pinpoint where the overall multi-signature proof fails if we relax binding to coset binding: 
+In the proof of our multi-signature construction, binding shows up in combination with lossy soundness in the very last proof step.
+To recall, lossy soundness states that even an unbounded prover can not make a verifier of the lossy identification scheme accept, given that $\pk$ is in lossy mode.
+An accepting transcript of the identification scheme has the form $(R,c,s)$ and satisfies $\LFunction(s) - c\cdot \pk = R$ for a linear function $\LFunction$\footnote{We use additive notation when talking about lossy identification from such linear functions in general, and multiplicative notation for the concrete instantiation of the linear function and commitment.}.
+Roughly, when constructing an unbounded reduction that breaks lossy soundness, we first guess\footnote{Recall that lossy soundness is a statistical notion, and so guessing is not a problem in terms of tightness at this point.} the random oracle query associated with the forgery.
+On this query, assume now that the adversary sends a commitment $\com$ for $R$ with respect to a binding commitment key.
+In this case, the reduction would non-efficiently extract the committed pair of group elements $R = (R_1,R_2)$ from $\com$ and output it in the lossy soundness game.
+Further, it would appropriately embed the challenge $c$ from the lossy soundness game.
+Finally, if the guess was correct, the adversary's forgery contains a valid response $s$, which the reduction can output.
+Now, it is clear why coset binding is not enough: 
+The adversary is not bound to $R=(R_1,R_2)$, and it can output a response $s$ that is valid for $R' = (R'_1,R_2') \neq R$, which is of no use for the reduction.
+
+\smallskip\noindent\textbf{Coset Lossy Soundness to the Rescue.} 
+While coset binding seems to be insufficient at first glance, it still gives us a guarantee we may leverage.
+Namely, by coset binding, $(R_1=g^{r_1},R_2=g^{r_2})$ and $(R_1'=g^{r'_1},R_2'=g^{r'_2})$ as above have to satisfy that $(r_1,r_2)^\transpose-(r'_1,r'_2)^\transpose$ is in the span of $\vec{E}$.
+We want to understand the impact of this guarantee on the lossy soundness game.
+For that, imagine a modified lossy soundness game where the final equation $\LFunction(s) - c\cdot \pk = R$ only has to hold up to a difference in the span of $\vec{E}$.
+We call this stronger notion of lossy soundness \emph{coset lossy soundness}.
+In fact, if we can argue that coset lossy soundness holds, then the reduction sketched above goes through assuming coset binding.
+For that, our main idea is to set up the binding commitment keys such that the span of $\vec{E}$ is always contained in the image of $\LFunction$.
+In this case, we observe that coset lossy soundness is implied by the original lossy soundness notion.
+This is because, roughly, if $\LFunction(s) - c\cdot \pk$ equals $R$ up to a difference in the span of $\vec{E}$, it means that $\LFunction(s) - c\cdot \pk = R + \LFunction(\delta)$ for some $\delta$, and so one can just treat $s-\delta$ as the new $s$.
+To summarize our optimized commitment construction, we have seen that lossy soundness of the identification scheme at hand is strong enough to compensate for the relaxed binding notion.
+We are confident that this insight is applicable in other contexts as well. 
+
+
+
+
+ \section{Preliminaries}
+By $[L] := \{1,\dots,L\} \subseteq \NN$ we denote the set of the first $L$ natural numbers. 
+Let $S$ be a finite set, $\DDD$ a distribution, and $\adversary$ be a probabilistic algorithm.
+The notation $s\randfrom S$ means that $s$ is sampled uniformly at random from $S$, and $x \from \DDD$ means that $x$ is sampled according to $\DDD$.
+The notation $s := \adversary(x;\rho)$ means that $\adversary$ outputs $s$ on input $x$ with random coins $\rho$, and when we write $s \from \adversary(x)$, we mean that $\rho$ is sampled uniformly at random. We write $s \in \adversary(x)$ to indicate that there are coins $\rho$ such that $\adversary$ outputs $s$ on input $x$ with these coins $\rho$.
+Throughout the paper, $\secpar$ will denote the security parameter, and all algorithms get it (in unary) as input.
+We use standard cryptographic notions like \ppt and negligible.
+
+\smallskip\noindent\textbf{Multi-Signatures.} 
+We define the syntax and security of multi-signatures in the plain public key model~\cite{CCS:BelNev06}.
+Following previous works, e.g.,~\cite{EPRINT:CriKomMal21,PKC:DOTT21,EC:PanWag23}, we assume the public keys participating in the signing protocol are given by a set, and we assume that sets can be ordered canonically, e.g. lexicographically.
+Thus, we can uniquely encode sets $\PKList = \{\pk_1,\dots,\pk_N\}$, and we denote such an encoding by $\encode{\PKList}$ throughout the paper.
+Further, we assume that the honest public key in our security definition is the entry $\pk_1$ in such a set, which is without loss of generality and for simplicity of presentation.
+In terms of syntax and security, we use the definition from~\cite{EC:PanWag23}.
+We postpone a formal definition of key aggregation to our full version~\cite{fullversion}.
+\begin{figure}[h]
+	\centering
+	\nicoresetlinenr
+	\noindent\fbox{
+		 \begin{minipage}[t]{0.65\textwidth}
+	 	 	\underline{\calgo $\MS.\Exec(\PKList,\SKList,\mes)$}
+	 	 	\begin{nicodemus}
+	 	 		\item $\pcparse \{\pk_1,\dots,\pk_N\}:= \PKList,~\{\sk_1,\dots,\sk_N\}:=\SKList$
+	 	 		\item $\pcfor i \in [N]: (\pm_{1,i},\State_{1,i})\from\Sign_0(\PKList,\sk,\mes)$
+	 	 		\item $\PMList_1 := (\pm_{1,1},\dots,\allowbreak\pm_{1,N})$
+	 	 		\item $\pcfor i \in [N]: (\pm_{2,i},\State_{2,i})\from\Sign_1(\State_{1,i},\PMList_1)$
+	 	 		\item $\PMList_2 := (\pm_{2,1},\dots,\allowbreak\pm_{2,N})$
+	 	 		\item $\pcfor i \in [N]: \sigma_i\from\Sign_2(\State_{2,i},\PMList_2)$
+	 	 		\item $\pcif \exists i \neq j \in [N] \text{ s.t. } \sigma_i \neq \sigma_j: \pcreturn \bot$
+	 	 		\item $\pcreturn \sigma:=\sigma_1$
+	 	 	\end{nicodemus}
+	 	 \end{minipage}
+		}
+	\caption{Algorithm $\MS.\Exec$ for a \ifnum\llncs=1(two-round)\fi multi-signature scheme $\MS = (\Setup,\Gen,\Sign,\Verify)$. The algorithm specifies an honest execution of the signing protocol $\Sign$ among $N$ signers with public keys $\pk_1,\dots,\pk_N$ and secret keys $\sk_1,\dots,\sk_N$ for a message $\mes$.}
+	\label{fig:toothpicks:ms:execution}
+\end{figure}
+\begin{definition}[Multi-Signature Scheme]
+	A (two-round) multi-signature scheme is a tuple of \ppt algorithms $\MS = (\Setup,\allowbreak\Gen,\allowbreak\Sign,\allowbreak\Verify)$ with the following syntax: 
+	\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+		\item $\Setup(1^\secpar) \rightarrow \parameters$ takes as input the security parameter $1^\secpar$ and outputs global system parameters $\parameters$. We assume that $\parameters$ implicitly defines sets of public keys, secret keys, messages and signatures, respectively. All algorithms related to $\MS$ take $\parameters$ at least implicitly as input.
+		\item $\Gen(\parameters) \rightarrow (\pk,\sk)$ takes as input system parameters $\parameters$, and outputs a public key $\pk$ and a secret key $\sk$.
+		\item $\Sign = (\Sign_0,\Sign_1,\Sign_2)$ is split into three algorithms:  
+		\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+			\item $\Sign_0(\PKList,\sk,\mes) \rightarrow (\pm_{1},\State_{1})$ takes as input a set $\PKList = \{\pk_1,\dots,\allowbreak\pk_N\}$ of public keys, a secret key $\sk$, and a message $\mes$, and outputs a protocol message $\pm_{1}$ and a state $\State_1$.
+			\item $\Sign_1(\State_{1},\PMList_1) \rightarrow (\pm_{2},\State_{2})$ takes as input a state $\State_{1}$ and a tuple $\PMList_1 = (\pm_{1,1},\dots,\allowbreak\pm_{1,N})$ of protocol messages, and outputs a protocol message $\pm_{2}$ and a state $\State_{2}$.
+			\item $\Sign_2(\State_{2},\PMList_2) \rightarrow \sigma_i$ takes as input a state $\State_{2}$ and a tuple $\PMList_2 = (\pm_{2,1},\dots,\pm_{2,N})$ of protocol messages, and outputs a signature $\sigma$.
+		\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+		\item $\Verify(\PKList,\mes,\sigma) \rightarrow b$ is deterministic, takes as input a set $\PKList = \{\pk_1,\allowbreak\dots,\allowbreak\pk_N\}$ of public keys, a message $\mes$, and a signature $\sigma$, and outputs a bit $b\in\bool$.
+	\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+	We require that $\MS$ is complete in the following sense. For all $\parameters \in \Setup(1^\secpar)$, all $N=\poly(\secpar)$, all $(\pk_j,\sk_j) \in \Gen(\parameters)$ for $j\in[N]$, and all messages $\mes$, we have
+	\[ \Pr\left[ \Verify(\PKList,\mes,\sigma) = 1~\middle| \begin{array}{l} \PKList = \{\pk_1,\dots,\pk_N\},
+	\SKList = \{\sk_1,\dots,\sk_N\},\\
+	\sigma \from \MS.\Exec(\PKList,\SKList,\mes) \\
+	 \end{array}\right] = 1,\]
+	 where algorithm $\MS.\Exec$ is defined in \cref{fig:toothpicks:ms:execution}.
+\end{definition}
+\begin{definition}[\mseufcma Security]
+	Let $\MS = (\Setup,\Gen,\Sign,\Verify)$ be a multi-signature scheme and consider the game $\MSEUFCMA$ defined in \cref{fig:toothpicks:game:ms:securitydef}.
+	We say that $\MS$ is \mseufcma secure, if for all \ppt adversaries $\adversary$, the following advantage is negligible: 
+	\[ \advantage{\adversary,\MS}{\mseufcma}(\secpar) := \Prob{\MSEUFCMA_\MS^\adversary(\secpar) \Rightarrow 1}.\]
+\end{definition}
+\begin{figure}[h]
+		\centering
+		\nicoresetlinenr
+		\noindent\fbox{
+			\begin{minipage}[t]{0.465\textwidth}\underline{\cgame $\MSEUFCMA_\MS^\adversary(\secpar)$}
+				\begin{nicodemus}
+					\item $\parameters \from \Setup(1^\secpar)$
+					\item $(\pk,\sk) \from \Gen(\parameters)$
+					\item $\SigningOracle := (\SigningOracle_0,\SigningOracle_1,\SigningOracle_2)$
+					\item $(\PKList^*,\mes^*,\sigma^*) \from \adversary^{\SigningOracle}(\parameters,\pk)$
+					\item $\pcif \pk \notin \PKList^*:~\pcreturn 0$
+					\item $\pcif (\PKList^*,\mes^*) \in \ListQueried:~\pcreturn 0$
+					\item $\pcreturn \Verify(\PKList^*,\mes^*,\sigma^*)$
+				\end{nicodemus}
+				\medskip\noindent
+				\underline{\coracle $\SigningOracle_0(\PKList,\mes)$}
+				\begin{nicodemus}
+					\item $\pcparse \{\pk_1,\dots,\pk_N\} := \PKList$
+					\item $\pcif \pk_1 \neq \pk: \pcreturn \bot$
+					\item $\ListQueried := \ListQueried \cup \{(\PKList,\mes)\}$
+					\item $ctr := ctr+1,~sid :=ctr$
+					\item $\MapRound[sid] := 1$
+					\item $(\pm_1,\State_1) \from \Sign_0(\PKList,\sk,\mes)$
+					\item $(\pm_1[sid],\State_1[sid]) := (\pm_1,\State_1)$
+					\item $\pcreturn (\pm_1[sid],sid)$
+				\end{nicodemus}
+			\end{minipage}\qquad
+			\begin{minipage}[t]{0.445\textwidth}\underline{\coracle $\SigningOracle_1(sid,\PMList_1)$}
+				\begin{nicodemus}
+					\item $\pcif \MapRound[sid]\neq 1: \pcreturn \bot$
+					\item $\pcparse (\pm_{1,1},\dots,\pm_{1,N}) := \PMList_1$
+					\item $\pcif \pm_1[sid] \neq \pm_{1,1}: \pcreturn \bot$
+					\item $\MapRound[sid] := \MapRound[sid] + 1$
+					\item $(\pm_2,\State_2) \from \Sign_1(\State_{1}[sid],\PMList_1)$
+					\item $(\pm_2[sid],\State_2[sid]) := (\pm_2,\State_2)$
+					\item $\pcreturn \pm_2[sid]$
+				\end{nicodemus}
+				\medskip \noindent
+				\underline{\coracle $\SigningOracle_2(sid,\PMList_2)$}
+				\begin{nicodemus}
+					\item $\pcif \MapRound[sid]\neq 2: \pcreturn \bot$
+					\item $\pcparse (\pm_{2,1},\dots,\pm_{2,N}) := \PMList_2$
+					\item $\pcif \pm_2[sid] \neq \pm_{2,1}: \pcreturn \bot$
+					\item $\MapRound[sid] := \MapRound[sid] + 1$
+					\item $\sigma \from \Sign_2(\State_{2}[sid],\PMList_2)$
+					\item $\pcreturn \sigma$
+				\end{nicodemus}
+			\end{minipage}
+		}
+		\caption{The game $\MSEUFCMA$ for a (two-round) multi-signature scheme $\MS$ and an adversary $\adversary$. 
+		To simplify the presentation, we assume that the canonical ordering of sets is chosen such that $\pk$ is always at the first position if it is included.}
+		\label{fig:toothpicks:game:ms:securitydef}
+\end{figure}
+
+\smallskip\noindent\textbf{Assumptions.}
+In this work, we base our constructions on the well-known \ddh assumption over a (family of) cyclic groups $\Group$ of prime order $p$ with generator $g$.
+To recall, the assumption states that it is infeasible to distinguish $(g,h,g^a,h^a) \in \Group^4$ from $(g,h,u,v) \in \Group^4$ for $h,u,v \randfrom \Group$ and $a \randfrom \ZZ_p$.
+For convenience, we define its multi-instance variant $Q$-\ddh.
+It is well-known that $Q$-$\ddh$ is tightly implied by $\ddh$ using random self-reducibility~\cite{C:EHKRV13}.
+\ifnum\llncs=1
+We postpone the formal definition of both assumptions to our full version~\cite{fullversion}.
+\else
+\ifnum\llncs=1
+\section{Assumptions}
+\label{sec:toothpicks:appendix:assumptions}
+\fi
+\begin{definition}[\ddh Assumption]
+	Let $\GGen$ be an algorithm that on input $1^\secpar$ outputs the description of a prime order group $\Group$ of order $p$ with generator $g$.
+	We say that the \ddh assumption holds relative to $\GGen$, if for all \ppt algorithms $\adversary$, the following advantage is negligible:
+	\begin{align*}
+		\advantage{\adversary,\GGen}{\ddh}(\secpar):= \bigg|& \Pr\left[\adversary(\Group,p,g,h,g^a,h^a) = 1 \middle| \begin{array}{l}
+		(\Group,g,p) \from \GGen(1^\secpar),\\ h \randfrom \Group, a \randfrom \ZZ_p
+	\end{array}\right] \\
+		-&\Pr\left[\adversary(\Group,p,g,h,u,v) = 1 \middle| \begin{array}{l}
+			(\Group,g,p) \from \GGen(1^\secpar),\\ h,u,v \randfrom \Group	\end{array}\right]\bigg|.
+	\end{align*}
+\end{definition}
+\begin{definition}[$Q$-\ddh Assumption]
+	Let $\GGen$ be an algorithm that on input $1^\secpar$ outputs the description of a prime order group $\Group$ of order $p$ with generator $g$.
+	We say that the $Q$-\ddh assumption holds relative to $\GGen$, if for all \ppt algorithms $\adversary$, the following advantage is negligible:
+	\begin{align*}
+		\advantage{\adversary,\GGen}{Q\text{-}\ddh}(\secpar):= \bigg|& \Pr\left[\adversary\left(\Group,p,g,h,\left(g^{a_i},h^{a_i}\right)_{i=1}^Q\right) = 1 \middle| \begin{array}{l}
+		(\Group,g,p) \from \GGen(1^\secpar),\\ h \randfrom \Group, \\
+		\forall i \in [Q]:~a_i \randfrom \ZZ_p
+	\end{array}\right] \\
+		-&\Pr\left[\adversary\left(\Group,p,g,h,\left(u_i,v_i\right)_{i=1}^Q\right) = 1 \middle| \begin{array}{l}
+			(\Group,g,p) \from \GGen(1^\secpar),\\ h \randfrom \Group, \\
+			\forall i \in [Q]:~u_i,v_i \randfrom \Group
+		\end{array}\right]\bigg|.
+	\end{align*}
+\end{definition}
+ \fi
+
+ \section{Our Building Blocks}
+\label{sec:toothpicks:buildingblocks}
+In this section, we introduce two building blocks we will use in our constructions.
+Namely, we make use of linear function families and a special kind of commitment scheme.
+This is similar to what is done in~\cite{EC:PanWag23}.
+However, compared to~\cite{EC:PanWag23}, a crucial observation is that we can weaken the requirements for the commitment scheme, thereby enabling a more efficient instantiation.
+To compensate, we strengthen the requirements for the linear function family in terms of soundness, which is for free in terms of efficiency.
+
+ \subsection{Linear Functions}
+\label{sec:toothpicks:buildingblocks:linearfunctions}
+Our first building block is a family of linear functions with suitable properties.
+Linear function families are a widely used abstraction~\cite{EC:HauKilLos19,AC:KatLosRos21,C:CHLLW22,EC:PanWag23,EC:TesZhu23a} that allows us to describe our protocols in a modular and uncluttered fashion.
+In terms of syntax, we use the definition given in~\cite{EC:PanWag23}.
+\begin{definition}[Linear Function Family]
+	A linear function family (LFF) is a tuple of \ppt algorithms $\LFFamily = (\Gen,\LFunction)$ with the following syntax: 
+	\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+		\item $\Gen(1^\secpar) \rightarrow \parameters$ takes as input the security parameter $1^\secpar$ and outputs parameters $\parameters$. We assume that $\parameters$ implicitly defines the following sets: 
+		\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+			\item A set of scalars $\SSS_\parameters$, which forms a field.
+			\item A domain $\DDD_\parameters$, which forms a vector space over $\SSS_\parameters$. 
+			\item A range $\RRR_\parameters$, which forms a vector space over $\SSS_\parameters$.
+		\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+		We omit the subscript $\parameters$ if it is clear from the context, and naturally denote the operations of these fields and vector spaces by $+$ and $\cdot$. We assume that these operations can be evaluated efficiently.
+		\item $\LFunction(\parameters,x) \rightarrow X$ is deterministic, takes as input parameters $\parameters$, an element $x \in \DDD$, and outputs an element $X \in \RRR$. 
+		For all parameters $\parameters$, $\LFunction(\parameters,\cdot)$ realizes a homomorphism, i.e. 
+		\[ \forall s \in \SSS, x,y \in \DDD:~\LFunction(\parameters,s \cdot x + y) = s \cdot \LFunction(\parameters,x) + \LFunction(\parameters,y).\]
+
+		We omit the input $\parameters$ if it is clear from the context.
+	\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+\end{definition}
+In~\cite{EC:PanWag23}, key indistinguishability and lossy soundness are defined to capture the set of properties that makes linear function families amenable for the use in lossy identification~\cite{EC:AFLT12}.
+We recall these definitions from \cite{EC:PanWag23}.
+Further, we introduce strengthened definitions, which allow us to weaken the properties for other building blocks.
+Concretely, we relax the winning condition for lossy soundness, such that it has to hold up to an arbitrary shift in the image of the linear function, leading to coset lossy soundness.
+In our full version~\cite{fullversion}, we also adapt the definition of aggregation lossy soundness from~\cite{EC:PanWag23} accordingly, leading to coset aggregation lossy soundness.
+Importantly, we show that the strengthened definitions come for free.
+\begin{definition}[Key Indistinguishability]
+	Let $\LFFamily = (\Gen,\LFunction)$ be a linear function family. 
+	We say that $\LFFamily$ satisfies key indistinguishability, if for any \ppt algorithm $\adversary$, the following advantage is negligible:
+	\begin{align*} 
+			\advantage{\adversary,\LFFamily}{\keydist}(\secpar) :=|	&\Pr\left[ \adversary(\parameters,X) = 1 \middle| \begin{array}{l} \parameters \from \Gen(1^\secpar),~x \randfrom \DDD,~X:=\LFunction(x)  \end{array}  \right] \\ 
+			- 
+				&\Pr\left[ \adversary(\parameters,X) = 1 \middle| \begin{array}{l} \parameters \from \Gen(1^\secpar),~ X \randfrom \RRR \end{array}  \right]
+			|.
+		\end{align*}
+\end{definition}
+\begin{definition}[Lossy Soundness]
+	Let $\LFFamily = (\Gen,\LFunction)$ be a linear function family. 
+	We say that $\LFFamily$ satisfies $\varepsilon_{\mathsf{l}}$-lossy soundness, if for any unbounded algorithm $\adversary$, the following probability is at most $\varepsilon_{\mathsf{l}}$:
+		\begin{align*}
+			\Pr\left[ 
+				\LFunction(s) - c\cdot X = R~
+			\middle| ~
+				\begin{array}{l}
+					\parameters \from \Gen(1^\secpar),~X \randfrom \RRR,\\ 
+					(\State,R) \from \adversary(\parameters,X),\\ 
+					c \randfrom \SSS,~s \from \adversary(\State,c)
+				\end{array}
+			\right].
+		\end{align*}
+\end{definition}
+\begin{definition}[Coset Lossy Soundness]
+	Let $\LFFamily = (\Gen,\LFunction)$ be a linear function family. 
+	We say that $\LFFamily$ satisfies $\varepsilon_{\mathsf{l}}$-coset lossy soundness, if for any unbounded algorithm $\adversary$, the following probability is at most $\varepsilon_{\mathsf{l}}$:
+		\begin{align*}
+			\Pr\left[ 
+				\LFunction(s) - c\cdot X \in R + \LFunction(\DDD)~
+			\middle| ~
+				\begin{array}{l}
+					\parameters \from \Gen(1^\secpar),~X \randfrom \RRR,\\ 
+					(\State,R) \from \adversary(\parameters,X),\\ 
+					c \randfrom \SSS,~s \from \adversary(\State,c)
+				\end{array}
+			\right].
+		\end{align*}
+\end{definition}
+\begin{lemma}
+	Let $\LFFamily$ be a linear function family, such that for any $\parameters \in \Gen(1^\secpar)$, the domain $\DDD_\parameters$ can be enumerated.
+	Then, if $\LFFamily$ satisfies $\varepsilon_{\mathsf{l}}$-lossy soundness, it also satisfies $\varepsilon_{\mathsf{l}}$-coset lossy soundness.
+	\label{lemma:toothpicks:lossysoundnessimpliescosetlossysoundness}
+\end{lemma}
+\begin{proof}
+	To prove the claim, it is sufficient to describe an (unbounded) reduction $\BBB$, that turns any algorithm $\adversary$ running in the coset lossy soundness game into an algorithm in the lossy soundness game.
+	The reduction $\BBB$ gets as input parameters $\parameters$ and an element $X \in \RRR$ from the lossy soundness game.
+	It runs $\adversary$ on input $\parameters$ and $X$ and gets an output $R$ in return, which it passes to the lossy soundness game. 
+	In return, it receives $c \in \SSS$, and forwards it to $\adversary$, which outputs $s \in \DDD$.
+	If $\adversary$ breaks coset lossy soundness, i.e, $\LFunction(s) - c\cdot X \in R + \LFunction(\DDD)$, then there is a $\delta \in \DDD$ such that $\LFunction(s) - c\cdot X  = R + \LFunction(\delta)$. By enumerating $\DDD$, the reduction $\BBB$ finds such a $\delta$ and returns $s-\delta$ to the lossy soundness game.
+	As we have $\LFunction(s-\delta) - c\cdot X  = R$, $\BBB$ breaks lossy soundness with the same probability as $\adversary$ breaks coset lossy soundness, and the claim follows.
+\end{proof} \subsection{Weaker Commitments}
+In this section, we formally define the syntax and properties of the commitment scheme we require for our construction.
+Namely, we weaken the commitment definition given in~\cite{EC:PanWag23}.
+To recall, the commitment scheme in~\cite{EC:PanWag23} allows to homomorphically commit to elements in the range of a linear function family.
+In addition to a statistically binding mode, there is an indistinguishable way of generating commitment keys together with a weak equivocation trapdoor.
+This trapdoor allows to open commitments to all messages of a certain structure.
+In comparison to~\cite{EC:PanWag23}, we now also weaken the binding property of the scheme.
+Concretely, in the binding mode, we only require the commitment to be binding up to any shift in the image of the linear function.
+Except for this change, we take the definition of~\cite{EC:PanWag23} verbatim.
+\begin{figure}[ht]
+		\centering
+		\nicoresetlinenr
+		\noindent\fbox{
+			\begin{minipage}[t]{0.4\textwidth}\underline{\cgame $Q$-$\KEYDIST_{0,\COMSch}^\adversary(\secpar)$}
+				\begin{nicodemus}
+					\item $\parameters \from \LFFamily.\Gen(1^\secpar),~x \randfrom \DDD$
+					\item $\pcif (\parameters,x) \notin \mathsf{Good}: \pcreturn 0$ 
+					\item $\pcfor i \in [Q]:\ck_i \from  \BindingGen(\parameters)$
+					\item $\beta\from \adversary(\parameters,x,\left(\ck_i\right)_{i\in[Q]})$
+					\item $\pcreturn \beta$
+				\end{nicodemus}
+			\end{minipage}\qquad
+			\begin{minipage}[t]{0.4\textwidth}\underline{\cgame $Q$-$\KEYDIST_{1,\COMSch}^\adversary(\secpar)$}
+				\begin{nicodemus}
+					\item $\parameters \from \LFFamily.\Gen(1^\secpar),~x \randfrom \DDD$
+					\item $\pcif (\parameters,x) \notin \mathsf{Good}: \pcreturn 0$ 
+					\item $\pcfor i \in [Q]: \ck_i \randfrom \KeySet_{\parameters}$
+					\item $\beta\from \adversary(\parameters,x,\left(\ck_i\right)_{i\in[Q]})$
+					\item $\pcreturn \beta$
+				\end{nicodemus}
+			\end{minipage}
+		}
+		\caption{The games $\KEYDIST_{0}, \KEYDIST_{1}$ for the definition of a weakly equivocable coset commitment Scheme $\COMSch$ and an adversary $\adversary$.}
+		\label{fig:game:commitment:keyindist}
+\end{figure}
+\begin{definition}[Weakly Equivocable Coset Commitment Scheme]
+	Let $\LFFamily = (\LFFamily.\Gen,\LFunction)$ be a linear function family and $\Rand = \{\Rand_{\parameters}\},\CommitmentSet = \{\CommitmentSet_\parameters\}$ be families of subsets of abelian groups with efficiently computable group operations $\oplus$ and $\otimes$, respectively.
+	Let $\KeySet = \{\KeySet_{\parameters}\}$ be a family of sets.
+	An $(\varepsilon_{\mathsf{b}},\varepsilon_{\mathsf{g}},\varepsilon_{\mathsf{t}})$-weakly equivocable coset commitment scheme for $\LFFamily$ with key space $\KeySet$, randomness space $\Rand$ and commitment space $\CommitmentSet$ is a tuple of \ppt algorithms $\COMSch = (\BindingGen,\allowbreak\TrapGen,\allowbreak\Com,\allowbreak\TrapCom,\allowbreak\TrapCol)$ with the following syntax: 
+	\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+		\item $\BindingGen(\parameters) \rightarrow \ck$ takes as input parameters $\parameters$, and outputs a key $\ck \in \KeySet_{\parameters}$.
+		\item $\TrapGen(\parameters,X) \rightarrow (\ck,\trap)$ takes as input parameters $\parameters$, and an element $X \in \RRR$, and outputs a key $\ck \in \KeySet_{\parameters}$ and a trapdoor $\trap$.
+		\item $\Com(\ck,R;\varphi) \rightarrow \com$ takes as input a key $\ck$, an element $R \in \RRR$, and a randomness $\varphi \in \Rand_\parameters$, and outputs a commitment $\com \in \CommitmentSet_\parameters$.
+		\item $\TrapCom(\ck,\trap) \rightarrow (\com,\State)$ takes as input a key $\ck$ and a trapdoor $\trap$, and outputs a commitment $\com \in \CommitmentSet_\parameters$ and a state $\State$.
+		\item $\TrapCol(\State,c) \rightarrow (\varphi,R,s)$ takes as input a state $\State$, and an element $c \in \SSS$, and outputs randomness $\varphi \in \Rand_\parameters$, and elements $R \in \RRR, s \in \DDD$.
+	\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+	We omit the subscript $\parameters$ if it is clear from the context.
+	Further, the algorithms are required to satisfy the following properties: 
+	\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+		\item \textbf{Homomorphism.} 
+		For all $\parameters \in \LFFamily.\Gen(1^\secpar), \ck \in \KeySet_{\parameters}, R_0,R_1 \in \RRR$ and $\varphi_0,\varphi_1 \in \Rand$, the following holds: \[
+			\Com(\ck,R_0;\varphi_0) \otimes \Com(\ck,R_1;\varphi_1) = \Com(\ck,R_0+R_1;\varphi_0 \oplus \varphi_1).
+		\]
+		\item \textbf{Good Parameters.} There is a set $\mathsf{Good}$, such that membership to $\mathsf{Good}$ can be decided in polynomial time, and \[ \Prob{(\parameters,x) \notin \mathsf{Good} \mid  \parameters \from \LFFamily.\Gen(1^\secpar),~x \randfrom \DDD} \leq \varepsilon_{\mathsf{g}}, \]
+		\item \textbf{Uniform Keys.} For all $(\parameters,x) \in \mathsf{Good}$, the following distributions are identical: \[
+			\{(\parameters,x,\ck) \mid \ck \randfrom \KeySet_{\parameters}\} \text{ and } \{(\parameters,x,\ck) \mid (\ck,\trap) \from \TrapGen(\parameters,\LFunction(x))\}.
+		\]
+		\item \textbf{Weak Trapdoor Property.} For all $(\parameters,x) \in \mathsf{Good}$, and all $c \in \SSS$, the following distributions $\TTT_0$ and $\TTT_1$ have statistical distance at most $\varepsilon_{\mathsf{t}}$:
+		\begin{align*}
+			\TTT_0 &:= \left\{ \left(\parameters,\ck,\trap,x,c,\com,\mathsf{tr}\right)~\middle|~ \begin{array}{l}
+			(\ck,\trap) \from \TrapGen(\parameters,\LFunction(x))\\ 
+			r \randfrom \DDD,~R := \LFunction(r),~\varphi\randfrom \Rand,\\
+			\com := \Com(\ck,R;\varphi),\\
+			s := c \cdot x + r,~\mathsf{tr} := (\varphi,R,s)
+			\end{array}\right\},\\
+			\TTT_1 &:= \left\{ \left(\parameters,\ck,\trap,x,c,\com,\mathsf{tr}\right)~\middle|~ \begin{array}{l}
+				(\ck,\trap) \from \TrapGen(\parameters,\LFunction(x))\\ 
+				(\com,\State) \from \TrapCom(\ck,\trap), \\  
+				\mathsf{tr} \from \TrapCol(\State,c)
+			\end{array}\right\}.
+		\end{align*}
+		\item \textbf{Multi-Key Indistinguishability.}
+		For every $Q = \poly(\secpar)$ and any \ppt algorithm $\adversary$, the following advantage is negligible:
+		\ifnum\llncs=1
+			\begin{align*}
+			\advantage{\adversary,\COMSch}{Q\text{-}\keydist}(\secpar):= 
+			|&\Pr\left[ Q\text{-}\KEYDIST_{0,\COMSch}^\adversary(\secpar) \Rightarrow 1 \right]\\
+			-&\Pr\left[ Q\text{-}\KEYDIST_{1,\COMSch}^\adversary(\secpar) \Rightarrow 1 \right]|,
+			\end{align*}
+		\else 
+			\begin{align*}
+			\advantage{\adversary,\COMSch}{Q\text{-}\keydist}(\secpar):= 
+			\left|\Pr\left[ Q\text{-}\KEYDIST_{0,\COMSch}^\adversary(\secpar) \Rightarrow 1 \right]
+			-\Pr\left[ Q\text{-}\KEYDIST_{1,\COMSch}^\adversary(\secpar) \Rightarrow 1 \right]\right|,
+			\end{align*}
+		\fi
+		where games $\KEYDIST_{0},\KEYDIST_{1}$ are defined in \cref{fig:game:commitment:keyindist}.
+		\item \textbf{Statistical Coset Binding.} There exists some (potentially unbounded) algorithm $\Ext$, such that for every (potentially unbounded) algorithm $\adversary$ the following probability is at most $\varepsilon_{\mathsf{b}}$:
+		\begin{align*}
+			\Pr\left[ \begin{array}{rl} 
+			\Com(\ck,R';\varphi') &= \com \\ 
+			\wedge~~R' \notin R+\LFunction(\DDD)\end{array}~\middle|~ 
+			\begin{array}{l}
+				\parameters \from \LFFamily.\Gen(1^\secpar), \\ 
+				\ck \from \BindingGen(\parameters),~(\com,\State) \from \adversary(\ck),\\
+				R \from \Ext(\ck,\com),~(R',\varphi') \from \adversary(\State)
+			\end{array} \right].
+		\end{align*}
+	\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+\end{definition}
+ \section{Our Constructions}
+In this section, we present two constructions of efficient two-round multi-signatures that do not rely on rewinding.
+Both constructions rely on the building blocks introduced before.
+ \subsection{Our Construction with Key Aggregation}
+\label{sec:toothpicks:constructionkeyagg:shorttext}
+In \cite{EC:PanWag23}, a multi-signature scheme \ChopsticksOne supporting key aggregation is presented, with a security loss proportional to the number of signing queries and without rewinding.
+In our full version~\cite{fullversion}, we show that if we instantiate \ChopsticksOne with our new building blocks, we get the same properties while improving efficiency. \subsection{Our Tight Construction}
+\label{sec:toothpicks:constructiontight}
+Here, we present our construction of a tightly secure two-round multi-signature scheme.
+For that, let $\LFFamily = (\LFFamily.\Gen,\allowbreak\LFunction)$ be a linear function family.
+Let $\COMSch = (\BindingGen,\allowbreak\TrapGen,\allowbreak\Com,\allowbreak\TrapCom,\allowbreak\TrapCol)$ be an $(\varepsilon_{\mathsf{b}},\varepsilon_{\mathsf{g}},\varepsilon_{\mathsf{t}})$-weakly equivocable coset commitment scheme for $\LFFamily$ with key space $\KeySet$, randomness space $\Rand$ and commitment space $\CommitmentSet$.
+Finally, let $\Hash\colon\boolstar \allowbreak \rightarrow \KeySet$, $\Hash_b\colon\boolstar \allowbreak\rightarrow \bool$, and $\Hash_c\colon\boolstar \allowbreak\rightarrow \SSS$ be random oracles.
+We give a verbal description of our scheme $\Toothpicks{\LFFamily}{\COMSch} = (\Setup,\allowbreak\Gen,\allowbreak\Sign,\allowbreak\Verify)$.
+
+\smallskip\noindent\textbf{Setup and Key Generation.}
+Our scheme makes use of public parameters $\parameters \from \LFFamily.\Gen(1^\secpar)$, which define the linear function $\LFunction = \LFunction(\parameters,\cdot)$.
+Keys are generated by sampling elements $x_0,x_1 \randfrom \DDD$ and a seed $\seed \randfrom \bool^\secpar$.
+Then, the keys are
+\[ \sk := (x_0,x_1,\seed),~~\pk := (X_0,X_1) := (\LFunction(x_0),\LFunction(x_1)).\]
+
+
+\smallskip\noindent\textbf{Signing Protocol.} We consider the setting of a set of $N$ signers with public keys $\PKList = \{\pk_1,\dots,\pk_N\}$.
+Let $\mes \in \boolstar$ denote the message that should be signed. 
+In the following, we describe the signing protocol, i.e., algorithms $\Sign_0,\allowbreak\Sign_1,\allowbreak\Sign_2$, from the perspective of the first signer.
+This signer holds a secret key $\sk_1 = (x_{1,0},x_{1,1},\seed_1)$ for public key $\pk_1 = (X_{1,0},X_{1,1})$.
+\begin{enumerate}
+	\item \textit{Commitment Phase.} First, a commitment key $\ck := \Hash(\encode{\PKList},\mes)$ is derived from the set of public keys and the message.
+	Further, the signer computes a bit $b_1 := \Hash_b(\seed_1,\encode{\PKList},\mes)$.
+	The signer computes 
+	\[ r_{1} \randfrom \DDD,~~R_{1} := \LFunction(r_{1}).\]
+	Then, the signer commits to $R_1$ using the commitment key $\ck$, i.e., it computes 
+	\[ \varphi_{1} \randfrom \Rand,~~\com_{1} := \Com(\ck,R_{1};\varphi_{1}).\]
+	Finally, it sends \(\pm_{1,1} := (b_1,\com_{1})\) as its first message of the protocol to all signers.
+
+	\item \textit{Response Phase.} Let $\PMList_1 = (\pm_{1,1},\dots,\allowbreak\pm_{1,N})$ be the list of messages output by the signers in the commitment phase. 
+	That is, the message $\pm_{1,i}$ is sent by signer $i$ and has the form $\pm_{1,i} = (b_i,\com_{i})$.
+	The signer aggregates these messages by setting \[
+	B := b_1\dots b_N \in \bool^N,~~\com := \bigotimes_{i\in[N]} \com_{i}.
+	\] 
+	Next, a signer specific challenge $c_1$ is derived and a response $s_1$ is computed.
+	This is done via \[
+		c_{1} := \Hash_c(\pk_1,\com,\mes,\encode{\PKList},B),~~s_{1} := c_{1}\cdot x_{1,b_1} + r_{1}.
+	\]
+	Observe that the signer uses bit $b_1$ to determine which part of the secret key is used.
+	Finally, the signer sends $\pm_{2,1} := (s_{1},\varphi_{1})$ as its second message of the protocol to all signers.
+
+	\item \textit{Aggregation Phase.} Let $\PMList_2 = (\pm_{2,1},\dots,\allowbreak\pm_{2,N})$ be the list of messages output by the signers in the response phase. 
+	That is, the message $\pm_{2,i}$ is sent by signer $i$ and has the form $\pm_{2,i} = (s_{i},\varphi_{i})$.
+	The signers aggregate the responses and commitment randomness received in the previous messages via
+	\[ s := \sum_{i\in[N]}s_{i},~\varphi := \bigoplus_{i\in[N]}\varphi_{i}.\]
+	Finally, the signature is defined as $\sigma:=(\com,\varphi,s,B)$.
+\end{enumerate}
+
+\smallskip\noindent\textbf{Verification.} Assume we have a set of public keys $\PKList = \{\pk_1,\dots,\pk_N\}$, a message $\mes \in \boolstar$, and a signature $\sigma:=(\com,\varphi,s,B)$.
+To verify $\sigma$, write $B = b_1\dots b_N \in \bool^N$ and each public key $\pk_i$ as $\pk_i = (X_{i,0},X_{i,1})$.
+Then, reconstruct the commitment key $\ck := \Hash(\encode{\PKList},\mes)$ and the signer specific challenges $c_{i} := \Hash_c(\pk_i,\com,\mes,\encode{\PKList},B)$ for each $i \in [N]$.
+The signature is valid, i.e., the verification outputs $1$, if and only if
+\begin{align*}
+	\com = \Com\left(\ck,\LFunction(s)-\sum_{i=1}^N c_{i}\cdot X_{i,b_i};\varphi\right).
+\end{align*}
+\begin{lemma}
+	Let $\LFFamily$ be a linear function family. 
+	Let $\COMSch$ be an $(\varepsilon_{\mathsf{b}},\varepsilon_{\mathsf{g}},\varepsilon_{\mathsf{t}})$-weakly equivocable coset commitment scheme for $\LFFamily$.
+	Then $\Toothpicks{\LFFamily}{\COMSch}$ is complete.
+	\label{lemma:toothpicks:tight:completeness}
+\end{lemma}
+\ifnum\llncs=1
+The proof of \cref{lemma:toothpicks:tight:completeness} is postponed to our full version~\cite{fullversion}.
+\else
+\ifnum\llncs=1
+\section{Omitted Proof from \cref{sec:toothpicks:constructiontight}}
+\label{sec:toothpicks:constructiontight:omitted}
+\begin{proof}[of \cref{lemma:toothpicks:tight:completeness}]
+\else
+\begin{proof}
+\fi
+To show completeness of $\Toothpicks{\LFFamily}{\COMSch}$, consider $N$ users and let $\PKList = \{\pk_1,\dots,\pk_N\}$ be the set of their public keys, where $\pk_i = (X_{i,0},X_{i,1}) = (\LFunction(x_{i,0}),\LFunction(x_{i,1}))$ for each $i \in [N]$.
+Let $\mes \in \boolstar$ be a message, and let $\sigma=(\com,\varphi,s,B)$ for $B = b_1\dots b_N \in \bool^N$ be a signature computed honestly in the signing protocol.
+We have to show that verification outputs $1$ on input $\PKList,\mes,\sigma$.
+For that, let $\ck = \Hash(\encode{\PKList},\mes)$ and $c_{i} = \Hash_c(\pk_i,\com,\mes,\encode{\PKList},B)$ for each $i \in [N]$ be as in the verification algorithm.
+We have to show that \[\com = \Com\left(\ck,\LFunction(s)-\sum_{i=1}^N c_{i}\cdot X_{i,b_i};\varphi\right).\]
+Using definition of $s$ and the $X_{i,b_i}$, and linearity of $\LFunction$, we get \begin{align*}
+	\LFunction(s)-\sum_{i=1}^N c_{i}\cdot X_{i,b_i} = \LFunction\left(\sum_{i=1}^Ns_{i}\right)-\sum_{i=1}^N c_{i}\cdot \LFunction(x_{i,b_i}) = \sum_{i=1}^N\LFunction(s_i-c_i\cdot x_{i,b_i}).
+\end{align*}
+Now, we use the definition of the $s_i$ as $s_{i} = c_{i}\cdot x_{i,b_i} + r_{i}$, where $r_i \in \DDD$ is the element that the $i$th signer samples in the first step, and get \[
+	\sum_{i=1}^N\LFunction(s_i-c_i\cdot x_{i,b_i}) = \sum_{i=1}^N\LFunction(r_i) =\sum_{i=1}^N R_{i}, 
+\] where $R_i = \LFunction(r_i)$ is the element to which each signer commits in the first step.
+In combination, we get \[
+	\Com\left(\ck,\LFunction(s)-\sum_{i=1}^N c_{i}\cdot X_{i,b_i};\varphi\right) = \Com\left(\ck,\sum_{i=1}^N R_{i};\bigoplus_{i\in[N]}\varphi_{i}\right),
+\] where we used the definition of $\varphi$.
+We can now apply the homomorphism property of the commitment and get 
+\[
+	\Com\left(\ck,\sum_{i=1}^N R_{i};\bigoplus_{i\in[N]}\varphi_{i}\right) = \bigotimes_{i=1}^N\Com\left(\ck,R_{i};\varphi_{i}\right) = \bigotimes_{i=1}^N\com_i = \com,
+\] where the $\com_i$ are what each signer sends in the first message.
+This proves the claim.
+\end{proof} \fi
+
+ \begin{theorem}
+	Let $\LFFamily$ be a linear function family that satisfies key indistinguishability and $\varepsilon_{\mathsf{l}}$-coset lossy soundness.
+	Let $\COMSch$ be an $(\varepsilon_{\mathsf{b}},\varepsilon_{\mathsf{g}},\varepsilon_{\mathsf{t}})$-weakly equivocable coset commitment scheme for $\LFFamily$.
+	Further, let $\Hash\colon\boolstar \rightarrow \KeySet,\allowbreak\Hash_b\colon\boolstar \rightarrow \bool,\allowbreak\Hash_c\colon\boolstar \rightarrow \SSS$ be random oracles.
+	Then $\Toothpicks{\LFFamily}{\COMSch}$ is \mseufcma secure.
+
+	Concretely, for any \ppt algorithm $\adversary$ that makes at most $Q_{\Hash},Q_{\Hash_b},Q_{\Hash_c},Q_S$ queries to oracles $\Hash,\Hash_b,\Hash_c,\SigningOracle_0$, respectively, there are \ppt algorithms $\BBB,\BBB'$ with $\AlgTime(\BBB) \approx \AlgTime(\adversary),\allowbreak \AlgTime(\BBB') \approx \AlgTime(\adversary)$ and
+	\begin{align*} \advantage{\adversary,\Toothpicks{\LFFamily}{\COMSch}}{\mseufcma}(\secpar) \leq \frac{Q_{\Hash_b}}{2^{\secpar}} &+8\varepsilon_{\mathsf{g}} + 4Q_S\varepsilon_{\mathsf{t}} + 4Q_\Hash Q_{\Hash_c}\varepsilon_{\mathsf{b}} + 4Q_{\Hash_c}\varepsilon_{\mathsf{l}} \\
+	&+4\cdot\advantage{\BBB,\COMSch}{Q_{\Hash}\text{-}\keydist}(\secpar)+4\cdot\advantage{\BBB',\LFFamily}{\keydist}(\secpar).\end{align*}
+	\label{theorem:toothpicks:tight:security}
+\end{theorem}
+\begin{proof}
+	Let $\adversary$ be an adversary against the security of $\Toothpicks{\LFFamily}{\COMSch}$.
+	To prove the statement, we give a sequence of games $\GAME_0,\dots,\GAME_8$.
+	We present the games formally in our full version~\cite{fullversion}, and we verbally describe and analyze them here.
+
+	\smallskip
+	\gamedes{0} 
+	\ifnum\llncs=1
+	We start with $\GAME_0$, which is defined to be the original security game $\MSEUFCMA_\Toothpicks{\LFFamily}{\COMSch}^\adversary$, but we omit the oracle $\SigningOracle_2$ from the game.
+	\else
+	This is defined to be the original security game $\MSEUFCMA_\Toothpicks{\LFFamily}{\COMSch}^\adversary$, but we omit the oracle $\SigningOracle_2$ from the game.
+	\fi
+	Observe that this is without loss of generality for the scheme at hand, as this oracle can be run publicly based on the outputs of the other oracles and does not make use of any secret state or key.
+	More concretely, for any adversary $\adversary$ that calls this oracle, we can build a wrapper adversary that internally simulates the game including oracle $\SigningOracle_2$ for $\adversary$ and forwards everything else to $\GAME_0$.
+	This wrapper adversary has the same advantage and running time as $\adversary$.
+	We now recall the game to fix notation. 
+	First, system parameters $\parameters \from \LFFamily.\Gen(1^\secpar)$ are generated.
+	In addition, the secret and public key of an honest user are generated.
+	Namely, the game samples $\seed_1 \randfrom \bool^\secpar$ and $x_{1,0},x_{1,1} \randfrom \DDD$ and sets $X_{1,0} := \LFunction(x_{1,0})$ and $X_{1,1} := \LFunction(x_{1,1})$.
+	It sets $\pk^* := (X_{1,0},X_{1,1})$ and runs $\adversary$ on input $\parameters,\pk^*$, with access to the following oracles 
+	\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+		\item Signing oracles $\SigningOracle_0$ and $\SigningOracle_1$: 
+		The signing oracles simulate an honest signer in a signing interaction.
+		More precisely, if $\adversary$ queries $\SigningOracle_0(\PKList,\mes)$, a new signing interaction for message $\mes$ with respect to $\PKList = \{\pk_1,\dots,\pk_N\}$ is started, where we assume that $\pk_1 = \pk^*$.
+		For that, first $(\PKList,\mes)$ is added to list $\ListQueried$. 
+		Then, the game runs algorithm $\Sign_0$ in the natural way and outputs the result to the adversary. Similarly, when $\adversary$ calls $\SigningOracle_1$, algorithm $\Sign_1$ is run.
+		\item Random oracles $\Hash$ and $\Hash_c$: The game simulates random oracles $\Hash$ and $\Hash_c$ for $\adversary$ by standard lazy sampling. 
+		For that, it holds maps $h$ and $h_c$ which map the inputs to their outputs.
+		For example, if $\adversary$ queries $\Hash(x)$, the game checks if $h[x]$ is defined.
+		If it is not yet defined, it is sampled at random from the output domain of $\Hash$, i.e., from $\KeySet$. Then, the game returns $h[x]$.
+		\item Random oracle $\Hash_b$: For $\Hash_b$, we additionally introduce a level of indirection. This will allow us to distinguish queries to $\Hash_b$ that the game itself issues from the queries that $\adversary$ issues directly.
+		Concretely, when $\Hash_b$ is queried, the game forwards the query to a random oracle $\bar{\Hash}_b$ with the same interface.
+		Oracle $\bar{\Hash}_b$ is simulated using a map $\bar{h}_b$ via lazy sampling.
+		We emphasize that this oracle $\bar{\Hash}_b$ is not provided to $\adversary$.
+		Further, the convention for all games will be that the game itself only queries $\bar{\Hash}_b$ and not $\Hash_b$, for example in oracle $\SigningOracle_0$.
+	\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+	Finally, $\adversary$ outputs a forgery $(\PKList^*,\mes^*,\sigma^*)$.
+	Write $\PKList^*$ as $\PKList^* = \{ \pk_1,\dots,\pk_N\}$ and $\sigma^*=(\com^*,\varphi^*,s^*,B^*)$. Further, write $B^* = b^*_1\dots b^*_N \in \bool^N$.
+	Then, the game outputs $0$ if $\pk^* \notin \PKList^*$ or $(\PKList^*,\mes^*) \in \ListQueried$.
+	Otherwise, we assume that $\pk^* = \pk_1$, and the game outputs $1$ if and only if $\Verify(\PKList^*,\mes^*,\sigma^*) = 1$.
+	By definition, we have \[
+		\advantage{\adversary,\Toothpicks{\LFFamily}{\COMSch}}{\mseufcma}(\secpar) = \Prob{\GAME_0 \Rightarrow 1}.
+	\]
+	Before we continue, we give an overview of the remaining games and our strategy.
+	In our first step (games $\GAME_1$ and $\GAME_2$), we will ensure that for the forgery it holds that $b^*_1 = 1-b^*$ and $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = b^*$, for a random bit $b^*$.
+	Once this is established, we change how we simulate the signing oracles (games $\GAME_3$ to $\GAME_6$). 
+	Namely, in the case $\bar{\Hash}_b(\seed_1,\encode{\PKList},\mes) = b^*$, we embed a binding commitment key and simulate signing for $({\PKList},\mes)$ honestly, whereas for the other case, we embed a commitment key with a trapdoor and simulate signing by using the trapdoor.
+	The result is that we no longer need $x_{1,1-b^*}$.
+	Now, we switch $X_{1,1-b^*}$ to lossy mode and use the binding property to reduce to lossy soundness (games $\GAME_7$ and $\GAME_8$).
+	This works, because the forgery is with respect to a lossy key and a binding commitment key.
+
+	\smallskip
+	\gamedes{1} This game is the same as $\GAME_0$, but we introduce a bad event on which the game aborts.
+	Namely, the game sets $\mathsf{bad} := 1$ if $\adversary$ queries $\Hash_b(\seed_1,x)$ for any $x \in \boolstar$. Once $\adversary$ terminates, the game outputs $0$ if $\mathsf{bad} = 1$. 
+	Otherwise, it behaves as $\GAME_0$.
+	It is clear that games $\GAME_0$ and $\GAME_1$ only differ if $\adversary$ makes such a query.
+	Further, the only information about $\seed_1$ that $\adversary$ gets are the values of $\Hash_b(\seed_1,\cdot)$. As $\seed_1$ is sampled uniformly at random from $\bool^\secpar$, we can bound the probability that a fixed query of $\adversary$ has the form $\Hash_b(\seed_1,x)$ by $1/2^\secpar$. With a union bound over the queries of $\adversary$ we obtain \[ \left| \Prob{\GAME_0 \Rightarrow 1} - \Prob{\GAME_1 \Rightarrow 1} \right| \leq \frac{Q_{\Hash_b}}{2^{\secpar}}.\]
+
+	\gamedes{2} In this game, we introduce a random bit $b^* \randfrom \bool$ that is sampled at the beginning of the game. Further, we change the winning condition as follows. 
+	When $\adversary$ outputs the forgery, the game outputs $0$, if $b^*_1 = b^*$ or $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = 1-b^*$.
+	Otherwise, it continues as $\GAME_1$ does.
+	In other words, game $\GAME_2$ outputs $1$ if $\GAME_1$ outputs $1$ and the following event occurs: 
+	\begin{itemize}
+		\item Event $\mathsf{RightBits}$: This event occurs, if for $\adversary$'s final output $(\PKList^*,\mes^*,\sigma^*)$ with $\PKList^* = \{ \pk_1 = \pk^*,\dots,\pk_N\},\allowbreak \sigma^*=(\com^*,\varphi^*,s^*,B^*)$, and $B^* = b^*_1\dots b^*_N \in \bool^N$, it holds that $b^*_1 = 1-b^*$ and $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = b^*$.
+	\end{itemize}
+	If we condition on $\GAME_1 \Rightarrow 1$, then we claim that $b^*$ and $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*)$ are uniformly random and independent, and independent of $\adversary$'s view. In particular, they are independent of $b^*_1$.
+	This is because bit $b^*$ is hidden from $\adversary$ by construction, and $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*)$ is hidden from $\adversary$ due to $(\PKList^*,\mes^*) \notin \ListQueried$ and the change introduced in $\GAME_1$.
+	Therefore, we have \begin{align*}
+		\Prob{\mathsf{RightBits} \mid \GAME_1 \Rightarrow 1} = \ProbWith{b,b^*\randfrom \bool}{b^*_1 = 1-b^* \wedge b = b^*} = \frac{1}{4}.
+	\end{align*}
+	With this, we obtain
+	\begin{align*}
+		\Prob{\GAME_2 \Rightarrow 1} & = \Prob{\mathsf{RightBits} \wedge \GAME_1 \Rightarrow 1} \\ 
+		& = \Prob{\mathsf{RightBits} \mid \GAME_1 \Rightarrow 1}  \cdot \Prob{\GAME_1 \Rightarrow 1} = \frac{1}{4} \cdot \Prob{\GAME_1 \Rightarrow 1}.
+	\end{align*}
+
+	\gamedes{3} This game is the same as $\GAME_2$, but we add another abort. 
+	Namely, once the game sampled $\parameters$ and $x_{1,0},x_{1,1}$ at the beginning of the game, it returns $0$ and terminates if $(\parameters,x_{1,1-b^*}) \notin \mathsf{Good}$, where $\mathsf{Good}$ is as in the definition of the weakly equivocable coset commitment scheme.
+	Otherwise, it continues as in $\GAME_2$ does. 
+	By the good parameters property of $\COMSch$, we have \[
+   			\left| \Prob{\GAME_2 \Rightarrow 1} - \Prob{\GAME_3 \Rightarrow 1} \right| \leq \Prob{(\parameters,x_{1,1-b^*}) \notin \mathsf{Good}} \leq \varepsilon_{\mathsf{g}}.
+	\]
+
+	\gamedes{4} In this game, we change how random oracle $\Hash$ is simulated.
+	Recall that until now, when $\Hash$ is queried on an input $(\encode{\PKList},\mes)$ and the output of $\Hash$ is not yet defined, it samples a random commitment key $\ck \randfrom \KeySet$ uniformly at random and defines the output to be this key.
+	From now on, we sample $\ck$ differently, distinguishing two cases depending on the bit $b := \bar{\Hash}_b(\seed_1,\encode{\PKList},\mes)$ and the bit $b^*$.
+	Namely, if $b = 1-b^*$, then $\ck$ is sampled in hiding mode with a trapdoor, i.e., $(\ck,\trap) \from \TrapGen(\parameters,X_{1,1-b^*})$. 
+	Further, the trapdoor $\trap$ is stored in a map $tr$ by setting $tr[\encode{\PKList},\mes] := \trap$.
+	On the other hand, if $b = b^*$, then $\ck$ is sampled in binding mode, i.e., $\ck \from \BindingGen(\parameters)$.
+	We now show indistinguishability of $\GAME_3$ and $\GAME_4$.
+	First, note that keys sampled in the first case are distributed identically in $\GAME_3$ and $\GAME_4$. This follows from the uniform keys property of $\COMSch$, which we can apply due to the previous change that ensures that $(\parameters,x_{1,1-b^*}) \in \mathsf{Good}$.
+	Second, keys sampled in the second case are indistinguishable by the multi-key indistinguishability property of $\COMSch$.
+	More precisely, there is a reduction $\BBB$ that gets as input $\parameters,x_{1,1-b^*}$, and commitment keys $\ck_1,\dots,\ck_{Q_\Hash}$. It then simulates game $\GAME_4$ for $\adversary$, but embedding the commitment keys $\ck_i$ whenever random oracle $\Hash$ needs to be simulated and $b = b^*$ as above.
+	In the end, $\BBB$ outputs whatever the game outputs. 
+	Clearly, $\BBB$'s running time is determined by the running time of $\adversary$ and it perfectly simulates $\GAME_4$ if the keys $\ck_1,\dots,\ck_{Q_\Hash}$ are generated via algorithm $\BindingGen$.
+	Otherwise, if the keys are sampled uniformly at random, it perfectly simulates $\GAME_3$ for $\adversary$. For this, it was important that we introduced the indirection via oracle $\bar{\Hash}_b$ as otherwise the simulation would not be perfect. Concretely, if $\BBB$ itself had queried $\Hash_b$ instead of $\bar{\Hash}_b$, then the game would always have output $0$, see the change in $\GAME_2$.
+	We have \[
+		\left| \Prob{\GAME_3 \Rightarrow 1} - \Prob{\GAME_4 \Rightarrow 1} \right| \leq \advantage{\BBB,\COMSch}{Q_{\Hash}\text{-}\keydist}(\secpar).
+	\]
+
+	\gamedes{5} In this game, we change the signing oracle. The result will be that we can simulate the signing oracle without $x_{1,1-b^*}$, but using trapdoors for commitment keys instead.
+	First, we explain how we change oracle $\SigningOracle_0$, which runs $\Sign_0$ in previous games. Recall from the definition of $\Sign_0$, that this means that the oracle on input ${\PKList}$ and $\mes$ samples $r_1 \randfrom \DDD$, defines $R_{1} := \LFunction(r_{1})$, computes a bit $b_1 := \Hash_b(\seed_1,\encode{\PKList},\mes)$ and a commitment key $\ck := \Hash(\encode{\PKList},\mes)$, and commits to $R_1$ by sampling $\varphi_{1} \randfrom \Rand$ and setting $\com_{1} := \Com(\ck,R_{1};\varphi_{1})$.
+	Now, if $b_1 = b^*$, we don't change anything and $\GAME_5$ behaves as previous games do. However, if $b_1 = 1-b^*$, the game computes $\com_{1}$ differently. 
+	It computes it as $(\com_{1},\State_1)\from \TrapCom(\ck,tr[\encode{\PKList},\mes])$. Here, recall that if $b_1 = 1-b^*$, then $\ck$ has been generated with a trapdoor that is stored in $tr$, see $\GAME_4$.
+	Next, we explain how we change oracle $\SigningOracle_1$, which runs $\Sign_1$ in previous games. To recall, this means that first, a challenge $c_1$ is computed using the random oracle $\Hash_c$ and all messages of the first round. 
+	Then, a response $s_1 := c_1\cdot x_{1,b_1}+r_1$ is computed, and $s_1$ and $\varphi_1$ is returned to $\adversary$.
+	Again, we only change the case where $b_1 = 1-b^*$. 
+	Namely, in this case, the game runs $(\varphi_{1},R_{1},s_{1}) \from \TrapCol(\State_1,c_{1})$ to compute $s_1$ and $\varphi_1$ instead.
+	Due to the change introduced in $\GAME_3$, we know that $(\parameters,x_{1,1-b^*}) \in \mathsf{Good}$, and thus we can apply the weak trapdoor property of $\COMSch$ for every signing query. We get \[
+		\left| \Prob{\GAME_4 \Rightarrow 1} - \Prob{\GAME_5 \Rightarrow 1} \right| \leq Q_S\varepsilon_{\mathsf{t}}.
+	\]
+
+
+
+	\gamedes{6} In this game, we undo the change from $\GAME_3$, namely, we no longer require that $(\parameters,x_{1,1-b^*}) \in\mathsf{Good}$. 
+	With a similar argument as in $\GAME_3$, we get \[
+   			\left| \Prob{\GAME_5 \Rightarrow 1} - \Prob{\GAME_6 \Rightarrow 1} \right| \leq \varepsilon_{\mathsf{g}}.
+	\]
+
+	\gamedes{7} In this game, we change how $X_{1,1-b^*}$ is generated.
+	Recall that until now, it is generated by sampling $x_{1,1-b^*} \randfrom \DDD$ and setting $X_{1,1-b^*} := \LFunction(x_{1,1-b^*})$.
+	From now on, we sample it in lossy mode, i.e., as $X_{1,1-b^*}\randfrom \RRR$.
+	Observe that $x_{1,1-b^*}$ is used nowhere else during the game, due to our previous changes. Therefore, we can easily bound the distinguishing advantage between $\GAME_6$ and $\GAME_7$ by a reduction $\BBB'$ that runs in the key indistinguishability game of $\LFFamily$ and embeds its input in $X_{1,1-b^*}$.
+	We have \[
+   			\left| \Prob{\GAME_6 \Rightarrow 1} - \Prob{\GAME_7 \Rightarrow 1} \right| \leq \advantage{\BBB',\LFFamily}{\keydist}(\secpar).
+	\]
+
+	\gamedes{8} In game $\GAME_8$, we make use of the statistical coset binding property of $\COMSch$.
+	Concretely, we change oracle $\Hash_c$ and the winning condition.
+	Recall that until now, a query $\Hash_c(\pk,\com,\mes,\encode{\PKList},B)$ is answered in the standard way using lazy sampling.
+	In game $\GAME_8$, this is still the case, but additionally the extractor $\Ext$ for the statistical coset binding property of $\COMSch$ is run in certain cases.
+	Namely, write $\PKList = \{\pk_1,\dots,\pk_N\}$ and $B = b_1\dots b_N$. 
+	Further, set $b := \bar{\Hash}_b(\seed_1,\encode{\PKList},\mes)$.
+	If $\pk^*$ is part of $\PKList$, i.e., $\pk^* = \pk_1$, and $b = b^*$, then we know that the commitment key $\ck := \Hash(\encode{\PKList},\mes)$ is generated in binding mode by algorithm $\BindingGen$. This is due to the change in $\GAME_4$.
+	Now, game $\GAME_8$ runs $R \from \Ext(\Hash(\encode{\PKList},\mes),\com)$ and stores $R$ in a map $r[\cdot]$ as $r[\com,\mes,\encode{\PKList},B]:=R$.
+	Other than that, the oracle $\Hash_c$ does not change.
+	Next, we describe how the winning condition is changed.
+	For that, assume that $\adversary$ outputs a forgery $\adversary$ outputs a forgery $(\PKList^*,\mes^*,\sigma^*)$ with $\PKList^* = \{ \pk_1,\dots,\pk_N\}$, $\sigma^*=(\com^*,\varphi^*,s^*,B^*)$, and $B^* = b^*_1\dots b^*_N \in \bool^N$.
+	Assume that game $\GAME_7$ does not return $0$.
+	Especially, we have $\pk_1 = \pk^*$ and $(\PKList^*,\mes^*) \notin \ListQueried$, and $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = b^*$ (see $\GAME_2$).
+	Further, the game parses $\pk_i = (X_{i,0},X_{i,1})$ for every key $\pk_i$ in $\PKList^*$ and defines challenges $c^*_{i} := \Hash_c(\pk_i,\com^*_0,\mes^*,\encode{\PKList^*},B^*)$ for all $i\in[N]$ as the verification algorithm does. 
+	In particular, now we know, due to $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = b^*$, that $r[\com^*,\mes^*,\encode{\PKList^*},B^*]$ is defined.
+	Next, the game defines $R^*:= \LFunction(s^*)-\sum_{i=1}^N c^*_{i}\cdot X_{i,b^*_i}$ as the verification algorithm does.
+	The game outputs $0$ if $R^* \notin r[\com^*,\mes^*,\encode{\PKList^*},B^*] + \LFunction(\DDD)$.
+	Otherwise, it behaves as $\GAME_7$ does.
+	Note that if $\GAME_7$ outputs $1$, but $\GAME_8$ does not, then we know that $\com^* = \Com(\ck,R^*;\varphi^*)$, where $\ck := \Hash(\encode{\PKList}^*,\mes^*)$.
+	In other words, $\GAME_7$ and $\GAME_8$ only differ, if for the forgery, the value $r[\com^*,\mes^*,\encode{\PKList^*},B^*]$ that the extractor extracted from commitment $\com^*$ is in a different coset than the value to which $\adversary$ successfully opens $\com^*$ in its forgery.
+	We can easily bound the probability of this using the statistical coset binding property of $\COMSch$.
+	For that, we sketch an (unbounded) reduction that gets as input the parameters $\parameters$ of the linear function, and a commitment key $\ck \from \BindingGen(\parameters)$.
+	Then, it first samples indices $i_\Hash \randfrom [Q_\Hash]$ and $i_{\Hash_c}\randfrom [Q_{\Hash_c}]$ uniformly at random, and then simulates the game $\GAME_8$ honestly for $\adversary$, except the $i_\Hash$th query to $\Hash$ and the $i_{\Hash_c}$th query to $\Hash_c$. In the $i_\Hash$th query to $\Hash$, if it has to sample a binding key, it embeds $\ck$. Otherwise, it aborts. 
+	In the $i_{\Hash_c}$th query to $\Hash_c$, if it had to run $\Ext$, it instead outputs the commitment $\com$ and its state to the statistical coset binding game.
+	Otherwise, it aborts.
+	Finally, when $\adversary$ outputs its forgery, and the $i_\Hash$th query to $\Hash$ and the $i_{\Hash_c}$th query to $\Hash_c$ are the queries of interest, and $R^* \notin r[\com^*,\mes^*,\encode{\PKList^*},B^*] + \LFunction(\DDD)$, the reduction outputs $R^*$ and $\varphi^*$, thereby winning the statistical coset binding game.
+	It is easy to see that this shows \[
+		\left| \Prob{\GAME_7 \Rightarrow 1} - \Prob{\GAME_8 \Rightarrow 1} \right| \leq Q_\Hash Q_{\Hash_c}\varepsilon_{\mathsf{b}}.
+	\]
+
+	To finish the proof, we bound the probability that $\GAME_8$ outputs $1$ using coset lossy soundness of $\LFFamily$.
+	For that consider the following unbounded reduction: \begin{itemize}
+		\item The reduction gets as input parameters $\parameters$ and an element $X \in \RRR$. 
+		
+		\item It picks a random index $\hat{i}\randfrom [Q_{\Hash_c}]$.
+		It then simulates game $\GAME_8$ for $\adversary$ until $\adversary$ outputs its forgery, using parameters $\parameters$ and defining $X_{1,1-b^*} := X$ instead of picking it randomly from $\RRR$.
+		Further, the reduction handles the $\hat{i}$th query to $\Hash_c$ differently.
+
+		\item Let $\Hash_c(\pk,\com,\mes,\encode{\PKList},B)$ be the $\hat{i}$th query to $\Hash_c$. If the hash value for this query is already defined, the reduction continues as $\GAME_8$ would do. Otherwise, let $\PKList = \{\pk_1,\dots,\pk_N\}$, $B = b_1\dots b_N$, and $b := \bar{\Hash}_b(\seed_1,\encode{\PKList},\mes)$.
+		The reduction also continues as $\GAME_8$ would do if $\pk^*$ is not in $\PKList$. Otherwise, assume that $\pk^* = \pk_1$ as usual. 
+		If $\pk \neq \pk^*$ or $b \neq b^*$, the reduction also continues as $\GAME_8$ would do.
+		In other words, the reduction only differs in the case in which $\GAME_8$ would run the extractor $\Ext$. 
+		In this case, the reduction runs $\Ext$ as $\GAME_8$ would do, i.e., it runs $\hat{R} \from \Ext(\Hash(\encode{\PKList},\mes),\com)$ and sets $r[\com,\mes,\encode{\PKList},B]:=\hat{R}$. 
+		In addition, the reduction sets $c_{i} := \Hash_c(\pk_i,\com,\mes,\encode{\PKList},B)$ for each $i \in [N]\setminus\{1\}$, and computes \[
+			R := \hat{R} + \sum_{i=2}^N c_{i}\cdot X_{i,b_i}.
+		\]
+		Then, the reduction outputs $R$ to the coset lossy soundness game, and in return it receives a challenge $c \in \SSS$. Finally, the reduction programs $h_c[\pk,\com,\mes,\encode{\PKList},B] := c$ and returns this hash value.
+
+		\item When $\adversary$ outputs its forgery $(\PKList^*,\mes^*,\sigma^*)$, the reduction does all the verification checks as in $\GAME_8$. 
+		Assuming all of these checks pass, write $\PKList^* = \{\pk_1=\pk^*,\dots,\pk_N\}$, $\sigma^* = (\com^*,\varphi^*,s^*,B^*)$, and $B^* = b^*_1\dots b^*_N \in \bool^N$.
+		Additionally, the reduction aborts if the hash value $\Hash_c(\pk_1,\com^*,\mes^*,\encode{\PKList^*},B^*)$ has not been defined during the $\hat{i}$th query to $\Hash_c$.
+		Otherwise, the reduction returns $s := s^*$ to the coset lossy soundness game.
+	\end{itemize}
+	One can easily see that the view of $\adversary$ is independent of the index $\hat{i}$ until a potential abort, and that, assuming the reduction does not abort, the simulation of $\GAME_8$ is perfect.
+	Now, we want to argue that the reduction breaks coset lossy soundness if $\GAME_8$ outputs $1$, and the index $\hat{i}$ is guessed correctly.
+	Once this is shown, we can conclude with \[
+		\Prob{\GAME_8 \Rightarrow 1} \leq Q_{\Hash_c}\varepsilon_{\mathsf{l}}.
+	\]
+	To show this claim, we assume that $\GAME_8$ outputs $1$ and the index $\hat{i}$ is guessed correctly. 
+	Now, it follows from the condition $\bar{\Hash}_b(\seed_1,\encode{\PKList^*},\mes^*) = b^*$ introduced in $\GAME_2$ that the reduction output $R$ as above to the coset lossy soundness game, received $c$, and programmed 
+	$\Hash_c(\pk_1,\com^*,\mes^*,\encode{\PKList^*},B^*)$ to be $c$.
+	It remains to argue that $\LFunction(s) - c\cdot X \in R + \LFunction(\DDD)$.
+	For that, first recall that the change introduced in $\GAME_8$ ensures that \[
+	    \LFunction(s^*)-\sum_{i=1}^N c^*_{i}\cdot X_{i,b^*_i} \in r[\com^*,\mes^*,\encode{\PKList^*},B^*] + \LFunction(\DDD).
+	\]
+	Using the assumption that the index $\hat{i}$ is guessed correctly, this implies  \[
+	    \LFunction(s^*)- c\cdot X_{1,b^*_1} - \sum_{i=2}^N c_{i}\cdot X_{i,b^*_i} \in \hat{R} + \LFunction(\DDD).
+	\]
+	Now, we rearrange terms and use the condition $b^*_1 = 1-b^*$ introduced in $\GAME_2$, and get \[
+		\LFunction(s^*)- c\cdot X_{1,1-b^*} \in \hat{R} + \sum_{i=2}^N c_{i}\cdot X_{i,b^*_i} + \LFunction(\DDD).
+	\]
+	If we recall the definition of $s^* = s$, $X_{1,1-b^*} = X$, and the definition of $R$, then this is exactly the statement we want to show. Concluded.
+\end{proof} \section{Our Instantiations}
+In this section, we instantiate the building blocks introduced in \cref{sec:toothpicks:buildingblocks}.
+We present a linear function family and a commitment scheme, both based on \ddh.
+ \subsection{Linear Function Family}
+We use the same linear function family as in \cite{EC:PanWag23}, which is a linear function family $\LFFamily_\ddh = (\Gen,\LFunction)$ based on the \ddh assumption.
+For that, we assume an algorithm $\GGen$, that outputs the description of a prime order group $\Group$ of order $p$ with generator $g$ on input $1^\secpar$.
+Algorithm $\Gen$ runs $\GGen$, samples $h \randfrom \Group$, and outputs parameters $\parameters := (g,h) \in \Group^2$. 
+The description of $\Group$ is also contained in $\parameters$ and left implicit for the sake of a concise presentation.
+These parameters define the set of scalars, domain, range, and the function $\LFunction(\parameters,\cdot)$, which are as follows:
+\ifnum\llncs=1
+	\( \SSS := \ZZ_p,~~\DDD := \ZZ_p,~~\RRR := \Group \times \Group,~~\LFunction(\parameters,x) := (g^x,h^x).\)
+\else
+	\begin{align*}
+		\SSS := \ZZ_p,~~\DDD := \ZZ_p,~~\RRR := \Group \times \Group,~~\LFunction(\parameters,x) := (g^x,h^x).
+	\end{align*}
+\fi
+One can easily verify that this is a linear function family.
+Further, it is shown in~\cite{EC:PanWag23} that $\LFFamily_\ddh$ satisfies key indistinguishability, lossy soundness, and aggregation lossy soundness.
+We conclude that $\LFFamily_\ddh$ satisfies coset lossy soundness and coset aggregation lossy soundness.
+The following lemma summarizes this.
+\begin{lemma}
+	Assuming that the \ddh assumption holds relative to $\GGen$, the linear function family $\LFFamily_\ddh$ satisfies key indistinguishability.
+	Concretely, for any \ppt algorithm $\adversary$ there is a \ppt algorithm $\BBB$ with $\AlgTime(\BBB) \approx \AlgTime(\adversary)$ and \[
+		\advantage{\adversary,\LFFamily_\ddh}{\keydist}(\secpar) \leq \advantage{\BBB,\GGen}{\ddh}(\secpar).
+	\]
+	Further, the linear function family $\LFFamily_\ddh$ satisfies $\varepsilon_{\mathsf{l}}$-coset lossy soundness and $\varepsilon_{\mathsf{al}}$-coset aggregation lossy soundness for \ifnum\llncs=1$\varepsilon_{\mathsf{l}} \leq 3/p$ and $\varepsilon_{\mathsf{al}} \leq 4/p$. \else
+		\[\varepsilon_{\mathsf{l}} \leq 3/p,~~\varepsilon_{\mathsf{al}} \leq 4/p.\]\fi
+	\label{lemma:toothpicks:instantiation:lossiness}
+\end{lemma} \subsection{Commitment Scheme}
+\label{sec:toothpicks:instantiation:commitment}
+In this section, we present our instantiation of the weakly equivocable coset commitment scheme for the linear function family $\LFFamily_\ddh$ introduced before.
+Our commitment scheme shares similarities with the commitment scheme from~\cite{EC:PanWag23}, which uses a $3 \times 3$ matrix of group elements as a commitment key. 
+Our crucial observation is that if we replace this $3\times 3$ structure with a more efficient $2\times 2$ structure, we obtain a scheme that is still binding on cosets.
+We now describe our commitment scheme 
+$\COMSch_\ddh = (\BindingGen,\allowbreak\TrapGen,\allowbreak\Com,\allowbreak\TrapCom,\allowbreak\TrapCol)$ for $\LFFamily_\ddh$.
+Assume parameters of $\LFFamily_\ddh$ are given, specifying a group $\Group$.
+Then, the commitment scheme has key space $\KeySet :=\Group^{2 \times 2}$, message space $\DDD = \Group \times \Group$, randomness space $\Rand = \ZZ_p^2$, and commitment space $\CommitmentSet = \Group^2$. 
+The spaces $\DDD,\Rand$, and $\CommitmentSet$ are associated with the natural componentwise group operations.
+Next, we describe the algorithms of the commitment scheme verbally.
+\ifnum\llncs=1\begin{compactitem}\else\begin{itemize}\fi
+	\item  $\BindingGen(\parameters) \rightarrow \ck$: Parse $\parameters = (g,h)$. Sample $a,b \randfrom \ZZ_p$ and set \[
+		\ck := \vec{A} := \begin{pmatrix}
+			A_{1,1} & A_{1,2}  \\ 
+			A_{2,1} & A_{2,2}  \\ 
+		\end{pmatrix} := \begin{pmatrix}
+			g^a & g^b \\ 
+			h^a & h^b \\ 
+		\end{pmatrix} \in \Group^{2\times 2}.
+	\]
+	\item $\TrapGen(\parameters,X = (X_1,X_2)) \rightarrow (\ck,\trap)$: Sample exponents $d_{i,j} \randfrom \ZZ_p$ for all $(i,j)\in[2]\times[2]$. Set \[
+		\ck := \vec{A} := \begin{pmatrix}
+			A_{1,1} & A_{1,2} \\ 
+			A_{2,1} & A_{2,2} \\ 
+		\end{pmatrix} := \begin{pmatrix}
+			X_1^{d_{1,1}} & X_1^{d_{1,2}} \\
+			X_2^{d_{2,1}} & X_2^{d_{2,2}} \\
+		\end{pmatrix}\in \Group^{2\times 2}.
+	\]
+	Further, set $\trap := (\vec{D},X_1,X_2)$ for \[
+		\vec{D} := \begin{pmatrix}
+			{d_{1,1}} & {d_{1,2}} \\ 
+			{d_{2,1}} & {d_{2,2}} \\
+		\end{pmatrix} \in \ZZ_p^{2\times 2}.
+	\]
+
+	\item $\Com(\ck,R = (R_1,R_2);\varphi) \rightarrow \com$: Let $\varphi = (\alpha,\beta) \in \ZZ_p^2$. Compute $\com :=(C_1,C_2)$ for 
+	\[ \begin{pmatrix}C_1 \\ C_2\end{pmatrix} :=  \begin{pmatrix} R_1\cdot&A_{1,1}^\alpha \cdot A_{1,2}^\beta \\ R_2\cdot&A_{2,1}^\alpha \cdot A_{2,2}^\beta\end{pmatrix}. \]
+	\item $\TrapCom(\ck,\trap) \rightarrow (\com,\State)$: Sample $\rho_1,\rho_2,s \randfrom \ZZ_p$. Set $\State := (\trap,\tau,\rho_1,\rho_2,s)$ and compute $\com :=(C_1,C_2)$ for \[\begin{pmatrix}C_1 \\ C_2\end{pmatrix} :=  \begin{pmatrix} X_1^{\rho_1} \cdot g^s \\ X_2^{\rho_2} \cdot h^s \end{pmatrix}. \]
+	\item $\TrapCol(\State,c) \rightarrow (\varphi,R,s)$: Set $R:=(R_1,R_2):=\left(g^s\cdot X_1^{-c},h^s\cdot X_2^{-c}\right)$. Then, if $\vec{D}$ is not invertible, return $\bot$.
+	Otherwise, compute $\varphi:=(\alpha,\beta)$ for  \[
+		\begin{pmatrix}\alpha \\ \beta \end{pmatrix} = \vec{D}^{-1}\cdot 	\begin{pmatrix}\rho_1+c \\ \rho_2+c\end{pmatrix}.
+	\]
+\ifnum\llncs=1\end{compactitem}\else\end{itemize}\fi
+\begin{theorem}
+	If the $\ddh$ assumption holds relative to $\GGen$, then $\COMSch_\ddh$ is an $(\varepsilon_{\mathsf{b}},\varepsilon_{\mathsf{g}},\varepsilon_{\mathsf{t}})$-weakly equivocable coset commitment scheme for $\LFFamily_\ddh$, with \begin{align*}
+		\varepsilon_{\mathsf{b}} = 0, ~~\varepsilon_{\mathsf{g}} \leq 2/p,~~\varepsilon_{\mathsf{t}} \leq 2/p.
+	\end{align*}
+	Concretely, for any \ppt algorithm $\adversary$, there is a \ppt algorithm $\BBB$ with $\AlgTime(\BBB) \approx \AlgTime(\adversary)$ and \[
+		\advantage{\adversary,\COMSch_\ddh}{Q\text{-}\keydist}(\secpar) \leq \advantage{\adversary,\GGen}{2Q\text{-}\ddh}(\secpar)..
+	\]
+	\label{theorem:toothpicks:commitmentscheme}
+\end{theorem}
+Due to space limitations, the proof of \cref{theorem:toothpicks:commitmentscheme} is postponed to our full version~\cite{fullversion}. \section{Efficiency}
+\label{sec:toothpicks:efficiency}
+Here, we analyze the efficiency of our schemes.
+We first explain minor optimizations that improve signature size and communication complexity.
+Then, we focus on the asymptotic and concrete efficiency of our schemes.
+
+\smallskip
+\noindent\textbf{Further Optimizations.} We describe the optimizations for our tight construction in \cref{sec:toothpicks:constructiontight}, but they also apply to our other scheme. 
+Our first optimization is to reduce the communication complexity by deriving the commitment randomness $\varphi$, which consists of two field elements, from a short seed of length $\secpar$ bit using a random oracle $\bar{\Hash}\colon\boolstar\rightarrow\ZZ_p^2$.
+Then, instead of sending $\varphi$ in the second round, each signer sends its seed, and the signers locally derive all $\varphi$'s and aggregate them.
+By the unpredictability of the random oracle, the scheme stays secure.
+Our second optimization allows us to remove the commitment $\com$, which consists of two group elements, from the final signature. 
+The idea is to replace it by a hash of $\com$ of length $2\secpar$ using another random oracle $\hat{\Hash}\colon\boolstar\rightarrow \bool^{2\secpar}$.
+Concretely, the signers first complete the signing protocol as before, but to define signer specific challenges, they compute $c_{i} := \Hash_c(\pk_i,h,\mes,\encode{\PKList},B)$ for all $i \in [N]$, where $h := \hat{\Hash}(\com)$.
+In the end, the signature is $\sigma:=(h,\varphi,s,B)$.
+The signature is verified by first recomputing the $c_i$'s as before (using $h$ instead of $\com$) and by checking the commitment after hashing, i.e., using the equation \[
+  h = \hat{\Hash}\left(\Com\left(\ck,\LFunction(s)-\sum_{i=1}^N c_{i}\cdot X_{i,b_i};\varphi\right)\right).
+\]
+In a security proof, we would use the collision-resistance and observability of $\hat{\Hash}$ to reduce this equation to the original verification equation.
+
+\smallskip
+\noindent\textbf{Asymptotics.} 
+In \cref{table:toothpicks:comparison:asymptoticefficiency}, we compare the asymptotic sizes of public keys and signatures and the communication complexity per signer for our schemes with previous schemes in the pairing-free setting.
+We see that our schemes are much more efficient than the schemes in \cite{EC:PanWag23}.
+Especially, the asymptotic efficiency of our schemes is comparable with most non-tight or three-round schemes.
+
+\smallskip
+\noindent\textbf{Concrete Parameters.}
+We compare the concrete efficiency and security level of two-round multi-signatures in the pairing-free setting in \cref{table:toothpicks:comparison:concrete}.
+Our comparison assumes that all constructions are instantiated with the secp256k1 curve, and we assume security parameter $\secpar = 128$.
+We compute the concrete security level based on the security bounds (see \cref{table:toothpicks:comparison:qualitative}) assuming the underlying assumption is $128$ bit hard, and assuming $Q_H = 2^{30}$ hash queries and $Q_S = 2^{20}$ signing queries.
+We see that our tightly secure scheme outperforms \ChopsticksTwo, the only other two-round scheme with comparable security level, by a factor of more than $3$ in a signature size, and more than $2$ in the communication complexity.
+Finally, we also remark that our scheme is at least twice as efficient as \ChopsticksTwo in terms of computation. \checkfornotes
+\ifnum\anonymous=0
+	\ifnum\acknowledgments=1
+		\paragraph{Acknowledgments.}
+		\acknowledgmenttext
+	\fi
+\fi
+%% \ifnum\llncs=1
+%% 	\bibliographystyle{splncs04}
+%% \else
+%% 	\bibliographystyle{\choosebibstyle}
+%% \fi
+
+\bibliography{main,cryptobib/abbrev0,cryptobib/crypto}
+%% \begin{foobibliography}{10}
+%% \providecommand{\url}[1]{\texttt{#1}}
+%% \providecommand{\urlprefix}{URL }
+%% \providecommand{\doi}[1]{https://doi.org/#1}
+
+%% \bibitem{EC:AFLT12}
+%% Abdalla, M., Fouque, P.A., Lyubashevsky, V., Tibouchi, M.: Tightly-secure
+%%   signatures from lossy identification schemes. In: Pointcheval, D., Johansson,
+%%   T. (eds.) EUROCRYPT~2012. {LNCS}, vol.~7237, pp. 572--590. Springer,
+%%   Heidelberg (Apr 2012). \doi{10.1007/978-3-642-29011-4_34}
+
+%% \bibitem{C:AlpBur21}
+%% Alper, H.K., Burdges, J.: Two-round trip schnorr multi-signatures via
+%%   delinearized witnesses. In: Malkin, T., Peikert, C. (eds.) CRYPTO~2021,
+%%   Part~I. {LNCS}, vol. 12825, pp. 157--188. Springer, Heidelberg, Virtual Event
+%%   (Aug 2021). \doi{10.1007/978-3-030-84242-0_7}
+
+%% \bibitem{TCC:BHJKL15}
+%% Bader, C., Hofheinz, D., Jager, T., Kiltz, E., Li, Y.: Tightly-secure
+%%   authenticated key exchange. In: Dodis, Y., Nielsen, J.B. (eds.) TCC~2015,
+%%   Part~I. {LNCS}, vol.~9014, pp. 629--658. Springer, Heidelberg (Mar 2015).
+%%   \doi{10.1007/978-3-662-46494-6_26}
+
+%% \bibitem{EC:BJLS16}
+%% Bader, C., Jager, T., Li, Y., Sch{\"a}ge, S.: On the impossibility of tight
+%%   cryptographic reductions. In: Fischlin, M., Coron, J.S. (eds.)
+%%   EUROCRYPT~2016, Part~II. {LNCS}, vol.~9666, pp. 273--304. Springer,
+%%   Heidelberg (May 2016). \doi{10.1007/978-3-662-49896-5_10}
+
+%% \bibitem{EC:BelBolMic00}
+%% Bellare, M., Boldyreva, A., Micali, S.: Public-key encryption in a multi-user
+%%   setting: Security proofs and improvements. In: Preneel, B. (ed.)
+%%   EUROCRYPT~2000. {LNCS}, vol.~1807, pp. 259--274. Springer, Heidelberg (May
+%%   2000). \doi{10.1007/3-540-45539-6_18}
+
+%% \bibitem{AC:BelDai21}
+%% Bellare, M., Dai, W.: Chain reductions for multi-signatures and the {HBMS}
+%%   scheme. In: Tibouchi, M., Wang, H. (eds.) ASIACRYPT~2021, Part~IV. {LNCS},
+%%   vol. 13093, pp. 650--678. Springer, Heidelberg (Dec 2021).
+%%   \doi{10.1007/978-3-030-92068-5_22}
+
+%% \bibitem{CCS:BelNev06}
+%% Bellare, M., Neven, G.: Multi-signatures in the plain public-key model and a
+%%   general forking lemma. In: Juels, A., Wright, R.N., {De Capitani di
+%%   Vimercati}, S. (eds.) ACM CCS 2006. pp. 390--399. {ACM} Press (Oct~/~Nov
+%%   2006). \doi{10.1145/1180405.1180453}
+
+%% \bibitem{CCS:BelRog93}
+%% Bellare, M., Rogaway, P.: Random oracles are practical: {A} paradigm for
+%%   designing efficient protocols. In: Denning, D.E., Pyle, R., Ganesan, R.,
+%%   Sandhu, R.S., Ashby, V. (eds.) ACM CCS 93. pp. 62--73. {ACM} Press (Nov
+%%   1993). \doi{10.1145/168588.168596}
+
+%% \bibitem{PKC:BKKP15}
+%% Blazy, O., Kakvi, S.A., Kiltz, E., Pan, J.: Tightly-secure signatures from
+%%   chameleon hash functions. In: Katz, J. (ed.) PKC~2015. {LNCS}, vol.~9020, pp.
+%%   256--279. Springer, Heidelberg (Mar~/~Apr 2015).
+%%   \doi{10.1007/978-3-662-46447-2_12}
+
+%% \bibitem{C:BlaKilPan14}
+%% Blazy, O., Kiltz, E., Pan, J.: ({H}ierarchical) identity-based encryption from
+%%   affine message authentication. In: Garay, J.A., Gennaro, R. (eds.)
+%%   CRYPTO~2014, Part~I. {LNCS}, vol.~8616, pp. 408--425. Springer, Heidelberg
+%%   (Aug 2014). \doi{10.1007/978-3-662-44371-2_23}
+
+%% \bibitem{PKC:Boldyreva03}
+%% Boldyreva, A.: Threshold signatures, multisignatures and blind signatures based
+%%   on the gap-{Diffie}-{Hellman}-group signature scheme. In: Desmedt, Y. (ed.)
+%%   PKC~2003. {LNCS}, vol.~2567, pp. 31--46. Springer, Heidelberg (Jan 2003).
+%%   \doi{10.1007/3-540-36288-6_3}
+
+%% \bibitem{AC:BonDriNev18}
+%% Boneh, D., Drijvers, M., Neven, G.: Compact multi-signatures for smaller
+%%   blockchains. In: Peyrin, T., Galbraith, S. (eds.) ASIACRYPT~2018, Part~II.
+%%   {LNCS}, vol. 11273, pp. 435--464. Springer, Heidelberg (Dec 2018).
+%%   \doi{10.1007/978-3-030-03329-3_15}
+
+%% \bibitem{C:BosTakTib22}
+%% Boschini, C., Takahashi, A., Tibouchi, M.: {MuSig}-{L}: Lattice-based
+%%   multi-signature with single-round online phase. In: Dodis, Y., Shrimpton, T.
+%%   (eds.) CRYPTO~2022, Part~II. {LNCS}, vol. 13508, pp. 276--305. Springer,
+%%   Heidelberg (Aug 2022). \doi{10.1007/978-3-031-15979-4_10}
+
+%% \bibitem{AC:BoyLi16}
+%% Boyen, X., Li, Q.: Towards tightly secure lattice short signature and id-based
+%%   encryption. In: Cheon, J.H., Takagi, T. (eds.) ASIACRYPT~2016, Part~II.
+%%   {LNCS}, vol. 10032, pp. 404--434. Springer, Heidelberg (Dec 2016).
+%%   \doi{10.1007/978-3-662-53890-6_14}
+
+%% \bibitem{C:CHLLW22}
+%% Chairattana-Apirom, R., Hanzlik, L., Loss, J., Lysyanskaya, A., Wagner, B.:
+%%   {PI}-cut-choo and friends: Compact blind signatures via parallel instance
+%%   cut-and-choose and more. In: Dodis, Y., Shrimpton, T. (eds.) CRYPTO~2022,
+%%   Part~III. {LNCS}, vol. 13509, pp. 3--31. Springer, Heidelberg (Aug 2022).
+%%   \doi{10.1007/978-3-031-15982-4_1}
+
+%% \bibitem{C:CheWee13}
+%% Chen, J., Wee, H.: Fully, (almost) tightly secure {IBE} and dual system groups.
+%%   In: Canetti, R., Garay, J.A. (eds.) CRYPTO~2013, Part~II. {LNCS}, vol.~8043,
+%%   pp. 435--460. Springer, Heidelberg (Aug 2013).
+%%   \doi{10.1007/978-3-642-40084-1_25}
+
+%% \bibitem{EPRINT:CriKomMal21}
+%% Crites, E., Komlo, C., Maller, M.: How to prove schnorr assuming schnorr:
+%%   Security of multi- and threshold signatures. Cryptology ePrint Archive,
+%%   Report 2021/1375 (2021), \url{https://eprint.iacr.org/2021/1375}
+
+%% \bibitem{PKC:DOTT21}
+%% Damg{\r a}rd, I., Orlandi, C., Takahashi, A., Tibouchi, M.: Two-round
+%%   n-out-of-n and multi-signatures and trapdoor commitment from lattices. In:
+%%   Garay, J. (ed.) PKC~2021, Part~I. {LNCS}, vol. 12710, pp. 99--130. Springer,
+%%   Heidelberg (May 2021). \doi{10.1007/978-3-030-75245-3_5}
+
+%% \bibitem{ACNS:DavGun21}
+%% Davis, H., G{\"u}nther, F.: Tighter proofs for the {SIGMA} and {TLS} 1.3 key
+%%   exchange protocols. In: Sako, K., Tippenhauer, N.O. (eds.) ACNS 21, Part~II.
+%%   {LNCS}, vol. 12727, pp. 448--479. Springer, Heidelberg (Jun 2021).
+%%   \doi{10.1007/978-3-030-78375-4_18}
+
+%% \bibitem{PKC:DGJL21}
+%% Diemert, D., Gellert, K., Jager, T., Lyu, L.: More efficient digital signatures
+%%   with tight multi-user security. In: Garay, J. (ed.) PKC~2021, Part~II.
+%%   {LNCS}, vol. 12711, pp. 1--31. Springer, Heidelberg (May 2021).
+%%   \doi{10.1007/978-3-030-75248-4_1}
+
+%% \bibitem{SP:DEFKLNS19}
+%% Drijvers, M., Edalatnejad, K., Ford, B., Kiltz, E., Loss, J., Neven, G.,
+%%   Stepanovs, I.: On the security of two-round multi-signatures. In: 2019 {IEEE}
+%%   Symposium on Security and Privacy. pp. 1084--1101. {IEEE} Computer Society
+%%   Press (May 2019). \doi{10.1109/SP.2019.00050}
+
+%% \bibitem{C:EHKRV13}
+%% Escala, A., Herold, G., Kiltz, E., R{\`a}fols, C., Villar, J.: An algebraic
+%%   framework for {Diffie}-{Hellman} assumptions. In: Canetti, R., Garay, J.A.
+%%   (eds.) CRYPTO~2013, Part~II. {LNCS}, vol.~8043, pp. 129--147. Springer,
+%%   Heidelberg (Aug 2013). \doi{10.1007/978-3-642-40084-1_8}
+
+%% \bibitem{C:FucKilLos18}
+%% Fuchsbauer, G., Kiltz, E., Loss, J.: The algebraic group model and its
+%%   applications. In: Shacham, H., Boldyreva, A. (eds.) CRYPTO~2018, Part~II.
+%%   {LNCS}, vol. 10992, pp. 33--62. Springer, Heidelberg (Aug 2018).
+%%   \doi{10.1007/978-3-319-96881-0_2}
+
+%% \bibitem{DBLP:journals/ijnc/FukumitsuH21}
+%% Fukumitsu, M., Hasegawa, S.: A tightly secure ddh-based multisignature with
+%%   public-key aggregation. Int. J. Netw. Comput.  \textbf{11}(2),  319--337
+%%   (2021), \url{http://www.ijnc.org/index.php/ijnc/article/view/257}
+
+%% \bibitem{EC:GHKW16}
+%% Gay, R., Hofheinz, D., Kiltz, E., Wee, H.: Tightly {CCA}-secure encryption
+%%   without pairings. In: Fischlin, M., Coron, J.S. (eds.) EUROCRYPT~2016,
+%%   Part~I. {LNCS}, vol.~9665, pp. 1--27. Springer, Heidelberg (May 2016).
+%%   \doi{10.1007/978-3-662-49890-3_1}
+
+%% \bibitem{EC:GHKP18}
+%% Gay, R., Hofheinz, D., Kohl, L., Pan, J.: More efficient (almost) tightly
+%%   secure structure-preserving signatures. In: Nielsen, J.B., Rijmen, V. (eds.)
+%%   EUROCRYPT~2018, Part~II. {LNCS}, vol. 10821, pp. 230--258. Springer,
+%%   Heidelberg (Apr~/~May 2018). \doi{10.1007/978-3-319-78375-8_8}
+
+%% \bibitem{C:GjoJag18}
+%% Gj{\o}steen, K., Jager, T.: Practical and tightly-secure digital signatures and
+%%   authenticated key exchange. In: Shacham, H., Boldyreva, A. (eds.)
+%%   CRYPTO~2018, Part~II. {LNCS}, vol. 10992, pp. 95--125. Springer, Heidelberg
+%%   (Aug 2018). \doi{10.1007/978-3-319-96881-0_4}
+
+%% \bibitem{JC:GJKW07}
+%% Goh, E.J., Jarecki, S., Katz, J., Wang, N.: Efficient signature schemes with
+%%   tight reductions to the {Diffie}-{Hellman} problems. Journal of Cryptology
+%%   \textbf{20}(4),  493--514 (Oct 2007). \doi{10.1007/s00145-007-0549-3}
+
+%% \bibitem{C:HJKLPRS21}
+%% Han, S., Jager, T., Kiltz, E., Liu, S., Pan, J., Riepel, D., Sch{\"a}ge, S.:
+%%   Authenticated key exchange and signatures with tight security in the standard
+%%   model. In: Malkin, T., Peikert, C. (eds.) CRYPTO~2021, Part~IV. {LNCS}, vol.
+%%   12828, pp. 670--700. Springer, Heidelberg, Virtual Event (Aug 2021).
+%%   \doi{10.1007/978-3-030-84259-8_23}
+
+%% \bibitem{EC:HauKilLos19}
+%% Hauck, E., Kiltz, E., Loss, J.: A modular treatment of blind signatures from
+%%   identification schemes. In: Ishai, Y., Rijmen, V. (eds.) EUROCRYPT~2019,
+%%   Part~III. {LNCS}, vol. 11478, pp. 345--375. Springer, Heidelberg (May 2019).
+%%   \doi{10.1007/978-3-030-17659-4_12}
+
+%% \bibitem{EC:Hofheinz17}
+%% Hofheinz, D.: Adaptive partitioning. In: Coron, J.S., Nielsen, J.B. (eds.)
+%%   EUROCRYPT~2017, Part~III. {LNCS}, vol. 10212, pp. 489--518. Springer,
+%%   Heidelberg (Apr~/~May 2017). \doi{10.1007/978-3-319-56617-7_17}
+
+%% \bibitem{C:HofJag12}
+%% Hofheinz, D., Jager, T.: Tightly secure signatures and public-key encryption.
+%%   In: Safavi-Naini, R., Canetti, R. (eds.) CRYPTO~2012. {LNCS}, vol.~7417, pp.
+%%   590--607. Springer, Heidelberg (Aug 2012). \doi{10.1007/978-3-642-32009-5_35}
+
+%% \bibitem{itakura1983public}
+%% Itakura, K., Nakamura, K.: A public-key cryptosystem suitable for digital
+%%   multisignatures. NEC Research \& Development (71), ~1--8 (1983)
+
+%% \bibitem{AC:KatLosRos21}
+%% Katz, J., Loss, J., Rosenberg, M.: Boosting the security of blind signature
+%%   schemes. In: Tibouchi, M., Wang, H. (eds.) ASIACRYPT~2021, Part~IV. {LNCS},
+%%   vol. 13093, pp. 468--492. Springer, Heidelberg (Dec 2021).
+%%   \doi{10.1007/978-3-030-92068-5_16}
+
+%% \bibitem{CCS:KatWan03}
+%% Katz, J., Wang, N.: Efficiency improvements for signature schemes with tight
+%%   security reductions. In: Jajodia, S., Atluri, V., Jaeger, T. (eds.) ACM CCS
+%%   2003. pp. 155--164. {ACM} Press (Oct 2003). \doi{10.1145/948109.948132}
+
+%% \bibitem{C:KilMasPan16}
+%% Kiltz, E., Masny, D., Pan, J.: Optimal security proofs for signatures from
+%%   identification schemes. In: Robshaw, M., Katz, J. (eds.) CRYPTO~2016,
+%%   Part~II. {LNCS}, vol.~9815, pp. 33--61. Springer, Heidelberg (Aug 2016).
+%%   \doi{10.1007/978-3-662-53008-5_2}
+
+%% \bibitem{C:KurDes04}
+%% Kurosawa, K., Desmedt, Y.: A new paradigm of hybrid encryption scheme. In:
+%%   Franklin, M. (ed.) CRYPTO~2004. {LNCS}, vol.~3152, pp. 426--442. Springer,
+%%   Heidelberg (Aug 2004). \doi{10.1007/978-3-540-28628-8_26}
+
+%% \bibitem{AC:LanPan20}
+%% Langrehr, R., Pan, J.: Unbounded {HIBE} with tight security. In: Moriai, S.,
+%%   Wang, H. (eds.) ASIACRYPT~2020, Part~II. {LNCS}, vol. 12492, pp. 129--159.
+%%   Springer, Heidelberg (Dec 2020). \doi{10.1007/978-3-030-64834-3_5}
+
+%% \bibitem{AC:LLGW20}
+%% Liu, X., Liu, S., Gu, D., Weng, J.: Two-pass authenticated key exchange with
+%%   explicit authentication and tight security. In: Moriai, S., Wang, H. (eds.)
+%%   ASIACRYPT~2020, Part~II. {LNCS}, vol. 12492, pp. 785--814. Springer,
+%%   Heidelberg (Dec 2020). \doi{10.1007/978-3-030-64834-3_27}
+
+%% \bibitem{EC:LOSSW06}
+%% Lu, S., Ostrovsky, R., Sahai, A., Shacham, H., Waters, B.: Sequential aggregate
+%%   signatures and multisignatures without random oracles. In: Vaudenay, S. (ed.)
+%%   EUROCRYPT~2006. {LNCS}, vol.~4004, pp. 465--485. Springer, Heidelberg
+%%   (May~/~Jun 2006). \doi{10.1007/11761679_28}
+
+%% \bibitem{DBLP:journals/dcc/MaxwellPSW19}
+%% Maxwell, G., Poelstra, A., Seurin, Y., Wuille, P.: Simple schnorr
+%%   multi-signatures with applications to bitcoin. Des. Codes Cryptogr.
+%%   \textbf{87}(9),  2139--2164 (2019). \doi{10.1007/s10623-019-00608-x},
+%%   \url{https://doi.org/10.1007/s10623-019-00608-x}
+
+%% \bibitem{CCS:MicOhtRey01}
+%% Micali, S., Ohta, K., Reyzin, L.: Accountable-subgroup multisignatures:
+%%   Extended abstract. In: Reiter, M.K., Samarati, P. (eds.) ACM CCS 2001. pp.
+%%   245--254. {ACM} Press (Nov 2001). \doi{10.1145/501983.502017}
+
+%% \bibitem{C:NicRufSeu21}
+%% Nick, J., Ruffing, T., Seurin, Y.: {MuSig2}: Simple two-round {Schnorr}
+%%   multi-signatures. In: Malkin, T., Peikert, C. (eds.) CRYPTO~2021, Part~I.
+%%   {LNCS}, vol. 12825, pp. 189--221. Springer, Heidelberg, Virtual Event (Aug
+%%   2021). \doi{10.1007/978-3-030-84242-0_8}
+
+%% \bibitem{CCS:NRSW20}
+%% Nick, J., Ruffing, T., Seurin, Y., Wuille, P.: {MuSig}-{DN}: Schnorr
+%%   multi-signatures with verifiably deterministic nonces. In: Ligatti, J., Ou,
+%%   X., Katz, J., Vigna, G. (eds.) ACM CCS 2020. pp. 1717--1731. {ACM} Press (Nov
+%%   2020). \doi{10.1145/3372297.3417236}
+
+%% \bibitem{PKC:PanWag22}
+%% Pan, J., Wagner, B.: Lattice-based signatures with tight adaptive corruptions
+%%   and more. In: Hanaoka, G., Shikata, J., Watanabe, Y. (eds.) PKC~2022,
+%%   Part~II. {LNCS}, vol. 13178, pp. 347--378. Springer, Heidelberg (Mar 2022).
+%%   \doi{10.1007/978-3-030-97131-1_12}
+
+%% \bibitem{EC:PanWag23}
+%% Pan, J., Wagner, B.: Chopsticks: Fork-free two-round multi-signatures from
+%%   non-interactive assumptions. In: Hazay, C., Stam, M. (eds.) EUROCRYPT~2023,
+%%   Part~V. {LNCS}, vol. 14008, pp. 597--627. Springer, Heidelberg (Apr 2023).
+%%   \doi{10.1007/978-3-031-30589-4_21}
+
+%% \bibitem{fullversion}
+%% Pan, J., Wagner, B.: Toothpicks: More efficient fork-free two-round
+%%   multi-signatures. Cryptology ePrint Archive, Paper 2023/1613 (2023),
+%%   \url{https://eprint.iacr.org/2023/1613},
+%%   \url{https://eprint.iacr.org/2023/1613}
+
+%% \bibitem{JC:Schnorr91}
+%% Schnorr, C.P.: Efficient signature generation by smart cards. Journal of
+%%   Cryptology  \textbf{4}(3),  161--174 (Jan 1991). \doi{10.1007/BF00196725}
+
+%% \bibitem{EPRINT:TSSHO23}
+%% Takemure, K., Sakai, Y., Santoso, B., Hanaoka, G., Ohta, K.: More efficient
+%%   two-round multi-signature scheme with provably secure parameters. Cryptology
+%%   ePrint Archive, Report 2023/155 (2023),
+%%   \url{https://eprint.iacr.org/2023/155}
+
+%% \bibitem{EC:TesZhu23a}
+%% Tessaro, S., Zhu, C.: Threshold and multi-signature schemes from linear hash
+%%   functions. In: Hazay, C., Stam, M. (eds.) EUROCRYPT~2023, Part~V. {LNCS},
+%%   vol. 14008, pp. 628--658. Springer, Heidelberg (Apr 2023).
+%%   \doi{10.1007/978-3-031-30589-4_22}
+
+%% \end{foobibliography}
+ 
+
+\appendix
+
+\end{document}

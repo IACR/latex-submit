@@ -1,0 +1,39 @@
+% Author: Bertram Poettering @ rub de
+\ProvidesPackage{nicodemus}
+\NeedsTeXFormat{LaTeX2e}
+
+\usepackage{enumitem} % http://mirrors.ctan.org/macros/latex/contrib/enumitem/enumitem.pdf
+
+\newcommand{\nicolinenrformat}{%       format of line numbers
+  \normalfont\footnotesize\ttfamily\color{black!50}%
+}
+
+\newlength{\nicolinenrsymbolwidth}%    width of a line-number digit
+\settowidth{\nicolinenrsymbolwidth}{%
+  \nicolinenrformat\texttt{0}%
+}
+
+\newcommand{\nicolinenrdigits}{%       amount of line-number digits
+  2%
+}
+
+\newlength{\nicolinenrwidth}%          width of whole line number
+\setlength{\nicolinenrwidth}{%
+  \nicolinenrdigits\nicolinenrsymbolwidth%
+}
+
+\newlength{\nicolinenrsep}%            width of line-number separator 
+\setlength{\nicolinenrsep}{%
+  0.5\nicolinenrwidth%
+}
+
+\newcommand{\nicorefprefix}{%         references to lines start with this prefix
+}
+
+\newcounter{nicolinenr}%               internal line number counter
+\stepcounter{nicolinenr}
+\newcommand{\nicosetlinenr}[1]{\setcounter{nicolinenr}{#1}}
+\newcommand{\nicoresetlinenr}{\nicosetlinenr{1}}
+
+\AddEnumerateCounter*{\PaddingUp}{\two@digits}{0}
+\newcommand{\PaddingUp}[1]{\expandafter\two@digits\csname c@#1\endcsname}

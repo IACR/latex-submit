@@ -281,6 +281,24 @@ class CompileError(BaseModel):
                                 description='The parser may have more to say about an error')
 
 
+class BibLink(BaseModel):
+    label: str = Field(...,
+                       title='The clickable content of <a> tag')
+    url: AnyUrl = Field(...,
+                        title='Link to bibliographic service')
+
+class BibItem(BaseModel):
+    key: str = Field(...,
+                     title='The bibtex key of the item',
+                     description='Useful for debugging')
+    label: str = Field(None,
+                       title='Used for alpha style labels on bibliography')
+    body: str = Field(None,
+                      title='The body of the citation.',
+                      description='May contain html with <a> tags for links')
+    links: List[BibLink] = Field([],
+                                title='links to biliographic services like eprint, google scholar, arxiv, mathscinet, etc')
+
 class Compilation(BaseModel):
     paperid: Annotated[str, StringConstraints(min_length=3)] = Field(...,
                                           title='Globally unique paper ID constructed in review system',
@@ -340,6 +358,9 @@ class Compilation(BaseModel):
     bibtex: Optional[str] = Field(default=None,
                                   title='BibTeX entries that are cited',
                                   description='List of references cited from the paper in BibTeX format. These are not guaranteed to be valid, but are what the author supplied.')
+    bibhtml: List[BibItem] = Field([],
+                                   title='List of bibliographic references parsed from bibtex',
+                                   description='Order reflects desired order of journal')
     model_config = ConfigDict(validate_default=True,
                               validate_assignment=True,
                               use_enum_values=True,

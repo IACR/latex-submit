@@ -1,0 +1,317 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{GHK{\etalchar{+}}21}
+
+\bibitem[AHKP22]{TCC:AHKP22}
+Anasuya Acharya, Carmit Hazay, Vladimir Kolesnikov, and Manoj Prabhakaran.
+\newblock {SCALES} - {MPC} with small clients and larger ephemeral servers.
+\newblock In Eike Kiltz and Vinod Vaikuntanathan, editors, {\em TCC~2022: 20th
+  Theory of Cryptography Conference, Part~II}, volume 13748 of {\em Lecture
+  Notes in Computer Science}, pages 502--531, Chicago, IL, USA, November~7--10,
+  2022. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-22365-5_18}
+  {\path{doi:10.1007/978-3-031-22365-5_18}}.
+
+\bibitem[ANOS22]{EPRINT:ANOS22}
+Bar Alon, Moni Naor, Eran Omri, and Uri Stemmer.
+\newblock {MPC} for tech giants ({GMPC}): Enabling gulliver and the
+  lilliputians to cooperate amicably.
+\newblock Cryptology ePrint Archive, Report 2022/902, 2022.
+\newblock \url{https://eprint.iacr.org/2022/902}.
+
+\bibitem[BBC{\etalchar{+}}19]{C:BBCGI19}
+Dan Boneh, Elette Boyle, Henry {Corrigan-Gibbs}, Niv Gilboa, and Yuval Ishai.
+\newblock Zero-knowledge proofs on secret-shared data via fully linear {PCPs}.
+\newblock In Alexandra Boldyreva and Daniele Micciancio, editors, {\em Advances
+  in Cryptology -- {CRYPTO}~2019, Part~III}, volume 11694 of {\em Lecture Notes
+  in Computer Science}, pages 67--97, Santa Barbara, CA, USA, August~18--22,
+  2019. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-26954-8_3}
+  {\path{doi:10.1007/978-3-030-26954-8_3}}.
+
+\bibitem[BBG{\etalchar{+}}21]{TCC:BBGHIN21}
+Fabrice Benhamouda, Elette Boyle, Niv Gilboa, Shai Halevi, Yuval Ishai, and
+  Ariel Nof.
+\newblock Generalized pseudorandom secret sharing and efficient
+  straggler-resilient secure computation.
+\newblock In Kobbi Nissim and Brent Waters, editors, {\em TCC~2021: 19th Theory
+  of Cryptography Conference, Part~II}, volume 13043 of {\em Lecture Notes in
+  Computer Science}, pages 129--161, Raleigh, NC, USA, November~8--11, 2021.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-90453-1_5}
+  {\path{doi:10.1007/978-3-030-90453-1_5}}.
+
+\bibitem[BJMS20]{AC:BJMS20}
+Saikrishna Badrinarayanan, Aayush Jain, Nathan Manohar, and Amit Sahai.
+\newblock Secure {MPC}: Laziness leads to {GOD}.
+\newblock In Shiho Moriai and Huaxiong Wang, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2020, Part~III}, volume 12493 of {\em Lecture Notes
+  in Computer Science}, pages 120--150, Daejeon, South Korea, December~7--11,
+  2020. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-64840-4_5}
+  {\path{doi:10.1007/978-3-030-64840-4_5}}.
+
+\bibitem[CDI05]{TCC:CraDamIsh05}
+Ronald Cramer, Ivan Damg{\aa}rd, and Yuval Ishai.
+\newblock Share conversion, pseudorandom secret-sharing and applications to
+  secure computation.
+\newblock In Joe Kilian, editor, {\em TCC~2005: 2nd Theory of Cryptography
+  Conference}, volume 3378 of {\em Lecture Notes in Computer Science}, pages
+  342--362, Cambridge, MA, USA, February~10--12, 2005. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/978-3-540-30576-7_19}
+  {\path{doi:10.1007/978-3-540-30576-7_19}}.
+
+\bibitem[CGG{\etalchar{+}}21]{C:CGGJK21}
+Arka~Rai Choudhuri, Aarushi Goel, Matthew Green, Abhishek Jain, and Gabriel
+  Kaptchuk.
+\newblock Fluid {MPC}: Secure multiparty computation with dynamic participants.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~II}, volume 12826 of {\em Lecture Notes in Computer
+  Science}, pages 94--123, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84245-1_4}
+  {\path{doi:10.1007/978-3-030-84245-1_4}}.
+
+\bibitem[CGH{\etalchar{+}}18]{C:CGHIKL18}
+Koji Chida, Daniel Genkin, Koki Hamada, Dai Ikarashi, Ryo Kikuchi, Yehuda
+  Lindell, and Ariel Nof.
+\newblock Fast large-scale honest-majority {MPC} for malicious adversaries.
+\newblock In Hovav Shacham and Alexandra Boldyreva, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2018, Part~III}, volume 10993 of {\em Lecture Notes in
+  Computer Science}, pages 34--64, Santa Barbara, CA, USA, August~19--23, 2018.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-96878-0_2}
+  {\path{doi:10.1007/978-3-319-96878-0_2}}.
+
+\bibitem[CK01]{EC:CanKra01}
+Ran Canetti and Hugo Krawczyk.
+\newblock Analysis of key-exchange protocols and their use for building secure
+  channels.
+\newblock In Birgit Pfitzmann, editor, {\em Advances in Cryptology --
+  {EUROCRYPT}~2001}, volume 2045 of {\em Lecture Notes in Computer Science},
+  pages 453--474, Innsbruck, Austria, May~6--10, 2001. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/3-540-44987-6_28}
+  {\path{doi:10.1007/3-540-44987-6_28}}.
+
+\bibitem[DEP21]{EPRINT:DamEscPol21}
+Ivan Damg{\r a}rd, Daniel Escudero, and Antigoni Polychroniadou.
+\newblock Phoenix: Secure computation in an unstable network with dropouts and
+  comebacks.
+\newblock Cryptology ePrint Archive, Report 2021/1376, 2021.
+\newblock \url{https://eprint.iacr.org/2021/1376}.
+
+\bibitem[DN07]{C:DamNie07}
+Ivan Damg{\aa}rd and Jesper~Buus Nielsen.
+\newblock Scalable and unconditionally secure multiparty computation.
+\newblock In Alfred Menezes, editor, {\em Advances in Cryptology --
+  {CRYPTO}~2007}, volume 4622 of {\em Lecture Notes in Computer Science}, pages
+  572--590, Santa Barbara, CA, USA, August~19--23, 2007. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/978-3-540-74143-5_32}
+  {\path{doi:10.1007/978-3-540-74143-5_32}}.
+
+\bibitem[DvW92]{DifVanWie92}
+Whitfield Diffie, Paul~C. {van Oorschot}, and Michael~J. Wiener.
+\newblock Authentication and authenticated key exchanges.
+\newblock {\em Designs, Codes and Cryptography}, 2(2):107--125, June 1992.
+
+\bibitem[DY81]{FOCS:DolYao81}
+Danny Dolev and Andrew Chi-Chih Yao.
+\newblock On the security of public key protocols (extended abstract).
+\newblock In {\em 22nd Annual Symposium on Foundations of Computer Science},
+  pages 350--357, Nashville, TN, USA, October~28--30, 1981. {IEEE} Computer
+  Society Press.
+\newblock \href {https://doi.org/10.1109/SFCS.1981.32}
+  {\path{doi:10.1109/SFCS.1981.32}}.
+
+\bibitem[FHM98]{C:FitHirMau98}
+Matthias Fitzi, Martin Hirt, and Ueli~M. Maurer.
+\newblock Trading correctness for privacy in unconditional multi-party
+  computation (extended abstract).
+\newblock In Hugo Krawczyk, editor, {\em Advances in Cryptology --
+  {CRYPTO}'98}, volume 1462 of {\em Lecture Notes in Computer Science}, pages
+  121--136, Santa Barbara, CA, USA, August~23--27, 1998. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/BFb0055724}
+  {\path{doi:10.1007/BFb0055724}}.
+
+\bibitem[FL19]{CCS:FurLin19}
+Jun Furukawa and Yehuda Lindell.
+\newblock Two-thirds honest-majority {MPC} for malicious adversaries at almost
+  the cost of semi-honest.
+\newblock In Lorenzo Cavallaro, Johannes Kinder, XiaoFeng Wang, and Jonathan
+  Katz, editors, {\em ACM CCS 2019: 26th Conference on Computer and
+  Communications Security}, pages 1557--1571, London, UK, November~11--15,
+  2019. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/3319535.3339811}
+  {\path{doi:10.1145/3319535.3339811}}.
+
+\bibitem[GHK{\etalchar{+}}21]{C:GHKMNRY21}
+Craig Gentry, Shai Halevi, Hugo Krawczyk, Bernardo Magri, Jesper~Buus Nielsen,
+  Tal Rabin, and Sophia Yakoubov.
+\newblock {YOSO}: You only speak once - secure {MPC} with stateless ephemeral
+  roles.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~II}, volume 12826 of {\em Lecture Notes in Computer
+  Science}, pages 64--93, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84245-1_3}
+  {\path{doi:10.1007/978-3-030-84245-1_3}}.
+
+\bibitem[GIP{\etalchar{+}}14]{STOC:GIPST14}
+Daniel Genkin, Yuval Ishai, Manoj Prabhakaran, Amit Sahai, and Eran Tromer.
+\newblock Circuits resilient to additive attacks with applications to secure
+  computation.
+\newblock In David~B. Shmoys, editor, {\em 46th Annual {ACM} Symposium on
+  Theory of Computing}, pages 495--504, New York, NY, USA, May~31~--~June~3,
+  2014. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/2591796.2591861}
+  {\path{doi:10.1145/2591796.2591861}}.
+
+\bibitem[GLO{\etalchar{+}}21]{C:GLOPS21}
+Vipul Goyal, Hanjun Li, Rafail Ostrovsky, Antigoni Polychroniadou, and Yifan
+  Song.
+\newblock {ATLAS}: Efficient and scalable {MPC} in the honest majority setting.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~II}, volume 12826 of {\em Lecture Notes in Computer
+  Science}, pages 244--274, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84245-1_9}
+  {\path{doi:10.1007/978-3-030-84245-1_9}}.
+
+\bibitem[GLS19]{C:GoyLiuSon19}
+Vipul Goyal, Yanyi Liu, and Yifan Song.
+\newblock Communication-efficient unconditional {MPC} with guaranteed output
+  delivery.
+\newblock In Alexandra Boldyreva and Daniele Micciancio, editors, {\em Advances
+  in Cryptology -- {CRYPTO}~2019, Part~II}, volume 11693 of {\em Lecture Notes
+  in Computer Science}, pages 85--114, Santa Barbara, CA, USA, August~18--22,
+  2019. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-26951-7_4}
+  {\path{doi:10.1007/978-3-030-26951-7_4}}.
+
+\bibitem[GPS19]{C:GuoPasShi19}
+Yue Guo, Rafael Pass, and Elaine Shi.
+\newblock Synchronous, with a chance of partition tolerance.
+\newblock In Alexandra Boldyreva and Daniele Micciancio, editors, {\em Advances
+  in Cryptology -- {CRYPTO}~2019, Part~I}, volume 11692 of {\em Lecture Notes
+  in Computer Science}, pages 499--529, Santa Barbara, CA, USA, August~18--22,
+  2019. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-26948-7_18}
+  {\path{doi:10.1007/978-3-030-26948-7_18}}.
+
+\bibitem[GS20]{EPRINT:GoySon20}
+Vipul Goyal and Yifan Song.
+\newblock Malicious security comes free in honest-majority {MPC}.
+\newblock Cryptology ePrint Archive, Report 2020/134, 2020.
+\newblock \url{https://eprint.iacr.org/2020/134}.
+
+\bibitem[GSZ20]{C:GoySonZhu20}
+Vipul Goyal, Yifan Song, and Chenzhi Zhu.
+\newblock Guaranteed output delivery comes free in honest majority {MPC}.
+\newblock In Daniele Micciancio and Thomas Ristenpart, editors, {\em Advances
+  in Cryptology -- {CRYPTO}~2020, Part~II}, volume 12171 of {\em Lecture Notes
+  in Computer Science}, pages 618--646, Santa Barbara, CA, USA, August~17--21,
+  2020. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-56880-1_22}
+  {\path{doi:10.1007/978-3-030-56880-1_22}}.
+
+\bibitem[HIJ{\etalchar{+}}16]{ITCS:HIJKR16}
+Shai Halevi, Yuval Ishai, Abhishek Jain, Eyal Kushilevitz, and Tal Rabin.
+\newblock Secure multiparty computation with general interaction patterns.
+\newblock In Madhu Sudan, editor, {\em ITCS 2016: 7th Conference on Innovations
+  in Theoretical Computer Science}, pages 157--168, Cambridge, MA, USA,
+  January~14--16, 2016. Association for Computing Machinery.
+\newblock \href {https://doi.org/10.1145/2840728.2840760}
+  {\path{doi:10.1145/2840728.2840760}}.
+
+\bibitem[HLP11]{C:HalLinPin11}
+Shai Halevi, Yehuda Lindell, and Benny Pinkas.
+\newblock Secure computation on the web: Computing without simultaneous
+  interaction.
+\newblock In Phillip Rogaway, editor, {\em Advances in Cryptology --
+  {CRYPTO}~2011}, volume 6841 of {\em Lecture Notes in Computer Science}, pages
+  132--150, Santa Barbara, CA, USA, August~14--18, 2011. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/978-3-642-22792-9_8}
+  {\path{doi:10.1007/978-3-642-22792-9_8}}.
+
+\bibitem[LN17]{CCS:LinNof17}
+Yehuda Lindell and Ariel Nof.
+\newblock A framework for constructing fast {MPC} over arithmetic circuits with
+  malicious adversaries and an honest-majority.
+\newblock In Bhavani~M. Thuraisingham, David Evans, Tal Malkin, and Dongyan Xu,
+  editors, {\em ACM CCS 2017: 24th Conference on Computer and Communications
+  Security}, pages 259--276, Dallas, TX, USA, October~31~--~November~2, 2017.
+  {ACM} Press.
+\newblock \href {https://doi.org/10.1145/3133956.3133999}
+  {\path{doi:10.1145/3133956.3133999}}.
+
+\bibitem[Mau03]{SCN:Maurer02}
+Ueli~M. Maurer.
+\newblock Secure multi-party computation made simple (invited talk).
+\newblock In Stelvio Cimato, Clemente Galdi, and Giuseppe Persiano, editors,
+  {\em SCN 02: 3rd International Conference on Security in Communication
+  Networks}, volume 2576 of {\em Lecture Notes in Computer Science}, pages
+  14--28, Amalfi, Italy, September~12--13, 2003. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/3-540-36413-7_2}
+  {\path{doi:10.1007/3-540-36413-7_2}}.
+
+\bibitem[Mau06]{Maurer}
+Ueli~M. Maurer.
+\newblock Secure multi-party computation made simple.
+\newblock {\em Discrete Applied Mathematics}, 154(2):370--381, 2006.
+\newblock \href {https://doi.org/10.1016/j.dam.2005.03.020}
+  {\path{doi:10.1016/j.dam.2005.03.020}}.
+
+\bibitem[NV18]{ACNS:NorVee18}
+Peter~Sebastian Nordholt and Meilof Veeningen.
+\newblock Minimising communication in honest-majority {MPC} by batchwise
+  multiplication verification.
+\newblock In Bart Preneel and Frederik Vercauteren, editors, {\em ACNS 18: 16th
+  International Conference on Applied Cryptography and Network Security},
+  volume 10892 of {\em Lecture Notes in Computer Science}, pages 321--339,
+  Leuven, Belgium, July~2--4, 2018. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-93387-0_17}
+  {\path{doi:10.1007/978-3-319-93387-0_17}}.
+
+\bibitem[Res18]{TLS13}
+Eric Rescorla.
+\newblock {The Transport Layer Security (TLS) Protocol Version 1.3}.
+\newblock IETF, RFC 8446, 2018.
+
+\bibitem[RS22]{C:RacSch22}
+Rahul Rachuri and Peter Scholl.
+\newblock Le mans: Dynamic and fluid {MPC} for dishonest majority.
+\newblock In Yevgeniy Dodis and Thomas Shrimpton, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2022, Part~I}, volume 13507 of {\em Lecture Notes in
+  Computer Science}, pages 719--749, Santa Barbara, CA, USA, August~15--18,
+  2022. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-15802-5_25}
+  {\path{doi:10.1007/978-3-031-15802-5_25}}.
+
+\bibitem[Sha79]{Shamir79}
+Adi Shamir.
+\newblock How to share a secret.
+\newblock {\em Communications of the Association for Computing Machinery},
+  22(11):612--613, November 1979.
+
+\bibitem[SW19]{RSA:SmaWoo19}
+Nigel~P. Smart and Tim Wood.
+\newblock Error detection in monotone span programs with application to
+  communication-efficient multi-party computation.
+\newblock In Mitsuru Matsui, editor, {\em Topics in Cryptology -- CT-RSA~2019},
+  volume 11405 of {\em Lecture Notes in Computer Science}, pages 210--229, San
+  Francisco, CA, USA, March~4--8, 2019. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-12612-4_11}
+  {\path{doi:10.1007/978-3-030-12612-4_11}}.
+
+\bibitem[Zen20]{WhiteCity}
+ZenGo.
+\newblock {White-City}: {A} framework for massive mpc with partial synchrony
+  and partially authenticated channels, 2020.
+\newblock URL:
+  \url{https://github.com/ZenGo-X/white-city/blob/master/White-City-Report/whitecity_new.pdf}.
+
+\end{thebibliography}

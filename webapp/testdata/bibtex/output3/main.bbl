@@ -1,0 +1,497 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{CAHL{\etalchar{+}}22}
+
+\bibitem[AB21]{C:AlpBur21}
+Handan~Kilin{\c c} Alper and Jeffrey Burdges.
+\newblock Two-round trip schnorr multi-signatures via delinearized witnesses.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~I}, volume 12825 of {\em Lecture Notes in Computer
+  Science}, pages 157--188, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84242-0_7}
+  {\path{doi:10.1007/978-3-030-84242-0_7}}.
+
+\bibitem[AFLT12]{EC:AFLT12}
+Michel Abdalla, Pierre-Alain Fouque, Vadim Lyubashevsky, and Mehdi Tibouchi.
+\newblock Tightly-secure signatures from lossy identification schemes.
+\newblock In David Pointcheval and Thomas Johansson, editors, {\em Advances in
+  Cryptology -- {EUROCRYPT}~2012}, volume 7237 of {\em Lecture Notes in
+  Computer Science}, pages 572--590, Cambridge, UK, April~15--19, 2012.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-642-29011-4_34}
+  {\path{doi:10.1007/978-3-642-29011-4_34}}.
+
+\bibitem[BBM00]{EC:BelBolMic00}
+Mihir Bellare, Alexandra Boldyreva, and Silvio Micali.
+\newblock Public-key encryption in a multi-user setting: Security proofs and
+  improvements.
+\newblock In Bart Preneel, editor, {\em Advances in Cryptology --
+  {EUROCRYPT}~2000}, volume 1807 of {\em Lecture Notes in Computer Science},
+  pages 259--274, Bruges, Belgium, May~14--18, 2000. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/3-540-45539-6_18}
+  {\path{doi:10.1007/3-540-45539-6_18}}.
+
+\bibitem[BD21]{AC:BelDai21}
+Mihir Bellare and Wei Dai.
+\newblock Chain reductions for multi-signatures and the {HBMS} scheme.
+\newblock In Mehdi Tibouchi and Huaxiong Wang, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2021, Part~IV}, volume 13093 of {\em Lecture Notes
+  in Computer Science}, pages 650--678, Singapore, December~6--10, 2021.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-92068-5_22}
+  {\path{doi:10.1007/978-3-030-92068-5_22}}.
+
+\bibitem[BDN18]{AC:BonDriNev18}
+Dan Boneh, Manu Drijvers, and Gregory Neven.
+\newblock Compact multi-signatures for smaller blockchains.
+\newblock In Thomas Peyrin and Steven Galbraith, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2018, Part~II}, volume 11273 of {\em Lecture Notes
+  in Computer Science}, pages 435--464, Brisbane, Queensland, Australia,
+  December~2--6, 2018. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-03329-3_15}
+  {\path{doi:10.1007/978-3-030-03329-3_15}}.
+
+\bibitem[BHJ{\etalchar{+}}15]{TCC:BHJKL15}
+Christoph Bader, Dennis Hofheinz, Tibor Jager, Eike Kiltz, and Yong Li.
+\newblock Tightly-secure authenticated key exchange.
+\newblock In Yevgeniy Dodis and Jesper~Buus Nielsen, editors, {\em TCC~2015:
+  12th Theory of Cryptography Conference, Part~I}, volume 9014 of {\em Lecture
+  Notes in Computer Science}, pages 629--658, Warsaw, Poland, March~23--25,
+  2015. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-46494-6_26}
+  {\path{doi:10.1007/978-3-662-46494-6_26}}.
+
+\bibitem[BJLS16]{EC:BJLS16}
+Christoph Bader, Tibor Jager, Yong Li, and Sven Sch{\"a}ge.
+\newblock On the impossibility of tight cryptographic reductions.
+\newblock In Marc Fischlin and Jean-S{\'{e}}bastien Coron, editors, {\em
+  Advances in Cryptology -- {EUROCRYPT}~2016, Part~II}, volume 9666 of {\em
+  Lecture Notes in Computer Science}, pages 273--304, Vienna, Austria,
+  May~8--12, 2016. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-49896-5_10}
+  {\path{doi:10.1007/978-3-662-49896-5_10}}.
+
+\bibitem[BKKP15]{PKC:BKKP15}
+Olivier Blazy, Saqib~A. Kakvi, Eike Kiltz, and Jiaxin Pan.
+\newblock Tightly-secure signatures from chameleon hash functions.
+\newblock In Jonathan Katz, editor, {\em PKC~2015: 18th International
+  Conference on Theory and Practice of Public Key Cryptography}, volume 9020 of
+  {\em Lecture Notes in Computer Science}, pages 256--279, Gaithersburg, MD,
+  USA, March~30~--~April~1, 2015. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-46447-2_12}
+  {\path{doi:10.1007/978-3-662-46447-2_12}}.
+
+\bibitem[BKP14]{C:BlaKilPan14}
+Olivier Blazy, Eike Kiltz, and Jiaxin Pan.
+\newblock ({H}ierarchical) identity-based encryption from affine message
+  authentication.
+\newblock In Juan~A. Garay and Rosario Gennaro, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2014, Part~I}, volume 8616 of {\em Lecture Notes in
+  Computer Science}, pages 408--425, Santa Barbara, CA, USA, August~17--21,
+  2014. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-44371-2_23}
+  {\path{doi:10.1007/978-3-662-44371-2_23}}.
+
+\bibitem[BL16]{AC:BoyLi16}
+Xavier Boyen and Qinyi Li.
+\newblock Towards tightly secure lattice short signature and id-based
+  encryption.
+\newblock In Jung~Hee Cheon and Tsuyoshi Takagi, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2016, Part~II}, volume 10032 of {\em Lecture Notes
+  in Computer Science}, pages 404--434, Hanoi, Vietnam, December~4--8, 2016.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-53890-6_14}
+  {\path{doi:10.1007/978-3-662-53890-6_14}}.
+
+\bibitem[BN06]{CCS:BelNev06}
+Mihir Bellare and Gregory Neven.
+\newblock Multi-signatures in the plain public-key model and a general forking
+  lemma.
+\newblock In Ari Juels, Rebecca~N. Wright, and Sabrina {De Capitani di
+  Vimercati}, editors, {\em ACM CCS 2006: 13th Conference on Computer and
+  Communications Security}, pages 390--399, Alexandria, Virginia, USA,
+  October~30~--~November~3, 2006. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/1180405.1180453}
+  {\path{doi:10.1145/1180405.1180453}}.
+
+\bibitem[Bol03]{PKC:Boldyreva03}
+Alexandra Boldyreva.
+\newblock Threshold signatures, multisignatures and blind signatures based on
+  the gap-{Diffie}-{Hellman}-group signature scheme.
+\newblock In Yvo Desmedt, editor, {\em PKC~2003: 6th International Workshop on
+  Theory and Practice in Public Key Cryptography}, volume 2567 of {\em Lecture
+  Notes in Computer Science}, pages 31--46, Miami, FL, USA, January~6--8, 2003.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/3-540-36288-6_3}
+  {\path{doi:10.1007/3-540-36288-6_3}}.
+
+\bibitem[BR93]{CCS:BelRog93}
+Mihir Bellare and Phillip Rogaway.
+\newblock Random oracles are practical: {A} paradigm for designing efficient
+  protocols.
+\newblock In Dorothy~E. Denning, Raymond Pyle, Ravi Ganesan, Ravi~S. Sandhu,
+  and Victoria Ashby, editors, {\em ACM CCS 93: 1st Conference on Computer and
+  Communications Security}, pages 62--73, Fairfax, Virginia, USA,
+  November~3--5, 1993. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/168588.168596}
+  {\path{doi:10.1145/168588.168596}}.
+
+\bibitem[BTT22]{C:BosTakTib22}
+Cecilia Boschini, Akira Takahashi, and Mehdi Tibouchi.
+\newblock {MuSig}-{L}: Lattice-based multi-signature with single-round online
+  phase.
+\newblock In Yevgeniy Dodis and Thomas Shrimpton, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2022, Part~II}, volume 13508 of {\em Lecture Notes in
+  Computer Science}, pages 276--305, Santa Barbara, CA, USA, August~15--18,
+  2022. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-15979-4_10}
+  {\path{doi:10.1007/978-3-031-15979-4_10}}.
+
+\bibitem[CAHL{\etalchar{+}}22]{C:CHLLW22}
+Rutchathon Chairattana-Apirom, Lucjan Hanzlik, Julian Loss, Anna Lysyanskaya,
+  and Benedikt Wagner.
+\newblock {PI}-cut-choo and friends: Compact blind signatures via parallel
+  instance cut-and-choose and more.
+\newblock In Yevgeniy Dodis and Thomas Shrimpton, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2022, Part~III}, volume 13509 of {\em Lecture Notes in
+  Computer Science}, pages 3--31, Santa Barbara, CA, USA, August~15--18, 2022.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-15982-4_1}
+  {\path{doi:10.1007/978-3-031-15982-4_1}}.
+
+\bibitem[CKM21]{EPRINT:CriKomMal21}
+Elizabeth Crites, Chelsea Komlo, and Mary Maller.
+\newblock How to prove schnorr assuming schnorr: Security of multi- and
+  threshold signatures.
+\newblock Cryptology ePrint Archive, Report 2021/1375, 2021.
+\newblock \url{https://eprint.iacr.org/2021/1375}.
+
+\bibitem[CW13]{C:CheWee13}
+Jie Chen and Hoeteck Wee.
+\newblock Fully, (almost) tightly secure {IBE} and dual system groups.
+\newblock In Ran Canetti and Juan~A. Garay, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2013, Part~II}, volume 8043 of {\em Lecture Notes in
+  Computer Science}, pages 435--460, Santa Barbara, CA, USA, August~18--22,
+  2013. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-642-40084-1_25}
+  {\path{doi:10.1007/978-3-642-40084-1_25}}.
+
+\bibitem[DEF{\etalchar{+}}19]{SP:DEFKLNS19}
+Manu Drijvers, Kasra Edalatnejad, Bryan Ford, Eike Kiltz, Julian Loss, Gregory
+  Neven, and Igors Stepanovs.
+\newblock On the security of two-round multi-signatures.
+\newblock In {\em 2019 {IEEE} Symposium on Security and Privacy}, pages
+  1084--1101, San Francisco, CA, USA, May~19--23, 2019. {IEEE} Computer Society
+  Press.
+\newblock \href {https://doi.org/10.1109/SP.2019.00050}
+  {\path{doi:10.1109/SP.2019.00050}}.
+
+\bibitem[DG21]{ACNS:DavGun21}
+Hannah Davis and Felix G{\"u}nther.
+\newblock Tighter proofs for the {SIGMA} and {TLS} 1.3 key exchange protocols.
+\newblock In Kazue Sako and Nils~Ole Tippenhauer, editors, {\em ACNS 21: 19th
+  International Conference on Applied Cryptography and Network Security,
+  Part~II}, volume 12727 of {\em Lecture Notes in Computer Science}, pages
+  448--479, Kamakura, Japan, June~21--24, 2021. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-78375-4_18}
+  {\path{doi:10.1007/978-3-030-78375-4_18}}.
+
+\bibitem[DGJL21]{PKC:DGJL21}
+Denis Diemert, Kai Gellert, Tibor Jager, and Lin Lyu.
+\newblock More efficient digital signatures with tight multi-user security.
+\newblock In Juan Garay, editor, {\em PKC~2021: 24th International Conference
+  on Theory and Practice of Public Key Cryptography, Part~II}, volume 12711 of
+  {\em Lecture Notes in Computer Science}, pages 1--31, Virtual Event,
+  May~10--13, 2021. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-75248-4_1}
+  {\path{doi:10.1007/978-3-030-75248-4_1}}.
+
+\bibitem[DOTT21]{PKC:DOTT21}
+Ivan Damg{\r a}rd, Claudio Orlandi, Akira Takahashi, and Mehdi Tibouchi.
+\newblock Two-round n-out-of-n and multi-signatures and trapdoor commitment
+  from lattices.
+\newblock In Juan Garay, editor, {\em PKC~2021: 24th International Conference
+  on Theory and Practice of Public Key Cryptography, Part~I}, volume 12710 of
+  {\em Lecture Notes in Computer Science}, pages 99--130, Virtual Event,
+  May~10--13, 2021. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-75245-3_5}
+  {\path{doi:10.1007/978-3-030-75245-3_5}}.
+
+\bibitem[EHK{\etalchar{+}}13]{C:EHKRV13}
+Alex Escala, Gottfried Herold, Eike Kiltz, Carla R{\`a}fols, and Jorge Villar.
+\newblock An algebraic framework for {Diffie}-{Hellman} assumptions.
+\newblock In Ran Canetti and Juan~A. Garay, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2013, Part~II}, volume 8043 of {\em Lecture Notes in
+  Computer Science}, pages 129--147, Santa Barbara, CA, USA, August~18--22,
+  2013. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-642-40084-1_8}
+  {\path{doi:10.1007/978-3-642-40084-1_8}}.
+
+\bibitem[FH21]{DBLP:journals/ijnc/FukumitsuH21}
+Masayuki Fukumitsu and Shingo Hasegawa.
+\newblock A tightly secure ddh-based multisignature with public-key
+  aggregation.
+\newblock {\em Int. J. Netw. Comput.}, 11(2):319--337, 2021.
+\newblock URL: \url{http://www.ijnc.org/index.php/ijnc/article/view/257}.
+
+\bibitem[FKL18]{C:FucKilLos18}
+Georg Fuchsbauer, Eike Kiltz, and Julian Loss.
+\newblock The algebraic group model and its applications.
+\newblock In Hovav Shacham and Alexandra Boldyreva, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2018, Part~II}, volume 10992 of {\em Lecture Notes in
+  Computer Science}, pages 33--62, Santa Barbara, CA, USA, August~19--23, 2018.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-96881-0_2}
+  {\path{doi:10.1007/978-3-319-96881-0_2}}.
+
+\bibitem[GHKP18]{EC:GHKP18}
+Romain Gay, Dennis Hofheinz, Lisa Kohl, and Jiaxin Pan.
+\newblock More efficient (almost) tightly secure structure-preserving
+  signatures.
+\newblock In Jesper~Buus Nielsen and Vincent Rijmen, editors, {\em Advances in
+  Cryptology -- {EUROCRYPT}~2018, Part~II}, volume 10821 of {\em Lecture Notes
+  in Computer Science}, pages 230--258, Tel Aviv, Israel, April~29~--~May~3,
+  2018. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-78375-8_8}
+  {\path{doi:10.1007/978-3-319-78375-8_8}}.
+
+\bibitem[GHKW16]{EC:GHKW16}
+Romain Gay, Dennis Hofheinz, Eike Kiltz, and Hoeteck Wee.
+\newblock Tightly {CCA}-secure encryption without pairings.
+\newblock In Marc Fischlin and Jean-S{\'{e}}bastien Coron, editors, {\em
+  Advances in Cryptology -- {EUROCRYPT}~2016, Part~I}, volume 9665 of {\em
+  Lecture Notes in Computer Science}, pages 1--27, Vienna, Austria, May~8--12,
+  2016. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-49890-3_1}
+  {\path{doi:10.1007/978-3-662-49890-3_1}}.
+
+\bibitem[GJ18]{C:GjoJag18}
+Kristian Gj{\o}steen and Tibor Jager.
+\newblock Practical and tightly-secure digital signatures and authenticated key
+  exchange.
+\newblock In Hovav Shacham and Alexandra Boldyreva, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2018, Part~II}, volume 10992 of {\em Lecture Notes in
+  Computer Science}, pages 95--125, Santa Barbara, CA, USA, August~19--23,
+  2018. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-96881-0_4}
+  {\path{doi:10.1007/978-3-319-96881-0_4}}.
+
+\bibitem[GJKW07]{JC:GJKW07}
+Eu-Jin Goh, Stanislaw Jarecki, Jonathan Katz, and Nan Wang.
+\newblock Efficient signature schemes with tight reductions to the
+  {Diffie}-{Hellman} problems.
+\newblock {\em Journal of Cryptology}, 20(4):493--514, October 2007.
+\newblock \href {https://doi.org/10.1007/s00145-007-0549-3}
+  {\path{doi:10.1007/s00145-007-0549-3}}.
+
+\bibitem[HJ12]{C:HofJag12}
+Dennis Hofheinz and Tibor Jager.
+\newblock Tightly secure signatures and public-key encryption.
+\newblock In Reihaneh Safavi-Naini and Ran Canetti, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2012}, volume 7417 of {\em Lecture Notes in Computer
+  Science}, pages 590--607, Santa Barbara, CA, USA, August~19--23, 2012.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-642-32009-5_35}
+  {\path{doi:10.1007/978-3-642-32009-5_35}}.
+
+\bibitem[HJK{\etalchar{+}}21]{C:HJKLPRS21}
+Shuai Han, Tibor Jager, Eike Kiltz, Shengli Liu, Jiaxin Pan, Doreen Riepel, and
+  Sven Sch{\"a}ge.
+\newblock Authenticated key exchange and signatures with tight security in the
+  standard model.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~IV}, volume 12828 of {\em Lecture Notes in Computer
+  Science}, pages 670--700, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84259-8_23}
+  {\path{doi:10.1007/978-3-030-84259-8_23}}.
+
+\bibitem[HKL19]{EC:HauKilLos19}
+Eduard Hauck, Eike Kiltz, and Julian Loss.
+\newblock A modular treatment of blind signatures from identification schemes.
+\newblock In Yuval Ishai and Vincent Rijmen, editors, {\em Advances in
+  Cryptology -- {EUROCRYPT}~2019, Part~III}, volume 11478 of {\em Lecture Notes
+  in Computer Science}, pages 345--375, Darmstadt, Germany, May~19--23, 2019.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-17659-4_12}
+  {\path{doi:10.1007/978-3-030-17659-4_12}}.
+
+\bibitem[Hof17]{EC:Hofheinz17}
+Dennis Hofheinz.
+\newblock Adaptive partitioning.
+\newblock In Jean-S{\'{e}}bastien Coron and Jesper~Buus Nielsen, editors, {\em
+  Advances in Cryptology -- {EUROCRYPT}~2017, Part~III}, volume 10212 of {\em
+  Lecture Notes in Computer Science}, pages 489--518, Paris, France,
+  April~30~--~May~4, 2017. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-319-56617-7_17}
+  {\path{doi:10.1007/978-3-319-56617-7_17}}.
+
+\bibitem[ITA83]{itakura1983public}
+K.~ITAKURA.
+\newblock A public-key cryptosystem suitable for digital multisignature.
+\newblock {\em NEC Research and Development}, 71:1--8, 1983.
+\newblock URL: \url{https://cir.nii.ac.jp/crid/1572543025896144128}.
+
+\bibitem[KD04]{C:KurDes04}
+Kaoru Kurosawa and Yvo Desmedt.
+\newblock A new paradigm of hybrid encryption scheme.
+\newblock In Matthew Franklin, editor, {\em Advances in Cryptology --
+  {CRYPTO}~2004}, volume 3152 of {\em Lecture Notes in Computer Science}, pages
+  426--442, Santa Barbara, CA, USA, August~15--19, 2004. Springer, Heidelberg,
+  Germany.
+\newblock \href {https://doi.org/10.1007/978-3-540-28628-8_26}
+  {\path{doi:10.1007/978-3-540-28628-8_26}}.
+
+\bibitem[KLR21]{AC:KatLosRos21}
+Jonathan Katz, Julian Loss, and Michael Rosenberg.
+\newblock Boosting the security of blind signature schemes.
+\newblock In Mehdi Tibouchi and Huaxiong Wang, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2021, Part~IV}, volume 13093 of {\em Lecture Notes
+  in Computer Science}, pages 468--492, Singapore, December~6--10, 2021.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-92068-5_16}
+  {\path{doi:10.1007/978-3-030-92068-5_16}}.
+
+\bibitem[KMP16]{C:KilMasPan16}
+Eike Kiltz, Daniel Masny, and Jiaxin Pan.
+\newblock Optimal security proofs for signatures from identification schemes.
+\newblock In Matthew Robshaw and Jonathan Katz, editors, {\em Advances in
+  Cryptology -- {CRYPTO}~2016, Part~II}, volume 9815 of {\em Lecture Notes in
+  Computer Science}, pages 33--61, Santa Barbara, CA, USA, August~14--18, 2016.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-662-53008-5_2}
+  {\path{doi:10.1007/978-3-662-53008-5_2}}.
+
+\bibitem[KW03]{CCS:KatWan03}
+Jonathan Katz and Nan Wang.
+\newblock Efficiency improvements for signature schemes with tight security
+  reductions.
+\newblock In Sushil Jajodia, Vijayalakshmi Atluri, and Trent Jaeger, editors,
+  {\em ACM CCS 2003: 10th Conference on Computer and Communications Security},
+  pages 155--164, Washington, DC, USA, October~27--30, 2003. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/948109.948132}
+  {\path{doi:10.1145/948109.948132}}.
+
+\bibitem[LLGW20]{AC:LLGW20}
+Xiangyu Liu, Shengli Liu, Dawu Gu, and Jian Weng.
+\newblock Two-pass authenticated key exchange with explicit authentication and
+  tight security.
+\newblock In Shiho Moriai and Huaxiong Wang, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2020, Part~II}, volume 12492 of {\em Lecture Notes
+  in Computer Science}, pages 785--814, Daejeon, South Korea, December~7--11,
+  2020. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-64834-3_27}
+  {\path{doi:10.1007/978-3-030-64834-3_27}}.
+
+\bibitem[LOS{\etalchar{+}}06]{EC:LOSSW06}
+Steve Lu, Rafail Ostrovsky, Amit Sahai, Hovav Shacham, and Brent Waters.
+\newblock Sequential aggregate signatures and multisignatures without random
+  oracles.
+\newblock In Serge Vaudenay, editor, {\em Advances in Cryptology --
+  {EUROCRYPT}~2006}, volume 4004 of {\em Lecture Notes in Computer Science},
+  pages 465--485, St. Petersburg, Russia, May~28~--~June~1, 2006. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/11761679_28}
+  {\path{doi:10.1007/11761679_28}}.
+
+\bibitem[LP20]{AC:LanPan20}
+Roman Langrehr and Jiaxin Pan.
+\newblock Unbounded {HIBE} with tight security.
+\newblock In Shiho Moriai and Huaxiong Wang, editors, {\em Advances in
+  Cryptology -- {ASIACRYPT}~2020, Part~II}, volume 12492 of {\em Lecture Notes
+  in Computer Science}, pages 129--159, Daejeon, South Korea, December~7--11,
+  2020. Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-64834-3_5}
+  {\path{doi:10.1007/978-3-030-64834-3_5}}.
+
+\bibitem[MOR01]{CCS:MicOhtRey01}
+Silvio Micali, Kazuo Ohta, and Leonid Reyzin.
+\newblock Accountable-subgroup multisignatures: Extended abstract.
+\newblock In Michael~K. Reiter and Pierangela Samarati, editors, {\em ACM CCS
+  2001: 8th Conference on Computer and Communications Security}, pages
+  245--254, Philadelphia, PA, USA, November~5--8, 2001. {ACM} Press.
+\newblock \href {https://doi.org/10.1145/501983.502017}
+  {\path{doi:10.1145/501983.502017}}.
+
+\bibitem[MPSW19]{DBLP:journals/dcc/MaxwellPSW19}
+Gregory Maxwell, Andrew Poelstra, Yannick Seurin, and Pieter Wuille.
+\newblock Simple schnorr multi-signatures with applications to bitcoin.
+\newblock {\em Des. Codes Cryptogr.}, 87(9):2139--2164, 2019.
+\newblock URL: \url{https://doi.org/10.1007/s10623-019-00608-x}, \href
+  {https://doi.org/10.1007/S10623-019-00608-X}
+  {\path{doi:10.1007/S10623-019-00608-X}}.
+
+\bibitem[NRS21]{C:NicRufSeu21}
+Jonas Nick, Tim Ruffing, and Yannick Seurin.
+\newblock {MuSig2}: Simple two-round {Schnorr} multi-signatures.
+\newblock In Tal Malkin and Chris Peikert, editors, {\em Advances in Cryptology
+  -- {CRYPTO}~2021, Part~I}, volume 12825 of {\em Lecture Notes in Computer
+  Science}, pages 189--221, Virtual Event, August~16--20, 2021. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-84242-0_8}
+  {\path{doi:10.1007/978-3-030-84242-0_8}}.
+
+\bibitem[NRSW20]{CCS:NRSW20}
+Jonas Nick, Tim Ruffing, Yannick Seurin, and Pieter Wuille.
+\newblock {MuSig}-{DN}: Schnorr multi-signatures with verifiably deterministic
+  nonces.
+\newblock In Jay Ligatti, Xinming Ou, Jonathan Katz, and Giovanni Vigna,
+  editors, {\em ACM CCS 2020: 27th Conference on Computer and Communications
+  Security}, pages 1717--1731, Virtual Event, USA, November~9--13, 2020. {ACM}
+  Press.
+\newblock \href {https://doi.org/10.1145/3372297.3417236}
+  {\path{doi:10.1145/3372297.3417236}}.
+
+\bibitem[PW]{fullversion}
+J.~Pan and B.~Wagner.
+\newblock Toothpicks: More efficient fork-free two-round.
+\newblock URL: \url{https://eprint.iacr.org/2023/1613}.
+
+\bibitem[PW22]{PKC:PanWag22}
+Jiaxin Pan and Benedikt Wagner.
+\newblock Lattice-based signatures with tight adaptive corruptions and more.
+\newblock In Goichiro Hanaoka, Junji Shikata, and Yohei Watanabe, editors, {\em
+  PKC~2022: 25th International Conference on Theory and Practice of Public Key
+  Cryptography, Part~II}, volume 13178 of {\em Lecture Notes in Computer
+  Science}, pages 347--378, Virtual Event, March~8--11, 2022. Springer,
+  Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-030-97131-1_12}
+  {\path{doi:10.1007/978-3-030-97131-1_12}}.
+
+\bibitem[PW23]{EC:PanWag23}
+Jiaxin Pan and Benedikt Wagner.
+\newblock Chopsticks: Fork-free two-round multi-signatures from non-interactive
+  assumptions.
+\newblock In Carmit Hazay and Martijn Stam, editors, {\em Advances in
+  Cryptology -- {EUROCRYPT}~2023, Part~V}, volume 14008 of {\em Lecture Notes
+  in Computer Science}, pages 597--627, Lyon, France, April~23--27, 2023.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-30589-4_21}
+  {\path{doi:10.1007/978-3-031-30589-4_21}}.
+
+\bibitem[Sch91]{JC:Schnorr91}
+Claus-Peter Schnorr.
+\newblock Efficient signature generation by smart cards.
+\newblock {\em Journal of Cryptology}, 4(3):161--174, January 1991.
+\newblock \href {https://doi.org/10.1007/BF00196725}
+  {\path{doi:10.1007/BF00196725}}.
+
+\bibitem[TSS{\etalchar{+}}23]{EPRINT:TSSHO23}
+Kaoru Takemure, Yusuke Sakai, Bagus Santoso, Goichiro Hanaoka, and Kazuo Ohta.
+\newblock More efficient two-round multi-signature scheme with provably secure
+  parameters.
+\newblock Cryptology ePrint Archive, Report 2023/155, 2023.
+\newblock \url{https://eprint.iacr.org/2023/155}.
+
+\bibitem[TZ23]{EC:TesZhu23a}
+Stefano Tessaro and Chenzhi Zhu.
+\newblock Threshold and multi-signature schemes from linear hash functions.
+\newblock In Carmit Hazay and Martijn Stam, editors, {\em Advances in
+  Cryptology -- {EUROCRYPT}~2023, Part~V}, volume 14008 of {\em Lecture Notes
+  in Computer Science}, pages 628--658, Lyon, France, April~23--27, 2023.
+  Springer, Heidelberg, Germany.
+\newblock \href {https://doi.org/10.1007/978-3-031-30589-4_22}
+  {\path{doi:10.1007/978-3-031-30589-4_22}}.
+
+\end{thebibliography}

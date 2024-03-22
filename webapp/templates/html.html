@@ -1,0 +1,51 @@
+{# html view used in several other views #}
+{% set meta = comp.meta %}
+          <h3>{{meta.title}}</h3>
+	  <div>
+	    <div id="authorlist" class="authorlist">
+	      {% for author in meta.authors %}
+	      <div class="author">
+		<div class="authorname">{{author.name}}
+		  {% if author.orcid %}
+		  <a target="_blank" href="https://orcid.org/{{author.orcid}}"><img alt="ORCID" class="align-baseline orcidIcon" src="/img/orcid.svg"></a>
+		  {% endif %}
+		</div>
+		<div class="ms-4 mb-2">
+		  {% for i in author.affiliations %}
+		  {% set aff = meta.affiliations[i-1] %}
+		  {{aff.name}}{% if aff.city %}, {{aff.city}}{% endif %}, {{aff.country}}<br>
+		  {% endfor %}
+		  {% if author.email %}
+		  <span class="font-monospace">{{author.email|replace('@', ' at ')|replace('.', ' dot ')}}</span>
+		  {% endif %}
+		</div>
+	      </div>
+	      {% endfor %}
+	    </div>
+	    {% if meta.keywords %}
+	    <div class="mb-3">
+	      <strong class="fs-4">Keywords: </strong>
+	      {% for keyword in meta.keywords %}
+	      <span class="badge p-2 text-bg-light keyword ms-2 my-1" alt="{{keyword}}" title="{{keyword}}"><a>{{keyword}}</a></span>
+	      {% endfor %}
+	    </div>
+	    {% endif %}
+	    {%- if meta.abstract -%}
+	    <h4 class="mt-4">Abstract</h4>
+	    {{meta.abstract|safe}}
+	    {% endif %}
+	    {% if comp.bibhtml %}
+	    <h4 class="mb-3">References</h4>
+	    {% for entry in comp.bibhtml %}
+            <div class="d-flex">
+              <div style="min-width:6rem;">{{entry.label|safe}}</div>
+              <div>{{entry.body|safe}}</div>
+            </div>
+	    <div class="text-end mb-4">
+              {% for link in entry.links %}
+	      <a href="{{link.url}}" target="_blank" class="ms-3">{{link.label}}</a>
+              {% endfor %}
+	    </div>
+	    {% endfor %} {# end of bibhtml #}
+	    {% endif %}
+	  </div>

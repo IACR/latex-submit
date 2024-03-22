@@ -1,0 +1,1908 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.8.15)  20 MAR 2024 16:32
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**main
+(./main.tex
+LaTeX2e <2022-06-01> patch level 5
+L3 programming layer <2022-09-28> (./iacrcc.cls
+
+ *** LaTeX class for IACR Communications in Cryptology v0.60 ***
+
+Document Class: iacrcc 2024/03/14
+(/home/kevin/texlive2022/texmf-dist/tex/latex/currfile/currfile.sty
+Package: currfile 2022/10/10 v0.8 Provides the file path elements of the current input file
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+) (/home/kevin/texlive2022/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+)) (/home/kevin/texlive2022/texmf-dist/tex/latex/filehook/filehook.sty
+Package: filehook 2022/10/25 v0.8b Hooks for input files
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/filehook/filehook-2020.sty
+Package: filehook-2020 2022/10/25 v0.8b Hooks for input files
+)) (/home/kevin/texlive2022/texmf-dist/tex/latex/currfile/currfile-abspath.sty
+Package: currfile-abspath 2022/10/10 v0.8 Provides absolute file paths, the parent working directory and the main file name
+)
+\c@currfiledepth=\count185
+
+
+Package currfile-abspath Warning: The required recorder file (.fls) was not found.
+(currfile-abspath)                Please compile with the '-recorder' option.
+(currfile-abspath)                Note that MikTeX requires two compiler runs.
+(currfile-abspath)                Occurred on input line 295.
+
+)
+iacrcc:opened as expl3.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2022-09-28 L3 programming layer (loader) 
+iacrcc:opened as l3backend-pdftex.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2022-09-28 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count186
+\l__pdf_internal_box=\box51
+)
+iacrcc:closed as l3backend-pdftex.def
+)
+iacrcc:closed as expl3.sty
+iacrcc:opened as xkeyval.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/xkeyval/xkeyval.tex (/home/kevin/texlive2022/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks17
+\XKV@tempa@toks=\toks18
+)
+\XKV@depth=\count187
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+))
+iacrcc:closed as xkeyval.sty
+iacrcc:opened as etoolbox.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count188
+)
+iacrcc:closed as etoolbox.sty
+
+Compiling version=final
+iacrcc:opened as xstring.sty
+(/home/kevin/texlive2022/texmf-dist/tex/generic/xstring/xstring.sty (/home/kevin/texlive2022/texmf-dist/tex/generic/xstring/xstring.tex
+\integerpart=\count189
+\decimalpart=\count190
+)
+Package: xstring 2023/01/14 v1.85 String manipulations (CT)
+)
+iacrcc:closed as xstring.sty
+iacrcc:opened as article.cls
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+iacrcc:opened as size10.clo
+(/home/kevin/texlive2022/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+iacrcc:closed as size10.clo
+\c@part=\count191
+\c@section=\count192
+\c@subsection=\count193
+\c@subsubsection=\count194
+\c@paragraph=\count195
+\c@subparagraph=\count196
+\c@figure=\count197
+\c@table=\count198
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+iacrcc:closed as article.cls
+iacrcc:opened as iftex.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+)
+iacrcc:closed as iftex.sty
+iacrcc:opened as geometry.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+iacrcc:opened as ifvtex.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+iacrcc:closed as ifvtex.sty
+\Gm@cnth=\count199
+\Gm@cntv=\count266
+\c@Gm@tempcnt=\count267
+\Gm@bindingoffset=\dimen139
+\Gm@wd@mp=\dimen140
+\Gm@odd@mp=\dimen141
+\Gm@even@mp=\dimen142
+\Gm@layoutwidth=\dimen143
+\Gm@layoutheight=\dimen144
+\Gm@layouthoffset=\dimen145
+\Gm@layoutvoffset=\dimen146
+\Gm@dimlist=\toks19
+)
+iacrcc:closed as geometry.sty
+iacrcc:opened as afterpage.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tools/afterpage.sty
+Package: afterpage 2014/10/28 v1.08 After-Page Package (DPC)
+\AP@output=\toks20
+\AP@partial=\box52
+\AP@footins=\box53
+)
+iacrcc:closed as afterpage.sty
+iacrcc:opened as tikz.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+iacrcc:opened as pgf.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+iacrcc:opened as pgfrcs.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+\pgfutil@everybye=\toks21
+\pgfutil@tempdima=\dimen147
+\pgfutil@tempdimb=\dimen148
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box54
+)
+iacrcc:opened as pgfrcs.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+)
+iacrcc:closed as pgfrcs.code.tex
+)
+iacrcc:closed as pgfrcs.sty
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+iacrcc:opened as pgfcore.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+iacrcc:opened as graphicx.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+iacrcc:opened as graphics.sty
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+iacrcc:opened as trig.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+iacrcc:closed as trig.sty
+iacrcc:opened as graphics.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+iacrcc:closed as graphics.cfg
+Package graphics Info: Driver file: pdftex.def on input line 107.
+iacrcc:opened as pdftex.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
+\stockwidth=\dimen149
+\stockheight=\dimen150
+)
+iacrcc:closed as pdftex.def
+)
+iacrcc:closed as graphics.sty
+\Gin@req@height=\dimen151
+\Gin@req@width=\dimen152
+)
+iacrcc:closed as graphicx.sty
+iacrcc:opened as pgfsys.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+iacrcc:opened as pgfsys.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks22
+\pgfkeys@temptoks=\toks23
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks24
+))
+\pgf@x=\dimen153
+\pgf@y=\dimen154
+\pgf@xa=\dimen155
+\pgf@ya=\dimen156
+\pgf@xb=\dimen157
+\pgf@yb=\dimen158
+\pgf@xc=\dimen159
+\pgf@yc=\dimen160
+\pgf@xd=\dimen161
+\pgf@yd=\dimen162
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count268
+\c@pgf@countb=\count269
+\c@pgf@countc=\count270
+\c@pgf@countd=\count271
+\t@pgf@toka=\toks25
+\t@pgf@tokb=\toks26
+\t@pgf@tokc=\toks27
+\pgf@sys@id@count=\count272
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-pdftex.def
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
+)))
+iacrcc:closed as pgfsys.code.tex
+iacrcc:opened as pgfsyssoftpath.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count273
+\pgfsyssoftpath@bigbuffer@items=\count274
+)
+iacrcc:closed as pgfsyssoftpath.code.tex
+iacrcc:opened as pgfsysprotocol.code.tex
+
+(/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+iacrcc:closed as pgfsysprotocol.code.tex
+)
+iacrcc:closed as pgfsys.sty
+iacrcc:opened as xcolor.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
+iacrcc:opened as color.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+iacrcc:closed as color.cfg
+Package xcolor Info: Driver file: pdftex.def on input line 227.
+iacrcc:opened as mathcolor.ltx
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+iacrcc:closed as mathcolor.ltx
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1357.
+Package xcolor Info: Model `RGB' extended on input line 1369.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1371.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
+)
+iacrcc:closed as xcolor.sty
+iacrcc:opened as pgfcore.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen163
+\pgfmath@count=\count275
+\pgfmath@box=\box55
+\pgfmath@toks=\toks28
+\pgfmath@stack@operand=\toks29
+\pgfmath@stack@operation=\toks30
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex)
+(/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count276
+)) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen164
+\pgf@picmaxx=\dimen165
+\pgf@picminy=\dimen166
+\pgf@picmaxy=\dimen167
+\pgf@pathminx=\dimen168
+\pgf@pathmaxx=\dimen169
+\pgf@pathminy=\dimen170
+\pgf@pathmaxy=\dimen171
+\pgf@xx=\dimen172
+\pgf@xy=\dimen173
+\pgf@yx=\dimen174
+\pgf@yy=\dimen175
+\pgf@zx=\dimen176
+\pgf@zy=\dimen177
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen178
+\pgf@path@lasty=\dimen179
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen180
+\pgf@shorten@start@additional=\dimen181
+)
+(/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box56
+\pgf@hbox=\box57
+\pgf@layerbox@main=\box58
+\pgf@picture@serial@count=\count277
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen182
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen183
+\pgf@pt@y=\dimen184
+\pgf@pt@temp=\dimen185
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen186
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen187
+\pgf@sys@shading@range@num=\count278
+\pgf@shadingcount=\count279
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box59
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+iacrcc:closed as pgfcore.code.tex
+)
+iacrcc:closed as pgfcore.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box60
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+iacrcc:opened as pgfcomp-version-0-65.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen188
+\pgf@nodesepend=\dimen189
+)
+iacrcc:closed as pgfcomp-version-0-65.sty
+iacrcc:opened as pgfcomp-version-1-18.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+)
+iacrcc:closed as pgfcomp-version-1-18.sty
+)
+iacrcc:closed as pgf.sty
+iacrcc:opened as pgffor.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+iacrcc:opened as pgfkeys.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+iacrcc:opened as pgfkeys.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)
+iacrcc:closed as pgfkeys.code.tex
+)
+iacrcc:closed as pgfkeys.sty
+iacrcc:opened as pgfmath.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+iacrcc:opened as pgfmath.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+iacrcc:closed as pgfmath.code.tex
+)
+iacrcc:closed as pgfmath.sty
+iacrcc:opened as pgffor.code.tex
+
+(/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen190
+\pgffor@skip=\dimen191
+\pgffor@stack=\toks31
+\pgffor@toks=\toks32
+)
+iacrcc:closed as pgffor.code.tex
+)
+iacrcc:closed as pgffor.sty
+iacrcc:opened as tikz.code.tex
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count280
+\pgfplotmarksize=\dimen192
+)
+\tikz@lastx=\dimen193
+\tikz@lasty=\dimen194
+\tikz@lastxsaved=\dimen195
+\tikz@lastysaved=\dimen196
+\tikz@lastmovetox=\dimen197
+\tikz@lastmovetoy=\dimen198
+\tikzleveldistance=\dimen199
+\tikzsiblingdistance=\dimen256
+\tikz@figbox=\box61
+\tikz@figbox@bg=\box62
+\tikz@tempbox=\box63
+\tikz@tempbox@bg=\box64
+\tikztreelevel=\count281
+\tikznumberofchildren=\count282
+\tikznumberofcurrentchild=\count283
+\tikz@fig@count=\count284
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count285
+\pgfmatrixcurrentcolumn=\count286
+\pgf@matrix@numberofcolumns=\count287
+)
+\tikz@expandcount=\count288
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+iacrcc:closed as tikz.code.tex
+)
+iacrcc:closed as tikz.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarysvg.path.code.tex
+File: tikzlibrarysvg.path.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/libraries/pgflibrarysvg.path.code.tex
+File: pgflibrarysvg.path.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/modules/pgfmoduleparser.code.tex
+File: pgfmoduleparser.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfparserdef@arg@count=\count289
+)
+\pgf@lib@svg@last@x=\dimen257
+\pgf@lib@svg@last@y=\dimen258
+\pgf@lib@svg@last@c@x=\dimen259
+\pgf@lib@svg@last@c@y=\dimen260
+\pgf@lib@svg@count=\count290
+\pgf@lib@svg@max@num=\count291
+))
+\@curXheight=\skip49
+\c@IACR@author@cnt=\count292
+\c@IACR@inst@cnt=\count293
+\c@IACR@email@cnt=\count294
+\iacrmeta=\write4
+\openout4 = `main.meta'.
+
+iacrcc:opened as xpatch.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/xpatch/xpatch.sty
+Package: xpatch 2020/03/25 v0.3a Extending etoolbox patching commands
+iacrcc:opened as xparse.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+Package: xparse 2023-02-02 L3 Experimental document command parser
+)
+iacrcc:closed as xparse.sty
+)
+iacrcc:closed as xpatch.sty
+iacrcc:opened as alphalph.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/alphalph/alphalph.sty
+Package: alphalph 2019/12/09 v2.6 Convert numbers to letters (HO)
+iacrcc:opened as infwarerr.sty
+
+(/home/kevin/texlive2022/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+iacrcc:closed as infwarerr.sty
+iacrcc:opened as intcalc.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+iacrcc:closed as intcalc.sty
+)
+iacrcc:closed as alphalph.sty
+iacrcc:opened as tokcycle.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/tokcycle/tokcycle.sty (/home/kevin/texlive2022/texmf-dist/tex/generic/tokcycle/tokcycle.tex
+\tc@tok=\toks33
+\tcdepth=\count295
+\cytoks=\toks34
+)
+Package: tokcycle 2021/08/25 V1.42 Cycle through and transform a stream of tokens
+)
+iacrcc:closed as tokcycle.sty
+iacrcc:opened as listofitems.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/listofitems/listofitems.sty (/home/kevin/texlive2022/texmf-dist/tex/generic/listofitems/listofitems.tex
+\loi_cnt_foreach_nest=\count296
+\loi_nestcnt=\count297
+)
+Package: listofitems 2019/08/21 v1.63 Grab items in lists using user-specified sep char (CT)
+)
+iacrcc:closed as listofitems.sty
+iacrcc:opened as fancyhdr.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
+\f@nch@headwidth=\skip50
+\f@nch@O@elh=\skip51
+\f@nch@O@erh=\skip52
+\f@nch@O@olh=\skip53
+\f@nch@O@orh=\skip54
+\f@nch@O@elf=\skip55
+\f@nch@O@erf=\skip56
+\f@nch@O@olf=\skip57
+\f@nch@O@orf=\skip58
+)
+iacrcc:closed as fancyhdr.sty
+iacrcc:opened as fancyvrb.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2023/01/19 4.5a verbatim text (tvz,hv)
+\FV@CodeLineNo=\count298
+\FV@InFile=\read3
+\FV@TabBox=\box65
+\c@FancyVerbLine=\count299
+\FV@StepNumber=\count300
+\FV@OutFile=\write5
+)
+iacrcc:closed as fancyvrb.sty
+iacrcc:opened as amsmath.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2022/04/08 v2.17n AMS math features
+\@mathmargin=\skip59
+
+For additional information on amsmath, use the `?' option.
+iacrcc:opened as amstext.sty
+(/home/kevin/texlive2022/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+iacrcc:opened as amsgen.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks35
+\ex@=\dimen261
+)
+iacrcc:closed as amsgen.sty
+)
+iacrcc:closed as amstext.sty
+iacrcc:opened as amsbsy.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen262
+)
+iacrcc:closed as amsbsy.sty
+iacrcc:opened as amsopn.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+iacrcc:closed as amsopn.sty
+\inf@bad=\count301
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count302
+\leftroot@=\count303
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count304
+\DOTSCASE@=\count305
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box66
+\strutbox@=\box67
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen263
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count306
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count307
+\dotsspace@=\muskip16
+\c@parentequation=\count308
+\dspbrk@lvl=\count309
+\tag@help=\toks36
+\row@=\count310
+\column@=\count311
+\maxfields@=\count312
+\andhelp@=\toks37
+\eqnshift@=\dimen264
+\alignsep@=\dimen265
+\tagshift@=\dimen266
+\tagwidth@=\dimen267
+\totwidth@=\dimen268
+\lineht@=\dimen269
+\@envbody=\toks38
+\multlinegap=\skip60
+\multlinetaggap=\skip61
+\mathdisplay@stack=\toks39
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
+)
+iacrcc:closed as amsmath.sty
+iacrcc:opened as amssymb.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+iacrcc:opened as amsfonts.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+iacrcc:closed as amsfonts.sty
+)
+iacrcc:closed as amssymb.sty
+iacrcc:opened as amsthm.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2020/05/29 v2.20.6
+\thm@style=\toks40
+\thm@bodyfont=\toks41
+\thm@headfont=\toks42
+\thm@notefont=\toks43
+\thm@headpunct=\toks44
+\thm@preskip=\skip62
+\thm@postskip=\skip63
+\thm@headsep=\skip64
+\dth@everypar=\toks45
+)
+iacrcc:closed as amsthm.sty
+iacrcc:opened as mathtools.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2022/06/29 v1.29 mathematical typesetting tools
+iacrcc:opened as calc.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count313
+\calc@Bcount=\count314
+\calc@Adimen=\dimen270
+\calc@Bdimen=\dimen271
+\calc@Askip=\skip65
+\calc@Bskip=\skip66
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count315
+\calc@Cskip=\skip67
+)
+iacrcc:closed as calc.sty
+iacrcc:opened as mhsetup.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/mathtools/mhsetup.sty
+Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
+)
+iacrcc:closed as mhsetup.sty
+\g_MT_multlinerow_int=\count316
+\l_MT_multwidth_dim=\dimen272
+\origjot=\skip68
+\l_MT_shortvdotswithinadjustabove_dim=\dimen273
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen274
+\l_MT_above_intertext_sep=\dimen275
+\l_MT_below_intertext_sep=\dimen276
+\l_MT_above_shortintertext_sep=\dimen277
+\l_MT_below_shortintertext_sep=\dimen278
+\xmathstrut@box=\box68
+\xmathstrut@dim=\dimen279
+)
+iacrcc:closed as mathtools.sty
+\c@definition=\count317
+\c@example=\count318
+\c@exercise=\count319
+\c@property=\count320
+\c@question=\count321
+\c@solution=\count322
+\c@theorem=\count323
+\c@proposition=\count324
+\c@problem=\count325
+\c@lemma=\count326
+\c@conjecture=\count327
+\c@corollary=\count328
+\c@remark=\count329
+\c@note=\count330
+\c@case=\count331
+iacrcc:opened as float.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count332
+\float@exts=\toks46
+\float@box=\box69
+\@float@everytoks=\toks47
+\@floatcapt=\box70
+)
+iacrcc:closed as float.sty
+\@float@every@table=\toks48
+\@float@every@figure=\toks49
+iacrcc:opened as microtype.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/microtype.sty
+Package: microtype 2022/06/23 v3.0f Micro-typographical refinements (RS)
+\MT@toks=\toks50
+\MT@tempbox=\box71
+\MT@count=\count333
+LaTeX Info: Redefining \noprotrusionifhmode on input line 1045.
+LaTeX Info: Redefining \leftprotrusion on input line 1046.
+LaTeX Info: Redefining \rightprotrusion on input line 1056.
+LaTeX Info: Redefining \textls on input line 1234.
+\MT@outer@kern=\dimen280
+LaTeX Info: Redefining \textmicrotypecontext on input line 1858.
+\MT@listname@count=\count334
+iacrcc:opened as microtype-pdftex.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+File: microtype-pdftex.def 2022/06/23 v3.0f Definitions specific to pdftex (RS)
+LaTeX Info: Redefining \lsstyle on input line 900.
+LaTeX Info: Redefining \lslig on input line 900.
+\MT@outer@space=\skip69
+)
+iacrcc:closed as microtype-pdftex.def
+Package microtype Info: Loading configuration file microtype.cfg.
+iacrcc:opened as microtype.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/microtype.cfg
+File: microtype.cfg 2022/06/23 v3.0f microtype main configuration file (RS)
+)
+iacrcc:closed as microtype.cfg
+)
+iacrcc:closed as microtype.sty
+iacrcc:opened as lmodern.sty
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/lm/lmodern.sty
+Package: lmodern 2015/05/01 v1.6.1 Latin Modern Fonts
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/lmr/m/n on input line 22.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/lmm/m/it on input line 23.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/lmsy/m/n on input line 24.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 25.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 26.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/lmm/b/it on input line 27.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/lmsy/b/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 31.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> OT1/lmss/m/n on input line 32.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/lmr/m/it on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> OT1/lmss/bx/n on input line 36.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
+)
+iacrcc:closed as lmodern.sty
+)
+iacrcc:closed as main.tex
+iacrcc:opened as doclicense.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/doclicense/doclicense.sty
+Package: doclicense 2022/05/18 v3.2.0 Support for putting documents under a license
+iacrcc:opened as xifthen.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/xifthen/xifthen.sty
+Package: xifthen 2015/11/05 v1.4.0 Extended ifthen features
+iacrcc:opened as ifthen.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
+)
+iacrcc:closed as ifthen.sty
+iacrcc:opened as ifmtarg.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/ifmtarg/ifmtarg.sty
+Package: ifmtarg 2018/04/16 v1.2b check for an empty argument
+)
+iacrcc:closed as ifmtarg.sty
+)
+iacrcc:closed as xifthen.sty
+iacrcc:opened as xspace.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+iacrcc:closed as xspace.sty
+iacrcc:opened as verbatim.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tools/verbatim.sty
+Package: verbatim 2020-07-07 v1.5u LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks51
+\verbatim@line=\toks52
+\verbatim@in@stream=\read4
+)
+iacrcc:closed as verbatim.sty
+\doclicense@hsize=\skip70
+iacrcc:opened as doclicense-english.ldf
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/doclicense/doclicense-english.ldf
+File: doclicense-english.ldf 
+)
+iacrcc:closed as doclicense-english.ldf
+)
+iacrcc:closed as doclicense.sty
+iacrcc:opened as paralist.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/paralist/paralist.sty
+Package: paralist 2017/01/22 v2.7 Extended list environments
+\pltopsep=\skip71
+\plpartopsep=\skip72
+\plitemsep=\skip73
+\plparsep=\skip74
+\pl@lab=\toks53
+)
+iacrcc:closed as paralist.sty
+iacrcc:opened as nicodemus.sty
+ (./nicodemus.sty
+Package: nicodemus 
+iacrcc:opened as enumitem.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip75
+\enit@outerparindent=\dimen281
+\enit@toks=\toks54
+\enit@inbox=\box72
+\enit@count@id=\count335
+\enitdp@description=\count336
+)
+iacrcc:closed as enumitem.sty
+\nicolinenrsymbolwidth=\skip76
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 14.
+iacrcc:opened as ot1lmr.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as ot1lmr.fd
+LaTeX Font Info:    Trying to load font information for OT1+lmtt on input line 14.
+iacrcc:opened as ot1lmtt.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/ot1lmtt.fd
+File: ot1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as ot1lmtt.fd
+\nicolinenrwidth=\skip77
+\nicolinenrsep=\skip78
+\c@nicolinenr=\count337
+)
+iacrcc:closed as nicodemus.sty
+iacrcc:opened as textpos.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/textpos/textpos.sty
+Package: textpos 2022/07/23 v1.10.1
+Package textpos Info: choosing support for LaTeX3 on input line 60.
+\TP@textbox=\box73
+\TP@holdbox=\box74
+\TPHorizModule=\dimen282
+\TPVertModule=\dimen283
+\TP@margin=\dimen284
+\TP@absmargin=\dimen285
+
+Grid set 16 x 16 = 37.34424pt x 52.81541pt
+\TPboxrulesize=\dimen286
+\TP@ox=\dimen287
+\TP@oy=\dimen288
+\TP@tbargs=\toks55
+TextBlockOrigin set to 0pt x 0pt
+)
+iacrcc:closed as textpos.sty
+iacrcc:opened as everypage.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/everypage/everypage.sty
+Package: everypage 2020/10/17 R2.0b Hooks to run on every page
+
+
+Package everypage Warning: Functionality similar to this package has recently
+(everypage)                been implemented in LaTeX. This package is now in
+(everypage)                legacy status.
+(everypage)                Please, don't use it in new documents and packages.
+
+
+Package everypage Warning: You appear to be running a version of LaTeX
+(everypage)                providing the new functionality.
+(everypage)                Doing the best to deliver the original `everypage`
+(everypage)                interface on top of it. Strict equivalence is
+(everypage)                not possible, breakage may occur.
+(everypage)                If truly needed, Use `everypage-1x` to force the
+(everypage)                loading of an older code base.
+
+)
+iacrcc:closed as everypage.sty
+\c@pagewarning=\count338
+\strutdepth=\skip79
+iacrcc:opened as cryptocode.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/cryptocode/cryptocode.sty
+Package: cryptocode 2021/08/15 v0.44 Cryptocode LaTeX package for typesetting pseudocode, algorithms and protocols as well as cryptographic proofs.
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+iacrcc:opened as xargs.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/xargs/xargs.sty
+Package: xargs 2008/03/22 v1.1  extended macro definitions  (mpg)
+\xargs@max=\count339
+\xargs@toksa=\toks56
+\xargs@toksb=\toks57
+)
+iacrcc:closed as xargs.sty
+iacrcc:opened as forloop.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/forloop/forloop.sty
+Package: forloop 2006/09/18 v3.0 For Loops for LaTeX
+)
+iacrcc:closed as forloop.sty
+iacrcc:opened as array.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tools/array.sty
+Package: array 2022/03/10 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen289
+\ar@mcellbox=\box75
+\extrarowheight=\dimen290
+\NC@list=\toks58
+\extratabsurround=\skip80
+\backup@length=\skip81
+\ar@cellbox=\box76
+)
+iacrcc:closed as array.sty
+iacrcc:opened as pbox.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/pbox/pbox.sty
+Package: pbox 2011/12/07 v1.2 Dynamic parboxes
+\pb@xlen=\skip82
+)
+iacrcc:closed as pbox.sty
+iacrcc:opened as varwidth.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/varwidth/varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box77
+\sift@deathcycles=\count340
+\@vwid@loff=\dimen291
+\@vwid@roff=\dimen292
+)
+iacrcc:closed as varwidth.sty
+iacrcc:opened as suffix.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/bigfoot/suffix.sty
+Package: suffix 2006/07/15 1.5a Variant command support
+)
+iacrcc:closed as suffix.sty
+iacrcc:opened as environ.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/environ/environ.sty
+Package: environ 2014/05/04 v0.3 A new way to define environments
+iacrcc:opened as trimspaces.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
+)
+iacrcc:closed as trimspaces.sty
+)
+iacrcc:closed as environ.sty
+\pcaboveskip=\skip83
+\pcbelowskip=\skip84
+\pcbeforeskip=\skip85
+\pcafterskip=\skip86
+\c@@pc@global@pc@cnt=\count341
+\c@@pc@global@pc@nestcnt=\count342
+\c@@pc@stackdepth=\count343
+\@pc@stackspace@len=\skip87
+\pcbeforehstackskip=\skip88
+\pcafterhstackskip=\skip89
+\@pc@stackcontentbox=\box78
+\@pc@minipage@length=\skip90
+\@pc@alt@minipage@length=\skip91
+\@pc@length@tmp@width@vstack=\skip92
+\@pseudocodecodeminlineheight@len=\skip93
+\@pcindentwidth=\skip94
+\c@pclinenumber=\count344
+\c@Hpclinenumber=\count345
+\c@@pclinenumber=\count346
+\c@H@pclinenumber=\count347
+\c@@pclinenumbertmp=\count348
+\c@pcgamecounter=\count349
+\c@Hpcgamecounter=\count350
+\c@pcrlinenumber=\count351
+\c@Hpcrlinenumber=\count352
+\c@@pcrlinenumbertmp=\count353
+\pcheadlinesep=\skip95
+\pcbodylinesep=\skip96
+\@pseudocodeheadheight@len=\skip97
+\pcheadheight=\skip98
+\c@@pc@indentationlevel=\count354
+\c@pccolumncounter=\count355
+\c@@pcsubprogcnt1=\count356
+\c@@pcrsubprogcnt1=\count357
+\c@@pcsubprogcnt2=\count358
+\c@@pcrsubprogcnt2=\count359
+\c@@pcsubprogcnt3=\count360
+\c@@pcrsubprogcnt3=\count361
+\c@@pcsubprogcnt4=\count362
+\c@@pcrsubprogcnt4=\count363
+\c@@pcsubprogcnt5=\count364
+\c@@pcrsubprogcnt5=\count365
+\c@@pcsubprogcnt6=\count366
+\c@@pcrsubprogcnt6=\count367
+\c@@pcsubprogcnt7=\count368
+\c@@pcrsubprogcnt7=\count369
+\c@@pcsubprogcnt8=\count370
+\c@@pcrsubprogcnt8=\count371
+\c@@pcsubprogcnt9=\count372
+\c@@pcrsubprogcnt9=\count373
+\c@@pcsubprogstep=\count374
+\pcmessagearrow=\skip99
+\c@@pc@remember=\count375
+\@bb@message@voffset=\skip100
+\@bb@query@voffset=\skip101
+\@bb@oraclequery@voffset=\skip102
+\@bb@challengerquery@voffset=\skip103
+\c@@bb@oracle@cnt=\count376
+\c@@bb@oracle@nestcnt=\count377
+\c@@bb@challenger@cnt=\count378
+\c@@bb@challenger@nestcnt=\count379
+\c@@bb@env@nestcnt=\count380
+\@bb@com@tmpoffset=\skip104
+\@bb@tmplength@b=\skip105
+\c@pcstartgamecounter=\count381
+)
+iacrcc:closed as cryptocode.sty
+iacrcc:opened as pseudocodemacros.sty
+ (./pseudocodemacros.sty)
+iacrcc:closed as pseudocodemacros.sty
+iacrcc:opened as pifont.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/psnfss/pifont.sty
+Package: pifont 2020/03/25 PSNFSS-v9.3 Pi font support (SPQR) 
+LaTeX Font Info:    Trying to load font information for U+pzd on input line 63.
+iacrcc:opened as upzd.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/psnfss/upzd.fd
+File: upzd.fd 2001/06/04 font definitions for U/pzd.
+)
+iacrcc:closed as upzd.fd
+LaTeX Font Info:    Trying to load font information for U+psy on input line 64.
+iacrcc:opened as upsy.fd
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/psnfss/upsy.fd
+File: upsy.fd 2001/06/04 font definitions for U/psy.
+)
+iacrcc:closed as upsy.fd
+)
+iacrcc:closed as pifont.sty
+iacrcc:opened as tikz-cd.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/tikz-cd/tikz-cd.sty
+Package: tikz-cd 2021/05/04 v1.0 Commutative diagrams with TikZ
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/tikz-cd/tikzlibrarycd.code.tex (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarymatrix.code.tex
+File: tikzlibrarymatrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryquotes.code.tex
+File: tikzlibraryquotes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowinset=\dimen293
+\pgfarrowlength=\dimen294
+\pgfarrowwidth=\dimen295
+\pgfarrowlinewidth=\dimen296
+)))
+iacrcc:closed as tikz-cd.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodepartlowerbox=\box79
+\pgfnodeparttwobox=\box80
+\pgfnodepartthreebox=\box81
+\pgfnodepartfourbox=\box82
+\pgfnodeparttwentybox=\box83
+\pgfnodepartnineteenbox=\box84
+\pgfnodeparteighteenbox=\box85
+\pgfnodepartseventeenbox=\box86
+\pgfnodepartsixteenbox=\box87
+\pgfnodepartfifteenbox=\box88
+\pgfnodepartfourteenbox=\box89
+\pgfnodepartthirteenbox=\box90
+\pgfnodeparttwelvebox=\box91
+\pgfnodepartelevenbox=\box92
+\pgfnodeparttenbox=\box93
+\pgfnodepartninebox=\box94
+\pgfnodeparteightbox=\box95
+\pgfnodepartsevenbox=\box96
+\pgfnodepartsixbox=\box97
+\pgfnodepartfivebox=\box98
+))
+iacrcc:opened as listings.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count382
+\lst@gtempboxa=\box99
+\lst@token=\toks59
+\lst@length=\count383
+\lst@currlwidth=\dimen297
+\lst@column=\count384
+\lst@pos=\count385
+\lst@lostspace=\dimen298
+\lst@width=\dimen299
+\lst@newlines=\count386
+\lst@lineno=\count387
+\lst@maxwidth=\dimen300
+iacrcc:opened as lstmisc.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count388
+\lst@skipnumbers=\count389
+\lst@framebox=\box100
+)
+iacrcc:closed as lstmisc.sty
+iacrcc:opened as listings.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+)
+iacrcc:closed as listings.cfg
+)
+iacrcc:closed as listings.sty
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+iacrcc:opened as fontenc.sty
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 112.
+iacrcc:opened as t1lmr.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/t1lmr.fd
+File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as t1lmr.fd
+)
+iacrcc:closed as fontenc.sty
+iacrcc:opened as hyperref.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2022-09-22 v7.00t Hypertext links for LaTeX
+iacrcc:opened as pdftexcmds.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+iacrcc:closed as pdftexcmds.sty
+iacrcc:opened as kvdefinekeys.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+iacrcc:closed as kvdefinekeys.sty
+iacrcc:opened as pdfescape.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+)
+iacrcc:closed as pdfescape.sty
+iacrcc:opened as hycolor.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+iacrcc:closed as hycolor.sty
+iacrcc:opened as letltxmacro.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+)
+iacrcc:closed as letltxmacro.sty
+iacrcc:opened as auxhook.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+iacrcc:closed as auxhook.sty
+iacrcc:opened as nameref.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2022-05-17 v2.50 Cross-referencing by name of section
+iacrcc:opened as refcount.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+iacrcc:closed as refcount.sty
+iacrcc:opened as gettitlestring.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+iacrcc:closed as gettitlestring.sty
+\c@section@level=\count390
+)
+iacrcc:closed as nameref.sty
+\@linkdim=\dimen301
+\Hy@linkcounter=\count391
+\Hy@pagecounter=\count392
+iacrcc:opened as pd1enc.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2022-09-22 v7.00t Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+iacrcc:closed as pd1enc.def
+iacrcc:opened as etexcmds.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+iacrcc:closed as etexcmds.sty
+\Hy@SavedSpaceFactor=\count393
+iacrcc:opened as puenc.def
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2022-09-22 v7.00t Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+iacrcc:closed as puenc.def
+Package hyperref Info: Hyper figures OFF on input line 4162.
+Package hyperref Info: Link nesting OFF on input line 4167.
+Package hyperref Info: Hyper index ON on input line 4170.
+Package hyperref Info: Plain pages OFF on input line 4177.
+Package hyperref Info: Backreferencing OFF on input line 4182.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4410.
+\c@Hy@tempcnt=\count394
+iacrcc:opened as url.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+iacrcc:closed as url.sty
+LaTeX Info: Redefining \url on input line 4748.
+\XeTeXLinkMargin=\dimen302
+iacrcc:opened as bitset.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+iacrcc:opened as bigintcalc.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
+)
+iacrcc:closed as bigintcalc.sty
+)
+iacrcc:closed as bitset.sty
+\Fld@menulength=\count395
+\Field@Width=\dimen303
+\Fld@charsize=\dimen304
+Package hyperref Info: Hyper figures OFF on input line 6027.
+Package hyperref Info: Link nesting OFF on input line 6032.
+Package hyperref Info: Hyper index ON on input line 6035.
+Package hyperref Info: backreferencing OFF on input line 6042.
+Package hyperref Info: Link coloring OFF on input line 6047.
+Package hyperref Info: Link coloring with OCG OFF on input line 6052.
+Package hyperref Info: PDF/A mode OFF on input line 6057.
+iacrcc:opened as atbegshi.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+iacrcc:closed as atbegshi.sty
+\Hy@abspage=\count396
+\c@Item=\count397
+\c@Hfootnote=\count398
+)
+iacrcc:closed as hyperref.sty
+Package hyperref Info: Driver (autodetected): hpdftex.
+iacrcc:opened as hpdftex.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2022-09-22 v7.00t Hyperref driver for pdfTeX
+iacrcc:opened as atveryend.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
+with kernel methods
+)
+iacrcc:closed as atveryend.sty
+\Fld@listcount=\count399
+\c@bookmark@seq@number=\count400
+iacrcc:opened as rerunfilecheck.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
+iacrcc:opened as uniquecounter.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+iacrcc:closed as uniquecounter.sty
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
+)
+iacrcc:closed as rerunfilecheck.sty
+\Hy@SectionHShift=\skip106
+)
+iacrcc:closed as hpdftex.def
+Package hyperref Info: Option `colorlinks' set `true' on input line 474.
+iacrcc:opened as after-hyperref.sty
+ (./after-hyperref.sty
+iacrcc:opened as cleveref.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/cleveref/cleveref.sty
+Package: cleveref 2018/03/27 v0.21.4 Intelligent cross-referencing
+Package cleveref Info: `hyperref' support loaded on input line 2370.
+LaTeX Info: Redefining \cref on input line 2370.
+LaTeX Info: Redefining \Cref on input line 2370.
+LaTeX Info: Redefining \crefrange on input line 2370.
+LaTeX Info: Redefining \Crefrange on input line 2370.
+LaTeX Info: Redefining \cpageref on input line 2370.
+LaTeX Info: Redefining \Cpageref on input line 2370.
+LaTeX Info: Redefining \cpagerefrange on input line 2370.
+LaTeX Info: Redefining \Cpagerefrange on input line 2370.
+LaTeX Info: Redefining \labelcref on input line 2370.
+LaTeX Info: Redefining \labelcpageref on input line 2370.
+Package cleveref Info: `amsthm' support loaded on input line 3026.
+Package cleveref Info: `listings' support loaded on input line 3131.
+Package cleveref Info: always capitalise cross-reference names on input line 7825.
+Package cleveref Info: always capitalise cross-reference names on input line 7852.
+Package cleveref Info: no abbreviation of names on input line 7852.
+)
+iacrcc:closed as cleveref.sty
+iacrcc:opened as macros.sty
+ (./macros.sty)
+iacrcc:closed as macros.sty
+iacrcc:opened as macros_be.sty
+ (./macros_be.sty
+iacrcc:opened as booktabs.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen305
+\lightrulewidth=\dimen306
+\cmidrulewidth=\dimen307
+\belowrulesep=\dimen308
+\belowbottomsep=\dimen309
+\aboverulesep=\dimen310
+\abovetopsep=\dimen311
+\cmidrulesep=\dimen312
+\cmidrulekern=\dimen313
+\defaultaddspace=\dimen314
+\@cmidla=\count401
+\@cmidlb=\count402
+\@aboverulesep=\dimen315
+\@belowrulesep=\dimen316
+\@thisruleclass=\count403
+\@lastruleclass=\count404
+\@thisrulewidth=\dimen317
+)
+iacrcc:closed as booktabs.sty
+iacrcc:opened as mdframed.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/mdframed/mdframed.sty
+Package: mdframed 2013/07/01 1.9b: mdframed
+iacrcc:opened as zref-abspage.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/zref/zref-abspage.sty
+Package: zref-abspage 2022-04-07 v2.34 Module abspage for zref (HO)
+iacrcc:opened as zref-base.sty
+
+(/home/kevin/texlive2022/texmf-dist/tex/latex/zref/zref-base.sty
+Package: zref-base 2022-04-07 v2.34 Module base for zref (HO)
+Package zref Info: New property list: main on input line 767.
+Package zref Info: New property: default on input line 768.
+Package zref Info: New property: page on input line 769.
+)
+iacrcc:closed as zref-base.sty
+\c@abspage=\count405
+Package zref Info: New property: abspage on input line 65.
+)
+iacrcc:closed as zref-abspage.sty
+iacrcc:opened as needspace.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/needspace/needspace.sty
+Package: needspace 2010/09/12 v1.3d reserve vertical space
+)
+iacrcc:closed as needspace.sty
+\mdf@templength=\skip107
+\c@mdf@globalstyle@cnt=\count406
+\mdf@skipabove@length=\skip108
+\mdf@skipbelow@length=\skip109
+\mdf@leftmargin@length=\skip110
+\mdf@rightmargin@length=\skip111
+\mdf@innerleftmargin@length=\skip112
+\mdf@innerrightmargin@length=\skip113
+\mdf@innertopmargin@length=\skip114
+\mdf@innerbottommargin@length=\skip115
+\mdf@splittopskip@length=\skip116
+\mdf@splitbottomskip@length=\skip117
+\mdf@outermargin@length=\skip118
+\mdf@innermargin@length=\skip119
+\mdf@linewidth@length=\skip120
+\mdf@innerlinewidth@length=\skip121
+\mdf@middlelinewidth@length=\skip122
+\mdf@outerlinewidth@length=\skip123
+\mdf@roundcorner@length=\skip124
+\mdf@footenotedistance@length=\skip125
+\mdf@userdefinedwidth@length=\skip126
+\mdf@needspace@length=\skip127
+\mdf@frametitleaboveskip@length=\skip128
+\mdf@frametitlebelowskip@length=\skip129
+\mdf@frametitlerulewidth@length=\skip130
+\mdf@frametitleleftmargin@length=\skip131
+\mdf@frametitlerightmargin@length=\skip132
+\mdf@shadowsize@length=\skip133
+\mdf@extratopheight@length=\skip134
+\mdf@subtitleabovelinewidth@length=\skip135
+\mdf@subtitlebelowlinewidth@length=\skip136
+\mdf@subtitleaboveskip@length=\skip137
+\mdf@subtitlebelowskip@length=\skip138
+\mdf@subtitleinneraboveskip@length=\skip139
+\mdf@subtitleinnerbelowskip@length=\skip140
+\mdf@subsubtitleabovelinewidth@length=\skip141
+\mdf@subsubtitlebelowlinewidth@length=\skip142
+\mdf@subsubtitleaboveskip@length=\skip143
+\mdf@subsubtitlebelowskip@length=\skip144
+\mdf@subsubtitleinneraboveskip@length=\skip145
+\mdf@subsubtitleinnerbelowskip@length=\skip146
+iacrcc:opened as md-frame-0.mdf
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/mdframed/md-frame-0.mdf
+File: md-frame-0.mdf 2013/07/01\ 1.9b: md-frame-0
+)
+iacrcc:closed as md-frame-0.mdf
+\mdf@frametitlebox=\box101
+\mdf@footnotebox=\box102
+\mdf@splitbox@one=\box103
+\mdf@splitbox@two=\box104
+\mdf@splitbox@save=\box105
+\mdfsplitboxwidth=\skip147
+\mdfsplitboxtotalwidth=\skip148
+\mdfsplitboxheight=\skip149
+\mdfsplitboxdepth=\skip150
+\mdfsplitboxtotalheight=\skip151
+\mdfframetitleboxwidth=\skip152
+\mdfframetitleboxtotalwidth=\skip153
+\mdfframetitleboxheight=\skip154
+\mdfframetitleboxdepth=\skip155
+\mdfframetitleboxtotalheight=\skip156
+\mdffootnoteboxwidth=\skip157
+\mdffootnoteboxtotalwidth=\skip158
+\mdffootnoteboxheight=\skip159
+\mdffootnoteboxdepth=\skip160
+\mdffootnoteboxtotalheight=\skip161
+\mdftotallinewidth=\skip162
+\mdfboundingboxwidth=\skip163
+\mdfboundingboxtotalwidth=\skip164
+\mdfboundingboxheight=\skip165
+\mdfboundingboxdepth=\skip166
+\mdfboundingboxtotalheight=\skip167
+\mdf@freevspace@length=\skip168
+\mdf@horizontalwidthofbox@length=\skip169
+\mdf@verticalmarginwhole@length=\skip170
+\mdf@horizontalspaceofbox=\skip171
+\mdfsubtitleheight=\skip172
+\mdfsubsubtitleheight=\skip173
+\c@mdfcountframes=\count407
+
+****** mdframed patching \endmdf@trivlist
+
+****** -- success******
+
+\mdf@envdepth=\count408
+\c@mdf@env@i=\count409
+\c@mdf@env@ii=\count410
+\c@mdf@zref@counter=\count411
+Package zref Info: New property: mdf@pagevalue on input line 895.
+)
+iacrcc:closed as mdframed.sty
+\saveparindent=\skip174
+\saveparskip=\skip175
+\c@ctr=\count412
+\c@savectr=\count413
+\c@ectr=\count414
+\minarrowwidth=\dimen318
+\arrowwidth=\dimen319
+\arrowlower=\dimen320
+\@ncols=\count415
+\@nccols=\count416
+\@nparties=\count417
+\@npartic=\count418
+)
+iacrcc:closed as macros_be.sty
+)
+iacrcc:closed as after-hyperref.sty
+iacrcc:opened as totpages.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/totpages/totpages.sty
+Package: totpages 2005/09/19 v2.00 Totpages Package (muewi)
+iacrcc:opened as everyshi.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/everyshi/everyshi.sty
+Package: everyshi 2020/11/18 v4.00 EveryShipout Package
+)
+iacrcc:closed as everyshi.sty
+)
+iacrcc:closed as totpages.sty
+iacrcc:opened as ccicons.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/ccicons/ccicons.sty
+Package: ccicons 2017/10/30 v1.6 LaTeX support for Creative Commons icons
+)
+iacrcc:closed as ccicons.sty
+iacrcc:opened as csquotes.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/csquotes/csquotes.sty
+Package: csquotes 2022-09-14 v5.2n context-sensitive quotations (JAW)
+\csq@reset=\count419
+\csq@gtype=\count420
+\csq@glevel=\count421
+\csq@qlevel=\count422
+\csq@maxlvl=\count423
+\csq@tshold=\count424
+\csq@ltx@everypar=\toks60
+iacrcc:opened as csquotes.def
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/csquotes/csquotes.def
+File: csquotes.def 2022-09-14 v5.2n csquotes generic definitions (JAW)
+)
+iacrcc:closed as csquotes.def
+Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
+Package csquotes Info: ... configuration file loaded successfully.
+iacrcc:opened as csquotes.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/csquotes/csquotes.cfg
+File: csquotes.cfg 
+)
+iacrcc:closed as csquotes.cfg
+)
+iacrcc:closed as csquotes.sty
+ (./main.aux)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 474.
+LaTeX Font Info:    ... okay on input line 474.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* hratio: 1:1
+* vratio: 1:1
+* modes: twoside 
+* h-part:(L,W,R)=(104.5657pt, 388.37646pt, 104.5657pt)
+* v-part:(T,H,B)=(105.63086pt, 633.78513pt, 105.63086pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=388.37646pt
+* \textheight=633.78513pt
+* \oddsidemargin=32.29572pt
+* \evensidemargin=32.29572pt
+* \topmargin=-3.63913pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=76.82234pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+iacrcc:opened as supp-pdf.mkii
+(/home/kevin/texlive2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count425
+\scratchdimen=\dimen321
+\scratchbox=\box106
+\nofMPsegments=\count426
+\nofMParguments=\count427
+\everyMPshowfont=\toks61
+\MPscratchCnt=\count428
+\MPscratchDim=\dimen322
+\MPnumerator=\count429
+\makeMPintoPDFobject=\count430
+\everyMPtoPDFconversion=\toks62
+)
+iacrcc:closed as supp-pdf.mkii
+iacrcc:opened as epstopdf-base.sty
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+iacrcc:opened as epstopdf-sys.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+)
+iacrcc:closed as epstopdf-sys.cfg
+)
+iacrcc:closed as epstopdf-base.sty
+LaTeX Info: Redefining \microtypecontext on input line 474.
+Package microtype Info: Applying patch `item' on input line 474.
+Package microtype Info: Applying patch `toc' on input line 474.
+Package microtype Info: Applying patch `eqnum' on input line 474.
+Package microtype Info: Applying patch `footnote' on input line 474.
+Package microtype Info: Generating PDF output.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: Automatic font expansion enabled (level 2),
+(microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
+Package microtype Info: Using default expansion set `alltext-nott'.
+LaTeX Info: Redefining \showhyphens on input line 474.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of interword spacing.
+Package microtype Info: No adjustment of character kerning.
+iacrcc:opened as mt-cmr.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/mt-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (RS)
+)
+iacrcc:closed as mt-cmr.cfg
+\c@lstlisting=\count431
+Package hyperref Info: Link coloring ON on input line 474.
+iacrcc:opened as main.out
+ (./main.out)
+iacrcc:closed as main.out
+iacrcc:opened as main.out
+ (./main.out)
+iacrcc:closed as main.out
+\@outlinefile=\write6
+\openout6 = `main.out'.
+
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\\' on input line 475.
+
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 475.
+iacrcc:opened as omllmm.fd
+(/home/kevin/texlive2022/texmf-dist/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as omllmm.fd
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 475.
+iacrcc:opened as omslmsy.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as omslmsy.fd
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 475.
+iacrcc:opened as omxlmex.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as omxlmex.fd
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 475.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 475.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 475.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 475.
+iacrcc:opened as umsa.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+iacrcc:closed as umsa.fd
+iacrcc:opened as mt-msa.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+iacrcc:closed as mt-msa.cfg
+LaTeX Font Info:    Trying to load font information for U+msb on input line 475.
+iacrcc:opened as umsb.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+iacrcc:closed as umsb.fd
+iacrcc:opened as mt-msb.cfg
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+iacrcc:closed as mt-msb.cfg
+
+
+Package hyperref Warning: Ignoring empty anchor on input line 475.
+
+
+Package hyperref Warning: Ignoring empty anchor on input line 475.
+
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 475.
+iacrcc:opened as t1lmtt.fd
+(/home/kevin/texlive2022/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as t1lmtt.fd
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 475.
+iacrcc:opened as t1lmss.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/t1lmss.fd
+File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as t1lmss.fd
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmss' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 475.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 475.
+\c@IACR@cnt=\count432
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 475.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 475.
+LaTeX Font Info:    Trying to load font information for OT1+lmss on input line 483.
+iacrcc:opened as ot1lmss.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/ot1lmss.fd
+File: ot1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as ot1lmss.fd
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmss' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 489.
+iacrcc:opened as ts1lmr.fd
+ (/home/kevin/texlive2022/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+iacrcc:closed as ts1lmr.fd
+\openout5 = `main.abstract'.
+
+<doclicense-CC-by-88x31.pdf, id=81, 90.3375pt x 31.61812pt>
+File: doclicense-CC-by-88x31.pdf Graphic file (type pdf)
+<use doclicense-CC-by-88x31.pdf>
+Package pdftex.def Info: doclicense-CC-by-88x31.pdf  used on input line 755.
+(pdftex.def)             Requested size: 36.99963pt x 12.95pt.
+ [1.1{/home/kevin/texlive2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+
+ </home/kevin/texlive2022/texmf-dist/tex/latex/doclicense/images/doclicense-CC-by-88x31.pdf>]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[2.2]
+Overfull \hbox (64.48602pt too wide) in paragraph at lines 822--841
+ [][] 
+ []
+
+[3.3]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[4.4] [5.5]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[6.6] [7.7]
+Underfull \hbox (badness 1596) in paragraph at lines 1098--1098
+[]\T1/lmss/bx/n/10 (+20) Figure 2: \T1/lmr/m/n/10 (+20) Al-go-rithm $[]\OML/lmm/m/it/10 :[]$ \T1/lmr/m/n/10 (+20) for a (two-round)multi-signature scheme $[] \OT1/lmr/m/n/10 (+20) =
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[8.8]
+Overfull \hbox (12.10742pt too wide) in paragraph at lines 1110--1111
+[]$[][]\OT1/lmr/m/n/10 (-20) (\OML/lmm/m/it/10 St[]; \OMS/lmsy/m/n/10 M[]\OT1/lmr/m/n/10 (-20) ) \OMS/lmsy/m/n/10 ! \OML/lmm/m/it/10 ^^[[]$ \T1/lmr/m/n/10 (-20) takes as in-put a state $\OML/lmm/m/it/10 St[]$ \T1/lmr/m/n/10 (-20) and a tu-ple $\OMS/lmsy/m/n/10 M[] \OT1/lmr/m/n/10 (-20) = ([][]\OML/lmm/m/it/10 ; [] ; [][]\OT1/lmr/m/n/10 (-20) )$
+ []
+
+Package microtype Info: Character `029' is missing
+(microtype)             in font `T1/lmr/m/sc/10'.
+(microtype)             Ignoring protrusion settings for this character.
+
+Underfull \hbox (badness 5592) in paragraph at lines 1174--1174
+[]$[] \OT1/lmr/m/n/10 (+20) ([][]\OML/lmm/m/it/10 ; [] ; [][]\OT1/lmr/m/n/10 (+20) ) :=
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1174--1174
+[]$\OT1/lmr/m/n/10 (+20) ([][][\OML/lmm/m/it/10 sid\OT1/lmr/m/n/10 (+20) ]\OML/lmm/m/it/10 ; St[]\OT1/lmr/m/n/10 (+20) [\OML/lmm/m/it/10 sid\OT1/lmr/m/n/10 (+20) ]) :=
+ []
+
+
+Underfull \hbox (badness 5592) in paragraph at lines 1174--1174
+[]$[] \OT1/lmr/m/n/10 (+20) ([][]\OML/lmm/m/it/10 ; [] ; [][]\OT1/lmr/m/n/10 (+20) ) :=
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 1715) has occurred while \output is active []
+
+ [9.9]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[10.10]
+Underfull \hbox (badness 2189) in paragraph at lines 1338--1338
+[]$[] \OML/lmm/m/it/10 i \OMS/lmsy/m/n/10 2 \OT1/lmr/m/n/10 (+20) [\OML/lmm/m/it/10 Q\OT1/lmr/m/n/10 (+20) ] : [][] \OMS/lmsy/m/n/10  
+ []
+
+[11.11]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[12.12] [13.13]
+
+LaTeX Font Warning: Font shape `T1/lmr/m/scit' undefined
+(Font)              using `T1/lmr/m/scsl' instead on input line 1510.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[14.14]
+Overfull \hbox (71.64255pt too wide) in paragraph at lines 1521--1535
+$[]$ \T1/lmr/m/n/10 (-20) We start with $[][]$, which is de-fined to be the orig-i-nal se-cu-rity game $[][]$,
+ []
+
+[15.15]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[16.16] [17.17]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[18.18] [19.19]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[20.20] [21.21]
+iacrcc:opened as main.bbl
+ (./main.bbl
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[22.22] [23.23]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[24.24] [25.25]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 22.48878pt, for example:
+(fancyhdr)                \setlength{\headheight}{22.48878pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-10.48878pt}.
+
+[26.26]
+Underfull \hbox (badness 1609) in paragraph at lines 418--424
+\T1/lmr/m/it/10 (+20) Cryp-togr.\T1/lmr/m/n/10 (+20) , 87(9):2139--2164, 2019.  URL: [][]$\T1/lmtt/m/n/10 https : / / doi . org / 10 . 1007 /
+ []
+
+)
+iacrcc:closed as main.bbl
+ [27.27] (./main.aux)
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 813476C3B3E2E4436C75A4AD7A0BB15B;2140.
+ ) 
+Here is how much of TeX's memory you used:
+ 37487 strings out of 475071
+ 709015 string characters out of 5778910
+ 1113677 words of memory out of 5000000
+ 57524 multiletter control sequences out of 15000+600000
+ 636707 words of font info for 346 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 125i,20n,120p,1248b,888s stack positions out of 30000i,1000n,20000p,200000b,200000s
+{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/home/kevin/texlive2022/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}</home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmcsco10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmex10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmmi5.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></home/kevin/texlive2022/texmf-dist/fonts/
+type1/public/lm/lmr10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr12.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr5.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr6.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmr9.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmri7.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmss10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmss8.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmss9.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmsy5.pfb></home/kevin/texlive2
+022/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></home/kevin/texlive2022/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
+Output written on main.pdf (27 pages, 687909 bytes).
+PDF statistics:
+ 764 PDF objects out of 1000 (max. 8388607)
+ 659 compressed objects within 7 object streams
+ 167 named destinations out of 1000 (max. 500000)
+ 97418 words of extra memory for PDF output out of 106986 (max. 10000000)
+

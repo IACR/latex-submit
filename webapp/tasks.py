@@ -11,7 +11,8 @@ from .compiler import runner
 from . import db, task_queue
 #from .metadata import meta_parse
 from .metadata.latex.iacrcc.parser import meta_parse
-from .metadata.meta_parse import clean_abstract, check_bibtex, extract_bibtex
+from .metadata.meta_parse import clean_abstract, extract_bibtex
+from .bibmarkup import check_bibtex, bibtex_to_html
 from .metadata.xml_meta import validate_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser, BibTexLogParser
@@ -126,7 +127,8 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
                 compilation.status = CompileStatus.COMPILATION_SUCCESS
             if compilation.status != CompileStatus.COMPILATION_FAILED:
                 extract_bibtex(output_path, compilation)
-                check_bibtex(compilation)
+                bibdb = check_bibtex(compilation)
+                bibtex_to_html(compilation, bibdb, output_path)
                 if compilation.venue == 'cic':
                     # Look for stuff we need for iacrcc.
                     metafile = output_path / Path('main.meta')

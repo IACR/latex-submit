@@ -307,73 +307,12 @@
           <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#page=1"></iframe>
         </div>
         <div class="tab-pane fade show p-3 mathjax" id="nav-html" role="tabpanel" aria-labelledby="nav-html-tab">
-	  {% set meta = comp.meta %}
 	  <p class="alert alert-info">
             This is approximately what part of the HTML page will look like. Please check the title, authors, abstract,
             and references. Note that HTML rendering of references may be malformed by using <tt>\url</tt> inside the
             <tt>howpublished</tt> field. Google scholar and eprint links are approximate, so they need not point to the paper.
           </p>
-          <div style="max-width:800px;" class="mx-auto">
-          <h3>{{meta.title}}</h3>
-	  <div id="authorlist" class="authorlist">
-	    {% for author in meta.authors %}
-	    <div class="author">
-	      <div class="authorname">{{author.name}}
-		{% if author.orcid %}
-		<a target="_blank" href="https://orcid.org/{{author.orcid}}"><img alt="ORCID" class="align-baseline orcidIcon" src="/img/orcid.svg"></a>
-		{% endif %}
-	      </div>
-	      <div class="ms-4 mb-2">
-		{% for i in author.affiliations %}
-		{% set aff = meta.affiliations[i-1] %}
-		{{aff.name}}{% if aff.city %}, {{aff.city}}{% endif %}, {{aff.country}}<br>
-		{% endfor %}
-		{% if author.email %}
-		<span class="font-monospace">{{author.email|replace('@', ' at ')|replace('.', ' dot ')}}</span>
-		{% endif %}
-	      </div>
-	    </div>
-	    {% endfor %}
-	  </div>
-	  {% if meta.keywords %}
-	  <div class="mb-3">
-	    <strong class="fs-4">Keywords: </strong>
-	    {% for keyword in meta.keywords %}
-	    <span class="badge p-2 text-bg-light keyword ms-2 my-1" alt="{{keyword}}" title="{{keyword}}"><a>{{keyword}}</a></span>
-	    {% endfor %}
-	  </div>
-	  {% endif %}
-	  {%- if meta.abstract -%}
-	  <h4 class="mt-4">Abstract</h4>
-	  {{meta.abstract|safe}}
-	  {% endif %}
-	  {% if references %}
-	  <h4 class="mb-3">References</h4>
-	  {% for entry in references %}
-	  <div class="d-flex">
-	    <div style="min-width:3rem;">[{{loop.index}}]</div>
-	    <div>{{entry.text|safe}}</div>
-	    {# {% if entry.scholar %}
-	    <a href="{{entry.scholar}}" target="_blank" class="ms-3"><img src="/images/Google_Scholar_logo.svg" alt="Google Scholar" title="Google Scholar" class="icon"></a>
-	    {% endif %}
-	    {% if entry.eprint %}
-	    <a href="{{entry.eprint}}" target="_blank" class="ms-2"><img src="/images/iacrlogo_small.svg" class="icon" title="IACR ePrint archive" alt="IACR ePrint archive"></a>
-	    {% endif %}#}
-	  </div>
-	  <div class="text-end mb-4">
-	    {% if entry.scholar %}
-	    <a href="{{entry.scholar}}" target="_blank" class="ms-3">
-	      {# <img src="/images/Google_Scholar_logo.svg" alt="Google Scholar" title="Google Scholar" class="icon">#}
-	      Google Scholar</a>
-	    {% endif %}
-	    {% if entry.eprint %}
-	    <a href="{{entry.eprint}}" target="_blank" class="ms-2">{#<img src="/images/iacrlogo_small.svg" class="icon" title="IACR ePrint archive" alt="IACR ePrint archive">#}
-	      ePrint</a>
-	    {% endif %}
-	  </div>
-	  {% endfor %} {# end of references #}
-	  {% endif %}
-          </div>
+          {% include "html.html" %}
 	</div>
         <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
           {% for line in loglines %}

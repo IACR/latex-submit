@@ -21,7 +21,7 @@ from .metadata.compilation import Compilation, CompileStatus, CompileError, Erro
 from .metadata import validate_paperid, get_doi
 from .tasks import run_latex_task
 from .forms import SubmitForm, CompileForCopyEditForm, NotifyFinalForm
-from .bibmarkup import mark_bibtex, bibtex_to_html
+from .bibmarkup import mark_bibtex
 from werkzeug.datastructures import MultiDict
 import hashlib
 import logging
@@ -274,7 +274,7 @@ def submit_version():
             txt = f.read_text(encoding='utf-8', errors='replace')
             if '\\begin{thebibliography}' in txt:
                 log_event(db, paperid, 'LaTeX file with thebibligraphy in it')
-                form.zipfile.errors.append('Your latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex.')
+                form.zipfile.errors.append('Your Latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex and upload your bibtex files.')
                 return render_template('submit.html', form=form)
     command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
@@ -838,13 +838,6 @@ def view_results(paperid, version, auth):
         data['bibtex_log'] = ['No bibtex log']
     if comp.bibtex:
         data['marked_bibtex'] = mark_bibtex(comp.bibtex)
-        htmlbib = bibtex_to_html(comp.bibtex)
-        if htmlbib['errors']:
-            for error in htmlbib['errors']:
-                comp.warning_log.append(CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                     logline=0,
-                                                     text='Error in converting bibtex to html: ' + error))
-        data['references'] = htmlbib['references']
     pstatus = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
     data['paper'] = pstatus
     data['submit_url'] = url_for('home_bp.show_submit_version',
