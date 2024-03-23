@@ -254,10 +254,11 @@
     <div class="resizer"></div>
     <div class="resizable ps-3 right-column">
       <div class="d-flex flex-column" style="height:90vh;">
-        <p>Status: {{paper.status.value}}, Venue: {{paper.journal}}, author email: {{paper.email}}</p>
+        <p>Status: {{paper.status.value}}, author email: {{paper.email}}</p>
         {% if paper.status.name == 'COPY_EDIT_ACCEPT' %}
         <p class="alert alert-success" role="alert">
           This paper has been approved for publishing.
+          <a class="my-2 btn btn-warning" href="#" data-bs-toggle="modal" data-bs-target="#moreChangesModal">Request more changes</a>
         </p>
         {% else %}
         <p class="alert alert-info alert-dismissible fade show mb-0" role="alert">
