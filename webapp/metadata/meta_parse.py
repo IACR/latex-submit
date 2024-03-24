@@ -8,6 +8,7 @@ from pybtex.database import parse_string, BibliographyData, BibliographyDataErro
 import pybtex.errors
 import random
 import re
+import shutil
 import string
 import sys
 import tempfile
@@ -56,6 +57,13 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
                                                       logline=0,
                                                       text='Missing aux file'))
             return
+        # We use a custom "wideexport" for bibexport. It needs to be in the path for
+        # bibexport to find it, so we copy it to the current output_path with a random filename
+        # and remove it when we are done.
+        bst_filename = 'wideexport_' + ''.join(random.choices(string.ascii_uppercase, k=10)) + '.bst'
+        bst_file = output_path / Path(bst_filename)
+        shutil.copy(Path('webapp/metadata/wideexport.bst'),
+                    bst_file)
         bcf_file = output_path / Path('main.bcf')
         if bcf_file.is_file():
             # In this case the author used biblatex/biber, so we
@@ -80,7 +88,7 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
             aux_file.write_text(tmpauxcontents, encoding='UTF-8', errors='replace')
         with tempfile.TemporaryDirectory() as tmpdir:
             bibfile = tmpdir / Path('main.bib')
-            args = ['bibexport', '-o', str(bibfile.resolve()), auxfilename]
+            args = ['bibexport', '-b', bst_filename, '-o', str(bibfile.resolve()), auxfilename]
             process = subprocess.run(args,
                                      cwd=output_path.resolve(),
                                      encoding='UTF-8',
@@ -104,6 +112,9 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
         compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
                                                   logline=0,
                                                   text='Error checking in extract_bibtex: {}. This may be a bug'.format(str(e))))
+    finally:
+        bst_file.unlink()
+
 
 
 def illegal_handler(n):
