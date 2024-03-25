@@ -327,6 +327,7 @@ def submit_version():
     # fire off a separate task to compile. We wrap run_latex_task so it
     # can have the flask context to use sqlalchemy on the database.
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           app.root_path,
                                            command,
                                            str(version_dir.absolute()),
                                            paperid,
@@ -486,6 +487,7 @@ def compile_for_copyedit():
     # fire off a separate task to compile. We wrap run_latex_task so it
     # can have the flask context to use sqlalchemy on the database.
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           app.root_path,
                                            command,
                                            str(copyedit_dir.absolute()),
                                            paperid,

@@ -38,7 +38,7 @@ def get_key_val(line):
     val = line[colon+1:].strip()
     return key, val
 
-def extract_bibtex(output_path: Path, compilation: Compilation):
+def extract_bibtex(root_path: str, output_path: Path, compilation: Compilation):
     """This is used to populate the bibtex field of compilation.
      This implementation uses bibexport, which is only supported
      under bibtex (not biber). In order to overcome this, we create a
@@ -60,10 +60,10 @@ def extract_bibtex(output_path: Path, compilation: Compilation):
         # We use a custom "wideexport" for bibexport. It needs to be in the path for
         # bibexport to find it, so we copy it to the current output_path with a random filename
         # and remove it when we are done.
-        bst_filename = 'wideexport_' + ''.join(random.choices(string.ascii_uppercase, k=10)) + '.bst'
+        bibtex_style_file = Path(root_path) / Path('metadata/wideexport.bst')
+        bst_filename = 'bst_' + ''.join(random.choices(string.ascii_uppercase, k=10)) + '.bst'
         bst_file = output_path / Path(bst_filename)
-        shutil.copy(Path('webapp/metadata/wideexport.bst'),
-                    bst_file)
+        shutil.copy(bibtex_style_file, bst_file)
         bcf_file = output_path / Path('main.bcf')
         if bcf_file.is_file():
             # In this case the author used biblatex/biber, so we

@@ -38,9 +38,10 @@ def is_fatal(err):
         return True
     return False
 
-def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
+def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
     """Execute latex on input_path contents, writing into output_path.
     args:
+       root_path: the root path of the flask app.
        cmd: latex command to run
        paper_path: absolute string path to directory containing compilation.json
        paperid: unique id for paper
@@ -126,7 +127,7 @@ def run_latex_task(cmd, paper_path, paperid, doi, version, task_key):
             elif compilation.venue != 'cic':
                 compilation.status = CompileStatus.COMPILATION_SUCCESS
             if compilation.status != CompileStatus.COMPILATION_FAILED:
-                extract_bibtex(output_path, compilation)
+                extract_bibtex(root_path, output_path, compilation)
                 bibdb = check_bibtex(compilation)
                 bibtex_to_html(compilation, bibdb, output_path)
                 if compilation.venue == 'cic':

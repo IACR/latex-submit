@@ -583,6 +583,7 @@ def request_more_changes():
     # can have the flask context to use sqlalchemy on the database.
     task_key = paper_key(paperid, Version.COPYEDIT.value)
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           app.root_path,
                                            command,
                                            str(copyedit_dir.absolute()),
                                            paperid,
@@ -781,6 +782,7 @@ def change_issue():
     # can have the flask context to use sqlalchemy on the database.
     log_event(db, paperid, 'Recompiled for volume {} issue {}'.format(volume.name, issue.name))
     task_queue[task_key] = executor.submit(context_wrap(run_latex_task),
+                                           app.root_path,
                                            compilation.command,
                                            str(final_dir.absolute()),
                                            paperid,
