@@ -37,10 +37,9 @@ RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm as
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
 RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile nomencl mnsymbol arydshln
 RUN tlmgr install upquote urwchancal
-RUN tlmgr uninstall authblk
 
 # people use pdfpages to bypass uploading LaTeX.
-RUN tlmgr uninstall pdfpages pdfjam
+RUN tlmgr remove -force pdfpages pdfjam
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
 # COPY compiler/texmf.cnf /usr/local/texlive/2023/texmf.cnf
