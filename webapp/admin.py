@@ -394,10 +394,12 @@ def final_review(paperid):
     diffs = {}
     candidate_tex_files = list(candidate_path.glob('output/**/*.tex'))
     candidate_tex_files.extend(list(candidate_path.glob('output/**/*.sty')))
+    candidate_tex_files.extend(list(candidate_path.glob('output/**/*.bib')))
     candidate_output = candidate_path / Path('output')
     candidate_file_map = {str(path.relative_to(candidate_output)): path for path in candidate_tex_files}
     final_tex_files = list(final_path.glob('output/**/*.tex'))
     final_tex_files.extend(list(final_path.glob('output/**/*.sty')))
+    final_tex_files.extend(list(final_path.glob('output/**/*.bib')))
     final_output = final_path / Path('output')
     final_file_map = {str(path.relative_to(final_output)): path for path in final_tex_files}
     for filename, file in candidate_file_map.items():
@@ -448,6 +450,16 @@ def finish_copyedit():
         # in this case, the paper has no issues for the author to
         # respond to, so we copy the candidate over to the final
         # version and tell the author that they are finished.
+        # We also create a CompileRecord for the final version.
+        candidate_sql = select(CompileRecord).where(and_(CompileRecord.paperid == paperid,
+                                                         CompileRecord.version == Version.CANDIDATE))
+        candidate_comprec = db.session.execute(candidate_sql).scalar_one_or_none()
+        final_comprec = CompileRecord(paperid=paperid,
+                                      version=Version.FINAL,
+                                      result=candidate_comprec.result,
+                                      task_status=TaskStatus.FINISHED,
+                                      started=datetime.now())
+        db.session.add(final_comprec)
         paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT.value
         paper_status.lastmodified = datetime.now()
         db.session.add(paper_status)
@@ -682,8 +694,6 @@ def publish_issue():
         return admin_message('Nonexistent issue')
     try:
         now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
-        logging.info('Issue was exported {} to {}'.format(issue.name,
-                                                          str(app.config['EXPORT_PATH'])))
         issue.exported = now
         db.session.add(issue)
         db.session.commit()
@@ -691,6 +701,8 @@ def publish_issue():
         msg = 'Failure to export issue {}: {}'.format(issue.name, str(e))
         logging.critical(msg)
         return admin_message(msg)
+    logging.info('Issue was exported {} to {}'.format(issue.name,
+                                                      str(app.config['EXPORT_PATH'])))
     flash('Issue was exported')
     return redirect(url_for('admin_file.view_issue', issueid=issue.id))
 
