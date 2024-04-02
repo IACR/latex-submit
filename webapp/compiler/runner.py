@@ -66,7 +66,7 @@ def run_latex(cmd, input_dirname, output_dirname):
             if file_path.name.endswith('.cls') or file_path.name.endswith('.bst'):
                 warnings.append('File {} was removed before compiling'.format(file_path.name))
                 file_path.unlink()
-            elif file_path.name.endswith('.sty'):
+            elif file_path.name.endswith('.sty') and file_path.name != 'after-hyperref.sty':
                 warnings.append('You should avoid uploading style files. Style file {} may result in copy editing problems if you violate the journal style.'.format(file_path.name))
             else:
                 file_path.chmod(0o644)
