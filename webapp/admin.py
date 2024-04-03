@@ -409,7 +409,7 @@ def final_review(paperid):
             final_lines = final_file.read_text(encoding='UTF-8', errors='replace').splitlines()
             if candidate_lines != final_lines:
                 htmldiff = HtmlDiff(tabsize=2)
-                diffs[filename] = htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5)
+                diffs[filename] = htmldiff.make_table(candidate_lines, final_lines, fromdesc='Original', todesc='Final version', context=True, numlines=5).replace('&nbsp;', ' ')
             del final_file_map[filename]
         else:
             diffs[filename] = 'File was removed'
