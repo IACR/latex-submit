@@ -1,6 +1,9 @@
 {# html view used in several other views #}
 {% set meta = comp.meta %}
           <h3>{{meta.title}}</h3>
+          {% if meta.subtitle %}
+          <h4>{{meta.subtitle}}</h4>
+{% endif %}
 	  <div style="max-width: 900px;">
 	    <div id="authorlist" class="authorlist">
 	      {% for author in meta.authors %}

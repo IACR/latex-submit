@@ -263,6 +263,12 @@ This template is used to show the status of a compilation for iacrcc.cls
                   <th>Title</th>
                   <td>{{comp.meta.title}}</td>
                 </tr>
+                {% if comp.meta.subtitle %}
+                <tr>
+                  <th>Subtitle</th>
+                  <td>{{comp.meta.subtitle}}</td>
+                </tr>
+                {% endif %}
                 <tr>
                   <th>DOI</th>
                   <td>{{comp.meta.DOI}}</td>
