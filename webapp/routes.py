@@ -63,7 +63,6 @@ def show_submit_version():
         form.journal.data = 'cic'
         form.volume.data = '1111'
         form.issue.data = '4'
-        form.pubtype.data = PubType.RESEARCH.name
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that

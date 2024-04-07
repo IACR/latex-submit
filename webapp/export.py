@@ -39,7 +39,7 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 import zipfile
-from .metadata.compilation import Compilation
+from .metadata.compilation import Compilation, PubType
 from .metadata.xml_meta import get_jats
 from . import db
 
@@ -101,15 +101,18 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         # what we export here. Ideally we would share the code for these, but I hate
         # git submodules. We essentially create an extended Meta class that contains
         # elements of Compilation.
-        data = comp.meta.model_dump(exclude={'version': True})
+        data = comp.meta.model_dump(exclude={'version': True}, exclude_none=True)
         data['submitted'] = comp.submitted
         data['accepted'] = comp.accepted
         data['compiled'] = comp.compiled.strftime('%Y-%m-%d %H:%M:%S')
-        data['pubtype'] = comp.pubtype
         data['errata_doi'] = comp.errata_doi
         data['paperid'] = comp.paperid
         data['bibtex'] = comp.bibtex
         data['corresponding_author'] = comp.email
+        # compdata has enums and types converted.
+        compdata = json.loads(comp.model_dump_json(exclude_none=True))
+        data['bibhtml'] = compdata.get('bibhtml', [])
+        data['pubtype'] = compdata.get('pubtype', PubType.RESEARCH.name)
         zip_file.writestr('{}/meta.json'.format(paperstatus.paperno),
                           json.dumps(data, indent=2, default=_datetime_serialize))
         jats_elem = get_jats(issue.volume.journal, '{}/{}/{}'.format(issue.volume.name,

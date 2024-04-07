@@ -46,8 +46,7 @@ latex2mathml
 # Packages below can be installed from debian.
 lxml                 # from debian
 nameparser           # from debian
-pybtex               # from debian
-pybtex               # from debian
+bibtexparser==2.0.0b7
 pylatexenc           # from debian
 pymysql              # from debian
 xmlschema            # from debian

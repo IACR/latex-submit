@@ -703,7 +703,7 @@ def publish_issue():
         return admin_message(msg)
     logging.info('Issue was exported {} to {}'.format(issue.name,
                                                       str(app.config['EXPORT_PATH'])))
-    flash('Issue was exported')
+    flash('Issue was exported to {}'.format(str(app.config['EXPORT_PATH'])))
     return redirect(url_for('admin_file.view_issue', issueid=issue.id))
 
 @admin_bp.route('/admin/change_issue', methods=['POST'])

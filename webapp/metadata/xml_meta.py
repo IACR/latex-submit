@@ -4,6 +4,7 @@ that knows about the URLS being served.
 """
 from datetime import datetime
 from io import BytesIO
+import logging
 from nameparser import HumanName
 from pathlib import Path
 import latex2mathml.converter
@@ -11,12 +12,11 @@ import re
 from xml.etree import ElementTree as ET
 from xml.sax.saxutils import unescape
 import xmlschema
-from pybtex.database import parse_string, Entry
 try:
     from .compilation import Compilation, Meta, PubType
 except Exception as e:
     from compilation import Compilation, Meta, PubType
-    
+
 try:
     from .countries import country_lookup
 except Exception as e:
@@ -27,107 +27,126 @@ try:
 except Exception as e:
     from db_models import Journal
 
+from bibtexparser.middlewares import BlockMiddleware, SeparateCoAuthors, SplitNameParts, MonthIntMiddleware, MergeNameParts, LatexDecodingMiddleware
+from bibtexparser import parse_string
+from bibtexparser.model import Entry
+
 # because of typing hints.
 assert sys.version_info >= (3,9)
 
 def _add_jats_citation(index: int, ref_list: ET.Element, entry: Entry):
-    ref = ET.SubElement(ref_list, 'ref', attrib={'id': 'ref{}'.format(index)})
-    ET.SubElement(ref, 'label').text = entry.key
-    citation = ET.SubElement(ref, 'element-citation')
-    if entry.persons:
-        if 'author' in entry.persons:
+    try: # lots of stuff could go wrong in author-supplied bibtex.
+        ref = ET.Element('ref', attrib={'id': 'ref{}'.format(index)})
+        ET.SubElement(ref, 'label').text = entry.key
+        citation = ET.SubElement(ref, 'element-citation')
+        fields = entry.fields_dict
+        for key in fields:
+            fields[key] = fields[key].value
+        if 'author' in fields:
             person_group = ET.SubElement(citation, 'person-group', attrib={'person-group-type': 'author'})
-            for person in entry.persons['author']:
+            for person in fields['author']:
                 name_el = ET.SubElement(person_group, 'name')
-                if person.last_names:
-                    if person.prelast_names:
-                        last_name = ' '.join(person.prelast_names) + ' ' + ' '.join(person.last_names)
+                if person.last:
+                    if person.von:
+                        last_name = ' '.join(person.von) + ' ' + ' '.join(person.last)
                         ET.SubElement(name_el, 'surname').text = last_name
                     else:
-                        ET.SubElement(name_el, 'surname').text = ' '.join(person.last_names)
-                if person.first_names:
-                    ET.SubElement(name_el, 'given-names').text = ' '.join(person.first_names)
-        if 'editor' in entry.persons:
+                        ET.SubElement(name_el, 'surname').text = ' '.join(person.last)
+                if person.first:
+                    ET.SubElement(name_el, 'given-names').text = ' '.join(person.first)
+        if 'editor' in fields:
             person_group = ET.SubElement(citation, 'person-group', attrib={'person-group-type': 'editor'})
-            for person in entry.persons['editor']:
+            for person in fields['editor']:
                 name_el = ET.SubElement(person_group, 'name')
-                if person.last_names:
-                    if person.prelast_names:
-                        last_name = ' '.join(person.prelast_names) + ' ' + ' '.join(person.last_names)
+                if person.last:
+                    if person.von:
+                        last_name = ' '.join(person.von) + ' ' + ' '.join(person.last)
                         ET.SubElement(name_el, 'surname').text = last_name
                     else:
-                        ET.SubElement(name_el, 'surname').text = ' '.join(person.last_names)
-                if person.first_names:
-                    ET.SubElement(name_el, 'given-names').text = ' '.join(person.first_names)
-    if 'year' in entry.fields:
-        ET.SubElement(citation, 'year', attrib={'iso-8601-date': str(entry.fields['year'])}).text = str(entry.fields['year'])
-    if 'month' in entry.fields:
-        ET.SubElement(citation, 'month').text = entry.fields['month']
-    if 'doi' in entry.fields:
-        doi = entry.fields['doi']
-        ET.SubElement(citation, 'pub-id', attrib={'pub-id-type': 'doi',
-                                                  'xlink:href': 'https://doi.org/' + doi}).text = doi
-    if 'url' in entry.fields:
-        ET.SubElement(citation, 'uri').text = entry.fields['url']
-        #comment = ET.SubElement(citation, 'comment')
-        #ET.SubElement(comment, 'ext-link', attrib={'ext-link-type': 'url',
-        #                                           'xlink:href': entry.fields['url']}).text = entry.fields['url']
-    if 'pages' in entry.fields:
-        parts = [a for a in entry.fields['pages'].split('-') if a]
-        ET.SubElement(citation, 'fpage').text = parts[0]
-        if len(parts) > 1:
-            ET.SubElement(citation, 'lpage').text = parts[1]
-    ctype = entry.type.lower() # InProceedings same as inproceedings.
-    if ctype == 'article':
-        citation.set('publication-type', 'journal')
-        if 'title' in entry.fields:
-            ET.SubElement(citation, 'article-title').text = entry.fields['title']
-        if 'journal' in entry.fields:
-            ET.SubElement(citation, 'source').text = entry.fields['journal']
-        if 'volume' in entry.fields:
-            ET.SubElement(citation, 'volume').text = entry.fields['volume']
-        if 'number' in entry.fields:
-            ET.SubElement(citation, 'issue').text = entry.fields['number']
-    elif ctype == 'inproceedings' or ctype == 'proceedings':
-        # see https://jats.nlm.nih.gov/publishing/tag-library/1.3d1/chapter/tag-cite-conf.html
-        citation.set('publication-type', 'conference')
-        if 'title' in entry.fields:
-            ET.SubElement(citation, 'article-title').text = entry.fields['title']
-        if 'booktitle' in entry.fields:
-            ET.SubElement(citation, 'source').text = entry.fields['booktitle']
-        if 'publisher' in entry.fields:
-            ET.SubElement(citation, 'conf-sponsor').text = entry.fields['publisher']
-        elif 'organization' in entry.fields:
-            ET.SubElement(citation, 'conf-sponsor').text = entry.fields['organization']
-        if 'series' in entry.fields:
-            ET.SubElement(citation, 'series').text = entry.fields['series']
-        if 'volume' in entry.fields:
-            ET.SubElement(citation, 'volume').text = entry.fields['volume']
-        if 'address' in entry.fields:
-            ET.SubElement(citation, 'conf-loc').text = entry.fields['address']
-    elif ctype == 'book' or ctype == 'booklet':
-        citation.set('publication-type', 'book')
-        if 'title' in entry.fields:
-            ET.SubElement(citation, 'source').text = entry.fields['title']
-        if 'publisher' in entry.fields:
-            ET.SubElement(citation, 'publisher-name').text = entry.fields['publisher']
-        if 'address' in entry.fields:
-            ET.SubElement(citation, 'publisher-loc').text = entry.fields['address']
-    elif ctype == 'inbook' or ctype == 'incollection':
-        citation.set('publication-type', 'book')
-        if 'title' in entry.fields:
-            ET.SubElement(citation, 'article-title').text = entry.fields['title']
-        if 'booktitle' in entry.fields:
-            ET.SubElement(citation, 'source').text = entry.fields['booktitle']
-        if 'publisher' in entry.fields:
-            ET.SubElement(citation, 'publisher-name').text = entry.fields['publisher']
-        if 'address' in entry.fields:
-            ET.SubElement(citation, 'publisher-loc').text = entry.fields['address']
-    else:
-        citation.set('publication-type', entry.type)
-        if 'title' in entry.fields:
-            ET.SubElement(citation, 'source').text = entry.fields['title']
-            
+                        ET.SubElement(name_el, 'surname').text = ' '.join(person.last)
+                if person.first:
+                    ET.SubElement(name_el, 'given-names').text = ' '.join(person.first)
+        if 'year' in fields:
+            try:
+                yearstr = str(int(fields['year']))
+                ET.SubElement(citation, 'year',
+                              attrib={'iso-8601-date': year}).text = year
+                if 'month' in fields:
+                    try: # JATS recommends 01 for january.
+                        monthstr = str(int(fields['month'])).zfill(2)
+                        ET.SubElement(citation, 'month').text = monthstr
+                    except:
+                        pass
+            except:
+                pass
+        if 'doi' in fields:
+            doi = fields['doi']
+            https_index = doi.find('doi.org/')
+            if https_index:
+                doi = doi[8:]
+            if re.match(r'^10\.[0-9]{4,9}/.{1,200}$', doi):
+                ET.SubElement(citation, 'pub-id', attrib={'pub-id-type': 'doi',
+                                                          'xlink:href': 'https://doi.org/' + doi}).text = doi
+        if 'pages' in fields:
+            parts = re.split(r'[-–—]+', fields['pages'])
+            if parts:
+                ET.SubElement(citation, 'fpage').text = parts[0]
+                if len(parts) > 1:
+                    ET.SubElement(citation, 'lpage').text = parts[-1]
+        ctype = entry.entry_type.lower() # InProceedings same as inproceedings.
+        if ctype == 'article':
+            citation.set('publication-type', 'journal')
+            if 'title' in fields:
+                ET.SubElement(citation, 'article-title').text = fields['title']
+            if 'journal' in fields:
+                ET.SubElement(citation, 'source').text = fields['journal']
+            if 'volume' in fields:
+                ET.SubElement(citation, 'volume').text = fields['volume']
+            if 'number' in fields:
+                ET.SubElement(citation, 'issue').text = fields['number']
+        elif ctype == 'inproceedings' or ctype == 'proceedings':
+            # see https://jats.nlm.nih.gov/publishing/tag-library/1.3d1/chapter/tag-cite-conf.html
+            citation.set('publication-type', 'conference')
+            if 'title' in fields:
+                ET.SubElement(citation, 'article-title').text = fields['title']
+            if 'booktitle' in fields:
+                ET.SubElement(citation, 'source').text = fields['booktitle']
+            if 'publisher' in fields:
+                ET.SubElement(citation, 'conf-sponsor').text = fields['publisher']
+            elif 'organization' in fields:
+                ET.SubElement(citation, 'conf-sponsor').text = fields['organization']
+            if 'series' in fields:
+                ET.SubElement(citation, 'series').text = fields['series']
+            if 'volume' in fields:
+                ET.SubElement(citation, 'volume').text = fields['volume']
+            if 'address' in fields:
+                ET.SubElement(citation, 'conf-loc').text = fields['address']
+        elif ctype == 'book' or ctype == 'booklet':
+            citation.set('publication-type', 'book')
+            if 'title' in fields:
+                ET.SubElement(citation, 'source').text = fields['title']
+            if 'publisher' in fields:
+                ET.SubElement(citation, 'publisher-name').text = fields['publisher']
+            if 'address' in fields:
+                ET.SubElement(citation, 'publisher-loc').text = fields['address']
+        elif ctype == 'inbook' or ctype == 'incollection':
+            citation.set('publication-type', 'book')
+            if 'title' in fields:
+                ET.SubElement(citation, 'article-title').text = fields['title']
+            if 'booktitle' in fields:
+                ET.SubElement(citation, 'source').text = fields['booktitle']
+            if 'publisher' in fields:
+                ET.SubElement(citation, 'publisher-name').text = fields['publisher']
+            if 'address' in fields:
+                ET.SubElement(citation, 'publisher-loc').text = fields['address']
+        else:
+            citation.set('publication-type', entry.entry_type)
+            if 'title' in fields:
+                ET.SubElement(citation, 'source').text = fields['title']
+        ref_list.append(ref)
+    except Exception as e:
+        logging.severe('Unable to convert to jats: {}'.format(entry.key))
+
 def get_jats_abstract(abstr: str) -> str:
     """Take HTML abstract and parse to return JATS abstract element.
     This may throw an exception if it cannot be parsed as XML."""
@@ -136,6 +155,15 @@ def get_jats_abstract(abstr: str) -> str:
     abstract_string = abstract_string.replace('<ul>', '<p><list list-type="bullet">').replace('</ul>', '</list></p>')
     abstract_string = abstract_string.replace('<li>', '<list-item><p>').replace('</li>', '</p></list-item>')
     return ET.parse(BytesIO(abstract_string.encode('UTF-8'))).getroot()
+
+class RemoveEmptyMiddleware(BlockMiddleware):
+    def transform_entry(self, entry, *args, **kwargs):
+        fields = entry.fields_dict
+        for fname in fields.keys():
+            value = fields[fname].value
+            if (isinstance(value, str) or isinstance(value, list)) and len(value) == 0:
+                entry.pop(fname)
+        return entry
 
 def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.Element:
     """TODO: tex-math contents should be CDATA to protect against < inside."""
@@ -211,7 +239,6 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
         abstract_elem = get_jats_abstract(comp.meta.abstract)
         article_meta.append(abstract_elem)
     except Exception as e:
-        print(comp.meta.abstract)
         raise ET.ParseError('unable to parse abstract: {}'.format(comp.meta.abstract))
     if meta.keywords:
         kwd_group = ET.SubElement(article_meta, 'kwd-group', attrib={'kwd-group-type': 'author'})
@@ -241,9 +268,13 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
                 ET.SubElement(award_group, 'award-id').text = funder.grantid
     ref_list = ET.SubElement(ET.SubElement(article, 'back'), 'ref-list')
     if comp.bibtex:
-        bibdata = parse_string(comp.bibtex, 'bibtex')
+        bibtexmiddleware = (LatexDecodingMiddleware(),
+                            SeparateCoAuthors(),
+                            SplitNameParts(),
+                            RemoveEmptyMiddleware())
+        bibdata = parse_string(comp.bibtex, append_middleware=bibtexmiddleware)
         counter = 0
-        for entry in bibdata.entries.values():
+        for entry in bibdata.entries:
             counter += 1
             _add_jats_citation(counter, ref_list, entry) # this is complicated
     return article

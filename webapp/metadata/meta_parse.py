@@ -109,7 +109,7 @@ def extract_bibtex(root_path: str, output_path: Path, compilation: Compilation):
                                                           logline=0,
                                                           text='No output from bibexport: {}'.format(process.stdout)))
     except Exception as e:
-        compilation.error_log.append(CompileError(error_type=ErrorType.LATEX_WARNING,
+        compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                                   logline=0,
                                                   text='Error checking in extract_bibtex: {}. This may be a bug'.format(str(e))))
     finally:
