@@ -1,6 +1,6 @@
 {% extends "admin/admin_base.html" %}
 {% block content %}
-<main id="adminContent" class="container-fluid admin-container px-md-4 py-3">
+<main id="adminContent" class="container admin-container px-md-4 py-3">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
   {{ message }}
@@ -40,6 +40,7 @@
       <th>paper number</th>
       <th>paper id</th>
       <th>hotcrp</th>
+      <th>Type</th>
       <th>status</th>
       <th>modified</th>
       <th>Title &amp; authors</th>
@@ -69,6 +70,7 @@
     </td>
     <td><a href="{{url_for('admin_file.show_admin_paper', paperid=status.paperid)}}">{{status.paperid}}</a></td>
     <td>{% if status.hotcrp == 'none' %}none{% else %}<a target="_blank" href="https://submit.iacr.org/{{status.hotcrp}}/paper/{{status.hotcrp_id}}">{{status.hotcrp}}/{{status.hotcrp_id}}</a>{% endif %}</td>
+      <td>{{status.pubtype.value|capitalize}}</td>
       <td class="status {{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
       <td>{{status.title}}<br><span class="fst-italic">{{status.authors}}</span></td>
