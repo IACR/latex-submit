@@ -105,7 +105,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         data['submitted'] = comp.submitted
         data['accepted'] = comp.accepted
         data['compiled'] = comp.compiled.strftime('%Y-%m-%d %H:%M:%S')
-        data['pubtype'] = comp.pubtype.name
+        data['pubtype'] = comp.pubtype
         data['errata_doi'] = comp.errata_doi
         data['paperid'] = comp.paperid
         data['bibtex'] = comp.bibtex
