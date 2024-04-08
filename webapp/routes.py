@@ -316,7 +316,7 @@ def submit_version():
     if paper_status.issue:
         metadata += '\\def\\IACR@vol{' + str(paper_status.issue.volume.name) + '}\n'
         metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
-    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi={\IACR@DOI}\&domain=pdf\&date\_stamp={\IACR@Published}}\n'
+    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=\IACR@DOI&domain=pdf&date_stamp=\IACR@Published}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
