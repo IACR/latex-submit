@@ -90,6 +90,12 @@ def test_abstract4():
     print(output)
     assert output == "<p>This is </p><ul> <li>first item </li><li>second item </li></ul><p> but also </p><ul><li>first<span class='text-danger'>nesting of enumerate or itemize is not allowed</span> </li><li>second bullet </li></ul><p>This starts a paragraph.</p><p>This is another paragraph but it's the last one. </p>"
 
+def test_abstract5():
+    abs_file = Path('testdata/abstracts/abstract5.txt')
+    output = clean_abstract(abs_file.read_text(encoding='UTF-8'))
+    print(output)
+    assert output == r"<p><span class='text-danger'>Illegal macro in textabstract: '\input'</span> </p>"
+
 def test_scramble():
     for l in range(3, 12):
         for i in range(100):
