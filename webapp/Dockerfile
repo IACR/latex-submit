@@ -39,7 +39,7 @@ RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catc
 RUN tlmgr install upquote urwchancal
 
 # people use pdfpages to bypass uploading LaTeX.
-RUN tlmgr remove -force pdfpages pdfjam ulem
+RUN tlmgr remove -force pdfpages pdfjam
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
 # COPY compiler/texmf.cnf /usr/local/texlive/2023/texmf.cnf
