@@ -182,6 +182,8 @@ def get_converter():
     lt_context_db.add_context_category('stripper',
                                        macros=[MacroTextSpec('textsf', '%s'),
                                                MacroTextSpec('href', simplify_repl=illegal_handler),
+                                               MacroTextSpec('input', simplify_repl=illegal_handler),
+                                               MacroTextSpec('include', simplify_repl=illegal_handler),
                                                MacroTextSpec('sc', ''),
                                                MacroTextSpec('boldmath', ''),
                                                MacroTextSpec('bm', ''),
