@@ -193,6 +193,7 @@ def _get_decoder():
     lt_context_db.add_context_category('bibtex',
                                        macros=[MacroTextSpec('cal', ''),
                                                macrospec.MacroSpec('textcommabelow', '{'),
+                                               MacroTextSpec('textless', '&lt;'),
                                                MacroTextSpec('textcommabelow', simplify_repl=_handle_textcommabelow),
                                                MacroTextSpec('gcd', 'gcd'),
                                                MacroTextSpec('mbox', ''),
@@ -504,6 +505,8 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         bibitem = BibItem(**bibitemdata)
         lookup[entry.key] = bibitem
     bibhtml = []
+    print(cite_map)
+    print(lookup.keys())
     for key in cite_map.keys():
         bibitem = lookup.get(key)
         if bibitem:
@@ -515,7 +518,7 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
     if len(bibhtml) != len(cite_map):
         compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                                   logline = 0,
-                                                  text='Mismatch in number of bibliographic references {} != {}. This is a bug.'.format(len(bibhtml), len(bibdata.entries))))
+                                                  text='Mismatch in number of bibliographic references {} != {}. This is a bug.'.format(len(bibhtml), len(cite_map))))
     compilation.bibhtml = bibhtml
     
 if __name__ == '__main__':
