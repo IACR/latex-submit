@@ -93,7 +93,8 @@ def extract_ror_id(uri):
     return uri.split('/')[-1]
 
 def parse_ror(filename):
-    """Return a map from id to potential Funder from ROR."""
+    """Return a map from id to potential Funder from ROR. This has
+    been modified for v2 of the schema."""
     fp = open(filename, 'r')
     funderslist = FunderList(funders={})
     items = stream_array(tokenize(fp))
@@ -104,39 +105,52 @@ def parse_ror(filename):
             print('read {} ror entries'.format(count))
         ror = item.get('id')
         id = extract_ror_id(ror)
+        locations = item.get('locations')
+        country = locations[0].get('geonames_details')
+        names = item.get('names')
+        name = None
+        altnames = []
+        for n in names:
+            if 'acronym' in n['types'] or 'alias' in n['types']:
+                altnames.append(n['value'])
+            elif 'ror_display' in n['types']:
+                name = n['value']
+        if not name:
+            print('missing name in item')
+            print(json.dumps(item, indent=2))
+            sys.exit(2)
+
         org = {'source_id': id,
                'source': 'ror',
-               'name': item.get('name'),
-               'altnames': item.get('aliases'),
-               'country_code': item.get('country').get('country_code'),
-               'country': item.get('country').get('country_name'),
+               'name': name,
+               'altnames': altnames,
+               'country_code': country.get('country_code'),
+               'country': country.get('country_name'),
                'children': [],
                'parents': [],
                'related': []
                }
         if len(item.get('types')) > 0:
-            org['funder_type'] = item.get('types')[0]
+            org['funder_type'] = item.get('types')[0].capitalize()
         else:
             org['funder_type'] = 'Other' 
-        org['altnames'].extend(item.get('acronyms'))
-        org['altnames'].extend([l['label'] for l in item.get('labels')])
         external_ids = item.get('external_ids')
-        if external_ids:
-            fundref = external_ids.get('FundRef')
-            if fundref:
-                preferred = fundref.get('preferred')
+        for i in external_ids:
+            if i['type'] == 'fundref':
+                preferred = i.get('preferred')
                 if preferred:
                     org['preferred_fundref'] = preferred
         for rel in item['relationships']:
-            if rel['type'] == RelationshipType.RELATED.value:
+            cap = rel['type'].capitalize()
+            if cap == RelationshipType.RELATED.value:
                 org['related'].append({'source': DataSource.ROR.value,
                                        'source_id': extract_ror_id(rel['id']),
                                        'name': rel['label']})
-            elif rel['type'] == RelationshipType.CHILD:
+            elif cap == RelationshipType.CHILD:
                 org['children'].append({'source': DataSource.ROR.value,
                                        'source_id': extract_ror_id(rel['id']),
                                        'name': rel['label']})
-            elif rel['type'] == RelationshipType.PARENT:
+            elif cap == RelationshipType.PARENT:
                 org['parents'].append({'source': DataSource.ROR.value,
                                        'source_id': extract_ror_id(rel['id']),
                                        'name': rel['label']})

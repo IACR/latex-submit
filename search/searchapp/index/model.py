@@ -36,8 +36,9 @@ class StrEnum(str, Enum):
     @classmethod
     def from_str(cls, val):
         """Convert string to enum value."""
+        cap = val.capitalize()
         for e in cls:
-            if e.value == val:
+            if e.value == cap or e.value == val:
                 return e
         return None
 
@@ -57,6 +58,7 @@ class FunderType(StrEnum):
     GOV = "Government",      # ROR and FundReg
     FAC = "Facility",        # ROR and FundReg
     INSTITUTE = 'Institute'  # FundReg only.
+    FUNDER = 'Funder'        # ROR v2
     OTHER = "Other"          # ROR and FundReg
     
 class RelationshipType(StrEnum):
