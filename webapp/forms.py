@@ -363,3 +363,13 @@ class CopyeditClaimForm(FlaskForm):
                                       ValidPaperId()])
     view = HiddenField('view the paper', default='')
     copyeditor = HiddenField(name='copyeditor', validators=[InputRequired()])
+
+class DeletePaperForm(FlaskForm):
+    paperid = HiddenField(name='paperid',
+                          validators=[InputRequired(),
+                                      ValidPaperId()])
+    # A paper may not belong to this issue, but it's used for
+    # determining where to forward the user to. Once the issue has no
+    # papers, it can be deleted.
+    issueid = HiddenField(name='issueid',
+                          validators=[InputRequired()])

@@ -33,6 +33,18 @@
   </div>
 </div>
 <h4 class="mt-3">Papers assigned to the issue</h4>
+<script>
+ function showDeletePaperModal(paperid, title) {
+   console.log(paperid);
+   document.getElementById('delete_title').innerText = title;
+   document.getElementById('delete_id_div').innerText = paperid;
+   document.getElementById('delete_paperid').value = paperid;
+   const modal = new bootstrap.Modal(document.getElementById('deletePaperModal'),
+                                     {keyboard: false,
+                                      backdrop:'static'});
+   modal.show();
+ }
+</script>
 <table class="table sortable">
   <thead>
     <tr>
@@ -74,6 +86,7 @@
       <td class="status {{status.status.name}}">{{status.status.value}}</td>
       <td>{{status.lastmodified.strftime('%Y-%m-%d')}}</td>
       <td>{{status.title}}<br><span class="fst-italic">{{status.authors}}</span></td>
+      <td><button type="button" class="btn btn-sm btn-danger" onclick="showDeletePaperModal('{{status.paperid}}','{{status.title}}')">Delete</button></td>
     </tr>
     {% endfor %}
 {% if hotcrp %}
@@ -136,11 +149,56 @@
       <td><a href="{{url_for('admin_file.show_admin_paper', paperid=paper.paperid)}}">{{paper.paperid}}</a></td>
       <td class="status {{paper.status.name}}">{{paper.status.value}}</td>
       <td>{{paper.title}}<br><span class="fst-italic">{{paper.authors}}</span></td>
+      <td class="text-end"><button type="button" class="btn btn-sm btn-danger" onclick="showDeletePaperModal('{{paper.paperid}}','{{paper.title}}')">Delete</button></td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 {% endif %}
+<div class="modal fade" id="deletePaperModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Delete paper</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+      </div>
+      <form action="{{url_for('admin_file.deletePaper')}}" method="POST">
+        {{ deletepaperform.csrf_token }}
+        <input type="hidden" name="paperid" id="delete_paperid">
+        {{deletepaperform.issueid}}
+        <div class="modal-body">
+          <div class="row my-3">
+            <div class="col-3 text-end">
+              Paper ID:
+            </div>
+            <div class="col-9" id="delete_id_div">
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col-3 text-end">
+              Title:
+            </div>
+            <div class="col-9" id="delete_title">
+            </div>
+          </div>
+          <div class="alert alert-danger mt-2">
+            <p>
+              <strong>This will delete every trace of the paper from the server.
+                This action cannot be undone!</strong>
+            </p>
+            <p>You may instead wish to just "bump" the paper from the issue
+              and leave it on the server.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete paper</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <script src="/js/sorttable.js"></script>
 </main>
 {% endblock %}

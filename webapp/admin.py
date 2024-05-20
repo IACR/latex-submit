@@ -22,7 +22,7 @@ from . import db, create_hmac, mail, generate_password, task_queue, paper_key, e
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event, NO_HOTCRP
-from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm, CopyeditClaimForm
+from .forms import AdminUserForm, MoreChangesForm, PublishIssueForm, ChangeIssueForm, ChangePaperNumberForm, CopyeditClaimForm, DeletePaperForm
 from .tasks import run_latex_task
 from .routes import context_wrap
 from .bibmarkup import mark_bibtex
@@ -340,6 +340,7 @@ def view_issue(issueid):
     bumpform = ChangeIssueForm(nexturl=request.path)
     includeform = ChangeIssueForm(issueid=issueid,nexturl=request.path)
     papernoform = ChangePaperNumberForm(issueid=issueid)
+    deletepaperform = DeletePaperForm(issueid=issueid)
     data = {'title': 'Status of Volume {}, Issue {}'.format(issue.volume.name, issue.name),
             'issue': issue,
             'volume': issue.volume,
@@ -349,6 +350,7 @@ def view_issue(issueid):
             'bumpform': bumpform,
             'papernoform': papernoform,
             'includeform': includeform,
+            'deletepaperform': deletepaperform,
             'papers': papers}
     hotcrp_papers = _get_hotcrp_papers(issue)
     if 'error' in hotcrp_papers:
@@ -374,7 +376,7 @@ def view_issue(issueid):
                     accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
     formdata = [{'paperid': p.paperid} for p in finished_papers]
-    if len(finished_papers) == len(papers):
+    if len(finished_papers) == len(papers) and len(papers) > 0:
         data['form'] = PublishIssueForm(issueid=issue.id)
     return render_template('admin/view_issue.html', **data)
 
@@ -895,3 +897,25 @@ def claimcopyedit():
     flash('Changed copy editor on {} to {}'.format(form.paperid.data,
                                                    form.copyeditor.data))
     return redirect(url_for('admin_file.copyedit_home'))
+
+@admin_bp.route('/admin/deletepaper', methods=['POST'])
+@login_required
+@admin_required
+def deletePaper():
+    form = DeletePaperForm()
+    if not form.validate_on_submit():
+        for key, value in form.errors.items():
+            flash('Invalid form: {}:{}'.format(key, value))
+        return admin_message('Invalid form submission. This is a bug.')
+    paper_dir = app.config['DATA_DIR'] / Path(form.paperid.data)
+    try:
+        shutil.rmtree(paper_dir)
+    except Exception as e:
+        flash('Unable to delete the directory for the paper {}. Perhaps it was already deleted?'.format(form.paperid.data))
+    sql = select(PaperStatus).filter_by(paperid=form.paperid.data)
+    paper_status = db.session.execute(sql).scalar_one_or_none()
+    db.session.delete(paper_status)
+    db.session.commit()
+    return redirect(url_for('admin_file.view_issue',
+                            issueid=form.issueid.data))
+
