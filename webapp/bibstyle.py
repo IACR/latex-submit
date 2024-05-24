@@ -2,6 +2,7 @@
 This file contains code for producing HTML from a parsed bibliography. This implements
 something close to the alphaurl style in the standard texlive distribution.
 """
+import calendar
 from bibtexparser.model import Entry
 try:
     from metadata.compilation import Compilation, ErrorType, CompileError, BibItem, PubType, CompileStatus
@@ -12,6 +13,55 @@ from typing import List, Dict
 import re
 
     
+# These abbreviations are built into many bibtex styles including alphaurl that we use.
+_MONTH_ABBREV = {'1': 'January',
+                 '2': 'February',
+                 '3': 'March',
+                 '4': 'April',
+                 '5': 'May',
+                 '6': 'June',
+                 '7': 'July',
+                 '8': 'August',
+                 '9': 'September',
+                 '10': 'October',
+                 '11': 'November',
+                 '12': 'December',
+                 'jan': 'January',
+                 'feb': 'February',
+                 'mar': 'March',
+                 'apr': 'April',
+                 'may': 'May',
+                 'jun': 'June',
+                 'jul': 'July',
+                 'aug': 'August',
+                 'sep': 'September',
+                 'oct': 'October',
+                 'nov': 'November',
+                 'dec': 'December'}
+def _date(fields):
+    """We assume fields has a year in it. We use issue_date if it exists."""
+    if 'issue_date' in fields:
+        return fields['issue_date'].value
+    if 'year' not in fields:
+        raise ValueError('no date fields')
+    if 'month' not in fields:
+        return fields['year'].value
+    # 'month' is a peculiar field, because people have shoved all sorts of things
+    # into it like jan # "\slash " # feb. We only recognize simple things like
+    # an integer, a lower case abbreviation, or a string without #
+    month = fields['month'].value
+    if isinstance(month, int):
+        month = calendar.month_name[month]
+    elif month in _MONTH_ABBREV:
+        month = _MONTH_ABBREV[month]
+    elif '#' in month:
+        # we ignore these
+        return fields['year'].value
+    if 'day' in fields:
+        return '{} {} {}'.format(month, fields['day'].value, fields['year'].value)
+    return '{} {}'.format(month, fields['year'].value)
+            
+
 class BibStyle:
     """
     This is used to transform a bibtex entry into HTML. This is  modeled
@@ -37,10 +87,10 @@ class BibStyle:
             'online': ['author/editor', 'title', 'year/date', 'url'],
             'patent': ['author', 'title', 'number', 'year/date'],
             'proceedings': ['title', 'year/date'],
-            'thesis': ['author', 'title', 'type', 'institution', 'year/date'],
-            'phdthesis': ['author', 'title', 'school', 'year/date'],
+            'thesis': ['author', 'title', 'type', 'institution/school', 'year/date'],
+            'phdthesis': ['author', 'title', 'institution/school', 'year/date'],
             'unpublished': ['author', 'title', 'note'],
-            'mastersthesis': ['author', 'title', 'school', 'year/date'],
+            'mastersthesis': ['author', 'title', 'institution/school', 'year/date'],
             'online': ['title', 'url'],
             'techreport': ['author', 'title', 'institution/publisher', 'year/date'],
         }
@@ -142,7 +192,7 @@ class BibStyle:
         elif len(names) == 2:
             output += names[0] + ' and ' + names[1]
         else:
-            output += ', '.join(a for a in names[:-1]) + ' and ' + names[-1]
+            output += ', '.join(a for a in names[:-1]) + ', and ' + names[-1]
         return output
 
     def _format_doi(self, entry):
@@ -154,7 +204,7 @@ class BibStyle:
             else:
                 self._warning(entry, 'DOI in wrong format: {}'.format(val))
                 return
-        self.append(' DOI: <a href="https://doi.org/{}">{}</a>.'.format(val, val))
+        self.append(' DOI: <a href="https://doi.org/{}">{}</a>'.format(val, val))
 
     def _make_title(self, fields: Dict[str, Entry], italics: bool):
         """Make it a hyperlink if url field is present."""
@@ -190,7 +240,7 @@ class BibStyle:
         if 'editor' in fields:
             self._format_editors(fields)
             self.append(', ')
-        self.append(' <em>' + fields['booktitle'].value + '</em>')
+        self.append(' <em>', fields['booktitle'].value, '</em>')
             
     def _format_bvolume(self, fields):
         if 'volume' in fields:
@@ -207,8 +257,9 @@ class BibStyle:
     def _format_number_series(self, fields):
         if 'series' in fields:
             if 'number' in fields:
-                self.append('Number ', fields['number'].value)
-            self.append(' in ', fields['series'].value)
+                self.append('Number ', fields['number'].value, ' in ')
+            else:
+                self.append(fields['series'].value)
 
     def _format_edition(self, fields):
         if 'edition' in fields:
@@ -235,12 +286,7 @@ class BibStyle:
                     self.append(':', fields['pages'].value)
         else:
             self._warning(entry, 'journal is required for @article')
-        if 'year' in fields:
-            self.append(', ', fields['year'].value, '.')
-        elif 'date' in fields:
-            self.append(', ', fields['date'].value, '.')
-        else:
-            self.append('.')
+        self.append(', ', _date(fields), '.')
         if 'doi' in fields:
             self._format_doi(entry)
 
@@ -261,22 +307,17 @@ class BibStyle:
             self._warning(entry, 'booktitle is expected for @article')
         self._format_bvolume(fields)
         if 'pages' in fields:
-            self.append(', pages {}.'.format(fields['pages'].value))
-        else:
-            self.append('.')
-        if 'publisher' in fields:
-            self.append(' ', fields['publisher'].value)
-        elif 'organization' in fields:
-            self.append(' ', fields['organization'].value)
+            self.append(', pages {}'.format(fields['pages'].value))
         if 'address' in fields:
             self.append(', ')
             self.append(fields['address'].value)
+        self.append('. ')
         if 'year' in fields:
-            self.append(' ', fields['year'].value, '.')
-        elif 'date' in fields:
-            self.append(' ', fields['date'].value, '.')
-        else:
-            self.append('.')
+            self.append(_date(fields), '. ')
+        if 'publisher' in fields:
+            self.append(' ', fields['publisher'].value, '. ')
+        elif 'organization' in fields:
+            self.append(' ', fields['organization'].value, '. ')
         if 'doi' in fields:
             self._format_doi(entry)
     def _incollection(self, entry):
@@ -285,11 +326,11 @@ class BibStyle:
             self.append(self._join_names(fields['author'].value))
             self.append('. ')
         else:
-            self._warning(entry, 'Author is required for @inproceedings')
+            self._warning(entry, 'Author is required for @incollection')
         if 'title' in fields:
             self.append(self._make_title(fields, False), '. ')
         else:
-            self._warning(entry, 'Title is required for @inproceedings')
+            self._warning(entry, 'Title is required for @incollection')
         if 'booktitle' in fields:
             self._format_booktitle(fields)
         self._format_bvolume(fields)
@@ -350,7 +391,7 @@ class BibStyle:
         elif 'organization' in fields:
             self.append(fields['organization'].value)
         if 'address' in fields:
-            self.append(fields['address'].value)
+            self.append(', ', fields['address'].value)
         if 'edition' in fields:
             self.append(', ')
             self.append(fields['edition'].value)
@@ -403,44 +444,73 @@ class BibStyle:
         self._format_note(fields)
         if 'doi' in fields:
             self._format_doi(entry)
+
     def _booklet(self, entry):
         fields = entry.fields_dict
-        if 'authors' in fields:
+        if 'author' in fields:
             self.append(self._join_names(fields['author'].value), '. ')
-        self.append(self._make_title(fields, False))
-        if 'howpublished' in fields or 'address' in fields:
-            self.append(', ')
+        if 'title' in fields:
+            self.append(self._make_title(fields, False), '. ')
         if 'howpublished' in fields:
-            self.append(fields['howpublished'].value, ', ')
+            self.append(fields['howpublished'].value, '. ')
         if 'address' in fields:
-            self.append(fields['address'].value, ', ')
+            self.append(fields['address'].value, '. ')
+        if 'note' in fields:
+            self._format_note(fields)
+            self.append('. ')
+        if 'year' in fields or 'issue_date' in fields:
+            self.append(_date(fields), '.')
             
-            
-        self.append('booklet')
     def _manual(self, entry):
         fields = entry.fields_dict
         needscomma = False
         if 'author' in fields:
-            self.append(self._join_names(fields['author'].value))
-        else:
-            if 'organization' in fields:
-                self.append(fields['organization'].value)
-                if 'address' in fields:
-                    self.append(', ', fields['address'].value)
+            self.append(self._join_names(fields['author'].value), '.')
         if 'title' in fields:
-            self.append(self._make_title(fields, True))
-            if 'year' in fields:
-                self.append(', ', fields['year'].value, '. ')
-            else:
-                self.append('. ')
-                self._warning(entry, 'year is required for bibtex type @manual')
+            self.append(self._make_title(fields, True), '. ')
         else:
             self._warning(entry, 'title is required for bibtex type @manual')
+            self.append(' ')
+        if 'organization' in fields:
+            self.append(fields['organization'].value)
+            if 'address' in fields:
+                self.append(', ', fields['address'].value)
+        if 'year' in fields:
+            self.append(', ', _date(fields))
+        else:
+            self._warning(entry, 'year is required for bibtex type @manual')
+        self.append('.')
+    def _athesis(self, entry, thesistype):
+        """Used for phdthesis, mastersthesis, and just thesis with a type."""
+        fields = entry.fields_dict
+        if 'author' in fields:
+            self.append(self._join_names(fields['author'].value), '. ')
+        if 'title' in fields:
+            self.append(self._make_title(fields, True), '. ')
+        self.append(thesistype, ', ')
+        if 'school' in fields:
+            self.append(fields['school'].value, ', ')
+        elif 'institution' in fields:
+            self.append(fields['institution'].value, ', ')
+        if 'address' in fields:
+            self.append(fields['address'].value, ', ')
+        self.append(_date(fields), '.')
     def _mastersthesis(self, entry):
-        self.append('mastersthesis')
+        self._athesis(entry, 'Master\'s thesis')
     def _phdthesis(self, entry):
-        self.append('phdthesis')
-
+        self._athesis(entry, 'PhD thesis')
+    def _thesis(self, entry):
+        fields = entry.fields_dict
+        if 'type' in fields:
+            thesistype = fields['type'].value
+            if thesistype == 'phdthesis':
+                self._phdthesis(entry)
+            elif thesistype == 'mathesis':
+                self._mastersthesis(entry)
+            else:
+                self._misc(entry)
+        else:
+            self._misc(entry)
     def _new_sentence_a(self, fields, name):
         if 'name' in fields:
             self.append('. ')
@@ -449,12 +519,6 @@ class BibStyle:
         if 'name1' in fields and 'name2' in fields:
             self.append('. ')
             
-    def _format_date(self, fields):
-        if 'year' in fields:
-            self.append(' ', fields['year'].value)
-        elif 'date' in fields:
-            self.append(' ', fields['date'].value)
-
     def _proceedings(self, entry):
         fields = entry.fields_dict
         if 'editor' in fields:
@@ -483,11 +547,10 @@ class BibStyle:
                     self.append(fields['organization'].value)
             if 'publisher' in fields:
                 self.append(' ', fields['publisher'].value)
-            self._format_date(fields)
+            self.append(_date(fields))
         else: # has address
             self.append(' ', fields['address'].value, ', ')
-            self._format_date(fields)
-            self.append('. ')
+            self.append(_date(fields), '. ')
             if not 'editor' in fields:
                 if 'organization' in fields:
                     self.append(fields['organization'].value)
@@ -501,29 +564,41 @@ class BibStyle:
     def _misc(self, entry):
         fields = entry.fields_dict
         if 'author' in fields:
-            self.append(self._join_names(fields['author'].value))
-            self.append('. ')
+            self.append(self._join_names(fields['author'].value), '. ')
         if 'title' in fields:
-            self.append(self._make_title(fields, False))
+            self.append(self._make_title(fields, False), '. ')
+        if 'note' in fields:
+            self._format_note(fields)
+            self.append('. ')
         if 'howpublished' in fields:
-            self.append(' ')
-            self.append(fields['howpublished'].value)
-            self.append('. ')
-        if 'year' in fields:
-            self.append(' ')
-            self.append(fields['year'].value)
-            self.append('. ')
-        elif 'date' in fields:
-            self.append(' ')
-            self.append('. ')
-            self.append(fields['date'].value)
-        self._format_note(fields)
+            self.append(fields['howpublished'].value, '. ')
+        if 'year' in fields or 'issue_date' in fields:
+            self.append(_date(fields), '.')
+
     def _techreport(self, entry):
-        # TODO:finish this
-        self._misc(entry)
+        fields = entry.fields_dict
+        if 'author' in fields:
+            self.append(self._join_names(fields['author'].value), '. ')
+        if 'title' in fields:
+            self.append(self._make_title(fields, False), '. ')
+        self.append('Technical report')
+        if 'number' in fields:
+            self.append(' number ', fields['number'].value, ', ')
+        else:
+            self.append(', ')
+        if 'institution' in fields:
+            self.append(fields['institution'].value, '. ')
+        elif 'organization' in fields:
+            self.append(fields['organization'].value, '. ')
+        if 'note' in fields:
+            self._format_note(fields)
+            self.append('. ')
+        self.append(_date(fields), '.')
+
     def _unpublished(self, entry):
         # TODO:finish this
         self._misc(entry)
+
     def _online(self, entry):
         # TODO:finish this
         self._misc(entry)
@@ -555,6 +630,8 @@ class BibStyle:
             self._mastersthesis(entry)
         elif alias == 'phdthesis':
             self._phdthesis(entry)
+        elif alias == 'thesis':
+            self._thesis(entry)
         elif alias == 'patent':
             self._patent(entry)
         elif alias == 'proceedings':

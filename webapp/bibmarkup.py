@@ -194,6 +194,7 @@ def _get_decoder():
                                        macros=[MacroTextSpec('cal', ''),
                                                macrospec.MacroSpec('textcommabelow', '{'),
                                                MacroTextSpec('textless', '&lt;'),
+                                               MacroTextSpec('textgreater', '&gt;'),
                                                MacroTextSpec('textcommabelow', simplify_repl=_handle_textcommabelow),
                                                MacroTextSpec('gcd', 'gcd'),
                                                MacroTextSpec('mbox', ''),
@@ -202,10 +203,19 @@ def _get_decoder():
                                                MacroTextSpec('pmod', 'mod'),
                                                MacroTextSpec('texttt', '%s'),
                                                MacroTextSpec('ell', 'ℓ'),
+                                               MacroTextSpec('thinspace', ' '),
+                                               MacroTextSpec('hss', simplify_repl=_illegal_handler),
+                                               MacroTextSpec('def', simplify_repl=_illegal_handler),
+                                               MacroTextSpec('ifx', simplify_repl=_illegal_handler),
+                                               MacroTextSpec('else', simplify_repl=_illegal_handler),
+                                               MacroTextSpec('fi', simplify_repl=_illegal_handler),
+                                               MacroTextSpec('newblock', simplify_repl=_illegal_handler),
                                                MacroTextSpec('sc', ''),
                                                MacroTextSpec('boldmath', ''),
                                                MacroTextSpec('bm', ''),
                                                MacroTextSpec('sl', ''),
+                                               MacroTextSpec('tt', ''),
+                                               MacroTextSpec('relax', ''),
                                                # These should be removed by the
                                                # HyperrefMiddleware before they hit
                                                # the LatexMiddleware
@@ -485,7 +495,7 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         bibitemdata = {'key': entry.key,
                        'label': cite_map.get(entry.key, 'BUG!')}
         if errors:
-            body = '<span class="text-danger">BibTeX entry {} could not be formatted.'
+            body = '<span class="text-danger">BibTeX entry {} could not be formatted.'.format(entry.key)
             for error in errors:
                 body += '<br>' + error
             body += '</span>'
@@ -505,8 +515,6 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         bibitem = BibItem(**bibitemdata)
         lookup[entry.key] = bibitem
     bibhtml = []
-    print(cite_map)
-    print(lookup.keys())
     for key in cite_map.keys():
         bibitem = lookup.get(key)
         if bibitem:
