@@ -4,8 +4,6 @@ Library for handling output meta file from compiling latex.
 
 from nameparser import HumanName
 from arxiv_latex_cleaner import arxiv_latex_cleaner
-from pybtex.database import parse_string, BibliographyData, BibliographyDataError, Entry
-import pybtex.errors
 import random
 import re
 import shutil
