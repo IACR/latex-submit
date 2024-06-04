@@ -37,10 +37,11 @@ jobs:
     - name: Tests for metadata
       working-directory: webapp/metadata/tests
       run: |
-        pytest xml_meta_test.py
-        pytest parse_test.py
-        pytest metadata_test.py
-    - name: Test for log_parser
+        pytest xml_meta_test.py -vv
+        pytest parse_test.py -vv
+        pytest metadata_test.py -vv
+    - name: Test for log_parser and bibstyle.
       working-directory: webapp
       run: |
-        pytest log_parser_test.py
+        pytest log_parser_test.py -vv
+        pytest bibmarkup_test.py -vv
