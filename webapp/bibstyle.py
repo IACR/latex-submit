@@ -80,7 +80,9 @@ class BibStyle:
             'book': ['author/editor', 'title', 'year/date'],
             'booklet': ['title'],
             'collection': ['editor', 'title', 'year/date'],
-            'inbook': ['author/editor', 'title', 'chapter/pages', 'booktitle', 'year/date'],
+            # inbook is a mess, and we should probably warn authors to use
+            # @book or @incollection instead.
+            'inbook': ['author/editor', 'title', 'chapter/pages', 'year/date'],
             'incollection': ['author', 'title', 'booktitle', 'year/date'],
             'inproceedings': ['author', 'title', 'booktitle/series', 'year/date'],
             'manual': ['title', 'year/date'],
@@ -208,7 +210,10 @@ class BibStyle:
 
     def _make_title(self, fields: Dict[str, Entry], italics: bool):
         """Make it a hyperlink if url field is present."""
-        value = fields['title'].value
+        if 'title' in fields:
+            value = fields['title'].value
+        else:
+            value = fields['booktitle'].value
         if 'href=' in value: # don't use url to mark it up.
             if italics:
                 return ' <em>{}</em>'.format(value)
@@ -236,11 +241,11 @@ class BibStyle:
                 self.append(', editors')
 
     def _format_booktitle(self, fields):
-        self.append(' In ')
+        self.append('In ')
         if 'editor' in fields:
             self._format_editors(fields)
             self.append(', ')
-        self.append(' <em>', fields['booktitle'].value, '</em>')
+        self.append('<em>', fields['booktitle'].value, '</em>')
             
     def _format_bvolume(self, fields):
         if 'volume' in fields:
@@ -258,8 +263,7 @@ class BibStyle:
         if 'series' in fields:
             if 'number' in fields:
                 self.append('Number ', fields['number'].value, ' in ')
-            else:
-                self.append(fields['series'].value)
+            self.append(fields['series'].value, '. ')
 
     def _format_edition(self, fields):
         if 'edition' in fields:
@@ -320,6 +324,7 @@ class BibStyle:
             self.append(' ', fields['organization'].value, '. ')
         if 'doi' in fields:
             self._format_doi(entry)
+
     def _incollection(self, entry):
         fields = entry.fields_dict
         if 'author' in fields:
@@ -369,7 +374,7 @@ class BibStyle:
             else:
                 self.append(', editor.')
         if 'title' in fields:
-            self.append(self._make_title(fields, True), '. ')
+            self.append(self._make_title(fields, True))
         elif 'booktitle' in fields:
             self._format_booktitle(fields)
         else:
@@ -380,7 +385,7 @@ class BibStyle:
             self.append(fields['chapter'].value)
         if 'pages' in fields:
             pages = fields['pages'].value
-            if '-' in pages:
+            if '-' in pages or '–' in pages:
                 self.append(', pages {}. '.format(pages))
             else:
                 self.append(', page {}. '.format(pages))
@@ -419,15 +424,14 @@ class BibStyle:
                 self.append(', editors.')
             else:
                 self.append(', editor.')
-        if 'title' in fields:
-            self.append(self._make_title(fields, True), '. ')
-        elif 'booktitle' in fields:
-            self._format_booktitle(fields)
-        else:
-            self._warning(entry, 'Title is required for @inbook')
+        self.append(self._make_title(fields, True))
+        # if 'volume' in fields:
+        #     self.append(', volume {}.'.format(fields['volume'].value))
+        # else:
+        #     self.append('. ')
         self._format_bvolume(fields)
-        self._format_number_series(fields)
         self.append('. ')
+        self._format_number_series(fields)
         if 'publisher' in fields:
             self.append(fields['publisher'].value)
         elif 'organization' in fields:
@@ -440,7 +444,7 @@ class BibStyle:
         elif 'date' in fields:
             self.append(' ', fields['date'].value, '.')
         else:
-            self.append('.')
+            self.append('. ')
         self._format_note(fields)
         if 'doi' in fields:
             self._format_doi(entry)

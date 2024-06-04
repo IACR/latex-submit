@@ -1,9 +1,10 @@
 \documentclass{article}
 \usepackage{hyperref}
-%\RequirePackage[backend=biber,style=alphabetic,maxcitenames=4,maxbibnames=20,useprefix=true]{biblatex}[2019/12/01]
 % with bibtex, use this
-%\bibliographystyle{splncs04}
 \bibliographystyle{alphaurl}
+% for biblatex, use these
+%\RequirePackage[backend=biber,style=alphabetic,maxcitenames=4,maxbibnames=20,useprefix=true]{biblatex}[2019/12/01]
+%\addbibresource{alltypes.bib}
 \begin{document}
 \cite{lwe}
 \cite{DifVanWie92}
@@ -29,8 +30,9 @@
 \cite{Sto12}
 \cite{ch}  
 \cite{doe}
-
-  %\bibdata{alltypes.bib}
+\cite{without}
 %with bibtex use this:
 \bibliography{alltypes}
+% for biblatex, use this:
+%\printbibliography
 \end{document}

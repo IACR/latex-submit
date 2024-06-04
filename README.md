@@ -240,6 +240,54 @@ discussion items to the author for them to correct.  The `final`
 version is created when the author uploads their response to the copy
 editor.
 
+A bit more about these states:
+* PENDING - the author has uploaded a paper, but they are presented with
+  warnings and errors. The author can repeatedly upload while in this state
+  in order to correct warnings and errors. If a paper has only warnings,
+  then they can present it for copyedit, which changes the state to
+  SUBMITTED. At this point the author can no longer upload their candidate
+  version because it is in the hands of the copy editor.
+* SUBMITTED - in this state, a copy editor has not been assigned yet. The
+  author may not upload another version.
+* EDIT_PENDING - a copy editor has been assigned, and any copy editor may
+  submit suggested changes. When the assigned copy editor is satisfied,
+  they change the state to EDIT_FINISHED. This causes the author to be
+  notified, and they have to respond to each requested or suggested change.
+  Once they do this, the author can upload their final version. They may do
+  this multiple times until they are satisfied that they responded to each
+  requested or suggested change. At that point they set the state to
+  FINAL_SUBMITTED - At that point they may not upload another final version,
+  because it's in the hands of the copy editor.
+* FINAL_SUBMITTED - the copy editor can look at the differences between the
+  candidate version and the final version to verify that they responded to
+  each discussion point. At this point the copy editor can accept the changes
+  and move it to the COPY_EDIT_ACCEPTED state, or else the copy editor can
+  request further changes, setting it to EDIT_REVISED. The copy editor gets
+  a chance to add more requested changes, and once they are satisfied the
+  author gets notified and can inspect the new requested changes and upload
+  another final version.
+* EDIT_REVISED - putting it in this state replaces the candidate version by the
+  final version
+  In the latter
+  case the copy editor gets a chance to add more
+
+The transitions take place as follows:
+
+* PENDING -> EDIT_PENDING by a form submitted to `home_bp.compile_for_copyedit`. We
+  currently bypass the state SUBMITTED and let copy editors claim ownership rather
+  than assigning one.
+* EDIT_PENDING -> EDIT_FINISHED by a form submitted from `admin_bp.copyedit` to
+  `admin_bp.finish_copyedit`. The author is notified to view it at `home_bp.copyedit`.
+* EDIT_FINISHED -> FINAL_SUBMITTED by a form from
+  `home_bp.copyedit` -> `home_bp.show_submit_version` -> `home_bp.submit_version`.
+* FINAL_SUBMITTED -> COPY_EDIT_ACCEPT is a form from `admin_bp.copyedit` submitted to
+  `admin_bp.approve_final`.
+* FINAL_SUBMITTED -> EDIT_REVISED is a form from `admin_bp.copyedit` submitted to
+  `admin_bp.request_more_changes`. This replaces the candidate version by the final version
+  and compiles it for copy editing.
+* COPY_EDIT_ACCEPT -> EDIT_REVISED is a form from `admin_bp.final_review` submitted to
+  `admin_bp.request_more_changes`.
+
 After one round of copy editing, we hope that the `final` version
 fulfills all of the required changes from the copy editor, but if they
 find new problems or if the author hasn't corrected serious problems,

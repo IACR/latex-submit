@@ -47,26 +47,26 @@ numpages = {40},
 }
 
 @Article{clusterDecomp,
-author =       "Muralidhar, K. and M. Sundareshan, M.",
-title =        "On the Decomposition of Large Communication Networks                                                           
+ author =       "Muralidhar, K. and M. Sundareshan, M.",
+ title =        "On the Decomposition of Large Communication Networks                                                           
                  for Hierarchical Control Implementation",
-                 journal =      "IEEE Transactions on Communications",
-                 volume =       "COM-34, 10",
-                 month = oct,
-                 year =         "1986",
-                 pages =        "985--987",
-                 references =   "0",
-                 country =      "USA",
-                 language =     "English",
-                 enum =         "3959",
-                 descriptors =  "Communication network; hierarchical network;                                                                   
-                 decomposition; optimization;",
-                 date =         "1990-05-02",
-  by_date =      "Uhl",
-  revision =     "21/04/91",
-  by_rev =       "Le",
-  location =     "UniDo-ESV",
-  annote =       "In the implementation of hierarchical schems for the
+ journal =      "IEEE Transactions on Communications",
+ volume =       "COM-34, 10",
+ month = oct,
+ year =         "1986",
+ pages =        "985--987",
+ references =   "0",
+ country =      "USA",
+ language =     "English",
+ enum =         "3959",
+ descriptors =  "Communication network; hierarchical network;                                                                   
+                decomposition; optimization;",
+ date =         "1990-05-02",
+ by_date =      "Uhl",
+ revision =     "21/04/91",
+ by_rev =       "Le",
+ location =     "UniDo-ESV",
+ annote =       "In the implementation of hierarchical schems for the
 adaptive control of large communication networks,
 decomposition of the overall network into node clusters  
 and assignment of a supervisor for each cluster are of  
@@ -124,17 +124,21 @@ Scott A. Vanstone",
   organization = {Climate Change Association}
 }
 
-@Inbook{solvdeg_degreg,
-author={Ding, Jintai and Schmidt, Dieter},
-title={Solving Degree and Degree of Regularity for Polynomial Systems over a Finite Fields},
-bookTitle={Number Theory and Cryptography: Papers in Honor of Johannes Buchmann on the Occasion of His 60th Birthday},
-year={2013},
-publisher={Springer},
-address={Berlin, Heidelberg},
-pages={34--49},
+This entry omits series.
+@Incollection{solvdeg_degreg,
+  author={Ding, Jintai and Schmidt, Dieter},
+  title={Solving Degree and Degree of Regularity for Polynomial Systems over a Finite Fields},
+  booktitle={Number Theory and Cryptography: Papers in Honor of Johannes Buchmann on the Occasion of His 60th Birthday},
+  year={2013},
+  publisher={Springer},
+  address={Berlin, Heidelberg},
+  pages={34--49},
+  isbn="978-3-642-42001-6",
+  doi="10.1007/978-3-642-42001-6_4",
+  url="https://doi.org/10.1007/978-3-642-42001-6_4"
 }
 
-@Inbook{mccurley1990odds,
+@Incollection{mccurley1990odds,
   title={Odds and ends from cryptology and computational number theory},
   author={McCurley, Kevin S},
   editor={Carl Pomerance},
@@ -147,7 +151,7 @@ pages={34--49},
 }
 
 @incollection{mychapter,
-  title        = {An Analysis of Example},
+  title        = {An incollection with a series},
   author       = {John Smith},
   year         = 2022,
   month        = {June},
@@ -157,6 +161,18 @@ pages={34--49},
   series       = {Example Book Series},
   volume       = 1,
   number       = 2,
+  pages        = {123--130},
+  editor       = {Jane Doe}
+}
+
+@incollection{without,
+  title        = {An incollection without series},
+  author       = {John Smith},
+  year         = 2022,
+  month        = {June},
+  booktitle    = {The Book of Examples},
+  publisher    = {Example Publisher},
+  address      = {New York, NY},
   pages        = {123--130},
   editor       = {Jane Doe}
 }
