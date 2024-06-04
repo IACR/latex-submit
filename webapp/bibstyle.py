@@ -291,6 +291,8 @@ class BibStyle:
         else:
             self._warning(entry, 'journal is required for @article')
         self.append(', ', _date(fields), '.')
+        if 'note' in fields:
+            self.append(' ', fields['note'].value)
         if 'doi' in fields:
             self._format_doi(entry)
 
@@ -324,6 +326,8 @@ class BibStyle:
             self.append(' ', fields['organization'].value, '. ')
         if 'doi' in fields:
             self._format_doi(entry)
+        if 'note' in fields:
+            self.append(' ', fields['note'].value)
 
     def _incollection(self, entry):
         fields = entry.fields_dict
