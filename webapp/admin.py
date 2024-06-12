@@ -786,7 +786,8 @@ def change_issue():
     db.session.add(comprec)
     db.session.commit()
     publishedDate = date.today().strftime('%Y-%m-%d')
-    metadata = '\\def\\IACR@DOI{' + compilation.meta.DOI + '}\n'
+    doi = compilation.meta.DOI
+    metadata = '\\def\\IACR@DOI{' + doi + '}\n'
     if journal.EISSN:
         metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
     metadata += '\\def\\IACR@Received{' + compilation.submitted[:10] + '}\n'
