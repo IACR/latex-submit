@@ -255,6 +255,10 @@ def approve_final():
         return admin_message('Missing PaperStatus for paperid {}'.format(paperid))
     paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT
     paper_status.lastmodified = datetime.now()
+    issue = paper_status.issue
+    if issue.exported:
+        # In this case the issue for the paper was already exported, so we unassign the paper.
+        paper_status.issue_id = None
     db.session.add(paper_status)
     db.session.commit()
     log_event(db, paperid, 'Final version approved for publication')
@@ -263,7 +267,7 @@ def approve_final():
                          recipients=[app.config['EDITOR_EMAILS']])
     maildata = {'journal_name': paper_status.journal_key,
                 'paperid': paperid,
-                'issue_url': url_for('admin_file.copyedit_home', _external=True)}
+                'copyedit_url': url_for('admin_file.copyedit_home', _external=True)}
     editor_msg.body = app.jinja_env.get_template('admin/copyedit_approved.txt').render(maildata)
     if app.config['TESTING']:
         print(editor_msg.body)
@@ -274,9 +278,7 @@ def approve_final():
         comp = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
         maildata = {'paperid': paperid,
                     'paper_title': comp.meta.title,
-                    'journal_name': paper_status.journal_key,
-                    'volume': paper_status.volume_key,
-                    'issue': paper_status.issue_key}
+                    'journal_name': paper_status.journal_key}
         author_msg = Message('Copy edit changes approved for {}'.format(paperid),
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
@@ -301,7 +303,7 @@ def view_journal(jid):
     volumes = [obj._asdict() for obj in volume_info]
     for volume in volumes:
         volume['issues'] = db.session.execute(select(Issue).where(Issue.volume_id==volume['id'])).scalars().all()
-    papers = db.session.execute(select(PaperStatus).where(PaperStatus.journal_key==journal.hotcrp_key)).scalars().all()
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.journal_key==journal.hotcrp_key).order_by(PaperStatus.lastmodified.desc())).scalars().all()
     data = {'title': journal.name,
             'journal': journal,
             'volumes': volumes,
@@ -376,7 +378,7 @@ def view_issue(issueid):
                     accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
     formdata = [{'paperid': p.paperid} for p in finished_papers]
-    if len(finished_papers) == len(papers) and len(papers) > 0:
+    if len(finished_papers) == len(papers) and len(papers) > 0 and not issue.exported:
         data['form'] = PublishIssueForm(issueid=issue.id)
     return render_template('admin/view_issue.html', **data)
 
@@ -464,6 +466,9 @@ def finish_copyedit():
         db.session.add(final_comprec)
         paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT.value
         paper_status.lastmodified = datetime.now()
+        if issue.exported:
+            # In this case the issue for the paper was already exported, so we unassign the paper.
+            paper_status.issue_id = None
         db.session.add(paper_status)
         db.session.commit()
         paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
@@ -488,6 +493,9 @@ def finish_copyedit():
         return redirect(url_for('admin_file.copyedit_home'), code=302)
     paper_status.status = PaperStatusEnum.EDIT_FINISHED.value
     paper_status.lastmodified = datetime.now()
+    if issue.exported:
+        # In this case the issue for the paper was already exported, so we unassign the paper.
+        paper_status.issue_id = None
     db.session.add(paper_status)
     db.session.commit()
     msg = Message('Copy editing was finished on your paper',

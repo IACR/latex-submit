@@ -32,6 +32,9 @@
     </table>
   </div>
 </div>
+{% if issue.exported %}
+<div class="alert alert-success">This was exported on {{issue.exported}}.</div>
+{% endif %}
 <h4 class="mt-3">Papers assigned to the issue</h4>
 <script>
  function showDeletePaperModal(paperid, title) {
@@ -122,7 +125,7 @@
   </div>
 </div>
 {% endif %}
-{% if unassigned_papers %}
+{% if unassigned_papers and not issue.exported %}
 <h4 class="mt-4">Unassigned papers</h4>
 <table class="table">
   <thead>
