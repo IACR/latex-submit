@@ -421,6 +421,9 @@ def final_review(paperid):
     for filename, file in final_file_map.items():
         diffs[filename] = 'File is new'
     comp_path = final_path / Path('compilation.json')
+    if not comp_path.is_file():
+        logging.critical('{} does not exist'.format(str(comp_path)))
+        return admin_message('Paper has not been finalized: {}'.format(paperid))
     compilation = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
     sql = select(Discussion).filter_by(paperid=paperid).order_by(Discussion.created.desc())
     items = db.session.execute(sql).scalars().all()

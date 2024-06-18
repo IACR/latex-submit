@@ -12,7 +12,7 @@ RUN apt-get update -q \
 RUN echo "Building with documentation: $DOCFILES" && \
     echo "Building with sources: $SRCFILES" && \
     echo "Building with scheme: $SCHEME"; \
-    wget https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2023/tlnet-final/install-tl-unx.tar.gz; \
+    wget ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2023/tlnet-final/install-tl-unx.tar.gz; \
     mkdir install-tl-unx; \
     tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
     echo "selected_scheme scheme-$SCHEME" >> install-tl-unx/texlive.profile && \
