@@ -255,10 +255,12 @@ def approve_final():
         return admin_message('Missing PaperStatus for paperid {}'.format(paperid))
     paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT
     paper_status.lastmodified = datetime.now()
-    issue = paper_status.issue
-    if issue.exported:
-        # In this case the issue for the paper was already exported, so we unassign the paper.
-        paper_status.issue_id = None
+    if paper_status.issue_id:
+        issue = paper_status.issue
+        if issue and issue.exported:
+            # In this case the issue for the paper was already exported, so we unassign the paper.
+            paper_status.issue_id = None
+            paper_status.paperno = None
     db.session.add(paper_status)
     db.session.commit()
     log_event(db, paperid, 'Final version approved for publication')
@@ -277,8 +279,7 @@ def approve_final():
         comp_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value) / Path('compilation.json')
         comp = Compilation.model_validate_json(comp_path.read_text(encoding='UTF-8'))
         maildata = {'paperid': paperid,
-                    'paper_title': comp.meta.title,
-                    'journal_name': paper_status.journal_key}
+                    'paper_title': comp.meta.title}
         author_msg = Message('Copy edit changes approved for {}'.format(paperid),
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
@@ -447,9 +448,6 @@ def finish_copyedit():
     if not paper_status:
         return admin_message('Unknown paper: {}'.format(paperid))
     numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()
-    issue = paper_status.issue
-    volume = issue.volume
-    journal = volume.journal
     if not numitems:
         # in this case, the paper has no issues for the author to
         # respond to, so we copy the candidate over to the final
@@ -466,9 +464,12 @@ def finish_copyedit():
         db.session.add(final_comprec)
         paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT.value
         paper_status.lastmodified = datetime.now()
-        if issue.exported:
-            # In this case the issue for the paper was already exported, so we unassign the paper.
-            paper_status.issue_id = None
+        if paper_status.issue_id:
+            issue = paper_status.issue
+            if issue and issue.exported:
+                # In this case the issue for the paper was already exported, so we unassign the paper.
+                paper_status.issue_id = None
+                paper_status.paperno = None
         db.session.add(paper_status)
         db.session.commit()
         paper_dir = Path(app.config['DATA_DIR']) / Path(paperid)
@@ -477,10 +478,7 @@ def finish_copyedit():
         shutil.copytree(candidate_dir,
                         final_dir)
         maildata = {'paperid': paperid,
-                    'paper_title': paper_status.title,
-                    'journal_name': journal.name,
-                    'volume': volume.name,
-                    'issue': issue.name}
+                    'paper_title': paper_status.title}
         author_msg = Message('Copy edit changes approved for {}'.format(paperid),
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
@@ -493,15 +491,18 @@ def finish_copyedit():
         return redirect(url_for('admin_file.copyedit_home'), code=302)
     paper_status.status = PaperStatusEnum.EDIT_FINISHED.value
     paper_status.lastmodified = datetime.now()
-    if issue.exported:
-        # In this case the issue for the paper was already exported, so we unassign the paper.
-        paper_status.issue_id = None
+    if paper_status.issue_id:
+        issue = paper_status.issue
+        if issue and issue.exported:
+            # In this case the issue for the paper was already exported, so we unassign the paper.
+            paper_status.issue_id = None
+            paper_status.paperno = None
     db.session.add(paper_status)
     db.session.commit()
     msg = Message('Copy editing was finished on your paper',
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[paper_status.email])
-    maildata = {'journal_name': journal.name,
+    maildata = {'journal_name': paper_status.journal_key,
                 'paperid': paperid,
                 'numitems': numitems,
                 'pdf_auth': create_hmac([paperid, 'copyedit']),

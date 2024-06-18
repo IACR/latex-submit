@@ -2,7 +2,6 @@ The final review on your paper # {{paperid}} titled
 
   {{paper_title}}
 
-for the journal {{journal_name}} has been finished and it now
-scheduled to be published in the next issue.  You will receive
-a final confirmation once the issue containing your paper is
-published. No further action is required from you.
+has been finished and it now scheduled to be published in the
+next issue.  You will receive a final confirmation once the issue
+containing your paper is published. No further action is required from you.
