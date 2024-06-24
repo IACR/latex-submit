@@ -459,6 +459,11 @@
     </div> {# end left-column #}
     <div class="resizer"></div>
     <div class="right-column">
+      {% if paper.status.name == 'PUBLISHED' %}
+      <p class="alert alert-success" role="alert">
+        This paper has been published
+      </p>
+      {% else %}
       <div class="d-flex flex-column" style="height:90vh;">
         {#  tabs for discussion and warnings from compilation #}
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -597,6 +602,7 @@
           </div>
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </main>

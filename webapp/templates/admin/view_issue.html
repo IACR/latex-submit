@@ -64,7 +64,7 @@
   <tbody id="paperList">
     {% for status in papers %}
     <tr class="align-middle">
-    <td>{% if status.status.name!='COPY_EDIT_ACCEPT' %}
+    <td>{% if status.status.name!='COPY_EDIT_ACCEPT' and status.status.name != 'PUBLISHED' %}
       <form method="POST" action="{{url_for('admin_file.change_issue')}}">
         {{ bumpform.csrf_token }}
         {{ bumpform.nexturl(value=url_for('admin_file.view_issue', issueid=issue.id)) }}

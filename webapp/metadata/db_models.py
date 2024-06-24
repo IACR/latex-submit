@@ -25,7 +25,7 @@ class PaperStatusEnum(str, Enum):
     FINAL_SUBMITTED = 'Pending final review'
     EDIT_REVISED = 'Further revision requested'
     COPY_EDIT_ACCEPT = 'Copy edit complete'
-    PUBLISHED = 'Published'
+    PUBLISHED = 'Exported (published)'
   
 class Role(str, Enum):
     AUTHOR = 'author'
