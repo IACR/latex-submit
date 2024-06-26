@@ -249,8 +249,7 @@ class BibStyle:
             
     def _format_bvolume(self, fields):
         if 'volume' in fields:
-            self.append(', volume ')
-            self.append(fields['volume'].value)
+            self.append(', volume ', fields['volume'].value)
             if 'series' in fields:
                 self.append(' of <em>{}</em>'.format(fields['series'].value))
 
@@ -311,7 +310,10 @@ class BibStyle:
             self._format_booktitle(fields)
         else:
             self._warning(entry, 'booktitle is expected for @article')
-        self._format_bvolume(fields)
+        if 'volume' in fields:
+            if 'number' in fields:
+                self._warning(entry, 'You cannot use both volume and number')
+            self._format_bvolume(fields)
         if 'pages' in fields:
             self.append(', pages {}'.format(fields['pages'].value))
         if 'address' in fields:
@@ -545,7 +547,6 @@ class BibStyle:
         else:
             self._warning(entry, 'Title is required for @inbook')
         self._format_bvolume(fields)
-        self._format_number_series(fields)
         if 'address' not in fields:
             if not 'editor' in fields:
                 self._new_sentence_a(fields, 'publisher')

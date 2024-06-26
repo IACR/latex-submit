@@ -365,7 +365,7 @@ def _bstrip(txt):
 def test_bibtex_style():
     test_dir = Path('testdata/bibtex/style')
     cite_map = get_citation_map(test_dir)
-    assert len(cite_map) == 25
+    assert len(cite_map) == 26
     bibtex_file = test_dir / Path('alltypes.bib')
     compilation_data = {'paperid': 'abcdefg',
                         'status': CompileStatus.COMPILING,
@@ -383,7 +383,7 @@ def test_bibtex_style():
     bibtex_to_html(compilation, cite_map)
     for i, bibhtml in enumerate(compilation.bibhtml):
         print(i, _bstrip(bibhtml.body))
-    assert len(compilation.bibhtml) == 25
+    assert len(compilation.bibhtml) == 26
     assert len(compilation.warning_log) == 4
     assert _bstrip(compilation.bibhtml[0].body) == 'Thomas E. Anderson, Michael Dahlin, Jeanna M. Neefe, David A. Patterson, Drew S. Roselli, and Randolph Wang.  Serverless Network File Systems.  <em>ACM Transactions on Computer Systems</em>, 14(1):41–79, 1996.'
     assert _bstrip(compilation.bibhtml[1].body) == 'Saikrishna Badrinarayanan, Aayush Jain, Nathan Manohar, and Amit Sahai.  Secure MPC: Laziness Leads to GOD. In Shiho Moriai and Huaxiong Wang, editors, <em>Advances in Cryptology – ASIACRYPT 2020, Part III</em>, volume 12493 of <em>Lecture Notes in Computer Science</em>, pages 120–150, Daejeon, South Korea. 2020.  Springer, Heidelberg, Germany.  DOI: <a href="https://doi.org/10.1007/978-3-030-64840-4_5">10.1007/978-3-030-64840-4_5</a>'
@@ -410,3 +410,4 @@ def test_bibtex_style():
     assert _bstrip(compilation.bibhtml[22].body) == 'Anton Stolbunov.  <em>Cryptographic schemes based on isogenies</em>. PhD thesis, Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk, 2012.'
     assert _bstrip(compilation.bibhtml[23].body) == 'ZenGo.  <a href="https://github.com/ZenGo-X/white-city/blob/master/White- City-Report/whitecity_new.pdf">White-City: A Framework For Massive MPC with Partial Synchrony and Partially Authenticated Channels</a>. 2020.'
     assert _bstrip(compilation.bibhtml[24].body) == 'Fester Zester.  My life story in 25 words or less. Available at <a href="https://eprint.iacr.org/2015/939.pdf">https://eprint.iacr.org/2015/939.pdf</a>. May 2015.'
+    assert _bstrip(compilation.bibhtml[25].body) == 'Zachary Zuster and Wanda Wild, editors. <em>Selected areas in cryptography—SAC 2017, 24th international conference, revised selected papers</em>, volume 10719 of <em>Lecture Notes in Computer Science</em> Ottawa, ON, Canada, August 16–18 2018. Springer.  DOI: <a href="https://doi.org/10.1007/978-3-319-72565-9">10.1007/978-3-319-72565-9</a>'
