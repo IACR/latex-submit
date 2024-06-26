@@ -556,7 +556,7 @@ class BibStyle:
                     self.append(fields['organization'].value)
             if 'publisher' in fields:
                 self.append(' ', fields['publisher'].value)
-            self.append(_date(fields))
+            self.append(' ', _date(fields))
         else: # has address
             self.append(' ', fields['address'].value, ', ')
             self.append(_date(fields), '. ')
