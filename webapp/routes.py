@@ -1037,23 +1037,6 @@ def show_cryptobib():
                            title='Search on cryptobib',
                            search_url=app.config['FUNDING_SEARCH_URL'])
 
-@home_bp.route('/cryptobib/view/<id>')
-def view_cryptobib(id):
-    try:
-        r = requests.get(app.config['FUNDING_SEARCH_URL'], params={'c': 'cryptobib', 'textq': 'id:'+ id})
-        if r.status_code == 200:
-            results = r.json().get('results')
-            if len(results) > 0:
-                result = {'item': results[0]}
-            else:
-                result = {'error': 'No such item'}
-        else:
-            result = {'error': 'No search response'}
-    except Exception as e:
-        result = {'error': 'Exception while fetching: ' + str(e)}
-    result['search_url'] = app.config['FUNDING_SEARCH_URL']
-    return render_template('cryptobib.html', **result)
-
 @home_bp.route('/about', methods=['GET'])
 def about():
     return render_template('about.html', title='About this site')

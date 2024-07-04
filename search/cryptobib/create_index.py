@@ -95,49 +95,48 @@ class LatexMiddleware(BlockMiddleware):
 
     def transform_entry(self, entry, *args, **kwargs):
         fields = entry.fields_dict
-        if 'title' in fields:
-            title_field = Field(key='s_title',
-                                value = self.decoder.latex_to_text(fields['title'].value))
-            entry.set_field(title_field)
+        if 'title' in fields and len(fields['title'].value) >= 2:
+            title = self.decoder.latex_to_text(fields['title'].value)
+        elif 'booktitle' in fields:
+            title = self.decoder.latex_to_text(fields['booktitle'].value)
+        elif 'howpublished' in fields:
+            title = self.decoder.latex_to_text(fields['howpublished'].value)
+        else:
+            title = 'NO TITLE'
+        entry.set_field(Field(key='s_title', value = title))
         if 'author' in fields:
             authors = self.wspatt.split(self.decoder.latex_to_text(fields['author'].value))
-            # authors = [a.strip() for a in self.decoder.latex_to_text(fields['author'].value).replace('\n', ' ').split(' and ')]
-            author_field = Field(key='s_author',
-                                 value = authors)
-            entry.set_field(author_field)
             fields['author']._value = self.wspatt.sub(' and\n            ', fields['author'].value)
-        if 'booktitle' in fields:
-            venue_field = Field(key='s_venue',
-                                value = self.decoder.latex_to_text(fields['booktitle'].value))
-            entry.set_field(venue_field)
-        elif 'journal' in fields:
-            venue_field = Field(key='s_venue',
-                                value = self.decoder.latex_to_text(fields['journal'].value))
-            entry.set_field(venue_field)
         else:
-            venue_field = Field(key='s_venue',
-                                value = '')
-            entry.set_field(venue_field)
+            authors = []
+        entry.set_field(Field(key='s_author',
+                              value = authors))
+        if 'booktitle' in fields:
+            venue = self.decoder.latex_to_text(fields['booktitle'].value)
+        elif 'journal' in fields:
+            venue = self.decoder.latex_to_text(fields['journal'].value)
+        elif 'organization' in fields:
+            venue = fields['organization'].value
+        elif 'institution' in fields:
+            venue = fields['institution'].value
+        else:
+            venue = ''
+        entry.set_field(Field(key='s_venue',
+                              value = venue))
         return entry
 
 
 def convert_entry(entry: Entry) -> Document:
     """Convenience method to convert a bibtex entry into the Document format."""
     fields = entry.fields_dict
-    if 'year' in fields:
-        year = fields['year'].value
-    else:
-        year = None
-    if 's_author' in fields:
-        authors = fields['s_author'].value
-    else:
-        authors = []
     doc = Document(key=entry.key,
                    title = fields['s_title'].value,
-                   authors = authors,
+                   authors = fields['s_author'].value,
                    raw = expand_entry(entry),
                    venue = fields['s_venue'].value,
-                   year=year)
+                   year=fields['year'].value)
+    if 'doi' in fields:
+        doc.doi = fields['doi'].value
     return doc
 
 def expand_entry(entry:Entry) -> str:
@@ -197,7 +196,9 @@ if __name__ == '__main__':
     termgenerator.set_flags(termgenerator.FLAG_SPELLING);
     count = 0
     for entry in bibdb.entries:
-        if entry.entry_type == 'inproceedings' or entry.entry_type == 'article':
+        fields = entry.fields_dict
+        if ('s_title' in fields and len(fields['s_title'].value) >= 2 and
+            'year' in fields and fields['year']):
             doc = convert_entry(entry)
             if args.verbose:
                 print('indexing {} {}'.format(entry.key, entry.entry_type))
