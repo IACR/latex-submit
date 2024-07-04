@@ -111,10 +111,10 @@ def parse_ror(filename):
         name = None
         altnames = []
         for n in names:
-            if 'acronym' in n['types'] or 'alias' in n['types']:
-                altnames.append(n['value'])
-            elif 'ror_display' in n['types']:
+            if 'ror_display' in n['types']:
                 name = n['value']
+            elif 'acronym' in n['types'] or 'alias' in n['types']:
+                altnames.append(n['value'])
         if not name:
             print('missing name in item')
             print(json.dumps(item, indent=2))

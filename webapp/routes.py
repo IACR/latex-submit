@@ -61,8 +61,8 @@ def show_submit_version():
         form.accepted.data = '2022-09-30 17:49:20'
         form.submitted.data = '2022-08-03 06:44:30'
         form.journal.data = 'cic'
-        form.volume.data = '1111'
-        form.issue.data = '4'
+        form.volume.data = '1'
+        form.issue.data = '1'
         form.generate_auth()
     else:
         # We only perform partial validation on the GET request to make sure that
@@ -1030,6 +1030,29 @@ def view_funder(id):
         result = {'error': 'Exception while fetching: ' + str(e)}
     result['search_url'] = app.config['FUNDING_SEARCH_URL']
     return render_template('funding.html', **result)
+
+@home_bp.route('/cryptobib')
+def show_cryptobib():
+    return render_template('cryptobib.html',
+                           title='Search on cryptobib',
+                           search_url=app.config['FUNDING_SEARCH_URL'])
+
+@home_bp.route('/cryptobib/view/<id>')
+def view_cryptobib(id):
+    try:
+        r = requests.get(app.config['FUNDING_SEARCH_URL'], params={'c': 'cryptobib', 'textq': 'id:'+ id})
+        if r.status_code == 200:
+            results = r.json().get('results')
+            if len(results) > 0:
+                result = {'item': results[0]}
+            else:
+                result = {'error': 'No such item'}
+        else:
+            result = {'error': 'No search response'}
+    except Exception as e:
+        result = {'error': 'Exception while fetching: ' + str(e)}
+    result['search_url'] = app.config['FUNDING_SEARCH_URL']
+    return render_template('cryptobib.html', **result)
 
 @home_bp.route('/about', methods=['GET'])
 def about():
