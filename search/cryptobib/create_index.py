@@ -134,6 +134,7 @@ def convert_entry(entry: Entry) -> Document:
                    authors = fields['s_author'].value,
                    raw = expand_entry(entry),
                    venue = fields['s_venue'].value,
+                   pubtype = entry.entry_type,
                    year=fields['year'].value)
     if 'doi' in fields:
         doc.doi = fields['doi'].value

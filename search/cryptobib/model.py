@@ -17,6 +17,8 @@ class Document(BaseModel):
     venue: str = Field(...,
                        title='booktitle or journal name')
     year: int
+    pubtype: str = Field(...,
+                         title='The bibtex entry type')
     doi: str = Field(default=None,
                      title='Optional DOI for reference')
     raw: str = Field(...,

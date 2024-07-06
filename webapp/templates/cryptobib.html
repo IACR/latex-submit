@@ -92,7 +92,7 @@ This template is used to show search on fundreg.
         <div class="row align-items-center">
           <div class="col-sm-6">
             <div class="form-floating">
-              <input type="text" class="form-control" id="textq" placeholder="homomorphic encryption">
+              <input type="text" class="form-control" id="textq" placeholder="homomorphic encryption" onkeydown="return event.key != 'Enter';">
               <label for="textq">Enter query</label>
             </div>
           </div>
@@ -105,15 +105,17 @@ This template is used to show search on fundreg.
 {% raw %}
 <script id="results-template" type="text/x-handlebars-template">
   <p>{{estimated_results}} results (if more than 1000, then refine your query)</p>
-  <ol>
     {{#each results}}
-    <li role="presentation">
-      <a href="#" onclick='showItemModal({{@index}});return false'>{{title}}</a>, 
-      {{#each authors}}{{#if @first}}{{else}}, {{/if}}{{this}}{{/each}}<br>{{venue}} ({{year}})
-      {{#if doi }} DOI: {{doi}}{{/if}}
-    </li>
+    <div class="mb-3 d-flex align-items-start">
+      <span class="badge text-bg-success p-2" role="button" class="btn btn-sm btn-success" onclick='showItemModal({{@index}});return false'>View</span>
+      <div class="ms-3"><span class="badge text-success-emphasis bg-success-subtle {{pubtype}}" title="{{venue}}">{{pubtype}}</span>
+      <b class="ms-2">{{title}}</b>,  
+      {{#each authors}}{{#if @first}}{{else}}, {{/if}}{{this}}{{/each}},
+      {{#if venue}}<em class="ms-2">{{venue}}</em>{{/if}} ({{year}})
+      {{#if doi }} DOI: <a href="https://doi.org/{{doi}}" target="_blank">{{doi}}</a>{{/if}}
+      </div>
+    </div>
     {{/each}}
-  </ol>
 </script>
 {% endraw %}
 <script src="/static/js/handlebars-v4.7.7.js"></script>
@@ -206,6 +208,10 @@ This template is used to show search on fundreg.
       </div>
       <div class="modal-body">
         <pre class="bg-white p-3" id="raw_bibtex"></pre>
+        <p id="eprint_warning" class="text-danger d-none">
+          Warning: you should usually always cite the officially published version of the paper instead
+          of the eprint version. <a href="" id="eprint_search">Search by title</a>
+        </p>
         <div id="doi_div" class="my-3">
           View DOI: <a id="doi_a" href="https://doi.org/{{doi}}" target="_blank">{{doi}}</a>
         </div>
@@ -232,6 +238,12 @@ This template is used to show search on fundreg.
      doi_div.classList.remove('d-none')
    } else {
      doi_div.classList.add('d-none')
+   }
+   if (result.key.startsWith('EPRINT:')) {
+     document.getElementById('eprint_warning').classList.remove('d-none');
+     document.getElementById('eprint_search').href = '/cryptobib?textq=' + encodeURIComponent(result.title);
+   } else {
+     document.getElementById('eprint_warning').classList.add('d-none');
    }
    const itemModal = new bootstrap.Modal('#itemModal', {}).show();
    console.log(itemModal);
