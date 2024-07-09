@@ -1,9 +1,9 @@
 {#
 =================================================================
-This template is used to show search on fundreg.
+This template is used to show search on cryptobib.
 =================================================================
 #}
-{% set title='Crossref Funding Registry Search' %}
+{% set title='CryptoBib Search' %}
 {% extends "base.html" %}
 {% block endOfHead %}
 <style>
@@ -88,20 +88,20 @@ This template is used to show search on fundreg.
       </p>
     </div>
   </div>
-      <form class="mt-3">
-        <div class="row align-items-center">
-          <div class="col-sm-6">
-            <div class="form-floating">
-              <input type="text" class="form-control" id="textq" placeholder="homomorphic encryption" onkeydown="return event.key != 'Enter';">
-              <label for="textq">Enter query</label>
-            </div>
-          </div>
+  <form class="mt-3">
+    <div class="row align-items-center">
+      <div class="col-sm-6">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="textq" placeholder="homomorphic encryption" onkeydown="return event.key != 'Enter';">
+          <label for="textq">Enter query</label>
         </div>
-      </form>
+      </div>
     </div>
-    <div class="widecontainer">
-      <div id="results" class="mt-3"></div>
-    </div>
+  </form>
+</div>
+<div class="widecontainer">
+  <div id="results" class="mt-3"></div>
+</div>
 {% raw %}
 <script id="results-template" type="text/x-handlebars-template">
   <p>{{estimated_results}} results (if more than 1000, then refine your query)</p>
@@ -162,43 +162,6 @@ This template is used to show search on fundreg.
    elem.addEventListener('input', doSearch);
  });
 </script>
-<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Help on metadata search</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>
-          The <i-mono>\addfunding</i-mono> and <i-mono>\addaffiliation</i-mono> macros in
-          <i-mono>iacrcc.cls</i-mono> can use IDs that globally identify organizations.
-        </p>
-        <p>
-          The <i-mono>\addaffiliation</i-mono> macro expects an ID from the
-          <a href="https://ror.org/" target="_blank">Research Organization Registry</a> (ROR).
-          Not every organization will have such an ID, but there are
-          now 107,000 organizations that have been registered.
-        </p>
-        <p>The <i-mono>\addfunding</i-mono> macro may take two kinds of IDs:
-          <ul>
-            <li>An ID from the
-              <a href="https://www.crossref.org/services/funder-registry/" target="_blank">Crossref Funder Registry</a>
-              (FUNDREG) is being merged with ROR. This includes almost 45,000
-              funding agencies.
-            </li>
-            <li>If you receive support from an organization to visit
-              them and they have a ROR ID, then you may include that.
-            </li>
-          </ul>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">

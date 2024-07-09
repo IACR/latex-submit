@@ -41,7 +41,7 @@
               <a class="nav-link active ms-md-5" aria-current="page" href="/about">About</a>
             </li>
             <li class="nav-item dropdown">
-              <a href="#" class="ms-md-5 nav-link dropdown-toggle" data-bs-toggle="dropdown"><img src="/img/user.svg"></a>
+              <a href="#" class="ms-md-5 nav-link dropdown-toggle" data-bs-toggle="dropdown"><img alt="User image" src="/img/user.svg"></a>
               <ul class="dropdown-menu">
                 {% if current_user and current_user.is_authenticated %}
                 <li class="dropdown-item-text">{{current_user.email}}</li>
