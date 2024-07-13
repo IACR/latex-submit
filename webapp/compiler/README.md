@@ -11,10 +11,10 @@ The steps to make this work are:
 
 2. cd to the webapp directory and execute the command:
 ```
-docker build -t debian-slim-texlive2022 .
+docker build -t debian-slim-texlive .
 ```
 (note the dot at the end). This will build the docker image from `Dockerfile`
-and tag it as `debian-slim-texlive2022`.
+and tag it as `debian-slim-texlive`.
 
 3. for a test run, use `python3 runner.py`.
 
@@ -28,7 +28,7 @@ be a directory created by the upload.
 A description of what `run.py` does is:
 1. check that the input directory contains main.tex.
 2. create a temporary directory and copy the user-uploaded files into that directory.
-3. start a docker container from the docker image `debian-slim-texlive2022` This
+3. start a docker container from the docker image `debian-slim-texlive` This
    container is configured to mount the temporary directory read-write as /data.
 4. Execute the command `latexmk` with suitable arguments within the docker container.
 5. create a tar file with the output from running `latexmk` within the host machine.
@@ -59,5 +59,5 @@ sudo usermod -aG docker www-data
 ```
 Then build the container as `www-data` using:
 ```
-sudo -u www-data docker build -t debian-slim-texlive2022 .
+sudo -u www-data docker build -t debian-slim-texlive .
 ```
