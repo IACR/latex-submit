@@ -42,6 +42,7 @@ This template is used to show search on cryptobib.
  @media (min-width: 768px) {
    .widecontainer {
      max-width: 720px;
+     padding-right: calc(var(—bs-gutter-x) * 1.5);
    }
  }
  @media (min-width: 992px) {
@@ -71,6 +72,12 @@ This template is used to show search on cryptobib.
  }
  pre#latex {
    background-color: #f8f8f8;
+ }
+ .inproceedings {
+   background-color: var(--bs-primary-bg-subtle) !important;
+ }
+ .misc {
+   background-color: var(--bs-danger-bg-subtle) !important;
  }
 </style>
 {% endblock %} {# endOfHead #}
@@ -104,14 +111,14 @@ This template is used to show search on cryptobib.
 </div>
 {% raw %}
 <script id="results-template" type="text/x-handlebars-template">
-  <p>{{estimated_results}} results (if more than 1000, then refine your query)</p>
+  <p>{{estimated_results}} results sorted by year (if more than 1000, then refine your query)</p>
     {{#each results}}
     <div class="mb-3 d-flex align-items-start">
       <span class="badge text-bg-success p-2" role="button" class="btn btn-sm btn-success" onclick='showItemModal({{@index}});return false'>View</span>
-      <div class="ms-3"><span class="badge text-success-emphasis bg-success-subtle {{pubtype}}" title="{{venue}}">{{pubtype}}</span>
+      <div class="ms-5"><span class="badge text-success-emphasis bg-success-subtle {{pubtype}}" title="{{venue}}">{{pubtype}}</span>
       <b class="ms-2">{{title}}</b>,  
       {{#each authors}}{{#if @first}}{{else}}, {{/if}}{{this}}{{/each}},
-      {{#if venue}}<em class="ms-2">{{venue}}</em>{{/if}} ({{year}})
+      {{#if venue}}<em>{{venue}}</em>{{/if}} ({{year}})
       {{#if doi }} DOI: <a href="https://doi.org/{{doi}}" target="_blank">{{doi}}</a>{{/if}}
       </div>
     </div>
@@ -173,7 +180,7 @@ This template is used to show search on cryptobib.
         <pre class="bg-white p-3" id="raw_bibtex"></pre>
         <p id="eprint_warning" class="text-danger d-none">
           Warning: you should usually always cite the officially published version of the paper instead
-          of the eprint version. <a href="" id="eprint_search">Search by title</a>
+          of the eprint version. <a class="btn btn-sm btn-info ms-3" href="" id="eprint_search">Search by title</a>
         </p>
         <div id="doi_div" class="my-3">
           View DOI: <a id="doi_a" href="https://doi.org/{{doi}}" target="_blank">{{doi}}</a>
