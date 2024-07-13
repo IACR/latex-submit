@@ -92,7 +92,7 @@ def run_latex(cmd, input_dirname, output_dirname):
     try:
         # We mount the staging_dir as /data in the container.
         mount = Mount('/data', str(staging_dir.absolute()), type='bind')
-        container = client.containers.run('debian-slim-texlive2022',
+        container = client.containers.run('debian-slim-texlive',
                                           detach=True,                  # Detach the container
                                           network_disabled=True,        # Disable networking
                                           mounts=[mount])               # Specify our mount point = the staging dir
