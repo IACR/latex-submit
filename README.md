@@ -27,7 +27,7 @@ All of the discussion below refers to the main publishing server, and
 you should look in the [`search`](search/README.md) directory for
 documentation on the search part (which is relatively simple).
 
-## Publishing workflows (#publishing-workflows)
+## Publishing workflows
 
 Our goal in designing this system is to reduce the amount of human
 labor as much as possible in order to minimize the cost of publishing
@@ -178,7 +178,7 @@ opinionated](https://dev.to/heroku/opinionated-or-not-choosing-the-right-framewo
 about how things should be done. In my experience this makes it harder
 to customize.
 
-## Architecture (#architecture)
+## Architecture
 
 The author is expected to upload a zip file to this server with their
 LaTeX sources. Compilation of LaTeX received from third parties
