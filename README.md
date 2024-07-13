@@ -1,15 +1,5 @@
 # IACR LaTeX Publishing Workflow
 
-## Contents
-* [Publishing workflows](#publishing-workflows)
-* Alternative approaches
-* Architecture
-* Installation
-* Running in development mode
-* Running in production
-* Copy editing
-* Publishing an issue
-
 ## What is this?
 
 This repository contains two web servers to support the workflow of
