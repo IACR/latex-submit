@@ -180,13 +180,14 @@ to customize.
 
 ## Architecture
 
-The author is expected to upload a zip file to this server with their
-LaTeX sources. Compilation of LaTeX received from third parties
-constitutes a security risk. For this reason, the production of PDF or
-HTML from LaTeX should be done within a controlled
-environment. Moreover, our controlled environment enforces some
-restrictions on the submitted LaTeX to make sure that it adheres to
-the look and feel designed for the journal. This is essentially the
+The author of an accepted paper is expected to upload a zip file to
+this server with their LaTeX sources. Unfortunately, compilation of
+LaTeX received from third parties constitutes [a security
+risk](https://arxiv.org/abs/2102.00856). For this reason, the
+production of PDF or HTML from LaTeX should be done within a
+controlled environment. Moreover, our controlled environment enforces
+some restrictions on the submitted LaTeX to make sure that it adheres
+to the look and feel designed for the journal. This is essentially the
 same approach taken by ACM and arXiv.
 
 NOTE: The original implementation used celery to maintain a queue of
@@ -576,6 +577,13 @@ Science Editing service
 (ISE)](https://www.acm.org/publications/authors/submissions) to
 provide language editing services for authors. The cost of these
 editing services is borne by the authors.
+
+A screenshot of the last phase of copy editing is shown below, where
+the author's first version may be compared to the final version,
+along with the responses from the author. There are tabs to view
+the HTML that is produced and the diffs between the LaTeX sources
+of the two versions.
+![copy-editing](copyedit.png).
 
 ## Publishing an issue
 
