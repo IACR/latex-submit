@@ -49,7 +49,8 @@ def home():
 def show_submit_version():
     form = SubmitForm(request.args)
     if not form.paperid.data:
-        if 'bypass' not in request.args:
+        bypass = request.args.get('bypass', None)
+        if bypass != app.config['SUBMIT_BYPASS']: # just for testing.
             return redirect(url_for('home_bp.home'))
         #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
