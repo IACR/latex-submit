@@ -27,6 +27,7 @@ class Config:
     WTF_CSRF_TIME_LIMIT = None
     EXPORT_PATH = '/tmp'
     FUNDING_SEARCH_URL = '/searchapi/search'
+    SUBMIT_BYPASS = 'testing'
     JOURNALS = [
         {
             'hotcrp_key': 'cic',
