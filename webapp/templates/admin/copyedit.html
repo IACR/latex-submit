@@ -77,6 +77,10 @@
    width: 12rem;
    text-align: right !important;
  }
+ div.BIBTEX_WARNING {
+   background-color: #f8e57c;
+ }
+ 
 </style>
 {# this template is used for generating notes from javascript. #}
 {% raw %}
@@ -554,7 +558,7 @@
             <div class="list-group discussionTabs">
               {% if comp.warning_log %}
               {% for err in comp.warning_log %}
-              <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show"
+              <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show {{err.error_type.name}}"
                    {% if err.filepath %}
                    {% if err.filepath.startswith('/usr/') %}
                    {% set filepath = err.filepath.split('/')[-1] %}
@@ -588,6 +592,9 @@
                       {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
                     </div>
                   </div>
+                  {% if err.help %}
+                  <div>{{err.help|safe}}</div>
+                  {% endif %}
                 </div>
                 <div class="ms-3 d-flex flex-column align-items-end">
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Hide"></button>

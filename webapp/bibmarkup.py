@@ -487,11 +487,22 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         if (entry.entry_type == 'article' or
             entry.entry_type == 'inproceedings'):
             if 'doi' not in entry.fields_dict and 'url' not in entry.fields_dict:
-                compilation.warning_log.append(
-                    CompileError(error_type=ErrorType.BIBTEX_WARNING,
-                                 logline=0,
-                                 text='bibtex entry {} of type @{} should probably have a doi or url field.'.format(entry.key,
-                                                                                                                   entry.entry_type)))
+                warning = CompileError(error_type=ErrorType.BIBTEX_WARNING,
+                                       logline=0,
+                                       text='bibtex entry {} of type @{} should probably have a doi or url field.'.format(entry.key,
+                                                                                                                          entry.entry_type))
+                if 'title' in entry.fields_dict:
+                    title = entry.fields_dict['title'].value
+                    # supply better text hint with title.
+                    warning.text = 'bibtex entry {} of type @{} with title "{}" should probably have a doi or url field.'.format(entry.key,
+                                                                                                                                 entry.entry_type,
+                                                                                                                                 title)
+                    searchurl = '/cryptobib?' + urlencode({'textq': title})
+                    crossrefurl = 'https://search.crossref.org/search/works?' + urlencode({'q': title,
+                                                                                           'from_ui': 'yes'})
+                    warning.help = '<a href="{}" target="_blank">Search cryptobib</a> or <a href="{}" target="_blank">search crossref.org</a>.'.format(searchurl,
+                                                                                                                                                       crossrefurl)
+                compilation.warning_log.append(warning)
         bibitemdata = {'key': entry.key,
                        'label': cite_map.get(entry.key, 'BUG!')}
         if errors:
