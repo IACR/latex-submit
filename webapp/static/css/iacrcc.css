@@ -130,3 +130,6 @@ img.eyes {
     width:1.2em;
     height:1.2em;
  }
+span.keyword {
+  background-color: #d1e7dd !important;
+} 
