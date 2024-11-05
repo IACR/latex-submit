@@ -20,7 +20,7 @@ arxiv-latex-cleaner>=v1.0.4
 # The flask package is frozen because we use flask-login. flask-login is barely being
 # maintained, and the flask developers seem to have no interest in maintaining backward
 # compatibility with extensions.
-flask==2.3.3
+flask
 # ##########################################
 flask_mail
 flask_limiter
@@ -40,13 +40,13 @@ pydantic[email]>=2.0
 sqlalchemy>=2.0
 # we need werkzeug for flask, flask_login, and MultiDict. The
 # version is pinned in order to maintain compatibility with flask_login
-werkzeug==2.3.7      
+werkzeug
 latex2mathml
 # ##########################################################
 # Packages below can be installed from debian.
 lxml                 # from debian
 nameparser           # from debian
-bibtexparser==2.0.0b7
+bibtexparser>=2.0.0b7
 pylatexenc           # from debian
 pymysql              # from debian
 xmlschema            # from debian
