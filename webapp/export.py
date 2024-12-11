@@ -121,6 +121,8 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         ET.indent(jats_elem, space='  ', level=0)
         jats_str = ET.tostring(jats_elem, encoding='utf-8').decode('utf-8')
         zip_file.writestr('{}/jats.xml'.format(paperstatus.paperno), jats_str)
+        paperstatus.status = PaperStatusEnum.PUBLISHED
+        db.session.add(paperstatus) # the commit occurs if and when the issue is updated.
     zip_file.writestr('issue.json', json.dumps(issuedata, indent=2, default=_datetime_serialize))
     zip_file.close()
     return now
