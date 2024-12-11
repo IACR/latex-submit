@@ -399,12 +399,14 @@ def final_review(paperid):
     diffs = {}
     candidate_tex_files = list(candidate_path.glob('output/**/*.tex'))
     candidate_tex_files.extend(list(candidate_path.glob('output/**/*.sty')))
-    candidate_tex_files.extend(list(candidate_path.glob('output/**/*.bib')))
+    # Due to a bug in htmldiff, we omit bibtex files.
+    # candidate_tex_files.extend(list(candidate_path.glob('output/**/*.bib')))
     candidate_output = candidate_path / Path('output')
     candidate_file_map = {str(path.relative_to(candidate_output)): path for path in candidate_tex_files}
     final_tex_files = list(final_path.glob('output/**/*.tex'))
     final_tex_files.extend(list(final_path.glob('output/**/*.sty')))
-    final_tex_files.extend(list(final_path.glob('output/**/*.bib')))
+    # Due to a bug in htmldiff, we omit bibtex files.
+    #   final_tex_files.extend(list(final_path.glob('output/**/*.bib')))
     final_output = final_path / Path('output')
     final_file_map = {str(path.relative_to(final_output)): path for path in final_tex_files}
     for filename, file in candidate_file_map.items():
