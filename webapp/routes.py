@@ -25,6 +25,7 @@ from .bibmarkup import mark_bibtex
 from werkzeug.datastructures import MultiDict
 import hashlib
 import logging
+from .country_list import countries
 
 ENGINES = {'lualatex': 'latexmk -g -recorder -pdflua -lualatex="lualatex --disable-write18 --nosocket --no-shell-escape" main',
            'pdflatex': 'latexmk -g -recorder -pdf -pdflatex="pdflatex -interaction=nonstopmode -disable-write18 -no-shell-escape" main',
@@ -1011,9 +1012,10 @@ def download_iacrcc_zipfile():
 
 @home_bp.route('/funding')
 def show_funding():
-    return render_template('funding.html',
-                           title='Funding and affiliation data',
-                           search_url=app.config['FUNDING_SEARCH_URL'])
+    data = {'title': 'Funding and affiliation data',
+            'countries': countries,
+            'search_url': app.config['FUNDING_SEARCH_URL']}
+    return render_template('funding.html', **data)
 
 @home_bp.route('/funding/view/<id>')
 def view_funder(id):
@@ -1030,6 +1032,7 @@ def view_funder(id):
     except Exception as e:
         result = {'error': 'Exception while fetching: ' + str(e)}
     result['search_url'] = app.config['FUNDING_SEARCH_URL']
+    result['countries'] = countries
     return render_template('funding.html', **result)
 
 @home_bp.route('/cryptobib')

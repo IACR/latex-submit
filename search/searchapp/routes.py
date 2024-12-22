@@ -19,14 +19,14 @@ def _get_dbpath(args):
 @search_bp.route('/search', methods=['GET'])
 def get_results():
     args = request.args.to_dict()
-    if 'textq' not in args and 'locationq' not in args:
+    if 'textq' not in args and 'country' not in args:
         response = jsonify({'error': 'missing queries'})
     else:
         db_path = _get_dbpath(args)
         response = jsonify(search(db_path,
                                   offset=args.get('offset', 0),
                                   textq=args.get('textq'),
-                                  locationq=args.get('locationq'),
+                                  country=args.get('country'),
                                   source=args.get('source'),
                                   app=app))
     response.headers.add('Access-Control-Allow-Origin', '*');

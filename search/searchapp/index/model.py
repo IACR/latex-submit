@@ -28,7 +28,7 @@ Funder types in ROR have the following distribution:
 """
 
 from enum import Enum
-from pydantic import StringConstraints, ConfigDict, BaseModel, Field, conint, conlist, validator, AnyUrl
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, conint, conlist, validator, AnyUrl, constr
 from typing import List, Dict, Optional, Union, Literal
 from typing_extensions import Annotated
 
@@ -98,9 +98,11 @@ class Funder(GlobalEntity):
     country: str = Field(...,
                          title='Country of affiliation',
                          description='May be any string')
-    country_code: Optional[str] = Field(default=None,
-                                        title='ISO 3-letter country code.',
-                                        description='Optional')
+    country_code: Optional[constr(to_lower=True,
+                                  min_length=2,
+                                  max_length=2)] = Field(default=None,
+                                                         title='ISO 2-letter country code.',
+                                                         description='Optional')
     funder_type: FunderType = Field(...,
                                     title='The type of funding agency',
                                     description='May be from ROR.')

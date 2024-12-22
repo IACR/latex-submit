@@ -25,6 +25,7 @@ class SearchPrefix(str, Enum):
     ORGTYPE = 'O'
     ID = 'Q'
     SOURCE = 'XS'
+    COUNTRY = 'N'
 
 def index_funder(funder, writable_db=None, termgenerator=None):
     """Index the funder. It returns no value. It is used by create_index.py.
@@ -44,7 +45,10 @@ def index_funder(funder, writable_db=None, termgenerator=None):
     doc = xapian.Document()
     docid = funder.global_id()
     doc.add_boolean_term(docid)
-    doc.add_boolean_term(SearchPrefix.SOURCE.value + funder.source.value)
+    termgenerator.increase_termpos()
+    doc.add_boolean_term(SearchPrefix.SOURCE.value + funder.source.value.lower())
+    termgenerator.increase_termpos()
+    doc.add_boolean_term(SearchPrefix.COUNTRY.value + funder.country_code.lower())
     # We sort on SLOT_NUMBER
     slot_value = '1' if funder.source.value == 'fundreg' else '0'
     doc.add_value(SLOT_NUMBER, slot_value)
@@ -54,18 +58,18 @@ def index_funder(funder, writable_db=None, termgenerator=None):
     termgenerator.index_text(name, 1, SearchPrefix.NAME.value)
     termgenerator.index_text(name, NAME_WEIGHT)
 
-    termgenerator.increase_termpos()
     for altname in funder.altnames:
+        termgenerator.increase_termpos()
         termgenerator.index_text(altname, 1, SearchPrefix.NAME.value)
         termgenerator.index_text(altname, NAME_WEIGHT)
     for child in funder.children:
+        termgenerator.increase_termpos()
         termgenerator.index_text(child.name, 1, SearchPrefix.NAME.value)
         termgenerator.index_text(child.name, NAME_WEIGHT)
     
     termgenerator.increase_termpos()
     location = funder.country
     termgenerator.index_text(location, 1, SearchPrefix.LOCATION.value)
-    termgenerator.increase_termpos()
 
     termgenerator.increase_termpos()
     orgtype = funder.funder_type.value
@@ -76,11 +80,10 @@ def index_funder(funder, writable_db=None, termgenerator=None):
 
     data = funder.dict()
     data['id'] = docid
-    data['source_id']
     doc.set_data(json.dumps(data, indent=2))
     writable_db.replace_document(docid, doc)
 
-def search(db_path, offset=0, limit=1000, textq=None, locationq=None, source=None, app=None):
+def search(db_path, offset=0, limit=1000, textq=None, country=None, source=None, app=None):
     """Execute a query on the index. At least one of textq or locationq
     must be non-None.
 
@@ -88,14 +91,15 @@ def search(db_path, offset=0, limit=1000, textq=None, locationq=None, source=Non
        db_path: path to database
        offset: starting offset for paging of results
        textq: raw query string from the user to be applied to any text field
-       locationq: raw query for location field
+       country: country code filter
     Returns: dict with the following:
        error: string if an error occurs (no other fields in this case)
        parsed_query: debug parsed query
        estimated_results: number of total results available
        results: an array of results
     """
-    if (not textq and not locationq):
+    if textq is None and country is None:
+        app.logger.info('search with not query')
         return {'estimated_results': 0,
                 'parsed_query': '',
                 'spell_corrected_query': '',
@@ -122,21 +126,19 @@ def search(db_path, offset=0, limit=1000, textq=None, locationq=None, source=Non
         # FLAG_WILDCARD enables things like * signature scheme to expand the *
         flags = queryparser.FLAG_SPELLING_CORRECTION | queryparser.FLAG_BOOLEAN | queryparser.FLAG_LOVEHATE | queryparser.FLAG_PHRASE | queryparser.FLAG_WILDCARD
         # we build a list of subqueries and combine them later with AND.
-        if not textq and not locationq:
-            return {'error': 'missing query'}
         query_list = []
         if textq:
             terms = textq.split()
             terms[-1] = terms[-1] + '*'
             for term in terms:
                 query_list.append(queryparser.parse_query(term, flags))
-        if locationq:
-            location_query = queryparser.parse_query(locationq, flags, SearchPrefix.LOCATION.value)
-            query_list.append(location_query)
         query = xapian.Query(xapian.Query.OP_AND, query_list)
-        if source: # filter on this source value.
+        if source and source != 'all': # filter on this source value.
             source_query = xapian.Query(SearchPrefix.SOURCE.value + source)
             query = xapian.Query(xapian.Query.OP_FILTER, query, source_query)
+        if country:
+            country_query = xapian.Query(SearchPrefix.COUNTRY.value + country.lower())
+            query = xapian.Query(xapian.Query.OP_FILTER, query, country_query)
         # Use an Enquire object on the database to run the query
         enquire = xapian.Enquire(db)
         enquire.set_query(query)
@@ -181,13 +183,13 @@ if __name__ == '__main__':
                            help='Path to writable database directory.')
     arguments.add_argument('--name',
                            help='basic query')
-    arguments.add_argument('--location',
-                           help='query restricted to location')
+    arguments.add_argument('--country',
+                           help='query restricted to country code')
     arguments.add_argument('--source',
                            help='ror or fundreg or None')
     args = arguments.parse_args()
-    if not args.name and not args.location:
-        print('one of --name or --location is required')
+    if not args.name and not args.country:
+        print('one of --name or --country is required')
         sys.exit(2)
-    results = search(args.dbpath, 0, 100, args.name, args.location, args.source)
+    results = search(args.dbpath, 0, 100, args.name, args.country, args.source)
     print(json.dumps(results, indent=2))

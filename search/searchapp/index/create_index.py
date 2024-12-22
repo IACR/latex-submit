@@ -43,7 +43,6 @@ def create_index(dbpath, funderlist, verbose=False):
     termgenerator.set_flags(termgenerator.FLAG_SPELLING);
     count = 0
     for funder in funderlist.funders.values():
-        narrower = {}
         index_funder(funder, db, termgenerator)
         count += 1
         if count % 5000 == 0:
@@ -63,12 +62,14 @@ def fetch_fundreg():
 def fetch_ror():
     print('fetching ROR data')
     # Apparently we have to use the zenodo schema to determine the date on the latest ROR data.
-    response = requests.get('https://zenodo.org/api/records/?communities=ror-data&sort=mostrecent')
-    version_data = response.json().get('hits').get('hits')[0]
+    response = requests.get('https://zenodo.org/api/records/?communities=ror-data&sort=mostrecent').json()
+    print(json.dumps(response, indent=2))
+    version_data = response.get('hits').get('hits')[0]
     print(json.dumps(version_data, indent=2))
     publication_date = version_data.get('metadata').get('publication_date')
     print('ROR data from {}'.format(publication_date))
     latest_url = version_data.get('files')[0].get('links').get('self')
+    latest_url = latest_url.replace('.json', '_schema_v2.json')
     print('fetching {}'.format(latest_url))
     # latest_url should be a zip file.
     with requests.get(latest_url, stream=True) as stream:
@@ -80,7 +81,7 @@ def fetch_ror():
         namelist = zipObj.namelist()
         zipObj.extractall()
         for fname in namelist:
-            if fname.endswith('.json'):
+            if fname.endswith('_schema_v2.json'):
                 os.rename(fname, _RAW_ROR_JSON)
             else:
                 try:
@@ -181,10 +182,26 @@ if __name__ == '__main__':
     arguments.add_argument('--exclude_dup_fundref',
                            action='store_true',
                            help='Whether to replace Fundref with corresponding ROR')
+    arguments.add_argument('--easter_egg',
+                           action='store_true',
+                           help='Whether to add an easter egg.')
     args = arguments.parse_args()
     ror_file = Path(_ROR_JSON)
     country_map = json.loads(open('data/country_map.json', 'r').read())
     allfunders = FunderList(funders={})
+    if args.easter_egg:
+        obj = {'source': 'ror',
+               'source_id': 'ror_0ohdarn00',
+               'name': 'University of Second Choice',
+               'country': 'Odarn',
+               'funder_type': 'Education',
+               'country_code': 'OO',
+               'altnames': [],
+               'children': [],
+               'parents': [],
+               'related': []}
+        allfunders.funders['ror_0unreal13'] = Funder(**obj)
+        print(allfunders.funders)
     if os.path.isfile(args.dbpath) or os.path.isdir(args.dbpath):
         print('CANNOT OVERWRITE dbpath')
         sys.exit(2)
@@ -213,7 +230,7 @@ if __name__ == '__main__':
         print('reading {}'.format(ror_file.name))
         ror_funders = FunderList.model_validate_json(ror_file.read_text(encoding='UTF-8'))
     else:
-        if not ror_file.is_file():
+        if not Path(_RAW_ROR_JSON).is_file():
             fetch_ror()
         print('parsing {}...this is slow to parse 112000 entries...'.format(_ROR_JSON))
         ror_funders = parse_ror(_RAW_ROR_JSON)

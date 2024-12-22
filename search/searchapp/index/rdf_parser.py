@@ -8,6 +8,7 @@ from xml.sax import parse
 from xml.sax.handler import ContentHandler
 from model import Funder, RelationshipType, DataSource, StrEnum, FunderType, FunderList
 from model import add_names_to_relationships
+from countries import iso_codes
 # This is a map from the values of svf:fundingBodySubType to the
 # associated FunderType.  We don't have a schema to define the values
 # of svf:fundingBodySubType. They were apparently provided by
@@ -109,7 +110,7 @@ class FunderHandler(ContentHandler):
             except:
                 raise ValueError('unrecognized funder type: ' + self.content)
         elif self.current_tag == Tag.addressCountry:
-            self.item['country_code'] = self.content
+            self.item['country_code'] = iso_codes[self.content.lower()]['code']
             self.item['country'] = self.country_map.get(self.content, 'unknown')
         self.current_tag = None
         self.content = '' # reset at end of tag.

@@ -84,9 +84,9 @@ This template is used to show search on fundreg.
         This is designed to help you locate identifiers for the macros
         <i-mono>\addaffiliation</i-mono> and <i-mono>\addfunding</i-mono> macros in
         <a href="/iacrcc"><i-mono>iacrcc.cls</i-mono></a>.
-        ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono> as well
-        as <i-mono>\addfunding</i-mono>. FUNDREG identifiers are intended only
-        for <i-mono>\addfunding</i-mono>.
+        ROR IDs are intended for use in <i-mono>\addaffiliation</i-mono>.
+        FUNDREG identifiers are intended only for <i-mono>\addfunding</i-mono>,
+        but  ROR identifiers can be used in <i-mono>\addfunding</i-mono> as a backup. 
         Search is performed as you type. <a href="#helpModal" data-bs-toggle="modal">Help</a>
         is available.
       </p>
@@ -101,23 +101,30 @@ This template is used to show search on fundreg.
   </div>
       <form class="mt-3">
         <div class="row align-items-center">
-          <div class="col-sm-6">
-            <div class="form-floating">
-              <input type="text" class="form-control" id="textq" placeholder="NSF">
-              <label for="textq">name of organization</label>
-            </div>
-          </div>
-          <div class="col-sm-3">
-            <div class="form-floating">
-              <input type="text" class="form-control" id="locationq" placeholder="Denmark">
-              <label for="locationq">country (optional)</label>
-            </div>
-          </div>
           <div class="col-sm-3">
             <select onchange="doSearch()" id="source" class="form-select form-select-lg" aria-label="Default select example">
               <option value="ror">ROR Affiliations</option>
-              <option value="all">ROR and Funding Registry</option>
+              <option value="all">Funding Registry</option>
             </select>
+          </div>
+          <div class="col-sm-4">
+            <div>{# class="form-floating">
+              <input type="text" class="form-control" id="locationq" placeholder="Denmark">
+              <label for="locationq">country (optional)</label>
+              #}
+              <select onchange="doSearch()" name="country" id="country" class="form-select form-select-lg" aria-label="Optional country filter">
+                <option value="" selected>Optional country filter</option>
+                {% for country in countries %}
+                <option value="{{country.iso2}}">{{country.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="form-floating">
+              <input type="text" class="form-control form-control-lg" id="textq" placeholder="NSF">
+              <label for="textq">name of organization</label>
+            </div>
           </div>
         </div>
       </form>
@@ -238,50 +245,50 @@ This template is used to show search on fundreg.
   var theTemplateScript = document.getElementById('results-template').innerHTML;
   var resultsTemplate = Handlebars.compile(theTemplateScript);
   var textinput = document.getElementById('textq');
-  var locinput = document.getElementById('locationq');
+  var countryselect = document.getElementById('country');
   var sourceinput = document.getElementById('source');
 
  {% include "search_js.html" %}
  
  var doSearch = debounce(function() {
    args = {}
-   if (textinput.value || locinput.value) {
-     if (textinput.value) {
-       args['textq'] = textinput.value;
-     }
-     if (locinput.value) {
-       args['locationq'] = locinput.value;
-     }
-     if (sourceinput.value == 'ror') {
-       // restrict to ror
-       args['source'] = 'ror'
-     }
-     if (controller !== undefined) {
-       console.log('killing');
-       controller.abort();
-     }
-     controller = new AbortController();
-     signal = controller.signal;
-     let search_url = "{{search_url}}" + "?" + new URLSearchParams(args);
-     fetch(search_url, {signal})
-       .then((response) => response.json())
-       .then((data) => {
-         console.log(data);
-         let elem = document.getElementById('view');
-         if (elem) {elem.innerHTML = '';}
-         if (data.results.length > 0) {
-           document.getElementById('results').innerHTML = resultsTemplate(data);
-         } else {
-           document.getElementById('results').innerHTML = 'no results';
-         }
-         controller = undefined;
-       }).catch((error) => {
-         console.log('error in fetch');
-         console.log(error);
-       });
-   } else {
+   if (!textinput.value) {
      console.log('no query');
+     return;
    }
+   if (textinput.value) {
+     args['textq'] = textinput.value;
+   }
+   if (countryselect.value) {
+     args['country'] = countryselect.value.toLowerCase();
+   }
+   if (sourceinput.value == 'ror') {
+     // restrict to ror
+     args['source'] = 'ror'
+   }
+   if (controller !== undefined) {
+     console.log('killing');
+     controller.abort();
+   }
+   controller = new AbortController();
+   signal = controller.signal;
+   let search_url = "{{search_url}}" + "?" + new URLSearchParams(args);
+   fetch(search_url, {signal})
+     .then((response) => response.json())
+     .then((data) => {
+       console.log(data);
+       let elem = document.getElementById('view');
+       if (elem) {elem.innerHTML = '';}
+       if (data.results.length > 0) {
+         document.getElementById('results').innerHTML = resultsTemplate(data);
+       } else {
+         document.getElementById('results').innerHTML = 'no results';
+       }
+       controller = undefined;
+     }).catch((error) => {
+       console.log('error in fetch');
+       console.log(error);
+     });
  }, 500); // only after 250 ms.
 
  document.querySelectorAll('input').forEach((elem) => {
