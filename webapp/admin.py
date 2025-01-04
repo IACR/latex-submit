@@ -237,6 +237,11 @@ def copyedit(paperid):
     log_file = paper_path / Path('output') / Path('main.log')
     latexlog = log_file.read_text(encoding='UTF-8', errors='replace')
     data['loglines'] = latexlog.splitlines()
+    bibtex_log = paper_path / Path('output') / Path('main.blg')
+    if bibtex_log.is_file():
+        data['bibtex_log'] = bibtex_log.read_text(encoding='UTF-8', errors='replace').splitlines()
+    else:
+        data['bibtex_log'] = ['No bibtex log']
     if compilation.bibtex:
         data['marked_bibtex'] = mark_bibtex(compilation.bibtex)
     return render_template('admin/copyedit.html', **data)
@@ -434,10 +439,22 @@ def final_review(paperid):
             'comp': compilation,
             'morechangesform': morechangesform,
             'discussion': items,
+            'version': Version.FINAL.value,
+            'source_auth': create_hmac([paperid, Version.FINAL.value]),
             'pdf_copyedit_auth': create_hmac([paperid, 'copyedit']),
             'pdf_final_auth': create_hmac([paperid, 'final']),
             'diffs': diffs,
             'paper': paper_status}
+    log_file = final_path / Path('output') / Path('main.log')
+    latexlog = log_file.read_text(encoding='UTF-8', errors='replace')
+    data['loglines'] = latexlog.splitlines()
+    bibtex_log = final_path / Path('output') / Path('main.blg')
+    if bibtex_log.is_file():
+        data['bibtex_log'] = bibtex_log.read_text(encoding='UTF-8', errors='replace').splitlines()
+    else:
+        data['bibtex_log'] = ['No bibtex log']
+    if compilation.bibtex:
+        data['marked_bibtex'] = mark_bibtex(compilation.bibtex)
     return render_template('admin/final_review.html', **data)
 
 @admin_bp.route('/admin/finish_copyedit', methods=['POST'])

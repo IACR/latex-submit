@@ -3,12 +3,6 @@
 {{ super() }}
 <script src="/js/handlebars.min-v4.7.7.js"></script>
 <style>
-  .lognav {
-    color : #0d6efd;
-  }
- .lognav:hover {
-    cursor: pointer;
- }
  img.icon {
    width: 16px;
    cursor: pointer;
@@ -39,9 +33,6 @@
    overflow-y: scroll;
    max-height:80vh;
    font-family:monospace;
- }
- div.highlight_log_line {
-   background-color:rgba(255, 240, 168, 0.6);
  }
  div#splitView {
    max-height: 88vh;
@@ -80,7 +71,6 @@
  div.BIBTEX_WARNING {
    background-color: #f8e57c;
  }
- 
 </style>
 {# this template is used for generating notes from javascript. #}
 {% raw %}
@@ -276,7 +266,7 @@
    {% endfor %}
  };
  </script>
- <script src="/js/nav.js"></script>
+ <script src="/js/nav.js?v=4"></script>
  <script id="MathJax-script" async src="/js/mathjax/tex-chtml.js"></script>
  <script src="/js/mark.min.js"></script>
 {% endblock %}
@@ -308,7 +298,7 @@
       </ul>
       <div class="tab-content" id="editTabContent">
         <div class="tab-pane fade show active" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab" tabindex="0">
-          <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#page=1"></iframe>
+          <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_auth)}}#view=FitH&pagemode=none&page=1"></iframe>
         </div>
         <div class="tab-pane fade show p-3 mathjax" id="nav-html" role="tabpanel" aria-labelledby="nav-html-tab">
 	  <p class="alert alert-info">
@@ -319,9 +309,7 @@
           {% include "html.html" %}
 	</div>
         <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
-          {% for line in loglines %}
-          <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
-          {% endfor %}
+          {% include "logview.html" %}
         </div>
         <div class="tab-pane fade" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab" tabindex="0">
           <div class="px-5 py-3">
@@ -329,135 +317,7 @@
           </div>
         </div>
         <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab" tabindex="0">
-          <table class="table mt-3 mx-3">
-            <tbody>
-              <tr>
-                <th>Paper ID:</th>
-                <td>{{comp.paperid}}</td>
-              </tr>
-              <tr>
-                <th>DOI:</th>
-                <td>{{comp.meta.DOI}}</dtd>
-              </tr>
-              <tr>
-                <th>Status:</th>
-                <td>{{comp.status}}</td>
-              </tr>
-              <tr>
-                <th>Title:</th>
-                <td>{{comp.meta.title}}</td>
-              </tr>
-              <tr>
-                <th>Authors:</th>
-                <td>
-                  <div class="list-group">
-                    {% for author in comp.meta.authors %}
-                    <div class="author list-group-item">
-                      <table class="table">
-                        <tbody>
-                          <tr>
-                            <th>Name:</th>
-                            <td>{{author.name}}</td>
-                          </tr>
-                          <tr>
-                            <th>Surname:</th>
-                            <td>{% if author.familyName %}{{author.familyName}}{% else %}<span class="text-danger">None</span>{% endif %}</td>
-                          </tr>
-                          <tr>
-                            <th>Email:</th>
-                            <td>{{author.email}}</td>
-                          </tr>
-                          <tr>
-                            <th>ORCID:</th>
-                            <td>{% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None (<a target="_blank" href="https://orcid.org/orcid-search/search?searchQuery={{author.name|urlencode}}">search</a>)</span>{% endif %}</td>
-                          </tr>
-                          <tr>
-                            <th>
-                              Affiliations:
-                            </th>
-                            <td>
-                              {% if author.affiliations %}
-                              <div class="list-group">
-                                {% for affil in author.affiliations %}
-                                <div class="affiliation list-group-item">
-                                  {% set aff=comp.meta.affiliations[affil-1] %}
-                                  <table class="table">
-                                    <tbody>
-                                      <tr>
-                                        <th>name</th>
-                                        <td>{{aff.name}}</td>
-                                      </tr>
-                                      <tr>
-                                        <th>ROR</th>
-                                        <td>{% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</td>
-                                      </tr>
-                                      <tr>
-                                        <th>Street</th>
-                                        <td>{{aff.street}}</td>
-                                      </tr>
-                                      <tr>
-                                        <th>City</th>
-                                        <td>{{aff.city}}</td>
-                                      </tr>
-                                      <tr>
-                                        <th>Postal code</th>
-                                        <td>{{aff.postcode}}</td>
-                                      </tr>
-                                      <tr>
-                                        <th>Country</th>
-                                        <td> {{aff.country}}</td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div> {# list-group-item #}
-                                {% endfor %}{# affiliations #}
-                              </div> {# end of list-group for affiliations #}
-                              {% else %}
-                              <span class="text-danger">None</span>
-                              {% endif %}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div> {# list-group-item for author #}
-                    {% endfor %}
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>Date compiled</th>
-                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-              </tr>
-              <tr>
-                <th>Compile time</th>
-                <td>{{comp.compile_time}} seconds</dtd>
-              </tr>
-              <tr>
-                <th>Contact email</th>
-                <td>{{comp.email}}</td>
-              </tr>
-              <tr>
-                <th>BibTeX</th>
-                <td>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</td>
-              </tr>
-              <tr>
-                <th>Submitted</th>
-                <td>{{comp.submitted}}</td>
-              </tr>
-              <tr>
-                <th>Accepted</th>
-                <td>{{comp.accepted}}</td>
-              </tr>
-              <tr>
-                <th>Compiled</th>
-                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-              </tr>
-              <tr>
-                <th>Zip filename</th>
-                <td>{{comp.zipfilename}}</td>
-              </tr>
-            </tbody>
-          </table>
+          {% include "admin/metadata.html" %}
         </div>
       </div> {# end of tab-content #}
     </div> {# end left-column #}
@@ -481,6 +341,7 @@
         {# tabs to be shown on right #}
         <div id="tabContent" class="tab-content p-3">
           <div class="tab-pane fade show active" id="feedback" role="tabpanel" aria-labelledby="feedback-tab" tabindex="0">
+            {# form for submitting Discussion item #}
             <input type="hidden" id="paperid" value="{{paper.paperid}}">
             <input type="hidden" id="logline" value="">
             <input type="hidden" id="copyedit_email" name="copyedit_email" value="{{current_user.email}}">
@@ -558,7 +419,10 @@
             <div class="list-group discussionTabs">
               {% if comp.warning_log %}
               {% for err in comp.warning_log %}
-              <div id="warning-{{loop.index}}" class="alert alert-warning d-flex justify-content-between fade show {{err.error_type.name}}"
+              <div id="warning-{{loop.index}}"
+                   data-errtype="{{err.error_type.name}}"
+                   {% if err.logline %}data-logline="{{err.logline}}"{% endif %}
+                   class="alert alert-warning d-flex justify-content-between fade show {{err.error_type.name}}"
                    {% if err.filepath %}
                    {% if err.filepath.startswith('/usr/') %}
                    {% set filepath = err.filepath.split('/')[-1] %}
@@ -720,6 +584,7 @@
 </div>
 <script>
  function showHasIssues() {
+   {% if not paper.copyeditor %}return;{% endif %}
    let num = document.getElementById('discussion').childElementCount;
    let button = document.getElementById('finishit');
    if (num == 0) {

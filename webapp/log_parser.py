@@ -369,10 +369,11 @@ class BibTexLogParser:
                 self.file_offsets[m.start()] = m.group(1)
         for m in re.finditer(BibTexLogParser.SINGLELINE_WARNING_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_WARNING,
-                                              text='BibTeX warning in entry {}: {}'.format(m.group(2),
+                                            text='BibTeX warning in entry {}: {}'.format(m.group(2),
                                                                                          m.group(1)),
-                                              filepath=self._get_bibtex_file(m.start()),
-                                              logline=self._get_lineno(m)))
+                                            filepath=self._get_bibtex_file(m.start()),
+                                            logline=self._get_lineno(m),
+                                            help='<span class="lognav" onclick="scrollToBibtex(\'' + m.group(2) + '\')">View bibtex entry</span>'))
         for m in re.finditer(BibTexLogParser.SINGLELINE_ERROR_REGEX, self.logstr, re.MULTILINE):
             self.errors.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                             text=m.group(1),

@@ -41,7 +41,7 @@ This template is used to show the status of a compilation for iacrcc.cls
  };
  var allSources = "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth)}}";
  </script>
- <script src="/js/nav.js?v=3"></script>
+ <script src="/js/nav.js?v=4"></script>
  {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-1 px-lg-3">
@@ -93,7 +93,8 @@ This template is used to show the status of a compilation for iacrcc.cls
               {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
                                      {% if err.filepath_line %}data-filepath_line="{{err.filepath_line}}" {% endif %}
                                      class="lognav" title="Show source file">{{filepath}}
-              {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>{% endif %}
+              {% if err.filepath_line %}line {{err.filepath_line}}{% endif %}</span>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -207,33 +208,11 @@ This template is used to show the status of a compilation for iacrcc.cls
 	{% if pdf %}
 	<div class="tab-pane {% if not comp.meta %}active {% endif %}fade show p-3" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab">
           {#        <embed width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#page=2">#}
-            <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#page=2"></iframe>
+            <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;" src="{{pdf}}#view=fitH&page=1"></iframe>
 	</div>
 	{% endif %}
 	<div class="tab-pane logtabcontent {% if not comp.meta and not pdf %}active {% endif %}fade show p-3" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-          <p id="log-top">There are three logs below: The <i-mono>.log</i-mono> file from the last run of LaTeX,
-            the <a href="#bibtex-log"><i-mono>.blg</i-mono></a> log file from running bibtex or biber, and the
-            <a href="#latexmk-log">log from latexmk</a>.
-          </p>
-          <h4 id="latex-log">Latex log</h4>
-          <i-mono>
-          {% for line in loglines %}
-          <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
-          {% endfor %}
-          </i-mono>
-          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
-          <h4 class="mt-3" id="bibtex-log">BibTeX/biber log</h4>
-          <i-mono>
-            {% for line in bibtex_log %}
-            <div id="bibtex-{{loop.index}}">{{loop.index}}: {{line}}</div>
-            {% endfor %}
-          </i-mono>
-          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
-          <h4 class="mt-3" id="latexmk-log">latexmk log</h4>
-          <pre id="latexLog">
-         {{comp.log}}
-          </pre>
-          </i-mono>
+          {% include "logview.html" %}
         </div>
         <div class="tab-pane fade show p-3" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab">
           {% include "nav_source_tab.html" %}

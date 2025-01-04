@@ -1,4 +1,5 @@
 import datetime
+import time
 from io import BytesIO
 from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for
 from flask import current_app as app
@@ -584,6 +585,8 @@ def view_copyedit(paperid, auth):
                     'pdf_auth': create_hmac([paperid, 'copyedit']),
                     'items': items,
                     'archived_items': archived_items,
+                    'source_auth': auth,
+                    'version': Version.COPYEDIT.value,
                     'upload': ''}
             if responded_count == len(items):
                 data['upload'] = url_for('home_bp.submit_version',
@@ -607,6 +610,30 @@ def view_copyedit(paperid, auth):
                                                            paper_status.volume_key,
                                                            paper_status.issue_key,
                                                            paper_status.pubtype.name]))
+
+            paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.COPYEDIT.value)
+            if not paper_path.is_dir():
+                return render_template('message.html',
+                                       title='Unknown paper',
+                                       error='Unknown paper. Try resubmitting.')
+            try:
+                json_file = paper_path / Path('compilation.json')
+                comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
+                data['comp'] = comp
+                if comp.bibtex:
+                    data['marked_bibtex'] = mark_bibtex(comp.bibtex)
+                log_file = paper_path / Path('output/main.log')
+                data['loglines'] = log_file.read_text(encoding='UTF-8').splitlines()
+                bibtex_logfile = paper_path / Path('output/main.blg')
+                if bibtex_logfile.is_file():
+                    data['bibtex_log'] = bibtex_logfile.read_text(encoding='UTF-8').splitlines()
+                else:
+                    data['bibtex_log'] = ['No bibtex log']
+            except Exception as e:
+                logging.error('Unable to parse compilation')
+                return render_template('message.html',
+                                       title='An error has occurred',
+                                       error='An error has occurred reading data. Please contact the admin.')
             return render_template('view_copyedit.html', **data)
         else:
             # TODO: handle the other cases like SUBMITTED or PENDING.
@@ -764,7 +791,7 @@ def show_pdf(paperid,version, auth):
                                error = 'Invalid hmac')
     pdf_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(version) / Path('output/main.pdf')
     if pdf_path.is_file():
-        return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
+        return send_file(str(pdf_path.absolute()), mimetype='application/pdf', max_age=0, etag=str(int(time.time())))
     return render_template('message.html',
                            title='Unable to retrieve file {}'.format(str(pdf_path.absolute())),
                            error='Unknown file. This is a bug')

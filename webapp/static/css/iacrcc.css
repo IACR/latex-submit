@@ -133,3 +133,10 @@ img.eyes {
 span.keyword {
   background-color: #d1e7dd !important;
 } 
+/* .lognav emulates a clickable link with color and cursor. */
+.lognav {
+   color : #0d6efd;
+}
+.lognav:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,129 @@
+          <table class="table mt-3 mx-3" id="metadisplay">
+            <tbody>
+              <tr>
+                <th>Paper ID:</th>
+                <td>{{comp.paperid}}</td>
+              </tr>
+              <tr>
+                <th>DOI:</th>
+                <td>{{comp.meta.DOI}}</dtd>
+              </tr>
+              <tr>
+                <th>Status:</th>
+                <td>{{comp.status}}</td>
+              </tr>
+              <tr>
+                <th>Title:</th>
+                <td>{{comp.meta.title}}</td>
+              </tr>
+              <tr>
+                <th>Authors:</th>
+                <td>
+                  <div class="list-group">
+                    {% for author in comp.meta.authors %}
+                    <div class="author list-group-item">
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <th>Name:</th>
+                            <td>{{author.name}}</td>
+                          </tr>
+                          <tr>
+                            <th>Surname:</th>
+                            <td>{% if author.familyName %}{{author.familyName}}{% else %}<span class="text-danger">None</span>{% endif %}</td>
+                          </tr>
+                          <tr>
+                            <th>Email:</th>
+                            <td>{{author.email}}</td>
+                          </tr>
+                          <tr>
+                            <th>ORCID:</th>
+                            <td>{% if author.orcid %}<a target="_blank" href="https://orcid.org/{{author.orcid}}">{{author.orcid}}</a>{% else %}<span class="text-danger">None (<a target="_blank" href="https://orcid.org/orcid-search/search?searchQuery={{author.name|urlencode}}">search</a>)</span>{% endif %}</td>
+                          </tr>
+                          <tr>
+                            <th>
+                              Affiliations:
+                            </th>
+                            <td>
+                              {% if author.affiliations %}
+                              <div class="list-group">
+                                {% for affil in author.affiliations %}
+                                <div class="affiliation list-group-item">
+                                  {% set aff=comp.meta.affiliations[affil-1] %}
+                                  <table class="table">
+                                    <tbody>
+                                      <tr>
+                                        <th>name</th>
+                                        <td>{{aff.name}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>ROR</th>
+                                        <td>{% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Street</th>
+                                        <td>{{aff.street}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>City</th>
+                                        <td>{{aff.city}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Postal code</th>
+                                        <td>{{aff.postcode}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>Country</th>
+                                        <td> {{aff.country}}</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div> {# list-group-item #}
+                                {% endfor %}{# affiliations #}
+                              </div> {# end of list-group for affiliations #}
+                              {% else %}
+                              <span class="text-danger">None</span>
+                              {% endif %}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div> {# list-group-item for author #}
+                    {% endfor %}
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th>Date compiled</th>
+                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+              </tr>
+              <tr>
+                <th>Compile time</th>
+                <td>{{comp.compile_time}} seconds</dtd>
+              </tr>
+              <tr>
+                <th>Contact email</th>
+                <td>{{comp.email}}</td>
+              </tr>
+              <tr>
+                <th>BibTeX</th>
+                <td>{% if comp.bibtex %}BibTeX extracted{% else %}<span class="text-danger">None</span>{% endif %}</td>
+              </tr>
+              <tr>
+                <th>Submitted</th>
+                <td>{{comp.submitted}}</td>
+              </tr>
+              <tr>
+                <th>Accepted</th>
+                <td>{{comp.accepted}}</td>
+              </tr>
+              <tr>
+                <th>Compiled</th>
+                <td>{{comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+              </tr>
+              <tr>
+                <th>Zip filename</th>
+                <td>{{comp.zipfilename}}</td>
+              </tr>
+            </tbody>
+          </table>

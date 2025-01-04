@@ -2,12 +2,6 @@
 {% block head %}
 {{ super() }}
 <style>
- img.icon {
-   width: 16px;
-   cursor: pointer;
-   margin-top: .25rem;
-   margin-bottom: .25rem;
- }
  table {
    word-wrap: break-word;
  }
@@ -199,7 +193,13 @@
    bootstrap.Tab.getInstance(firstTab).show(); // Select the first tab.
    document.getElementById('warning-'+index).remove();
  }
+ var allSources = "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth)}}";
+ var sources = {
+   {% for f in comp.output_files %}"{{f}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=f)}}",
+   {% endfor %}
+ };
 </script>
+<script src="/js/nav.js?v=5"></script>
 {% endblock %}
 {% block extraMenu %}
 <li class="nav-item">
@@ -213,7 +213,7 @@
       <div class="nav-text me-5"><h2 class="mb-2">Final copy edit check for {{paper.paperid}}</h2></div>
       <ul class="nav nav-tabs align-items-end" id="reviewTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="pdfs-tab" data-bs-toggle="tab" data-bs-target="#pdfs" type="button" role="tab" aria-controls="pdfs" aria-selected="true">PDFs</button>
+          <button class="nav-link active" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf" type="button" role="tab" aria-controls="nav-pdf" aria-selected="true">PDFs</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#htmlview" type="button" role="tab" aria-controls="htmlview" aria-selected="false">HTML</button>
@@ -222,20 +222,30 @@
           <button class="nav-link" id="diffs-tab" data-bs-toggle="tab" data-bs-target="#diffs" type="button" role="tab" aria-controls="diffs" aria-selected="false">Diffs</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab" aria-controls="logs" aria-selected="false">Log</button>
+          <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source" type="button" role="tab" aria-controls="nav-source" aria-selected="false">LaTeX</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta" type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log" type="button" role="tab" aria-controls="nav-log" aria-selected="false">Log</button>
         </li>
       </ul>
       <div class="tab-content" id="reviewTabsContent">
-        <div class="tab-pane fade show active pe-2" id="pdfs" role="tabpanel" aria-labelledby="pdfs-tab" tabindex="0">
+        <div class="tab-pane fade show active pe-2" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab" tabindex="0">
           <div class="d-flex w-100" style="height:80vh;">
             <div style="width:50%">
               <h4 class="mt-2 text-center">Original</h4>
-              <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_copyedit_auth)}}#view=fitH">
+              <iframe id="orig_pdf_iframe" width="100%" height="100vh" style="width:100%;height:80vh;"
+                      src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_copyedit_auth)}}#view=FitH&pagemode=none&page=1"></iframe>
+              {#<embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='copyedit',auth=pdf_copyedit_auth)}}#view=fitH">#}
             </div>
             <div class="resizer mx-2"></div>
             <div style="width:50%;">
               <h4 class="mt-2 text-center">Final</h4>
-              <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=fitH">
+              <iframe id="pdfiframe" width="100%" height="100vh" style="width:100%;height:80vh;"
+                      src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=FitH&pagemode=none&page=1"></iframe>
+{#              <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paper.paperid,version='final',auth=pdf_final_auth)}}#view=fitH">#}
             </div>
           </div>
         </div>
@@ -252,8 +262,19 @@
           {{value|safe}}
           {% endfor %}
         </div>
-        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab" tabindex="0">
-          <pre>{{comp.log}}</pre>
+        <div class="tab-pane fade" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab" tabindex="0">
+          <div class="px-5 py-3">
+            {% include "nav_source_tab.html" %}
+          </div>
+        </div>
+        <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab" tabindex="0">
+          <div class="px-5 py-3">
+            {% include "admin/metadata.html" %}
+          </div>
+        </div>
+        <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
+          {#          <pre>{{comp.log}}</pre> #}
+          {% include "logview.html" %}
         </div>
       </div>
     </div>
@@ -296,7 +317,7 @@
           <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="true">Responses</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false">Warnings</button>
+          <button class="nav-link" id="nav-warnings-tab" data-bs-toggle="tab" data-bs-target="#nav-warnings" type="button" role="tab" aria-controls="nav-warnings" aria-selected="false">Log</button>
         </li>
       </ul>
       {# tabs to be shown #}
@@ -306,7 +327,7 @@
             {% for item in discussion %}
             <div class="alert alert-secondary">
               <div id="item-div-{{item.id}}" class="mb-2">
-                <div class="d-flex justify-content-between"><span>Page {{item.pageno}}, line {{item.lineno}}</span> {% if item.archived %}<span class="ms-3 badge text-bg-dark">Archived</span>{% endif %}</div>
+                <div class="d-flex justify-content-between"><span class="lognav" onclick="showPage({{item.pageno}})">Page {{item.pageno}}, line {{item.lineno}}</span> {% if item.archived %}<span class="ms-3 badge text-bg-dark">Archived</span>{% endif %}</div>
                 <span>{{item.text}}</span>
               </div>
               <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">
@@ -316,7 +337,7 @@
             {% endfor %}
           </div>
         </div>
-        <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab" tabindex="0">
+        <div class="tab-pane fade" id="nav-warnings" role="tabpanel" aria-labelledby="nav-warnings-tab" tabindex="0">
           <p>These warnings are from compiling the author's final version. You can view the warnings on the author's
             first version in a separate tab by <a target="_blank" href="{{url_for('admin_file.copyedit', paperid=paper.paperid)}}">clicking here</a>.
           </p>
@@ -341,7 +362,7 @@
                 <div class="d-flex justify-content-between">
                   <div class="">
                     {% if err.logline %}
-                    <span onclick="showLogLine({{err.logline}})" class="lognav" title="Scroll to log line">Log line {{err.logline}}</span>
+                    <span onclick="showLogLine('latex', {{err.logline}})" class="lognav" title="Scroll to log line">Log line {{err.logline}}</span>
                     {% endif %}
                   </div>
                   <div class="">
@@ -530,10 +551,4 @@
     </div>
   </div>
 </div>
-<script>
- document.querySelectorAll('td a').forEach((el) => {
-   el.parentElement.nextElementSibling.nextElementSibling.style.backgroundColor='#e0c0e0';
- });
-
-</script>
 {% endblock %}

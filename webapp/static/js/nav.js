@@ -9,20 +9,23 @@ function showSource(el) {
         document.getElementById('sourcefile').innerHTML = data;
         const sourceTab = document.querySelector('button[data-bs-target="#nav-source"]')
         bootstrap.Tab.getOrCreateInstance(sourceTab).show()
+        var id = 'sourceline-1'; // default if there is no filepath_line number in the error.
         if ('filepath_line' in el.dataset) {
-          let id = 'sourceline-' + String(el.dataset.filepath_line);
-          let line = document.getElementById(id);
-          if (line) {
-            line.scrollIntoView({behavior: 'smooth'});
-            document.querySelectorAll('div.highlight_log_line').forEach((el) => {
-              el.classList.remove('highlight_log_line');
-            });
-            line.classList.add('highlight_log_line');
-          } else {
-            console.log('no line element');
-          }
+          id = 'sourceline-' + String(el.dataset.filepath_line);
         } else {
           console.log('no line number')
+        }
+        let line = document.getElementById(id);
+        if (line) {
+          line.scrollIntoView({behavior: 'smooth'});
+          document.querySelectorAll('div.highlight_log_line').forEach((el) => {
+            el.classList.remove('highlight_log_line');
+          });
+          if (id != 'sourceline-1') {
+            line.classList.add('highlight_log_line');
+          }
+        } else {
+          console.log('no line element');
         }
       })
   } else {
@@ -35,11 +38,33 @@ function showSource(el) {
   }
 }
 
+function reload_iframe(el, src) {
+  el.src = src;
+  if (el.contentDocument != null) {
+    // firefox may have this as null.
+    el.contentDocument.location.reload(true);
+  }
+}
+
+/*
+ * This is called to scroll the PDF(s) to a given page. The only way
+ * to do this is to reload the iframe with a new fragment. Browsers
+ * will often block reloading if only the hash segment of a URL changes,
+ * so we also rely upon the server sending a different eTag and a cache
+ * limit of 0 seconds. Without that it was impossible to get firefox to
+ * reload.
+*/
 function showPage(pageno) {
   let iframe = document.getElementById('pdfiframe');
-  pdfurl = iframe.src;
-  iframe.src = pdfurl.split('#')[0] + '#page=' + pageno;
-  iframe.contentDocument.location.reload(true);
+  let pdfurl = iframe.src;
+  let args = '#view=FitH&page=' + pageno;
+  reload_iframe(iframe, pdfurl.split('#')[0] + args);
+  // For view of final PDF, there are two iframes to scroll.
+  let orig_iframe = document.getElementById('orig_pdf_iframe');
+  if (orig_iframe) {
+    let orig_pdfurl = orig_iframe.src;
+    reload_iframe(orig_iframe, orig_pdfurl.split('#')[0] + args);
+  }
   const pdfTab = document.querySelector('button[data-bs-target="#nav-pdf"]')
   bootstrap.Tab.getOrCreateInstance(pdfTab).show()
 }

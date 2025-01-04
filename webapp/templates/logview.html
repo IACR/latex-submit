@@ -1,0 +1,28 @@
+{# This is used in multiple views as a tab-pane to show three logs, namely
+the latex log, the bibtex/biber log, and the latexmk log. This view contains thousands
+of DOM elements, which allows nav.js to direct users to the appropriate line in the log files.
+#}
+
+<p id="log-top">There are three logs below: The <i-mono>.log</i-mono> file from the last run of LaTeX,
+            the <a href="#bibtex-log"><i-mono>.blg</i-mono></a> log file from running bibtex or biber, and the
+            <a href="#latexmk-log">log from latexmk</a>.
+          </p>
+          <h4 id="latex-log">Latex log</h4>
+          <i-mono>
+          {% for line in loglines %}
+          <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
+          {% endfor %}
+          </i-mono>
+          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
+          <h4 class="mt-3" id="bibtex-log">BibTeX/biber log</h4>
+          <i-mono>
+            {% for line in bibtex_log %}
+            <div id="bibtex-{{loop.index}}">{{loop.index}}: {{line}}</div>
+            {% endfor %}
+          </i-mono>
+          <div class="mt-3 float-end"><a href="#log-top">top</a></div>
+          <h4 class="mt-3" id="latexmk-log">latexmk log</h4>
+          <pre id="latexLog">
+         {{comp.log}}
+          </pre>
+          </i-mono>

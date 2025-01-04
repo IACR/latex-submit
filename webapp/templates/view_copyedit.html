@@ -30,6 +30,15 @@ This template is used to show the status of a compilation for copyedit
    background-color: #fff3cd;
  }
 </style>
+<script>
+ var sources = {
+   {% for f in comp.output_files %}
+   "{{f}}": "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth, filename=f)}}",
+   {% endfor %}
+ };
+ var allSources = "{{url_for('home_bp.view_source', paperid=comp.paperid,version=version,auth=source_auth)}}";
+ </script>
+ <script src="/js/nav.js?v=4"></script>
 {% endblock %}
 {% block content %}
 <main id="mainContent" class="container-fluid px-3 px-md-4">
@@ -50,9 +59,52 @@ This template is used to show the status of a compilation for copyedit
 </script>
 <div class="row">
   <div class="col-8" id="pdf_viewer">
-    <embed width="100%" height="100%" src="{{url_for('home_bp.show_pdf', paperid=paperid,version='copyedit',auth=pdf_auth)}}#view=fitH">
-  </div>
-  <div class="col-4" id="discussion">
+  <ul class="nav nav-tabs mt-2" id="editTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="nav-pdf-tab" data-bs-toggle="tab" data-bs-target="#nav-pdf" type="button" role="tab" aria-controls="nav-pdf" aria-selected="true">PDF</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="nav-html-tab" data-bs-toggle="tab" data-bs-target="#nav-html" type="button" role="tab" aria-controls="nav-html" aria-selected="false">HTML</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="nav-log-tab" data-bs-toggle="tab" data-bs-target="#nav-log" type="button" role="tab" aria-controls="nav-log" aria-selected="false">Log</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="nav-source-tab" data-bs-toggle="tab" data-bs-target="#nav-source" type="button" role="tab" aria-controls="nav-source" aria-selected="false">LaTeX</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="nav-meta-tab" data-bs-toggle="tab" data-bs-target="#nav-meta" type="button" role="tab" aria-controls="nav-meta" aria-selected="false">Metadata</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="editTabContent">
+    <div class="tab-pane fade show active" id="nav-pdf" role="tabpanel" aria-labelledby="nav-pdf-tab" tabindex="0">
+      <iframe id="pdfiframe" style="width:100%;height:85vh;" src="{{url_for('home_bp.show_pdf', paperid=paperid,version='copyedit',auth=pdf_auth)}}#view=FitH&page=1"></iframe>
+    </div>
+    <div class="tab-pane fade show p-3 mathjax" id="nav-html" role="tabpanel" aria-labelledby="nav-html-tab">
+      <p class="alert alert-info">
+        This is approximately what part of the HTML page will look like. Please check the title, authors, abstract,
+        and references. Note that HTML rendering of references may be malformed by using <tt>\url</tt> inside the
+        <tt>howpublished</tt> field. Google scholar and eprint links are approximate, so they need not point to the paper.
+      </p>
+      {% include "html.html" %}
+    </div>
+    <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab" tabindex="0">
+      {% include "logview.html" %}
+      {% for line in loglines %}
+      <div id="logline-{{loop.index}}">{{loop.index}}: {{line}}</div>
+      {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="nav-source" role="tabpanel" aria-labelledby="nav-source-tab" tabindex="0">
+      <div class="px-5 py-3">
+        {% include "nav_source_tab.html" %}
+      </div>
+    </div>
+    <div class="tab-pane fade" id="nav-meta" role="tabpanel" aria-labelledby="nav-meta-tab" tabindex="0">
+      {% include "admin/metadata.html" %}
+    </div>
+  </div> {# end of tab-content #}
+</div>
+<div class="col-4" id="discussion">
     <div class="d-flex flex-column align-items-center">
       <h4 class="text-center my-2">Copy edit on {{paperid}}</h4>
       <div id="allowUpload" class="alert alert-success upload {% if not upload %}collapse{% endif %}">
@@ -76,7 +128,7 @@ This template is used to show the status of a compilation for copyedit
         <div class="alert alert-secondary">
           <div class="item pb-1 d-flex justify-content-between">
             <div id="item-div-{{item.id}}">
-              <div>Page {{item.pageno}}, line {{item.lineno}}</div>
+              <div><span onclick="showPage({{item.pageno}})" class="lognav">Page {{item.pageno}}</span>, line {{item.lineno}}</div>
               <span>{{item.text}}</span>
             </div>
             <div class="ps-2 d-flex flex-column align-items-center">
@@ -87,6 +139,31 @@ This template is used to show the status of a compilation for copyedit
 {#              <span id="check-{{item.id}}" class="d-none text-success mt-2">✔</span>#}
             </div>
           </div>
+                <div class="d-flex flex-column justify-content-between w-100">
+                  <div id="warning-text-{{loop.index}}">{{item.text}}</div>
+                  <div class="d-flex justify-content-between">
+                    <div class="">
+                      {% if item.text.startswith('bibtex entry ') %}
+                      {% set bibtex_key = item.text.split()[2] %}
+                      <span class="lognav" onclick="scrollToBibtex('{{bibtex_key}}');">Show bibtex entry</span>
+                      {% else %}
+                      {% if item.logline %}<span onclick="showLogLine('{{item.error_type[:6]}}', {{item.logline}})" class="lognav" title="Scroll to log line"> Log line {{item.logline}}</span>{% endif %}
+                      {% endif %}
+                    </div>
+                    <div class="">
+                      {% if item.pageno %}<span onclick="showPage({{item.pageno}})" class="lognav" title="Scroll to PDF page {{item.pageno}}">PDF page &ge;{{item.pageno}}</span>{% endif %}
+                    </div>
+                    <div class="text-end">
+                      {% if filepath %}<span data-filepath="{{filepath}}" onclick="showSource(this)"
+                                             {% if item.filepath_line %}data-filepath_line="{{item.filepath_line}}" {% endif %}
+                                             class="lognav" title="Show source file">{{filepath}}
+                      {% if item.filepath_line %}line {{item.filepath_line}}{% endif %}</span>{% endif %}
+                    </div>
+                  </div>
+                  {% if item.help %}
+                  <div>{{item.help|safe}}</div>
+                  {% endif %}
+          <div class="row"><div class="col-4">This</div></div>
           <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span></div>
         </div>
         {% endfor %}
