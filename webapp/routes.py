@@ -93,9 +93,9 @@ def show_submit_version():
         elif ((paper_status.status == PaperStatusEnum.EDIT_FINISHED.value or
                paper_status.status == PaperStatusEnum.EDIT_REVISED) and
               form.version.data != Version.FINAL.value):
-            return render_template('message.html',
-                                   title='Wrong version',
-                                   error='Version should be final. This is a bug')
+            return redirect(url_for('home_bp.view_copyedit',
+                                    paperid=paperid,
+                                    auth=create_hmac([paperid, Version.COPYEDIT.value])))
         elif paper_status.status == PaperStatusEnum.FINAL_SUBMITTED:
             return render_template('message.html',
                                    title='Your paper is pending final review.',
