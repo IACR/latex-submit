@@ -623,14 +623,14 @@ def view_copyedit(paperid, auth):
                 if comp.bibtex:
                     data['marked_bibtex'] = mark_bibtex(comp.bibtex)
                 log_file = paper_path / Path('output/main.log')
-                data['loglines'] = log_file.read_text(encoding='UTF-8').splitlines()
+                data['loglines'] = log_file.read_text(encoding='UTF-8', errors='replace').splitlines()
                 bibtex_logfile = paper_path / Path('output/main.blg')
                 if bibtex_logfile.is_file():
-                    data['bibtex_log'] = bibtex_logfile.read_text(encoding='UTF-8').splitlines()
+                    data['bibtex_log'] = bibtex_logfile.read_text(encoding='UTF-8', errors='replace').splitlines()
                 else:
                     data['bibtex_log'] = ['No bibtex log']
             except Exception as e:
-                logging.error('Unable to parse compilation')
+                logging.error('Unable to parse compilation:' + str(e))
                 return render_template('message.html',
                                        title='An error has occurred',
                                        error='An error has occurred reading data. Please contact the admin.')
