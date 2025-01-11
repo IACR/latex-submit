@@ -9,8 +9,13 @@
 <div class="row mt-4">
   <div class="col-12 col-md-6">
     <div class="alert alert-danger">
+      {% if config.TESTING_INSTANCE %}
+      This is only a test server. If you are trying to submit a final version for the journal,
+      then you should start from your hotcrp instance.
+      {% else %}
       This site is currently used for submissions of <strong>final</strong> versions of
       papers for <a href="https://cic.iacr.org/">IACR Communications in Cryptology</a>.
+      {% endif %}
       If you are looking to submit a paper to the journal, see
       the <a href="https://cic.iacr.org/callforpapers">Call for Papers</a>.
     </div>
@@ -25,6 +30,17 @@
 </div>
 <div class="row mt-3">
   <div class="col-12 col-md-8 offset-md-2">
+    {% if config.TESTING_INSTANCE %}
+    <p class="alert alert-info">
+      This test server allows people to experiment with the infrastructure, but is not part of
+      the actual pipeline for the journal. Papers uploaded here are not private,
+      but they will be deleted every day so nothing is permanent. If you wish to have
+      access as an admin, notify {{config.COPYEDITOR_EMAILS}}.
+    </p>
+    <div class="text-center my-2">
+      <a class="btn btn-primary" href="{{url_for('home_bp.show_submit_version', bypass=config.SUBMIT_BYPASS)}}">Upload a paper</a>
+    </div>
+    {% endif %}
     <p>
       The goal of this site is to reduce the cost of open access publishing by
       <a href="http://ftp.tug.org/TUGboat/tb44-1/tb136bos-metadata.pdf">reducing the

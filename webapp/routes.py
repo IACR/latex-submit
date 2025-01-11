@@ -51,20 +51,21 @@ def home():
 def show_submit_version():
     form = SubmitForm(request.args)
     if not form.paperid.data:
-        bypass = request.args.get('bypass', None)
-        if bypass != app.config['SUBMIT_BYPASS']: # just for testing.
+        if not app.config['TESTING_INSTANCE']:
             return redirect(url_for('home_bp.home'))
-        #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         form.hotcrp.data = NO_HOTCRP
         form.hotcrp_id.data = NO_HOTCRP
         form.version.data = 'candidate'
-        form.accepted.data = '2022-09-30 17:49:20'
-        form.submitted.data = '2022-08-03 06:44:30'
+        now = datetime.datetime.now()
+        submitted = now - datetime.timedelta(days=10)
+        accepted = now - datetime.timedelta(days=5)
+        form.accepted.data = accepted.strftime('%Y-%m-%d %H:%M:%S')
+        form.submitted.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
         form.journal.data = 'cic'
-        form.volume.data = '1'
+        form.volume.data = '9999'
         form.issue.data = '1'
         form.generate_auth()
     else:
