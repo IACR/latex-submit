@@ -79,7 +79,7 @@ class SQLAlchemy():
 
 # DB wrapper is global so we can have easy access to engine and session.
 db = SQLAlchemy(None, None)
-# scheduler is only used to clean up old jobs in case it has config.TESTING_INSTANCE set to tru
+# scheduler is only used to clean up old jobs in case it has config.DEMO_INSTANCE set to tru
 scheduler = Scheduler(executors={'default': pool.ThreadPoolExecutor(1)},
                       timezone='America/Los_Angeles')
 
@@ -106,7 +106,7 @@ def create_app(config):
     # Create database tables if they don't already exist.
     Base.metadata.create_all(bind=db.engine)
     login_manager.init_app(app)
-    if config.TESTING_INSTANCE:
+    if config.DEMO_INSTANCE:
         from .cleanup import cleanup_task
         scheduler.init_app(app)
         scheduler.start()

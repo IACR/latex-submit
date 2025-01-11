@@ -51,7 +51,7 @@ def home():
 def show_submit_version():
     form = SubmitForm(request.args)
     if not form.paperid.data:
-        if not app.config['TESTING_INSTANCE']:
+        if not app.config['DEMO_INSTANCE']:
             return redirect(url_for('home_bp.home'))
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()

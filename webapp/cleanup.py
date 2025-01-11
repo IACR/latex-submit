@@ -1,4 +1,4 @@
-"""This is used only if config.TESTING_INSTANCE is True, and is
+"""This is used only if config.DEMO_INSTANCE is True, and is
 used to remove old articles.
 """
 
@@ -16,7 +16,7 @@ def cleanup_task():
         if scheduler.app.config['DEBUG']:
             scheduler.app.logger.warning('skipping cleanup of existing papers')
             return
-        if scheduler.app.config['TESTING_INSTANCE']:
+        if scheduler.app.config['DEMO_INSTANCE']:
             scheduler.app.logger.warning('cleanup should not be configured')
             return
         scheduler.app.logger.warning('cleaning up papers')

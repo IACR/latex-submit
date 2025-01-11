@@ -24,10 +24,11 @@ class Config:
     CROSSREF_PUBLISHER_EMAIL = 'crossref@iacr.org'
     USERS = None
     TESTING = False
+    DEMO_INSTANCE = False
     WTF_CSRF_TIME_LIMIT = None
     EXPORT_PATH = '/tmp'
     FUNDING_SEARCH_URL = '/searchapi/search'
-    SUBMIT_BYPASS = 'testing'
+    SUBMIT_BYPASS = '' # now deprecated and replaced by DEMO_INSTANCE
     JOURNALS = [
         {
             'hotcrp_key': 'cic',
@@ -75,6 +76,7 @@ class DebugConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True
+    DEMO_INSTANCE = True
     # used by kevin.
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:st0remydata@localhost/publication'
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://publication:mystuff@localhost/publication'

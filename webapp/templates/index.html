@@ -9,7 +9,7 @@
 <div class="row mt-4">
   <div class="col-12 col-md-6">
     <div class="alert alert-danger">
-      {% if config.TESTING_INSTANCE %}
+      {% if config.DEMO_INSTANCE %}
       This is only a test server. If you are trying to submit a final version for the journal,
       then you should start from your hotcrp instance.
       {% else %}
@@ -30,7 +30,7 @@
 </div>
 <div class="row mt-3">
   <div class="col-12 col-md-8 offset-md-2">
-    {% if config.TESTING_INSTANCE %}
+    {% if config.DEMO_INSTANCE %}
     <p class="alert alert-info">
       This test server allows people to experiment with the infrastructure, but is not part of
       the actual pipeline for the journal. Papers uploaded here are not private,
