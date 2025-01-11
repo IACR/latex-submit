@@ -510,7 +510,7 @@ def compile_for_copyedit():
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC is being compiled for copy editing.\n\nYou can view it at {}'.format(copyedit_url)
     mail.send(msg)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     data = {'title': 'Compiling your LaTeX for copy editor',
             'status_url': status_url,
@@ -547,7 +547,7 @@ def final_review():
     final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
     mail.send(msg)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     return render_template('message.html',
                            title='Your paper will be reviewed',
