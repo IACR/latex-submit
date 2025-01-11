@@ -525,7 +525,7 @@ and users in the database. Using sqlite is probably simpler in development,
 and SQLAlchemy shields you from details of the database.
 
 There is a test instance of this running at publishtest.iacr.org. That has
-`config.TESTING_INSTANCE` set to true.
+`config.DEMO_INSTANCE` set to true.
 
 You need to install some things on the machine, including a python virtual
 environment and docker. First start with
