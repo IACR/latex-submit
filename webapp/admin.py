@@ -173,7 +173,7 @@ def user():
                                                ts=timestamp,
                                                _external=True)}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
-            if app.config['TESTING']:
+            if app.config['DEBUG']:
                 print(msg.body)
             mail.send(msg)
             flash('User {} was created and they were notified.'.format(form.email.data))
@@ -276,7 +276,7 @@ def approve_final():
                 'paperid': paperid,
                 'copyedit_url': url_for('admin_file.copyedit_home', _external=True)}
     editor_msg.body = app.jinja_env.get_template('admin/copyedit_approved.txt').render(maildata)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(editor_msg.body)
     mail.send(editor_msg)
     ############ send a message to the author.
@@ -289,7 +289,7 @@ def approve_final():
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
         author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
-        if app.config['TESTING']:
+        if app.config['DEBUG']:
             print(author_msg.body)
         mail.send(author_msg)
     except Exception as e:
@@ -505,7 +505,7 @@ def finish_copyedit():
                              sender=app.config['EDITOR_EMAILS'],
                              recipients=[paper_status.email])
         author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
-        if app.config['TESTING']:
+        if app.config['DEBUG']:
             print(author_msg.body)
         mail.send(author_msg)
         log_event(db, paperid, 'Copy edit was finished and author notified')
@@ -531,7 +531,7 @@ def finish_copyedit():
                 'final_url': url_for('home_bp.view_copyedit', paperid=paperid,auth=create_hmac([paperid, Version.COPYEDIT.value]),
                                      _external=True)}
     msg.body = app.jinja_env.get_template('admin/copyedit_finished.txt').render(maildata)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     mail.send(msg)
     log_event(db, paperid, 'Copy edit was finished and author notified')

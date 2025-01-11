@@ -119,7 +119,7 @@ def _send_login_link(initiator, email):
                                        auth=create_hmac([email, str(ts)]),
                                        _external=True)}
     msg.body = app.jinja_env.get_template('recover_password.txt').render(maildata)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     mail.send(msg)
     return True

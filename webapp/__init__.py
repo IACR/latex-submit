@@ -22,6 +22,10 @@ from pathlib import Path
 import secrets
 import string
 import sys
+import json
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors import pool
+from apscheduler.triggers.interval import IntervalTrigger
 
 # Make sure we aren't running on an old python.
 assert sys.version_info >= (3, 7)
@@ -62,6 +66,11 @@ executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='compiler')
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
+class Scheduler(BackgroundScheduler):
+    """A simple wrapper around apscheduler. Much simpler than flask_apscheduler."""
+    def init_app(self, app):
+        self.app = app
+
 class SQLAlchemy():
     """Wrapper for sqlalchemy scoped_session and engine, like flask-sqlalchemy."""
     def __init__(self, engine, session):
@@ -70,6 +79,9 @@ class SQLAlchemy():
 
 # DB wrapper is global so we can have easy access to engine and session.
 db = SQLAlchemy(None, None)
+# scheduler is only used to clean up old jobs in case it has config.DEMO_INSTANCE set to tru
+scheduler = Scheduler(executors={'default': pool.ThreadPoolExecutor(1)},
+                      timezone='America/Los_Angeles')
 
 # In case we want to try to force the pragma for sqlite3.
 # @event.listens_for(Engine, 'connect')
@@ -94,6 +106,20 @@ def create_app(config):
     # Create database tables if they don't already exist.
     Base.metadata.create_all(bind=db.engine)
     login_manager.init_app(app)
+    if config.DEMO_INSTANCE:
+        from .cleanup import cleanup_task
+        scheduler.init_app(app)
+        scheduler.start()
+        # Check every 15 minutes to clean up old papers.
+        trigger = IntervalTrigger(minutes=15)
+        scheduler.add_job(cleanup_task,
+                          trigger=trigger,
+                          args=[],
+                          id='cleanup_update',
+                          name='cleanup_update')
+        app.logger.warning([str(job) for job in scheduler.get_jobs()])
+    else:
+        app.logger.warning('Scheduler was not started')
     with app.app_context():
         from . import admin
         from . import routes

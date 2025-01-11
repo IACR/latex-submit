@@ -51,20 +51,21 @@ def home():
 def show_submit_version():
     form = SubmitForm(request.args)
     if not form.paperid.data:
-        bypass = request.args.get('bypass', None)
-        if bypass != app.config['SUBMIT_BYPASS']: # just for testing.
+        if not app.config['DEMO_INSTANCE']:
             return redirect(url_for('home_bp.home'))
-        #TODO: remove this if. It's only for testing to supply a paperid when it doesn't come from internal.
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
         form.hotcrp.data = NO_HOTCRP
         form.hotcrp_id.data = NO_HOTCRP
         form.version.data = 'candidate'
-        form.accepted.data = '2022-09-30 17:49:20'
-        form.submitted.data = '2022-08-03 06:44:30'
+        now = datetime.datetime.now()
+        submitted = now - datetime.timedelta(days=10)
+        accepted = now - datetime.timedelta(days=5)
+        form.accepted.data = accepted.strftime('%Y-%m-%d %H:%M:%S')
+        form.submitted.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
         form.journal.data = 'cic'
-        form.volume.data = '1'
+        form.volume.data = '9999'
         form.issue.data = '1'
         form.generate_auth()
     else:
@@ -509,7 +510,7 @@ def compile_for_copyedit():
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC is being compiled for copy editing.\n\nYou can view it at {}'.format(copyedit_url)
     mail.send(msg)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     data = {'title': 'Compiling your LaTeX for copy editor',
             'status_url': status_url,
@@ -546,7 +547,7 @@ def final_review():
     final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
     mail.send(msg)
-    if app.config['TESTING']:
+    if app.config['DEBUG']:
         print(msg.body)
     return render_template('message.html',
                            title='Your paper will be reviewed',
@@ -619,6 +620,9 @@ def view_copyedit(paperid, auth):
             try:
                 json_file = paper_path / Path('compilation.json')
                 comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
+            except Exception as e:
+                logging.error('Unable to read compilation:' + str(e))
+            try:
                 data['comp'] = comp
                 if comp.bibtex:
                     data['marked_bibtex'] = mark_bibtex(comp.bibtex)
@@ -630,7 +634,7 @@ def view_copyedit(paperid, auth):
                 else:
                     data['bibtex_log'] = ['No bibtex log']
             except Exception as e:
-                logging.error('Unable to parse compilation:' + str(e))
+                logging.error('Unable to ingest compilation:' + str(e))
                 return render_template('message.html',
                                        title='An error has occurred',
                                        error='An error has occurred reading data. Please contact the admin.')
