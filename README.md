@@ -511,47 +511,94 @@ the author.
 
 ## Installation
 
-TODO: these instructions need to be updated. We now have a `requirements.txt`
+The installation varies slightly between production and development. I'll describe
+both, but some parts of the production environment are omitted.
+For production I've checked the code out in
+`/var/www/wsgi/latex-submit`, but for development you can check it out anywhere.
 
+There are quite a few configuration settings to use in `webapp/config.py`.
+Depending on how you set the `SQLALCHEMY_DATABASE_URI` in your config, you
+will need to set up the database. I use mysql in both production and
+development, so I create the database and the user/password to connect to it.
+The app will create the tables when it starts up, and populate the journals
+and users in the database. Using sqlite is probably simpler in development,
+and SQLAlchemy shields you from details of the database.
+
+There is a test instance of this running at publishtest.iacr.org. That has
+`config.TESTING_INSTANCE` set to true.
+
+You need to install some things on the machine, including a python virtual
+environment and docker. First start with
 ```
-python3 -m pip install flask
-python3 -m pip install flask-mail
-python3 -m pip install flask-login
-python3 -m pip install sqlalchemy
-python3 -m pip install flask-WTF
-python3 -m pip install docker
-python3 -m pip install arxiv-latex-cleaner
+sudo apt install python3-venv
 sudo apt install docker
+sudo apt install memcached
 ```
-add user to docker group with
+We use memcached for rate limiting on password guessing, and this is
+configured in the `webapp/config.py` file.
+
+Next we need to add the user who will run the app to the `docker`
+group. For root you use
+```
+sudo usermod -aG docker www-data
+```
+For development you would use
 ```
 sudo usermod -aG docker $USER
 ```
-Then you will need to logout and login again.
-
+Next you create a python `venv` for the app. The path to the venv is
+up to you, but I'll refer to it in the apache configuration for production.
+For production it can be produced with
 ```
-cd webapp/compiler
+sudo python3 -m venv /var/www/venv/publish
+```
+For development you can create the environment as yourself somewhere in
+your home directory so you have access to it. Once you create the `venv`
+you activate it with
+```
+source /var/www/venv/publish/bin/activate
+```
+Then you need to install the required python packages in the `venv` (as
+root for production). You do this with
+```
+cd webapp
+python3 -m pip install -r requirements.txt
+```
+(as root for production). Next you need to create the docker image. The method for
+production is
+```
+cd webapp/
+mkdir data
+chown www-data data
 docker build -t debian-slim-texlive .
 ```
-(note the dot at the end). While you are in that directory, you should try
-running `webapp/compiler/runner.py` on some sample input to check that
-the docker compiler is working.
+(note the dot at the end so that it references the `Dockerfile` in the `webapp`
+directory). For development you only need to create the `data` directory
+as yourself and run docker as your user.
 
-## Running the app in dev
-
-In order to start the web server, run:
+In development, you should try running `webapp/compiler/runner.py` on some
+sample input to check that the docker compiler is working. You can then
+start the app in the root directory of the github image using
 ```
 python3 run.py
 ```
-
 At this point you should be able to point your browser at localhost:5000
 
-## Running the app in production
+The setup for production requires more effort, because you have to configure
+the app to run as a `wsgi` app behind a web server. We happen to use `apache`
+with `mod_wsgi`, but `nginx` with a `wsgi` server like `uWSGI` or `gunicorn` is also
+an option. The configuration for production requires some skill with web
+server configuration so we'll omit that. The `wsgi` server should be configured
+to run with the `venv` you created above. In production you also need to configure
+a mail server so that mails can be sent to authors and admins. The configuration
+for that is in `webapp/config.py`. If you run in development then it just
+prints the emails to the log so you can see what is being sent (and read
+the URLs that are sent to authors and admins).
 
-The web server would ordinarily be started behind apache running
-mod_wsgi. This requires a `.wsgi` file, which may require
-customization for your server environment (e.g., with another wsgi
-server behind nginx).
+I have not completed making the server generic, so there are a bunch
+of hardwired things right now to show the UI as it is for iacr.org.
+If there is sufficient demand I would be happy to work with others to
+make it usable for them.
 
 ## Copy editing
 
