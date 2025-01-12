@@ -343,10 +343,16 @@ def submit_version():
                         auth=create_hmac([paperid, version]),
                         _external=True)
     if send_mail:
-        msg = Message('Paper {} was submitted'.format(paperid),
+        msg = Message('Paper {} was uploaded'.format(paperid),
                       sender=app.config['EDITOR_EMAILS'],
-                      recipients=['iacrcc@digicrime.com']) # for testing
-        msg.body = 'This is just a test message for now.\n\nYour paper will be viewable at {}'.format(paper_url)
+                      recipients=[compilation.email])
+        body = 'Thank you for uploading your paper. Until you send your paper\nfor copy editing, you will be able to view it at\n\n {}'.format(paper_url)
+        msg.body = body
+        mail.send(msg)
+        msg = Message('FYI: Paper {} was uploaded'.format(paperid),
+                      sender=app.config['EDITOR_EMAILS'],
+                      recipients=['kmccurley@gmail.com'])
+        msg.body = body
         mail.send(msg)
     status_url = paper_url.replace('/view/', '/tasks/')
     data = {'title': 'Compiling your LaTeX',

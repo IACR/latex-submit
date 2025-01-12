@@ -14,7 +14,7 @@ from .metadata.db_models import PaperStatus
 def cleanup_task():
     with scheduler.app.app_context():
         if scheduler.app.config['DEBUG']:
-            scheduler.app.logger.warning('skipping cleanup of existing papers')
+            scheduler.app.logger.info('skipping cleanup of existing papers')
             return
         if scheduler.app.config['DEMO_INSTANCE']:
             scheduler.app.logger.warning('cleanup should not be configured')
