@@ -419,7 +419,22 @@ def get_links(entry: Entry):
 
 # these are used in the construction of the map from cite key to label.
 BIBCITE_PATT = r'^\\bibcite{([^}]+)}{(.+)}$'
-BIBLATEX_PATT = r'\\entry{([^}]+)}(?:.*\\field{labelalpha}{([^}]+)})?(?:.*\\field{extraalpha}{([^}]+)})?'
+
+def _get_biblatex_label(part):
+    label = ''
+    labelalpha = None
+    extraalpha = ''
+    for line in part.splitlines():
+        m = re.search(r'\\field{labelalpha}{([^$]*)$', line)
+        if m:
+            labelalpha = m.group(1)[:-1] # cut off the ending }
+        m = re.search(r'\\field{extraalpha}{([0-9]+)}', line)
+        if m:
+            index = int(m.group(1)) - 1
+            extraalpha = string.ascii_lowercase[index]
+    if labelalpha:
+        label = (labelalpha + extraalpha).replace('\\textsuperscript {+}', '<sup>+</sup>')
+    return label
 
 def get_citation_map(output_dir):
     """Look in the main.aux and main.bbl files to map citation keys to labels.
@@ -435,22 +450,13 @@ def get_citation_map(output_dir):
     if not len(mapping): # in this case it's biblatex, so look in main.bbl
         bbl_file = output_dir / Path('main.bbl')
         bbl_str = bbl_file.read_text(encoding='UTF-8')
-        bbl_str = ' '.join(bbl_str.splitlines())
         entryparts = re.split(r'\\endentry', bbl_str)
         for part in entryparts:
-            m = re.search(BIBLATEX_PATT, part)
+            m = re.search(r'\\entry{([^}]+)}', part)
             if m:
-                label = ''
-                if m.group(2):
-                    label = m.group(2).replace('{$^{+}$}', '<sup>+</sup>')
-                    if m.group(3):
-                        try:
-                            index = int(m.group(3))-1
-                            label += string.ascii_lowercase[index]
-                        except Exception as e:
-                            logging.warning('unable to convert extraalpha {} to int'.format(m.group(3)))
-                            label += m.group(3)
-                mapping[m.group(1)] = label
+                key = m.group(1)
+                label = _get_biblatex_label(part)
+                mapping[key] = label
     return mapping
 
 def bibtex_to_html(compilation, cite_map: OrderedDict):
