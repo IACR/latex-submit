@@ -9,14 +9,14 @@ import shutil
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from . import scheduler
-from .metadata.db_models import PaperStatus
+from .metadata.db_models import PaperStatus, PaperStatusEnum
 
 def cleanup_task():
     with scheduler.app.app_context():
         if scheduler.app.config['DEBUG']:
             scheduler.app.logger.info('skipping cleanup of existing papers')
             return
-        if scheduler.app.config['DEMO_INSTANCE']:
+        if not scheduler.app.config['DEMO_INSTANCE']:
             scheduler.app.logger.warning('cleanup should not be configured')
             return
         scheduler.app.logger.warning('cleaning up papers')
@@ -27,7 +27,7 @@ def cleanup_task():
         with Session(engine) as session:
             papers = session.execute(select(PaperStatus)).scalars().all()
             for paper in papers:
-                if paper.status == PaperStatus.PENDING.value and paper.lastmodified < submit_deadline:
+                if paper.status == PaperStatusEnum.PENDING.value and paper.lastmodified < submit_deadline:
                     deleted_ids.add(paper.paperid)
                     session.delete(paper)
                 elif paper.lastmodified < copyedit_deadline:
