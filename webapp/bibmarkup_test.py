@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 import pytest
-from .bibmarkup import mark_bibtex, bibtex_to_html, BibTeXParser, BIBCITE_PATT, BIBLATEX_PATT, get_citation_map
+from .bibmarkup import mark_bibtex, bibtex_to_html, BibTeXParser, BIBCITE_PATT, get_citation_map, _get_biblatex_label
 from .metadata.compilation import CompileStatus, Compilation, PubType
 import datetime
 import re
@@ -320,6 +320,115 @@ def test_output4():
     assert notdoi[1].text == 'Bibtex error: logstar: booktitle is expected for @article'
     assert len(compilation.warning_log) == 403
     assert len(compilation.bibhtml) == 525
+
+def test_biblatex_label():
+    part = r"""    \entry{DBLP:conf/crypto/BelliziaBCGGMPP20}{inproceedings}{}{}
+      \name{author}{9}{}{%
+        {{hash=8e9fe53888a227e15c9d19ef93956fac}{%
+           family={Bellizia},
+           familyi={B\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+        {{hash=9f704713856e580301d8b7490d4352af}{%
+           family={Bronchain},
+           familyi={B\bibinitperiod},
+           given={Olivier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=8f505f2e7f7250292fcaac3333f246b6}{%
+           family={Cassiers},
+           familyi={C\bibinitperiod},
+           given={Gaëtan},
+           giveni={G\bibinitperiod}}}%
+        {{hash=b06ef8dc60d50ef98e70b2227a624927}{%
+           family={Grosso},
+           familyi={G\bibinitperiod},
+           given={Vincent},
+           giveni={V\bibinitperiod}}}%
+        {{hash=f04e432be249d4c3dce4206adb75670a}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Chun},
+           giveni={C\bibinitperiod}}}%
+        {{hash=5b3730beab940d7e2c5fc13a1e36274e}{%
+           family={Momin},
+           familyi={M\bibinitperiod},
+           given={Charles},
+           giveni={C\bibinitperiod}}}%
+        {{hash=3c6ed346633d45823651d9d6eb7bf4f4}{%
+           family={Pereira},
+           familyi={P\bibinitperiod},
+           given={Olivier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=49eab97df4aa4dcaa64954bdb04bde53}{%
+           family={Peters},
+           familyi={P\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=5c71d876f9e36978a8e2cc04ac4da9fb}{%
+           family={Standaert},
+           familyi={S\bibinitperiod},
+           given={François{-}Xavier},
+           giveni={F\bibinitperiod}}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=b3211adf5dbe7a65b2b1f58cab4f6a0c}{%
+           family={Micciancio},
+           familyi={M\bibinitperiod},
+           given={Daniele},
+           giveni={D\bibinitperiod}}}%
+        {{hash=4987cfb2b2fac291a9b2963bdc9b5d53}{%
+           family={Ristenpart},
+           familyi={R\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{fullhash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{fullhashraw}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{bibnamehash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{authorbibnamehash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{authornamehash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{authorfullhash}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{authorfullhashraw}{e9601bf4edd8955ed5afd3128a5575de}
+      \strng{editorbibnamehash}{f31a5e88df578b52a17760297e40e125}
+      \strng{editornamehash}{f31a5e88df578b52a17760297e40e125}
+      \strng{editorfullhash}{f31a5e88df578b52a17760297e40e125}
+      \strng{editorfullhashraw}{f31a5e88df578b52a17760297e40e125}
+      \field{labelalpha}{BBC\textsuperscript {+}20}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Cryptology - {CRYPTO} 2020 - 40th Annual International Cryptology Conference, {CRYPTO} 2020, Santa Barbara, CA, USA, August 17-21, 2020, Proceedings, Part {I}}
+      \field{series}{Lecture Notes in Computer Science}
+      \field{title}{Mode-Level vs. Implementation-Level Physical Security in Symmetric Cryptography - {A} Practical Guide Through the Leakage-Resistance Jungle}
+      \field{volume}{12170}
+      \field{year}{2020}
+      \field{pages}{369\bibrangedash 400}
+      \range{pages}{32}
+      \verb{doi}
+      \verb 10.1007/978-3-030-56784-2_13
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/978-3-030-56784-2_13
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/978-3-030-56784-2_13
+      \endverb
+"""
+    label = _get_biblatex_label(part)
+    assert label == 'BBC<sup>+</sup>20'
+
+def test_output5():
+    """Just another biblatex test."""
+    output_dir = Path('testdata/bibtex/output5')
+    mapping = get_citation_map(output_dir)
+    print(json.dumps(mapping, indent=2))
+    assert len(mapping) == 57
+    assert mapping['DBLP:conf/crypto/BelliziaBCGGMPP20'] == 'BBC<sup>+</sup>20'
 
 def test_missing():
     output_dir = Path('testdata/bibtex/missing')
