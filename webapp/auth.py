@@ -130,7 +130,7 @@ _challenges = {
         'Whit'
     ],
     'What is the first name of the H in DH?': [
-        'Margin',
+        'Martin',
         'Marty'
     ],
     'What is the first name of the A in RSA?': [
