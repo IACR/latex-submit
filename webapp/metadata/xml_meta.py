@@ -187,6 +187,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
     meta = comp.meta
     article_meta = ET.SubElement(front, 'article-meta')
     ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'publisher-id'}).text = public_paper_id
+    ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'custom'}).text = comp.paperid
     ET.SubElement(article_meta, 'article-id', attrib={'pub-id-type': 'doi'}).text = meta.DOI
     title_group = ET.SubElement(article_meta, 'title-group')
     ET.SubElement(title_group, 'article-title').text = meta.title
@@ -224,6 +225,31 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
         if aff.postcode:
             ET.SubElement(aff_elem, 'postal-code').text = aff.postcode
             
+    pubdates = ET.SubElement(article_meta, 'pub-history')
+    received_date = comp.submitted.split()[0]
+    received_event = ET.SubElement(pubdates, 'event', attrib={'event-type': 'received'})
+    received_desc = ET.SubElement(received_event, 'event-desc')
+    received_desc.text = 'Received: '
+    received_event_date = ET.SubElement(received_desc,
+                                        'date',
+                                        attrib={'date-type': 'received',
+                                                'iso-8601-date': received_date})
+    date_parts = received_date.split('-')
+    ET.SubElement(received_event_date, 'day').text = date_parts[2]
+    ET.SubElement(received_event_date, 'month').text = date_parts[1]
+    ET.SubElement(received_event_date, 'year').text = date_parts[0]
+
+    accepted_date = comp.accepted.split()[0]
+    accepted_event = ET.SubElement(pubdates, 'event', attrib={'event-type': 'accepted'})
+    accepted_desc = ET.SubElement(accepted_event, 'event-desc')
+    accepted_desc.text = 'Accepted: '
+    accepted_event_date = ET.SubElement(accepted_desc, 'date', attrib={'date-type': 'accepted',
+                                                                       'iso-8601-date': accepted_date})
+    date_parts = accepted_date.split('-')
+    ET.SubElement(accepted_event_date, 'day').text = date_parts[2]
+    ET.SubElement(accepted_event_date, 'month').text = date_parts[1]
+    ET.SubElement(accepted_event_date, 'year').text = date_parts[0]
+
     permissions = ET.SubElement(article_meta, 'permissions')
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})

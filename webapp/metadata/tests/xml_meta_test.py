@@ -100,7 +100,7 @@ def test_jats_creation1():
     schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     json_file = Path('testdata/xml/compilation1.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
-    article = get_jats(_journal, '1/19', compilation)
+    article = get_jats(_journal, '1/4/19', compilation)
     journal_meta = article.find('front').find('journal-meta')
     issn = journal_meta.find('journal-id')
     assert issn.text == '3006-5496'
@@ -150,9 +150,31 @@ def test_jats_creation1():
     assert berkeley.attrib['institution-id-type'] == 'ROR'
     assert berkeley.text == 'https://ror.org/01an7q238'
     article_meta = article.find('front').find('article-meta')
+    paperids = list(article_meta.iter('article-id'))
+    # Should have articleid and doi
+    assert len(paperids) == 3
+    assert paperids[0].attrib['pub-id-type'] == 'publisher-id'
+    assert paperids[0].text == '1/4/19'
+    assert paperids[1].attrib['pub-id-type'] == 'custom'
+    assert paperids[1].text == 'qcbpxph3'
+    assert paperids[2].attrib['pub-id-type'] == 'doi'
+    assert paperids[2].text == '10.1729/1234'
     #abstr = article_meta.find('abstract')
     #print(ET.tostring(abstr).decode('utf-8'))
     #assert len(abstr.findall('p')) == 3
+    pub_history = article_meta.find('pub-history')
+    events = list(pub_history.iter('event'))
+    assert len(events) == 2
+    assert events[0].find('event-desc').text == 'Received: '
+    date = events[0].find('event-desc').find('date')
+    assert date.find('year').text == '2022'
+    assert date.find('month').text == '08'
+    assert date.find('day').text == '03'
+    assert events[1].find('event-desc').text == 'Accepted: '
+    date = events[1].find('event-desc').find('date')
+    assert date.find('year').text == '2022'
+    assert date.find('month').text == '09'
+    assert date.find('day').text == '30'
     license = article_meta.find('permissions').find('license')
     assert license.attrib['license-type'] == 'open-access'
     assert license.attrib['xlink:href'] == 'https://creativecommons.org/licenses/by/4.0/'
