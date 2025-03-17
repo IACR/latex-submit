@@ -520,3 +520,31 @@ def test_bibtex_style():
     assert _bstrip(compilation.bibhtml[23].body) == 'ZenGo.  <a href="https://github.com/ZenGo-X/white-city/blob/master/White- City-Report/whitecity_new.pdf">White-City: A Framework For Massive MPC with Partial Synchrony and Partially Authenticated Channels</a>. 2020.'
     assert _bstrip(compilation.bibhtml[24].body) == 'Fester Zester.  My life story in 25 words or less. Available at <a href="https://eprint.iacr.org/2015/939.pdf">https://eprint.iacr.org/2015/939.pdf</a>. May 2015.'
     assert _bstrip(compilation.bibhtml[25].body) == 'Zachary Zuster and Wanda Wild, editors. <em>Selected areas in cryptography—SAC 2017, 24th international conference, revised selected papers</em>, volume 10719 of <em>Lecture Notes in Computer Science</em> Ottawa, ON, Canada, August 16–18 2018. Springer.  DOI: <a href="https://doi.org/10.1007/978-3-319-72565-9">10.1007/978-3-319-72565-9</a>'
+
+def test_bibtex_macros():
+    test_dir = Path('testdata/bibtex/cc2-1-17')
+    cite_map = get_citation_map(test_dir)
+    assert len(cite_map) == 81
+    bibtex_file = test_dir / Path('stuff.bib')
+    compilation_data = {'paperid': 'abcdefg',
+                        'status': CompileStatus.COMPILING,
+                        'email': 'foo@example.com',
+                        'venue': 'cic',
+                        'submitted': '2023-01-02 01:02:03',
+                        'accepted': '2023-01-03 01:02:55',
+                        'compiled': datetime.datetime.now(),
+                        'command': 'dummy command',
+                        'error_log': [],
+                        'warning_log': [],
+                        'bibtex': bibtex_file.read_text(encoding='UTF-8'),
+                        'zipfilename': 'submit.zip'}
+    compilation = Compilation(**compilation_data)
+    bibtex_to_html(compilation, cite_map)
+    assert len(compilation.error_log) == 2
+    for idx, e in enumerate(compilation.error_log):
+        print(idx, e.text)
+    for idx,e in enumerate(compilation.warning_log):
+        print(idx, e)
+    assert r'Unable to parse region of bibtex: Middleware could not be fully applied: Illegal macro: \textstuff in ' in compilation.warning_log[0].text
+    assert len(compilation.warning_log) == 11
+    assert len(compilation.bibhtml) == 80

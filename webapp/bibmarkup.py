@@ -176,7 +176,7 @@ class LowerCaseFieldNamesMiddleware(BlockMiddleware):
 
 def _illegal_handler(n):
     """output <span> to show that conversion failed."""
-    raise ValueError('<span class="text-danger">Illegal macro: {}</span>'.format(n.latex_verbatim()))
+    raise ValueError('Illegal macro: {}'.format(n.latex_verbatim()))
 #if n.isNodeType(latexwalker.LatexMacroNode):
 #        return "<span class='text-danger'>Illegal macro in bibtex: '\\{}'</span>".format(n.macroname)
 #    elif n.isNodeType(latexwalker.LatexEnvironmentNode):
@@ -194,6 +194,9 @@ def _get_decoder():
                                        macros=[MacroTextSpec('cal', ''),
                                                macrospec.MacroSpec('textcommabelow', '{'),
                                                MacroTextSpec('textless', '&lt;'),
+                                               MacroTextSpec('textsuperscript', ''),
+                                               MacroTextSpec('textsubscript', ''),
+                                               MacroTextSpec('textsf', ''),
                                                MacroTextSpec('textgreater', '&gt;'),
                                                MacroTextSpec('textcommabelow', simplify_repl=_handle_textcommabelow),
                                                MacroTextSpec('gcd', 'gcd'),
@@ -365,7 +368,8 @@ class BibTeXParser:
                     elif isinstance(block, ParsingFailedBlock):
                         warning = CompileError(error_type=ErrorType.BIBTEX_WARNING,
                                                logline=0,
-                                               text='Unable to parse region of bibtex: {}'.format(block.raw))
+                                               text='Unable to parse region of bibtex: {} in {}'.format(block.error,
+                                                                                                        block.raw))
                         if block.start_line:
                             warning.filepath_line = block.start_line
                         self.warnings.append(warning)
@@ -539,11 +543,11 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         else:
             compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                                       logline = 0,
-                                                      text='Error looking up bibtex entry {}. This is a bug'.format(key)))
+                                                      text='Error looking up bibtex entry {}. This is probably a bibtex parsing error'.format(key)))
     if len(bibhtml) != len(cite_map):
         compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                                   logline = 0,
-                                                  text='Mismatch in number of bibliographic references {} != {}. This is a bug.'.format(len(bibhtml), len(cite_map))))
+                                                  text='Mismatch in number of bibliographic references {} != {}. This is probably a bibtex parsing error.'.format(len(bibhtml), len(cite_map))))
     compilation.bibhtml = bibhtml
     
 if __name__ == '__main__':
