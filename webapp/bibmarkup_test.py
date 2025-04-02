@@ -548,3 +548,28 @@ def test_bibtex_macros():
     assert r'Unable to parse region of bibtex: Middleware could not be fully applied: Illegal macro: \textstuff in ' in compilation.warning_log[0].text
     assert len(compilation.warning_log) == 11
     assert len(compilation.bibhtml) == 80
+
+def test_bibunits():
+    # If an author uses the bibunits package without bibliography=common then there is an
+    # extra bu.aux file (or maybe bu1.aux bu2.aux, etc. This checks that case.
+    test_dir = Path('testdata/bibtex/cc2-1-62')
+    cite_map = get_citation_map(test_dir)
+    assert len(cite_map) == 78
+    bibtex_file = test_dir / Path('comp.bib')
+    compilation_data = {'paperid': 'abcdefg',
+                        'status': CompileStatus.COMPILING,
+                        'email': 'foo@example.com',
+                        'venue': 'cic',
+                        'submitted': '2023-01-02 01:02:03',
+                        'accepted': '2023-01-03 01:02:55',
+                        'compiled': datetime.datetime.now(),
+                        'command': 'dummy command',
+                        'error_log': [],
+                        'warning_log': [],
+                        'bibtex': bibtex_file.read_text(encoding='UTF-8'),
+                        'zipfilename': 'submit.zip'}
+    compilation = Compilation(**compilation_data)
+    bibtex_to_html(compilation, cite_map)
+    assert len(compilation.error_log) == 0
+    assert len(compilation.warning_log) == 40
+    assert len(compilation.bibhtml) == 78

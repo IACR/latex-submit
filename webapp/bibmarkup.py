@@ -423,6 +423,7 @@ def get_links(entry: Entry):
 
 # these are used in the construction of the map from cite key to label.
 BIBCITE_PATT = r'^\\bibcite{([^}]+)}{(.+)}$'
+INPUT_PATT = r'^\\@input{([^}]+)}$'
 
 def _get_biblatex_label(part):
     label = ''
@@ -449,6 +450,13 @@ def get_citation_map(output_dir):
     # first look in the main.aux file for \bibcite to match key to label.
     aux_file = output_dir / Path('main.aux')
     aux_str = aux_file.read_text(encoding='UTF-8')
+    # This was required to support the bibunits package. They use \@input(bu.aux) in the
+    # main.aux and the \bibcite commands appear there. We append these files to the main.aux
+    # in order to get all of the \bibcite commands.
+    for m in re.finditer(INPUT_PATT, aux_str, re.MULTILINE):
+        aux_file = output_dir / Path(m.group(1))
+        if aux_file.is_file():
+            aux_str += aux_file.read_text(encoding='UTF-8')
     for m in re.finditer(BIBCITE_PATT, aux_str, re.MULTILINE):
         mapping[m.group(1)] = m.group(2).replace('{$^{+}$}', '<sup>+</sup>')
     if not len(mapping): # in this case it's biblatex, so look in main.bbl
