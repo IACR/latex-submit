@@ -41,6 +41,13 @@
     {{ message }}
   </div>
   {% endfor %}
+  {% if config.DEMO_INSTANCE %}
+  <p class="alert alert-warning mt-4">Since this is a demo instance, we allow anyone to login as an administrator.
+    This allows you to see what the user interface is like for copy editing. Please do not abuse this privilege by
+    adding other accounts or messing with papers that others submit. The username for admin on this instance is
+    <code>testing@example.com</code> and the password is <code>mypowers</code>
+  </p>
+  {% endif %}
   <p class="alert alert-info mt-4">
     Accounts are only for administrators or copy editors.
     If you forgot your password, you can try to <a href="/recover">reset your password</a>
