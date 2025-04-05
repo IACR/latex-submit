@@ -607,6 +607,7 @@ def view_copyedit(paperid, auth):
                                          accepted=paper_status.accepted,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
+                                         pubtype=paper_status.pubtype.name,
                                          auth=create_hmac([paperid, # TODO: authenticate other fields
                                                            paper_status.hotcrp,
                                                            paper_status.hotcrp_id,
