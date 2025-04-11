@@ -474,7 +474,7 @@ def _bstrip(txt):
 def test_bibtex_style():
     test_dir = Path('testdata/bibtex/style')
     cite_map = get_citation_map(test_dir)
-    assert len(cite_map) == 26
+    assert len(cite_map) == 28
     bibtex_file = test_dir / Path('alltypes.bib')
     compilation_data = {'paperid': 'abcdefg',
                         'status': CompileStatus.COMPILING,
@@ -492,7 +492,7 @@ def test_bibtex_style():
     bibtex_to_html(compilation, cite_map)
     for i, bibhtml in enumerate(compilation.bibhtml):
         print(i, _bstrip(bibhtml.body))
-    assert len(compilation.bibhtml) == 26
+    assert len(compilation.bibhtml) == 28
     assert len(compilation.warning_log) == 4
     assert _bstrip(compilation.bibhtml[0].body) == 'Thomas E. Anderson, Michael Dahlin, Jeanna M. Neefe, David A. Patterson, Drew S. Roselli, and Randolph Wang.  Serverless Network File Systems.  <em>ACM Transactions on Computer Systems</em>, 14(1):41–79, 1996.'
     assert _bstrip(compilation.bibhtml[1].body) == 'Saikrishna Badrinarayanan, Aayush Jain, Nathan Manohar, and Amit Sahai.  Secure MPC: Laziness Leads to GOD. In Shiho Moriai and Huaxiong Wang, editors, <em>Advances in Cryptology – ASIACRYPT 2020, Part III</em>, volume 12493 of <em>Lecture Notes in Computer Science</em>, pages 120–150, Daejeon, South Korea. 2020.  Springer, Heidelberg, Germany.  DOI: <a href="https://doi.org/10.1007/978-3-030-64840-4_5">10.1007/978-3-030-64840-4_5</a>'
@@ -504,8 +504,8 @@ def test_bibtex_style():
     assert _bstrip(compilation.bibhtml[7].body) == 'Danny Dolev and Andrew Chi-Chih Yao.  On the Security of Public Key Protocols (Extended Abstract). In <em>22nd Annual Symposium on Foundations of Computer Science</em>, pages 350–357, Nashville, TN, USA. 1981.  IEEE Computer Society Press.  DOI: <a href="https://doi.org/10.1109/SFCS.1981.32">10.1109/SFCS.1981.32</a>'
     assert _bstrip(compilation.bibhtml[8].body) == 'Oded Goldreich.  <em>Foundations of Cryptography: Basic Applications</em>, volume 2. Cambridge University Press, Cambridge, UK 2004.'
     assert _bstrip(compilation.bibhtml[9].body) == 'Neil Haller, Craig Metz, Philip J. Nesser II, and Mike Straw. <em>RFC 2289: A One-Time Password System</em>. Internet Activities Board, February 1998.'
-    assert _bstrip(compilation.bibhtml[10].body) == 'D. Kohel.  <em>Endomorphism rings of elliptic curves over finite fields</em>. PhD thesis, University of California at Berkeley, 1996.'
-    assert _bstrip(compilation.bibhtml[11].body) == 'D. Lewin.  <em>Consistent hashing and random trees: Algorithms for caching in distributed networks</em>. Master\'s thesis, MIT, 1998.'
+    assert _bstrip(compilation.bibhtml[10].body) == 'D. Kohel.  <em>Endomorphism rings of elliptic curves over finite fields</em>. PhD thesis. University of California at Berkeley, 1996.'
+    assert _bstrip(compilation.bibhtml[11].body) == 'D. Lewin.  <em>Consistent hashing and random trees: Algorithms for caching in distributed networks</em>. Master\'s thesis. MIT, 1998.'
     assert _bstrip(compilation.bibhtml[12].body) == 'Ueli M. Maurer.  Secure multi-party computation made simple.  <em>Discrete Applied Mathematics</em>, 154(2):370–381, 2006. Full version at <a href="https://crypto.ethz.ch/publications/files/Maurer02b.pdf">https://crypto.ethz.ch/publications/files/Maurer02b.pdf</a> DOI: <a href="https://doi.org/10.1016/j.dam.2005.03.020">10.1016/j.dam.2005.03.020</a>'
     assert _bstrip(compilation.bibhtml[13].body) == 'Kevin S McCurley.  Odds and ends from cryptology and computational number theory. In Carl Pomerance, editor, <em>Cryptology and Computational Number Theory</em>, volume 42 of <em>Proceedings of Symposia in Applied Mathematics</em>, pages 49–74. American Mathematical Society 1990.'
     assert _bstrip(compilation.bibhtml[14].body) == 'K. Muralidhar and M. M. Sundareshan.  On the Decomposition of Large Communication Networks for Hierarchical Control Implementation.  <em>IEEE Transactions on Communications</em>, COM-34, 10:985–987, October 1986.'
@@ -516,10 +516,12 @@ def test_bibtex_style():
     assert _bstrip(compilation.bibhtml[19].body) == 'John Smythe and Jane Doer.  The Effects of Hemlength Change. In Bob Johnson, editor, <em>Proceedings of the Annual Conference on Climate Change</em>, pages 55–62, Los Angeles, CA. June 2022.  Springer.  This is a sample entry for a paper in conference proceedings.'
     assert _bstrip(compilation.bibhtml[20].body) == 'John Smith.  An incollection with a series. In Jane Doe, editor, <em>The Book of Examples</em>, volume 1 of <em>Example Book Series</em>, pages 123–130. Example Publisher, New York, NY 2022.'
     assert _bstrip(compilation.bibhtml[21].body) == 'John Smith.  An incollection without series. In Jane Doe, editor, <em>The Book of Examples</em>, pages 123–130. Example Publisher, New York, NY 2022.'
-    assert _bstrip(compilation.bibhtml[22].body) == 'Anton Stolbunov.  <em>Cryptographic schemes based on isogenies</em>. PhD thesis, Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk, 2012.'
+    assert _bstrip(compilation.bibhtml[22].body) == 'Anton Stolbunov.  <em>Cryptographic schemes based on isogenies</em>. PhD thesis. Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk, 2012.'
     assert _bstrip(compilation.bibhtml[23].body) == 'ZenGo.  <a href="https://github.com/ZenGo-X/white-city/blob/master/White- City-Report/whitecity_new.pdf">White-City: A Framework For Massive MPC with Partial Synchrony and Partially Authenticated Channels</a>. 2020.'
     assert _bstrip(compilation.bibhtml[24].body) == 'Fester Zester.  My life story in 25 words or less. Available at <a href="https://eprint.iacr.org/2015/939.pdf">https://eprint.iacr.org/2015/939.pdf</a>. May 2015.'
     assert _bstrip(compilation.bibhtml[25].body) == 'Zachary Zuster and Wanda Wild, editors. <em>Selected areas in cryptography—SAC 2017, 24th international conference, revised selected papers</em>, volume 10719 of <em>Lecture Notes in Computer Science</em> Ottawa, ON, Canada, August 16–18 2018. Springer.  DOI: <a href="https://doi.org/10.1007/978-3-319-72565-9">10.1007/978-3-319-72565-9</a>'
+    assert _bstrip(compilation.bibhtml[26].body) == 'D. Kohel.  <em>Endomorphism rings of elliptic curves over finite fields</em>. Diplomarbeit. Darmstadt University, 1996.'
+    assert _bstrip(compilation.bibhtml[27].body) == 'A. Mauland.  <em>Realizing distributed RSA using secure multiparty computations</em>. Master\'s thesis. Norwegian University of Science and Technology, July 2009.'
 
 def test_bibtex_macros():
     test_dir = Path('testdata/bibtex/cc2-1-17')
