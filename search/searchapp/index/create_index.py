@@ -189,19 +189,6 @@ if __name__ == '__main__':
     ror_file = Path(_ROR_JSON)
     country_map = json.loads(open('data/country_map.json', 'r').read())
     allfunders = FunderList(funders={})
-    if args.easter_egg:
-        obj = {'source': 'ror',
-               'source_id': 'ror_0ohdarn00',
-               'name': 'University of Second Choice',
-               'country': 'Odarn',
-               'funder_type': 'Education',
-               'country_code': 'OO',
-               'altnames': [],
-               'children': [],
-               'parents': [],
-               'related': []}
-        allfunders.funders['ror_0unreal13'] = Funder(**obj)
-        print(allfunders.funders)
     if os.path.isfile(args.dbpath) or os.path.isdir(args.dbpath):
         print('CANNOT OVERWRITE dbpath')
         sys.exit(2)
@@ -225,6 +212,29 @@ if __name__ == '__main__':
                 fetch_fundreg()
             allfunders = parse_rdf(_REGISTRY_RDF, country_map)
             funders_json_file.write_text(allfunders.model_dump_json(indent=2), encoding='UTF-8')
+    if args.easter_egg:
+        obj = {'source': 'ror',
+               'source_id': 'ror_0ohdarn00',
+               'name': 'University of Second Choice',
+               'country': 'Odarn',
+               'funder_type': 'Education',
+               'country_code': 'OO',
+               'altnames': [],
+               'children': [],
+               'parents': [],
+               'related': []}
+        allfunders.funders['ror_0ohdarn00'] = Funder(**obj)
+        obj = {'source': 'ror',
+               'source_id': 'ror_0deadbeef',
+               'name': 'Faber College',
+               'country': 'Odarn',
+               'funder_type': 'Education',
+               'country_code': 'OO',
+               'altnames': [],
+               'children': [],
+               'parents': [],
+               'related': []}
+        allfunders.funders['ror_0deadbeef'] = Funder(**obj)
     ror_funders = FunderList(funders={})
     if args.use_cache:
         print('reading {}'.format(ror_file.name))
@@ -248,5 +258,8 @@ if __name__ == '__main__':
                                                   preferred_fundreg.model_dump_json(indent=2)))
                     print('prefer {}'.format(value.model_dump_json(indent=2)))
                 del allfunders.funders[preferred_fundreg_id]
+    if args.easter_egg:
+        assert 'ror_0ohdarn00' in allfunders.funders
+        assert 'ror_0deadbeef' in allfunders.funders
     create_index(args.dbpath, allfunders, args.verbose)
 
