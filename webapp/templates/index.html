@@ -38,10 +38,13 @@
       access as an admin, notify {{config.COPYEDITOR_EMAILS}}.
     </p>
     <div class="text-center my-2">
-      <a class="btn btn-primary" href="{{url_for('home_bp.show_submit_version', bypass=config.SUBMIT_BYPASS)}}">Upload a paper</a>
+      <div>
+        <span class="mx-auto me-4">You can download sample zip files <a href="https://mccurley.org/examples/">here</a></span>
+        <a class="mx-auto btn btn-primary" href="{{url_for('home_bp.show_submit_version', bypass=config.SUBMIT_BYPASS)}}">Upload a paper</a>
+      </div>
     </div>
     {% endif %}
-    <p>
+    <p class="mt-4">
       The goal of this site is to reduce the cost of open access publishing by
       <a href="http://ftp.tug.org/TUGboat/tb44-1/tb136bos-metadata.pdf">reducing the
         amount of human labor</a> by both authors and editors. Once a
