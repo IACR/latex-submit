@@ -102,6 +102,9 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
                         compilation.status = CompileStatus.COMPILATION_ERRORS
                     else:
                         compilation.warning_log.append(error)
+                # Put reference errors at the end because they are
+                # usually caused by something else.
+                compilation.error_log.sort(key=lambda err: 1 if err.error_type == ErrorType.REFERENCE_ERROR else 0)
                 biblogfile = output_path / Path('main.blg')
                 if biblogfile.is_file():
                     biblog_parser = BibTexLogParser()
@@ -173,8 +176,7 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
                                     # Translate license keys from iacrcc.cls to keys in LicenseEnum.
                                     data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
                                 except ValueError as e:
-                                    data['license'] = LicenseEnum.CC_BY.value.model_dump()
-                                    logging.error('License assigned by default as CC_BY')
+                                    data['license'] = LicenseEnum.license_from_spdx(data['license'])
                             compilation.meta = Meta(**data)
                             compilation.meta.DOI = doi
                             # Check authors to see if they have ORCID and affiliations.

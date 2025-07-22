@@ -8,7 +8,7 @@ RUN apt-get update -q \
     && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install texlive 2024.
+# Install texlive 2025.
 RUN wget https://mirrors.mit.edu/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz
 RUN mkdir install-tl-unx
 RUN tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
@@ -18,7 +18,7 @@ RUN tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
     install-tl-unx/install-tl -profile install-tl-unx/texlive.profile; \
     rm -r install-tl-unx; rm install-tl-unx.tar.gz
 
-ENV PATH="/usr/local/texlive/2024/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/2025/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
 ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 
@@ -38,7 +38,7 @@ RUN tlmgr install upquote urwchancal tagpdf
 RUN tlmgr remove -force pdfpages pdfjam
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
-# COPY compiler/texmf.cnf /usr/local/texlive/2024/texmf.cnf
+# COPY compiler/texmf.cnf /usr/local/texlive/2025/texmf.cnf
 
 RUN useradd -ms /bin/bash texlive
 # The :33 is to ensure that texlive has the same numeric GID as the www-data group,
@@ -50,6 +50,8 @@ COPY metadata/iacrtrans/iacrtrans.cls /home/texlive/texmf/tex/latex/iacrcc/iacrt
 COPY metadata/iacrtrans/settings.tosc.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tosc.tex
 COPY metadata/iacrtrans/settings.tches.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tches.tex
 COPY metadata/latex/iacrcc/cryptobib/ /home/texlive/texmf/tex/latex/iacrcc/cryptobib/
+COPY metadata/latex/metacapture/iacrj.cls /home/texlive/texmf/tex/latex/metacapture/iacrj.cls
+COPY metadata/latex/metacapture/metacapture.sty /home/texlive/texmf/tex/latex/metacapture/metacapture.sty
 WORKDIR /data
 
 # This causes the container to run no more than 500 seconds. This is to protect against

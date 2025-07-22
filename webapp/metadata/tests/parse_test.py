@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import sys
 sys.path.insert(0, '../')
-from compilation import Meta, LicenseEnum
+from compilation import Meta, LicenseEnum, VersionEnum
 sys.path.insert(0, '../latex/iacrcc/parser')
 from meta_parse import parse_meta
 
@@ -136,3 +136,16 @@ def test_meta8():
     data['abstract'] = 'We added an abstract'
     data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
     meta = Meta(**data)
+
+def test_meta9():
+    tfile = Path('testdata/test9.meta').read_text(encoding='UTF-8')
+    data = parse_meta(tfile)
+    print(data)
+    data['abstract'] = 'We added an abstract'
+    data['license'] = LicenseEnum.license_from_spdx(data['license'])
+    meta = Meta(**data)
+    assert meta.affiliations[0].countrycode == 'BE'
+    assert meta.funders[0].countrycode == 'US'
+    # set by default
+    assert meta.version == VersionEnum.FINAL
+    
