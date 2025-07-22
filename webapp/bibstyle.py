@@ -497,7 +497,7 @@ class BibStyle:
             self.append(self._join_names(fields['author'].value), '. ')
         if 'title' in fields:
             self.append(self._make_title(fields, True), '. ')
-        self.append(thesistype, ', ')
+        self.append(thesistype, '. ')
         if 'school' in fields:
             self.append(fields['school'].value, ', ')
         elif 'institution' in fields:
@@ -506,19 +506,29 @@ class BibStyle:
             self.append(fields['address'].value, ', ')
         self.append(_date(fields), '.')
     def _mastersthesis(self, entry):
-        self._athesis(entry, 'Master\'s thesis')
+        fields = entry.fields_dict
+        thesis_type = 'Master\'s thesis'
+        if 'type' in fields:
+            thesis_type = fields['type'].value
+        self._athesis(entry, thesis_type)
     def _phdthesis(self, entry):
-        self._athesis(entry, 'PhD thesis')
+        fields = entry.fields_dict
+        thesis_type = 'PhD thesis'
+        if 'type' in fields:
+            thesis_type = fields['type'].value
+        self._athesis(entry, thesis_type)
     def _thesis(self, entry):
         fields = entry.fields_dict
         if 'type' in fields:
             thesistype = fields['type'].value
             if thesistype == 'phdthesis':
-                self._phdthesis(entry)
+                self._athesis(entry, 'PhD thesis')
             elif thesistype == 'mathesis':
-                self._mastersthesis(entry)
+                self._athesis(entry, 'Master\'s thesis')
+            elif thesistype == 'bathesis':
+                self._athesis(entry, 'Bachelor\'s thesis')
             else:
-                self._misc(entry)
+                self._athesis(entry, thesistype)
         else:
             self._misc(entry)
     def _new_sentence_a(self, fields, name):
