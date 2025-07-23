@@ -231,6 +231,7 @@ This template is used to show the status of a compilation for iacrcc.cls
             indexing services. If something is wrong or missing, then you should correct it in the
             LaTeX source and submit it again. We will not publish email addresses.
           </p>
+          {% if comp.meta %}
           <div class="mx-3">
             <table class="table ms-3 mt-2 table-bordered">
               <tbody>
@@ -278,7 +279,7 @@ This template is used to show the status of a compilation for iacrcc.cls
                             <div class="affiliation list-group-item">
                               {% set aff=comp.meta.affiliations[affil-1] %}
                               <div class="elem"><div class="elem_title">name:</div> {{aff.name}}</div>
-                              <div class="elem"><div class="elem_title">ROR:</div> {% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>){% endif %}</div>
+                              <div class="elem"><div class="elem_title">ROR:</div> {% if aff.ror %}<a href="https://ror.org/{{aff.ror}}" target="_blank">{{aff.ror}}</a>{% else %}<span class="text-danger">None (<a href="/funding?textq={{aff.name|urlencode}}&ror=true" target="_blank">search</a>)</span>{% endif %}</div>
                                 <div class="elem"><div class="elem_title">Street:</div> {{aff.street}}</div>
                                 <div class="elem"><div class="elem_title">City:</div> {{aff.city}}</div>
                                 <div class="elem"><div class="elem_title">Post code:</div> {{aff.postcode}}</div>
@@ -330,6 +331,7 @@ This template is used to show the status of a compilation for iacrcc.cls
               </tbody>
             </table>
           </div>
+          {% endif %}
           {% if form %}
           <div class="alert alert-info mt-3">
             If you are satisfied with your paper and your metadata, you can
