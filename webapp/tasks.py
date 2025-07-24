@@ -127,8 +127,6 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
                 compilation.error_log.insert(0, CompileError(error_type=ErrorType.LATEX_ERROR,
                                                              logline=0,
                                                              text='Exit code of {} because the compilation failed'.format(compilation.exit_code)))
-            elif compilation.venue != 'cic':
-                compilation.status = CompileStatus.COMPILATION_SUCCESS
             if compilation.status != CompileStatus.COMPILATION_FAILED:
                 try:
                     extract_bibtex(root_path, output_path, compilation)
@@ -147,77 +145,81 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
                                                  CompileError(error_type=ErrorType.SERVER_ERROR,
                                                              logline=0,
                                                               text='Error producing html: {} This is a bug'.format(str(eee))))
-                if compilation.venue == 'cic':
-                    # Look for stuff we need for iacrcc.
-                    metafile = output_path / Path('main.meta')
-                    if metafile.is_file():
-                        try:
-                            metastr = metafile.read_text(encoding='UTF-8', errors='replace')
-                            data = meta_parse.parse_meta(metastr)
-                            abstract_file = Path(output_path) / Path('main.abstract')
-                            if not abstract_file.is_file():
+                # Look for metadata.
+                metafile = output_path / Path('main.meta')
+                if metafile.is_file():
+                    try:
+                        metastr = metafile.read_text(encoding='UTF-8', errors='replace')
+                        data = meta_parse.parse_meta(metastr)
+                        abstract_file = Path(output_path) / Path('main.abstract')
+                        if not abstract_file.is_file():
+                            compilation.status = CompileStatus.MISSING_ABSTRACT
+                            compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                                      logline=0,
+                                                                      text='The textabstract environment is required.'))
+                        else:
+                            data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8', errors='replace'))
+                            if not validate_abstract(data['abstract']):
                                 compilation.status = CompileStatus.MISSING_ABSTRACT
                                 compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                           logline=0,
-                                                                          text='An abstract is required.'))
-                            else:
-                                data['abstract'] = clean_abstract(abstract_file.read_text(encoding='UTF-8', errors='replace'))
-                                if not validate_abstract(data['abstract']):
-                                    compilation.status = CompileStatus.MISSING_ABSTRACT
-                                    compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
-                                                                              logline=0,
-                                                                              text='The textabstract environment contains illegal macros or environments. See the HTML tab.'))
-                            if 'license' not in data:
-                                compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
-                                                                          logline=0,
-                                                                          text='A license is required.'))
-                            else:
-                                try:
-                                    # Translate license keys from iacrcc.cls to keys in LicenseEnum.
-                                    data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
-                                except ValueError as e:
-                                    data['license'] = LicenseEnum.license_from_spdx(data['license'])
-                            compilation.meta = Meta(**data)
-                            compilation.meta.DOI = doi
-                            # Check authors to see if they have ORCID and affiliations.
-                            for author in compilation.meta.authors:
-                                if not author.orcid:
-                                    compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                   logline=0,
-                                                                                   help='See <a target="_blank" href="https://orcid.org/orcid-search/search?{}">ORCID search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'searchQuery': author.name})),
-                                                                                   text='author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name)))
-                                if not author.affiliations:
-                                    compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                   logline=0,
-                                                                                   text='author {} is lacking an affiliation'.format(author.name)))
-                                else:
-                                    for affindex in author.affiliations:
-                                        aff = compilation.meta.affiliations[affindex-1]
-                                        if not aff.ror:
-                                            compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
-                                                                                           logline=0,
-                                                                                           text='affiliation {} may have a ROR ID'.format(aff.name),
-                                                                                           help='See <a href="https://ror.org/search?{}" target="_blank">ROR search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'query': aff.name}))))
-                            if compilation.meta.version != VersionEnum.FINAL:
-                                compilation.status = CompileStatus.WRONG_VERSION
-                                compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
-                                                                          logline=0,
-                                                                          text='Paper should use documentclass[version=final]',
-                                                                          help='See <a href="/iacrcc">the documentation for iacrcc.cls</a>'))
-                            elif compilation.error_log:
-                                compilation.status = CompileStatus.COMPILATION_ERRORS
-                            else:
-                                compilation.status = CompileStatus.COMPILATION_SUCCESS
-                        except Exception as me:
+                                                                          text='The textabstract environment contains illegal macros or environments. See the HTML tab.'))
+                        if 'license' not in data:
                             compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                       logline=0,
-                                                                      text='Failure to extract metadata: ' + str(me)))
-                            compilation.status = CompileStatus.METADATA_PARSE_FAIL
-                    else:
-                        compilation.status = CompileStatus.METADATA_FAIL
+                                                                      text='A license is required.'))
+                        else:
+                            try:
+                                # Translate license keys from iacrcc.cls to keys in LicenseEnum.
+                                data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
+                            except ValueError as e:
+                                try:
+                                    data['license'] = LicenseEnum.license_from_spdx(data['license'])
+                                except ValueError as ee:
+                                    compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                                              logline=0,
+                                                                              text='Unrecognized SPDX license identifier'))
+                        compilation.meta = Meta(**data)
+                        compilation.meta.DOI = doi
+                        # Check authors to see if they have ORCID and affiliations.
+                        for author in compilation.meta.authors:
+                            if not author.orcid:
+                                compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                                               logline=0,
+                                                                               help='See <a target="_blank" href="https://orcid.org/orcid-search/search?{}">ORCID search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'searchQuery': author.name})),
+                                                                               text='author {} is lacking an ORCID. They are strongly recommended for all authors.'.format(author.name)))
+                            if not author.affiliations:
+                                compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                                               logline=0,
+                                                                               text='author {} is lacking an affiliation'.format(author.name)))
+                            else:
+                                for affindex in author.affiliations:
+                                    aff = compilation.meta.affiliations[affindex-1]
+                                    if not aff.ror:
+                                        compilation.warning_log.insert(0, CompileError(error_type=ErrorType.METADATA_WARNING,
+                                                                                       logline=0,
+                                                                                       text='affiliation {} may have a ROR ID'.format(aff.name),
+                                                                                       help='See <a href="https://ror.org/search?{}" target="_blank">ROR search</a> and <a target="_blank" href="https://publish.iacr.org/iacrcc">iacrcc latex documentation</a>.'.format(urlencode({'query': aff.name}))))
+                        if compilation.meta.version != VersionEnum.FINAL:
+                            compilation.status = CompileStatus.WRONG_VERSION
+                            compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                                      logline=0,
+                                                                      text='Paper should use documentclass[version=final]',
+                                                                      help='See <a href="/iacrcc">the documentation for iacrcc.cls</a>'))
+                        elif compilation.error_log:
+                            compilation.status = CompileStatus.COMPILATION_ERRORS
+                        else:
+                            compilation.status = CompileStatus.COMPILATION_SUCCESS
+                    except Exception as me:
                         compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                   logline=0,
-                                                                  text='No metadata file. Are you sure you used iacrcc?'))
+                                                                  text='Failure to extract metadata: ' + str(me)))
+                        compilation.status = CompileStatus.METADATA_PARSE_FAIL
+                else:
+                    compilation.status = CompileStatus.METADATA_FAIL
+                    compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
+                                                              logline=0,
+                                                              text='No metadata file. Are you sure you used the correct document class?'))
             # This is a legacy to attempt to fix issue #12. I gave up and
             # made it dependent on the value in the database, but we still
             # store the compilation.json file.

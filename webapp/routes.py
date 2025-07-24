@@ -49,6 +49,12 @@ def home():
 
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
+    journal_id = request.args.get('journal')
+    if not journal_id:
+        return render_template('message.html',
+                               title='No journal specified.',
+                               error='No journal specified.')
+    journal = db.session.execute(select(Journal).filter_by(hotcrp_key=journal_id)).scalar_one_or_none()
     form = SubmitForm(request.args)
     if not form.paperid.data:
         if not app.config['DEMO_INSTANCE']:
@@ -64,7 +70,6 @@ def show_submit_version():
         accepted = now - datetime.timedelta(days=5)
         form.accepted.data = accepted.strftime('%Y-%m-%d %H:%M:%S')
         form.submitted.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
-        form.journal.data = 'cic'
         form.volume.data = '9999'
         form.issue.data = '1'
         form.generate_auth()
@@ -109,7 +114,7 @@ def show_submit_version():
             return render_template('message.html',
                                    title='Your paper has already been published.',
                                    error='Your paper has already been published.')
-    return render_template('submit.html', form=form, title='Upload your paper')
+    return render_template('submit.html', form=form, title='Upload your paper', journal=journal)
 
 def context_wrap(fn):
     """Wrapper to pass context to function in thread."""
@@ -431,7 +436,7 @@ def compile_for_copyedit():
     if not version_comprec:
         return render_template('message.html',
                                title='Compilation not found',
-                               error='Compilation record was not found. This is a bug')
+                               error='Compilation record was not found for {}. This is a bug'.format(form.version.data))
     # Change the status to submitted, so that it cannot be updated by the author.
     version_compilation = version_comprec.result
     if not version_compilation:
@@ -905,25 +910,15 @@ def view_results(paperid, version, auth):
                                  engine=comp.engine)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('view.html', **data)
-    if comp.venue == 'cic': # special handling for this journal.
-        if version == Version.CANDIDATE.value:
-            formdata = MultiDict({'email': comp.email,
-                                  'version': Version.CANDIDATE.value,
-                                  'paperid': comp.paperid,
-                                  'auth': create_hmac([comp.paperid, version, comp.email])})
-            form = CompileForCopyEditForm(formdata=formdata)
-            data['form'] = form
-            data['next_action'] = 'copy editing'
-        else: # version == Version.FINAL.value
-            formdata = MultiDict({'paperid': comp.paperid,
-                                  'email': comp.email,
-                                  'auth': create_hmac([comp.paperid,
-                                                       Version.FINAL.value,
-                                                       comp.email])})
-            form = NotifyFinalForm(formdata=formdata)
-            data['form'] = form
-            data['next_action'] = 'final review'
-    else: # these do not go through peer review yet.
+    if version == Version.CANDIDATE.value:
+        formdata = MultiDict({'email': comp.email,
+                              'version': Version.CANDIDATE.value,
+                              'paperid': comp.paperid,
+                              'auth': create_hmac([comp.paperid, version, comp.email])})
+        form = CompileForCopyEditForm(formdata=formdata)
+        data['form'] = form
+        data['next_action'] = 'copy editing'
+    else: # version == Version.FINAL.value
         formdata = MultiDict({'paperid': comp.paperid,
                               'email': comp.email,
                               'auth': create_hmac([comp.paperid,
@@ -931,7 +926,7 @@ def view_results(paperid, version, auth):
                                                    comp.email])})
         form = NotifyFinalForm(formdata=formdata)
         data['form'] = form
-        data['next_action'] = 'final publication'
+        data['next_action'] = 'final review'
     return render_template('view.html', **data)
 
 """
