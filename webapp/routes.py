@@ -243,7 +243,7 @@ def submit_version():
     except Exception as e:
         logging.error('Unable to save zip file: {}'.format(str(e)))
         form.zipfile.errors.append('unable to save zip file')
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     try:
         allzip= zipfile.ZipFile(zip_path, 'w')
         with zipfile.ZipFile(tmpzip_path, 'r') as tmpzip:
@@ -258,7 +258,7 @@ def submit_version():
     except Exception as e:
         logging.error('Unable to remove __MACOSX from zip file')
         form.zipfile.errors.append('Unable to remove __MACOSX from zip file. Please rezip without this')
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     input_dir = version_dir / Path('input')
     try:
         zip_file = zipfile.ZipFile(zip_path)
@@ -267,13 +267,13 @@ def submit_version():
         logging.error('Unable to extract from zip file: {}'.format(str(e)))
         log_event(db, paperid, 'Zip file could not be unzipped')
         form.zipfile.errors.append('Unable to extract from zip file: {}'.format(str(e)))
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
         log_event(db, paperid, 'Zip file did not have main.tex at top level')
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     # Check that none of the latex files use \begin{thebibliography}, because that would
     # bypass our bibliography style. The LaTeX runner will automatically remove main.bbl
     # later on.
@@ -283,7 +283,7 @@ def submit_version():
             if '\\begin{thebibliography}' in txt:
                 log_event(db, paperid, 'LaTeX file with thebibligraphy in it')
                 form.zipfile.errors.append('Your Latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex and upload your bibtex files.')
-                return render_template('submit.html', form=form)
+                return render_template('submit.html', form=form, journal=journal)
     command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
