@@ -18,7 +18,7 @@ RUN tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
     install-tl-unx/install-tl -profile install-tl-unx/texlive.profile; \
     rm -r install-tl-unx; rm install-tl-unx.tar.gz
 
-ENV PATH="/usr/local/texlive/2024/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/2025/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
 ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 
@@ -32,13 +32,13 @@ RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj v
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
 RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile nomencl mnsymbol arydshln
-RUN tlmgr install upquote urwchancal tagpdf
+RUN tlmgr install upquote urwchancal tagpdf tabularray
 
 # people use pdfpages to bypass uploading LaTeX.
 RUN tlmgr remove -force pdfpages pdfjam
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
-# COPY compiler/texmf.cnf /usr/local/texlive/2024/texmf.cnf
+# COPY compiler/texmf.cnf /usr/local/texlive/2025/texmf.cnf
 
 RUN useradd -ms /bin/bash texlive
 # The :33 is to ensure that texlive has the same numeric GID as the www-data group,
