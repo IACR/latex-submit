@@ -49,6 +49,12 @@ def home():
 
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
+    journal_id = request.args.get('journal')
+    if not journal_id:
+        return render_template('message.html',
+                               title='No journal specified.',
+                               error='No journal specified.')
+    journal = db.session.execute(select(Journal).filter_by(hotcrp_key=journal_id)).scalar_one_or_none()
     form = SubmitForm(request.args)
     if not form.paperid.data:
         if not app.config['DEMO_INSTANCE']:
@@ -64,7 +70,6 @@ def show_submit_version():
         accepted = now - datetime.timedelta(days=5)
         form.accepted.data = accepted.strftime('%Y-%m-%d %H:%M:%S')
         form.submitted.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
-        form.journal.data = 'cic'
         form.volume.data = '9999'
         form.issue.data = '1'
         form.generate_auth()
@@ -109,7 +114,7 @@ def show_submit_version():
             return render_template('message.html',
                                    title='Your paper has already been published.',
                                    error='Your paper has already been published.')
-    return render_template('submit.html', form=form, title='Upload your paper')
+    return render_template('submit.html', form=form, title='Upload your paper', journal=journal)
 
 def context_wrap(fn):
     """Wrapper to pass context to function in thread."""
@@ -238,7 +243,7 @@ def submit_version():
     except Exception as e:
         logging.error('Unable to save zip file: {}'.format(str(e)))
         form.zipfile.errors.append('unable to save zip file')
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     try:
         allzip= zipfile.ZipFile(zip_path, 'w')
         with zipfile.ZipFile(tmpzip_path, 'r') as tmpzip:
@@ -253,7 +258,7 @@ def submit_version():
     except Exception as e:
         logging.error('Unable to remove __MACOSX from zip file')
         form.zipfile.errors.append('Unable to remove __MACOSX from zip file. Please rezip without this')
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     input_dir = version_dir / Path('input')
     try:
         zip_file = zipfile.ZipFile(zip_path)
@@ -262,13 +267,13 @@ def submit_version():
         logging.error('Unable to extract from zip file: {}'.format(str(e)))
         log_event(db, paperid, 'Zip file could not be unzipped')
         form.zipfile.errors.append('Unable to extract from zip file: {}'.format(str(e)))
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     tex_file = input_dir / Path('main.tex')
     if not tex_file.is_file():
         log_event(db, paperid, 'Zip file did not have main.tex at top level')
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
-        return render_template('submit.html', form=form)
+        return render_template('submit.html', form=form, journal=journal)
     # Check that none of the latex files use \begin{thebibliography}, because that would
     # bypass our bibliography style. The LaTeX runner will automatically remove main.bbl
     # later on.
@@ -278,7 +283,7 @@ def submit_version():
             if '\\begin{thebibliography}' in txt:
                 log_event(db, paperid, 'LaTeX file with thebibligraphy in it')
                 form.zipfile.errors.append('Your Latex files may not contain \\begin{thebibliography} in them. Please use bibtex or biblatex and upload your bibtex files.')
-                return render_template('submit.html', form=form)
+                return render_template('submit.html', form=form, journal=journal)
     command = ENGINES.get(args.get('engine'))
     compilation_data = {'paperid': paperid,
                         'status': CompileStatus.COMPILING,
@@ -431,7 +436,7 @@ def compile_for_copyedit():
     if not version_comprec:
         return render_template('message.html',
                                title='Compilation not found',
-                               error='Compilation record was not found. This is a bug')
+                               error='Compilation record was not found for {}. This is a bug'.format(form.version.data))
     # Change the status to submitted, so that it cannot be updated by the author.
     version_compilation = version_comprec.result
     if not version_compilation:
@@ -905,25 +910,15 @@ def view_results(paperid, version, auth):
                                  engine=comp.engine)
     if comp.exit_code != 0 or comp.status != CompileStatus.COMPILATION_SUCCESS or comp.error_log:
         return render_template('view.html', **data)
-    if comp.venue == 'cic': # special handling for this journal.
-        if version == Version.CANDIDATE.value:
-            formdata = MultiDict({'email': comp.email,
-                                  'version': Version.CANDIDATE.value,
-                                  'paperid': comp.paperid,
-                                  'auth': create_hmac([comp.paperid, version, comp.email])})
-            form = CompileForCopyEditForm(formdata=formdata)
-            data['form'] = form
-            data['next_action'] = 'copy editing'
-        else: # version == Version.FINAL.value
-            formdata = MultiDict({'paperid': comp.paperid,
-                                  'email': comp.email,
-                                  'auth': create_hmac([comp.paperid,
-                                                       Version.FINAL.value,
-                                                       comp.email])})
-            form = NotifyFinalForm(formdata=formdata)
-            data['form'] = form
-            data['next_action'] = 'final review'
-    else: # these do not go through peer review yet.
+    if version == Version.CANDIDATE.value:
+        formdata = MultiDict({'email': comp.email,
+                              'version': Version.CANDIDATE.value,
+                              'paperid': comp.paperid,
+                              'auth': create_hmac([comp.paperid, version, comp.email])})
+        form = CompileForCopyEditForm(formdata=formdata)
+        data['form'] = form
+        data['next_action'] = 'copy editing'
+    else: # version == Version.FINAL.value
         formdata = MultiDict({'paperid': comp.paperid,
                               'email': comp.email,
                               'auth': create_hmac([comp.paperid,
@@ -931,7 +926,7 @@ def view_results(paperid, version, auth):
                                                    comp.email])})
         form = NotifyFinalForm(formdata=formdata)
         data['form'] = form
-        data['next_action'] = 'final publication'
+        data['next_action'] = 'final review'
     return render_template('view.html', **data)
 
 """

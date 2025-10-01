@@ -1,0 +1,35 @@
+schema:0.9
+title: The metacapture LaTeX package
+  subtitle: Structured metadata from authors
+author:
+  name:Joppe W. Bos
+  orcid:0000-0003-1010-8157
+  inst:1
+  surname:Bos
+  email:joppe.bos@nxp.com
+author:
+  name:Kevin S. McCurley
+  orcid:0000-0001-7890-5430
+  inst:2
+  surname:McCurley
+  email:latex@digicrime.com
+affiliation:
+  name:NXP Semiconductors
+  ror:031v4g827
+  street:Interleuvenlaan 80
+  city:Leuven
+  postcode:3001
+  country:Belgium
+  countrycode:BE
+affiliation:
+  name:Unaffiliated
+  country:United States
+  department:Department of Redundancy Department
+  state:California
+  city:San Jose
+funding:
+  name:IACR
+  country:United States
+  countrycode:US
+keywords: Metadata, publishing, LaTeX
+license: CC-BY-4.0

@@ -77,6 +77,7 @@ def show_admin_paper(paperid):
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid)
     discussion = db.session.execute(select(Discussion).where(Discussion.paperid==paperid)).scalars().all()
     versions = {}
+    journal = paper_status.issue.volume.journal
     if not paper_path.is_dir():
         return admin_message('Unable to open directory: ' + str(paper_path))
     for v in paper_path.iterdir():
@@ -104,6 +105,7 @@ def show_admin_paper(paperid):
             'issue': issue,
             'versions': versions,
             'discussion': discussion,
+            'journal': journal,
             'events': events}
     return render_template('admin/view.html', **data)
 
@@ -322,7 +324,8 @@ def _get_hotcrp_papers(issue: Issue):
     if not issue.hotcrp or issue.hotcrp == NO_HOTCRP:
         return {'error': ''}
     try:
-        conf_msg = ':'.join([issue.hotcrp, 'cic'])
+        journal = issue.volume.journal
+        conf_msg = ':'.join([issue.hotcrp, journal.hotcrp_key])
         auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
                         conf_msg.encode('utf-8'), hashlib.sha256).hexdigest()
         url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(issue.hotcrp, auth)

@@ -159,11 +159,10 @@ class SubmitForm(FlaskForm):
                             name='hotcrp_id',
                             default='',
                             validators=[InputRequired('paper id in HotCRP instance')])
-    # TODO: change this to HiddenField
-    journal = SelectField(id='journal',
+    journal = HiddenField(id='journal',
                           name='journal',
-                          choices = [(j['hotcrp_key'], j['name']) for j in app.config['JOURNALS']],
-                          validators=[InputRequired('Journal is required'),
+                          description='key to select the journal from the list of journals',
+                          validators=[InputRequired('journal is required'),
                                       AnyOf([j['hotcrp_key'] for j in app.config['JOURNALS']])])
     volume = HiddenField(id='volume',
                          name='volume',

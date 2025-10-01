@@ -37,11 +37,27 @@
       but they will be deleted every day so nothing is permanent. If you wish to have
       access as an admin, notify {{config.COPYEDITOR_EMAILS}}.
     </p>
-    <div class="text-center my-2">
-      <a class="btn btn-primary" href="{{url_for('home_bp.show_submit_version', bypass=config.SUBMIT_BYPASS)}}">Upload a paper</a>
+    <div class="alert alert-secondary my-3">
+    <form method="GET" action="{{url_for('home_bp.show_submit_version')}}">
+      <input type="hidden" name="bypass" value="true">
+      <div class="row">
+        <label for="venue" class="col-3 col-form-label text-end">Select a Journal.</label>
+        <div class="col-7">
+          <select id="venue" name='journal' class='form-select'>
+            {% for j in config['JOURNALS'] %}
+            <option value="{{j.hotcrp_key}}">{{j.name}}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Ordinarily the journal would be chosen by the submission system</div>
+        </div>
+        <div class="col-2">
+          <button class="btn btn-primary">Try it</button>
+        </div>
+      </div>
+    </form>
     </div>
     {% endif %}
-    <p>
+    <p class="mt-4">
       The goal of this site is to reduce the cost of open access publishing by
       <a href="http://ftp.tug.org/TUGboat/tb44-1/tb136bos-metadata.pdf">reducing the
         amount of human labor</a> by both authors and editors. Once a

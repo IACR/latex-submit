@@ -4,6 +4,7 @@ used properly.
 """
 import json
 from pydantic import model_validator, StringConstraints, ConfigDict, BaseModel, Field, EmailStr, AnyUrl, PositiveInt
+from pydantic_extra_types.country import CountryAlpha2
 from typing import List, Optional
 from typing_extensions import Annotated
 
@@ -57,7 +58,10 @@ class Funder(BaseModel, extra='forbid'):
     country: Optional[Annotated[str, StringConstraints(min_length=2)]
                       ] = Field(default=None,
                                 title='Country of organization',
-                                description=' Any identifier is acceptable')
+                                description='Any identifier is acceptable')
+    countrycode: Optional[CountryAlpha2] = Field(default=None,
+                                                 title='ISO alpha2 country code',
+                                                 description='The country name need not match the name here.')
     grantid: Optional[str] = Field(default=None,
                                    title = 'Grant ID from funding agency',
                                    description = 'This optional field can be any string')
@@ -86,6 +90,9 @@ class Affiliation(BaseModel):
                       ] = Field(default=None,
                                 title='Country of affiliation',
                                 description='May be any string')
+    countrycode: Optional[CountryAlpha2] = Field(default=None,
+                                                 title='ISO alpha2 country code',
+                                                 description='The country name need not match the name here.')
     postcode: Optional[str] = Field(default=None,
                                     title='Postal code of affiliation',
                                     description='May be any string')
@@ -147,6 +154,27 @@ class LicenseEnum(Enum):
                   label='No rights reserved',
                   reference='https://creativecommons.org/publicdomain/zero/1.0/')
     @classmethod
+    def license_from_spdx(cls, val):
+        """Convert spdx license identifier to a LicenseEnum value."""
+        key = val.upper()
+        match key:
+            case 'CC-BY-4.0':
+                return LicenseEnum.CC_BY.value.model_dump()
+            case 'CC-BY-SA-4.0':
+                return LicenseEnum.CC_BY_SA.value.model_dump()
+            case 'CC-BY-ND-4.0':
+                return LicenseEnum.CC_BY_ND.value.model_dump()
+            case 'CC-BY-NC-4.0':
+                return LicenseEnum.CC_BY_NC.value.model_dump()
+            case 'CC-BY-NC-SA-4.0':
+                return LicenseEnum.CC_BY_NC_SA.value.model_dump()
+            case 'CC-BY-NC-ND-4.0':
+                return LicenseEnum.CC_BY_NC_ND.value.model_dump()
+            case 'CC0-1.0':
+                return LicenseEnum.CC0.value.model_dump()
+            case _:
+                raise ValueError('Unknown spdx key {}'.format(key))
+    @classmethod
     def license_from_iacrcc(cls, val):
         """Convert iacrcc license key to an enum value."""
         key = 'CC' + val[2:].replace('-', '_').upper()
@@ -177,8 +205,9 @@ class Meta(BaseModel):
                                           description=('The schema is serialized to disk, so that future versions can migrate '
                                                        'data to new schemas. Not to be confused with the version of json schema '
                                                        'specified in $schema.'))
-    version: VersionEnum = Field(title='Version used in documentclass[version=...]',
-                                 description='Should be final.')
+    version: VersionEnum = Field(default=VersionEnum.FINAL,
+                                 title='Version used in documentclass[version=...]',
+                                 description='This is no longer used and we make it default to final.')
     DOI: Optional[str] = Field(default=None,
                                title='The DOI of the official publication',
                                description='Omits any URL resolver part.')

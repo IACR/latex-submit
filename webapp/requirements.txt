@@ -36,6 +36,9 @@ flask-login
 flask-wtf
 # pydantic when through a major change with 2.0.
 pydantic[email]>=2.0
+# Added for ISO alpha2 country codes.
+pydantic-extra-types
+pycountry
 # sqlalchemy also went through a major change with 2.0.
 sqlalchemy>=2.0
 # we need werkzeug for flask, flask_login, and MultiDict. The

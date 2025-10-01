@@ -20,13 +20,36 @@
         final check.
       </p>
       {% else %}
+      {% if config.DEMO_INSTANCE %}
       <div class="alert alert-success w-75 mx-auto">
-        <strong>Instructions:</strong>  Papers submitted to the IACR Communications in Cryptology
+        <p><strong>Instructions:</strong>  In this demo instance we accept articles in several LaTeX formats.</p>
+        <ul>
+          <li>The <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class.
+            This is the original format used for the IACR Communications in Cryptology.</li>
+          <li>The <a href="https://github.com/IACR/latex/blob/main/metacapture/iacrdoc.pdf">
+              <span class="text-monospace">iacrj</span></a>
+            document class. This is intended as a future replacement for both <span class="text-monospace">iacrcc.cls</span>
+              and <span class="text-monospace">iacrtrans.cls</span>.</li>
+          <li>Any document class that uses the
+            <a href="https://github.com/IACR/latex/blob/main/metacapture/metadoc.pdf"><span class="text-monospace">metacapture</span></a> package.</li>
+        </ul>
+        <p class="fw-bold">
+          You can download sample zip files <a href="https://mccurley.org/examples/">here</a>
+        </p>
+        <p>
+          All fields below are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
+          for hints on how to avoid problems.
+        </p>
+      </div>
+      {% else %}
+      <div class="alert alert-success w-75 mx-auto">
+      <strong>Instructions:</strong>  Papers submitted to the IACR Communications in Cryptology
         are required to use the <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
         document class. Use this form to upload the final version of your paper. All fields
         are required. <a href="#" onclick="showHelp();return false;">See the help tab</a>
-        for hints on how to avoid problems.
+      for hints on how to avoid problems.
       </div>
+      {% endif %}
       {% endif %}
       {% if form.errors %}
       {% for field_name, field_errors in form.errors|dictsort if field_errors %}
@@ -80,29 +103,8 @@
 	{{ form.pubtype }}
 	{{ form.errata_doi }}
         {{ form.issue }}
-        <div class="form-group">
-          <label for="venue" class="form-label">Select a Journal. At present only <span class="text-monospace">CiC with iacrcc</span> is fully supported.</label>
-          <div class="row align-items-center">
-            <div class="col-6">
-              {% if form.journal.errors %}
-              {% for msg in form.journal.errors %}
-              <div class="alert alert-danger">{{ msg }}</div>
-              {% endfor %}
-              {% endif %}
-              {{ form.journal(class_='form-select') }}
-            </div>
-            <div class="col-6">
-              <div class="clsfile" id="cic">use <i-mono>documentclass iacrcc</i-mono></div>
-              <div class="clsfile d-none" id="tosc">use <i-mono>documentclass iacrtrans</i-mono></div>
-              <div class="clsfile d-none" id="tches">use <i-mono>documentclass iacrtrans</i-mono></div>
-              <div class="clsfile d-none" id="asiacrypt">use <i-mono>documentclass llncs</i-mono></div>
-              <div class="clsfile d-none" id="crypto">use <i-mono>documentclass llncs</i-mono></div>
-              <div class="clsfile d-none" id="eurocrypt">use <i-mono>documentclass llncs</i-mono></div>
-              <div class="clsfile d-none" id="pkc">use <i-mono>documentclass llncs</i-mono></div>
-              <div class="clsfile d-none" id="tcc">use <i-mono>documentclass llncs</i-mono></div>
-            </div>
-          </div>
-        </div>
+        {{ form.journal }}
+        <h4>Submission to {{journal.name}}</h4>
         <div class="form-group mt-4">
           {% if form.email.errors %}
           {% for msg in form.email.errors %}
@@ -132,11 +134,9 @@
         <div class="form-group mt-4">
           <label for="zipfile" class="form-label">Zip file with all
             <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
-            source files required to produce your paper. You do not need to upload
-            the <span class="text-monospace">iacrcc.cls</span> file.
-            The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span> file should be named
-            <i-mono>main.tex</i-mono>. Subdirectories are acceptable within the zip file,
-            but the    <i-mono>main.tex</i-mono> file should be at the top level.
+            source files required to produce your paper. The main <span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>
+            file should be named <i-mono>main.tex</i-mono>. Subdirectories are acceptable within the zip file,
+            but the    <i-mono>main.tex</i-mono> file should be at the top level. You do not need upload <i-mono>sty</i-mono> or <i-mono>cls</i-mono> files.
             <a href="#" onclick="showHelp();return false;">See the
               Help tab</a> for more complete instructions here.
           </label>

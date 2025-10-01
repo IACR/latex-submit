@@ -20,6 +20,7 @@
     <tr><th>HotCRP paper:</th><td>
       {% if paper_status.hotcrp == 'none' %}none{% else %}<a href="https://submit.iacr.org/{{paper_status.hotcrp}}/paper/{{paper_status.hotcrp_id}}">{{paper_status.hotcrp}}</a>{% endif %}</td></tr>
     <tr><th>email:</th><td>{{paper_status.email}}</td></tr>
+    <tr><th>Journal</th><td><a href="{{url_for('admin_file.view_journal', jid=journal.id)}}">{{journal.name}}</td></tr>
     <tr><th>original volume:</th><td>{{paper_status.volume_key}}</td></tr>
     <tr><th>original issue:</th><td>{{paper_status.issue_key}}</td></tr>
     <tr><th>assigned issue:</th><td>{% if issue %}<a href="{{url_for('admin_file.view_issue', issueid=paper_status.issue_id)}}">{{issue.name}}</a>{% else %}<span class="text-danger">None</span>{% endif %}</td></tr>

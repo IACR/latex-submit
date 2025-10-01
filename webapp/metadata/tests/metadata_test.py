@@ -2,6 +2,7 @@ import copy
 import json
 from pathlib import Path
 from pydantic import ValidationError
+from pydantic_extra_types.country import CountryAlpha2
 import pytest
 import random
 import sys
@@ -174,6 +175,7 @@ _meta_data = {
         {
             'name': 'UCSD',
             'country': 'USA',
+            'countrycode': 'US',
             'ror': '012345600'
         },
         {
@@ -248,11 +250,13 @@ _compile_data = {
         'authors': [
             {
                 'name': 'Fester Bestertester',
-                'email': 'fester@example.com'
+                'email': 'fester@example.com',
+                'affiliations': [1]
             },
             {
                 'name': 'Gerald Geriatric',
-                'orcid': '0000-1111-2222-3333'
+                'orcid': '0000-1111-2222-3333',
+                'affiliations': [1,2]
             }
         ],
         'affiliations': [
@@ -264,7 +268,8 @@ _compile_data = {
             },
             {
                 'name': 'UCSD',
-                'country': 'USA'
+                'country': 'USA',
+                'countrycode': 'US'
             }
         ],
         'funders': [
