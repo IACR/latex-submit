@@ -47,6 +47,10 @@ def home():
     return render_template('index.html',
                            title=app.config['SITE_NAME'])
 
+@home_bp.route('/forbidden', methods=['GET'])
+def forbidden_packages():
+    return render_template('forbidden.html', title='Forbidden LaTeX packages')
+
 @home_bp.route('/submit', methods=['GET'])
 def show_submit_version():
     journal_id = request.args.get('journal')

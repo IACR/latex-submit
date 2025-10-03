@@ -35,7 +35,9 @@ RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catc
 RUN tlmgr install upquote urwchancal tagpdf tabularray ninecolors
 
 # people use pdfpages to bypass uploading LaTeX.
-RUN tlmgr remove -force pdfpages pdfjam
+RUN tlmgr remove --force pdfpages pdfjam adhocfilelist amsrefs anysize pdfxup changepage iexec
+RUN tlmgr remove --force pyluatex pythontex
+
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
 # COPY compiler/texmf.cnf /usr/local/texlive/2025/texmf.cnf

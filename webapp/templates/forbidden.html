@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
+<h3 id="unsupported" class="pt-3">LaTeX packages that are <span class="text-danger">not</span> supported</h3>
+<p>
+  This system currently supports about 2000 LaTeX packages, but there are some
+  that are explicitly not supported because they have
+  incompatibilities with the document classes we use. 
+  Some of the packages listed below may retain part of their functionality,
+  but you should not rely upon them.
+</p>
+<ol class="packages" style="column-count:2;">
+  <li>abc</li>
+  <li>acrotex</li>
+  <li>adhocfilelist</li>
+  <li>asyfig/asyprocess</li>
+  <li>asyfig</li>
+  <li>asypictureB</li>
+  <li>authblk</li>
+  <li>autopdf</li>
+  <li>auto-pst-pdf</li>
+  <li>auto-pst-pdf-lua</li>
+  <li>bashful</li>
+  <li>bodeplot</li>
+  <li>cnltx</li>
+  <li>ditaa</li>
+  <li>dot2texi</li>
+  <li>dottex</li>
+  <li>download</li>
+  <li>elsarticle/pdfwidgets</li>
+  <li>epspdfconversion</li>
+  <li>epstopdf-base</li>
+  <li>feynmp-auto</li>
+  <li>forest</li>
+  <li>fotex</li>
+  <li>geometry (usage is restricted)</li>
+  <li>getmap</li>
+  <li>gitlog</li>
+  <li>gitver</li>
+  <li>gmp</li>
+  <li>gnuplottex</li>
+  <li>graphicscache</li>
+  <li>graphicxpsd</li>
+  <li>graphviz</li>
+  <li>hgb</li>
+  <li>horoscop</li>
+  <li>hvpygmentex</li>
+  <li>hvextern</li>
+  <li>iexec</li>
+  <li>imakeidx</li>
+  <li>includernw</li>
+  <li>indextools</li>
+  <li>inline-images</li>
+  <li>markdown</li>
+  <li>minted</li>
+  <li>mi-solns</li>
+  <li>moodle</li>
+  <li>mpgraphics</li>
+  <li>mpostinl</li>
+  <li>natbib</li>
+  <li>pdfpages</li>
+  <li>pdfjam</li>
+  <li>pdftexcmds</li>
+  <li>pdftricks</li>
+  <li>pdftricks2</li>
+  <li>pdfx</li>
+  <li>petri-nets/pndraw</li>
+  <li>preprint (and fullpage)</li>
+  <li>profcollege</li>
+  <li>pstool</li>
+  <li>pstricks</li>
+  <li>pstricks/pstricks-pdf</li>
+  <li>pygmentex</li>
+  <li>pyluatex</li>
+  <li>python</li>
+  <li>rubik</li>
+  <li>rubikrotation</li>
+  <li>rubiktwocube</li>
+  <li>runcode</li>
+  <li>savetrees</li>
+  <li>shdoc</li>
+  <li>shellesc</li>
+  <li>silence</li>
+  <li>standalone</li>
+  <li>svg</li>
+  <li>svg/svg-extract</li>
+  <li>tablor</li>
+  <li>tcbextern</li>
+  <li>tcolorbox</li>
+  <li>texments</li>
+  <li>tile-graphic</li>
+  <li>titlesec</li>
+  <li>toptesi</li>
+  <li>tudscr</li>
+  <li>ucs</li>
+  <li>ulqda</li>
+  <li>verbments</li>
+  <li>vpe</li>
+  <li>xepersian</li>
+  <li>xypic</li>
+</ol>
+</main>
+{% endblock %} {# content #}
+
+
+
