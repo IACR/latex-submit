@@ -77,7 +77,7 @@ def show_admin_paper(paperid):
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid)
     discussion = db.session.execute(select(Discussion).where(Discussion.paperid==paperid)).scalars().all()
     versions = {}
-    journal = paper_status.issue.volume.journal
+    journal = db.session.execute(select(Journal).where(Journal.hotcrp_key == paper_status.journal_key)).scalar_one_or_none()
     if not paper_path.is_dir():
         return admin_message('Unable to open directory: ' + str(paper_path))
     for v in paper_path.iterdir():
