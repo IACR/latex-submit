@@ -149,3 +149,7 @@ def test_meta9():
     # set by default
     assert meta.version == VersionEnum.FINAL
     
+def test_meta10():
+    tfile = Path('testdata/test10.meta').read_text(encoding='UTF-8')
+    with pytest.raises(ValueError, match='Invalid orcid checksum:'):
+        data = parse_meta(tfile)
