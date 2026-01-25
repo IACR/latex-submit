@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<main id="mainContent" class="container px-3 px-md-4">
+<h2 class="mt-5 mb-3">The iacrj document class</h2>
+<div class="row">
+  <div class="col-6">
+    <p>
+      Up until 2026 we were using a document class
+      called <i-mono>iacrcc.cls</i-mono> for the IACR Communications in
+      Cryptology. We are now in the process of switching to a new document
+      class <i-mono>iacrj.cls</i-mono> that can be used for all three journals
+      CiC, ToSC, and TCHES. This document class requires an additional
+      file <i-mono>metacapture.sty</i-mono> that is included in the download.
+    </p>
+  </div>
+  <div class="col-6">
+    <a class="btn btn-success m-2 float-end" href="/iacrcc.zip">Download</a>
+    <p>
+      You can <a href="/iacrj.zip">download the LaTeX files in a zip file</a>.
+      This download includes the LaTeX document class <i-mono>iacrj.cls</i-mono>,
+      the package <i-mono>metacapture.sty</i-mono>, and the documentation.
+    </p>
+  </div>
+</div>
+<iframe src="/iacrj/iacrdoc.pdf" width="100%" height="1200px"></iframe>
+</main>
+{% endblock %} {# content #}

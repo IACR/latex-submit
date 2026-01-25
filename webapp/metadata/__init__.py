@@ -66,7 +66,10 @@ def _unscramble(suffix):
     plaintext = plaintext[::-1]
     return ''.join([_alphabet[plaintext[i]] for i in range(len(plaintext))])
 
-def get_doi(prefix, paperid):
+def get_doi(journal, paperid):
     if not validate_paperid(paperid):
         raise ValueError('invalid paperid: ' + paperid)
-    return prefix + '/a' + _scramble(paperid)
+    prefix = journal.DOI_PREFIX + '/'
+    if journal.hotcrp_key == 'tosc' or journal.hotcrp_key == 'tches':
+        prefix += journal.hotcrp_key + '.'    
+    return prefix + 'a' + _scramble(paperid)

@@ -319,7 +319,7 @@ def submit_version():
     receivedDate = datetime.datetime.strptime(submitted[:10],'%Y-%m-%d')
     acceptedDate = datetime.datetime.strptime(accepted[:10],'%Y-%m-%d')
     publishedDate = datetime.date.today().strftime('%Y-%m-%d')
-    doi = get_doi(journal.DOI_PREFIX, paperid)
+    doi = get_doi(journal, paperid)
     metadata = '\\def\\IACR@DOI{' + doi + '}\n'
     if journal.EISSN:
         metadata += '\\def\\IACR@EISSN{' + journal.EISSN + '}\n'
@@ -523,7 +523,8 @@ def compile_for_copyedit():
                   sender=app.config['EDITOR_EMAILS'],
                   recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
-    msg.body = 'A paper for CiC is being compiled for copy editing.\n\nYou can view it at {}'.format(copyedit_url)
+    msg.body = 'A paper for {} is being compiled for copy editing.\n\nYou can view it at {}'.format(paper_status.journal_key,
+                                                                                                    copyedit_url)
     mail.send(msg)
     if app.config['DEBUG']:
         print(msg.body)
@@ -1002,6 +1003,27 @@ def download_output_zipfile(version, paperid):
 @home_bp.route('/iacrcc', methods=['GET'])
 def iacrcc_homepage():
     return render_template('iacrcc.html', title='iacrcc document class')
+
+@home_bp.route('/iacrj', methods=['GET'])
+def iacrj_homepage():
+    return render_template('iacrj.html', title='iacrj document class')
+
+@home_bp.route('/iacrj/iacrdoc.pdf', methods=['GET'])
+def iacrj_iacrdoc():
+    pdf_path = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/metacapture/iacrdoc.pdf')
+    if pdf_path.is_file():
+        return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
+
+@home_bp.route('/iacrj.zip', methods=['GET'])
+def download_iacrj_zipfile():
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        iacrj_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/metacapture')
+        for file in iacrj_dir.iterdir():
+            if file.name in ['iacrj.cls', 'metacapture.sty', 'iacrdoc.tex', 'iacrdoc.pdf', 'template.tex', 'template.bib', 'biblio.bib']:
+                zf.write(file, arcname=('iacrj/' + file.name))
+    memory_file.seek(0)
+    return send_file(memory_file, download_name='iacrj.zip', as_attachment=True)
 
 @home_bp.route('/iacrcc/convertllncs', methods=['GET'])
 def iacrcc_convertllncs():
