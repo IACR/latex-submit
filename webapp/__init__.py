@@ -108,25 +108,28 @@ def create_app(config):
     login_manager.init_app(app)
     if config.DEMO_INSTANCE:
         from .cleanup import cleanup_task
-        scheduler.init_app(app)
-        scheduler.start()
-        # Check every 15 minutes to clean up old papers.
-        trigger = IntervalTrigger(minutes=15)
-        scheduler.add_job(cleanup_task,
-                          trigger=trigger,
-                          args=[],
-                          id='cleanup_update',
-                          name='cleanup_update')
-        app.logger.warning([str(job) for job in scheduler.get_jobs()])
+        if not config.DEBUG:
+            scheduler.init_app(app)
+            scheduler.start()
+            # Check every 15 minutes to clean up old papers.
+            trigger = IntervalTrigger(minutes=15)
+            scheduler.add_job(cleanup_task,
+                              trigger=trigger,
+                              args=[],
+                              id='cleanup_update',
+                              name='cleanup_update')
+            app.logger.warning([str(job) for job in scheduler.get_jobs()])
     else:
         app.logger.warning('Scheduler was not started')
     with app.app_context():
         from . import admin
         from . import routes
         from . import auth
+        from . import ojs_admin
         app.register_blueprint(routes.home_bp)
         app.register_blueprint(admin.admin_bp)
         app.register_blueprint(auth.auth_bp)
+        app.register_blueprint(ojs_admin.ojs_bp)
         # We use rate limiting in auth_bp.
         limiter = Limiter(app=app,
                           storage_uri=app.config['RATELIMIT_STORAGE_URI'],

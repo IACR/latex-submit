@@ -54,7 +54,7 @@ def show_admin_home():
     errors = []
     journals = db.session.execute(select(Journal)).scalars().all()
     papers = db.session.execute(select(PaperStatus).order_by(PaperStatus.lastmodified.desc())).scalars().all()
-    data = {'title': 'IACR CC Upload Admin Home',
+    data = {'title': 'Upload Admin Home',
             'errors': errors,
             'journal_name': app.config['SITE_SHORTNAME'],
             'papers': papers,
