@@ -194,6 +194,8 @@ class PubType(StrEnum):
     RESEARCH = 'RESEARCH'
     SOK = 'SOK'
     ERRATA = 'ERRATA'
+    CORRIGENDUM = 'CORRIGENDUM'
+    PREFACE = 'PREFACE'
 
 class Meta(BaseModel):
     """Metadata encoded in LaTeX files using iacrcc.cls. Note that

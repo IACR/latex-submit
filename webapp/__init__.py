@@ -110,7 +110,6 @@ def create_app(config):
         from .cleanup import cleanup_task
         if not config.DEBUG:
             scheduler.init_app(app)
-            scheduler.start()
             # Check every 15 minutes to clean up old papers.
             trigger = IntervalTrigger(minutes=15)
             scheduler.add_job(cleanup_task,
@@ -118,6 +117,7 @@ def create_app(config):
                               args=[],
                               id='cleanup_update',
                               name='cleanup_update')
+            scheduler.start()
             app.logger.warning([str(job) for job in scheduler.get_jobs()])
     else:
         app.logger.warning('Scheduler was not started')

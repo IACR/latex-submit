@@ -33,7 +33,7 @@
   </div>
 </div>
 {% if issue.exported %}
-<div class="alert alert-success">This was exported on {{issue.exported}}.</div>
+<div class="alert alert-success">This was exported on {{issue.exported}}. You can <a href="{{url_for('ojs_file.show_ojs_issue', issue_id=issue.id)}}">view the issue</a> if you want to copy information for OJS.</div>
 {% endif %}
 <h4 class="mt-3">Papers assigned to the issue</h4>
 <script>
