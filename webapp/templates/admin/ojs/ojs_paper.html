@@ -143,7 +143,7 @@
         <div class="col-2 rowlab">ORCID:</div>
         <div class="col d-flex align-items-center">
           <button class="btn btn-sm btn-success me-2" onclick="copyData('orcid-{{loop.index}}');">Copy</button>
-          <input type="text" class="form-control" id="orcid-{{loop.index}}" value="{{author.orcid}}">
+          <input type="text" class="form-control" id="orcid-{{loop.index}}" value="https://orcid.org/{{author.orcid}}">
         </div>
       </div>
       <div class="row">
