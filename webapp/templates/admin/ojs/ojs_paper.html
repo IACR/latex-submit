@@ -67,7 +67,7 @@
     <div class="col-2 rowlab">Abstract:</div>
     <div class="col d-flex align-items-center">
       <button class="btn btn-sm btn-success me-2" onclick="copyData('abstract');">Copy</button>
-      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract}}</textarea>
+      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|replace('<p>', '')|replace('</p>', '')}}</textarea>
     </div>
   </div>
   <div class="row">
@@ -88,7 +88,7 @@
     <div class="col-2 rowlab">Supporting agencies:</div>
     <div class="col d-flex align-items-center">
       <button class="btn btn-sm btn-success me-2" onclick="copyData('agencies');">Copy</button>
-      <input class="form-control" id="agencies" value="{% for funder in comp.meta.funders %}funder.name, {% endfor %}">
+      <input class="form-control" id="agencies" value="{% for funder in comp.meta.funders %}{{funder.name}}, {% endfor %}">
     </div>
   </div>
   <div class="row">
@@ -96,7 +96,6 @@
     <div class="col d-flex align-items-center">
       <button class="btn btn-sm btn-success me-2" onclick="copyData('references');">Copy</button>
       <textarea rows="20" class="form-control" id="references">{% for ref in references %}{{ref}}
-
 {% endfor %}</textarea>
     </div>
   </div>
