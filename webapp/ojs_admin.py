@@ -39,9 +39,9 @@ def show_ojs_issue(issue_id):
             'papers': papers}
     return render_template('admin/ojs/ojs_issue.html', **data)
 
-_CLEANER = re.compile('<.*?>')
+_CLEANER = re.compile('<div .*?>')
 def _clean_html(ref):
-    return re.sub(_CLEANER, '', ref.body)
+    return re.sub(_CLEANER, '', ref.body).replace('</div>', '')
 
 @ojs_bp.route('/admin/ojs/paper/<paperid>')
 @login_required
@@ -53,6 +53,8 @@ def show_ojs_paper(paperid):
     if not paper:
         return admin_message('Unknown paper: {}'.format(paperid))
     issue = paper.issue
+    if not issue:
+        return admin_message('Paper with no issue: {}'.format(paperid))
     volume = issue.volume
     journal = volume.journal
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value)
@@ -81,7 +83,15 @@ def show_ojs_paper(paperid):
         aut['country'] = ''
         if author.affiliations:
             affs = [comp.meta.affiliations[i-1] for i in author.affiliations]
-            aut['affiliations'] = ', '.join([aff.name for aff in affs])
+            affiliations = []
+            for aff in affs:
+                affiliation = aff.name
+                if aff.city:
+                    affiliation += ', ' + aff.city
+                if aff.country:
+                    affiliation += ', ' + aff.country
+                affiliations.append(affiliation)
+            aut['affiliations'] = ', '.join(affiliations)
             for aff in affs:
                 if aff.country:
                     aut['country'] = aff.country
