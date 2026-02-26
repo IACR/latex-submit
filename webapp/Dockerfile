@@ -52,7 +52,7 @@ COPY metadata/iacrtrans/iacrtrans.cls /home/texlive/texmf/tex/latex/iacrcc/iacrt
 COPY metadata/iacrtrans/settings.tosc.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tosc.tex
 COPY metadata/iacrtrans/settings.tches.tex /home/texlive/texmf/tex/latex/iacrcc/settings.tches.tex
 COPY metadata/latex/iacrcc/cryptobib/ /home/texlive/texmf/tex/latex/iacrcc/cryptobib/
-COPY metadata/latex/metacapture/iacrj.cls /home/texlive/texmf/tex/latex/metacapture/iacrj.cls
+COPY metadata/latex/iacrj/iacrj.cls /home/texlive/texmf/tex/latex/metacapture/iacrj.cls
 COPY metadata/latex/metacapture/metacapture.sty /home/texlive/texmf/tex/latex/metacapture/metacapture.sty
 WORKDIR /data
 
