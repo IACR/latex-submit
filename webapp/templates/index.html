@@ -22,9 +22,11 @@
   </div>
   <div class="col-12 col-md-6">
     <p>
-      Papers submitted to the IACR Communications in Cryptology are required to use the
-      <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> LaTeX document class.
-      <a class="ms-3 btn btn-sm btn-success" href="/iacrcc">Download</a>
+      Papers submitted to Transactions on Symmetric Cryptology and the IACR Communications in Cryptology
+      should use the <a href="/iacrj"><span class="text-monospace">iacrj</span></a> LaTeX document class.
+      We are in the process of migrating from the older <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a>
+      document class.
+      <a class="ms-3 btn btn-sm btn-success" href="/iacrj">Download</a>
     </p>
   </div>
 </div>
@@ -34,8 +36,8 @@
     <p class="alert alert-info">
       This test server allows people to experiment with the infrastructure, but is not part of
       the actual pipeline for the journal. Papers uploaded here are not private,
-      but they will be deleted every day so nothing is permanent. If you wish to have
-      access as an admin, notify {{config.COPYEDITOR_EMAILS}}.
+      but they will be deleted every day so nothing is permanent. You can login as an admin
+      to see what it's like as an editor. For further information, contact {{config.COPYEDITOR_EMAILS}}.
     </p>
     <div class="alert alert-secondary my-3">
     <form method="GET" action="{{url_for('home_bp.show_submit_version')}}">
@@ -59,7 +61,7 @@
     {% endif %}
     <p class="mt-4">
       The goal of this site is to reduce the cost of open access publishing by
-      <a href="http://ftp.tug.org/TUGboat/tb44-1/tb136bos-metadata.pdf">reducing the
+      <a href="https://arxiv.org/abs/2504.10424">reducing the
         amount of human labor</a> by both authors and editors. Once a
       paper is accepted, authors will be directed to a URL on this site
       in order to submit their final versions in LaTeX format.  Their
@@ -86,7 +88,7 @@
 </p>
 <ol>
   <li>Safely validate that the LaTeX compiles correctly under the new
-    <a href="/iacrcc"><span class="text-monospace">iacrcc</span></a> document class.</li>
+    <a href="/iacrj"><span class="text-monospace">iacrcc</span></a> document class.</li>
   <li>Validate that the author has supplied sufficient metadata (e.g., title, affiliations,
     funding information, etc).</li>
   <li>Assign a DOI immediately upon submission.</li>

@@ -116,8 +116,13 @@ def create_app(config):
                               trigger=trigger,
                               args=[],
                               id='cleanup_update',
-                              name='cleanup_update')
-            scheduler.start()
+                              name='cleanup_update',
+                              replace_existing=True)
+            if not scheduler.running:
+                try:
+                    scheduler.start()
+                except SchedulerAlreadyRunningError:
+                    pass
             app.logger.warning([str(job) for job in scheduler.get_jobs()])
     else:
         app.logger.warning('Scheduler was not started')

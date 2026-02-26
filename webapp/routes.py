@@ -768,7 +768,7 @@ def get_status(paperid, version, auth):
             else:
                 msg = 'Compilation finished running'
         else: # it's enqueued
-            status = TaskStatus.COMPILING
+            status = TaskStatus.RUNNING
             try:
                 position = tuple(task_queue.keys()).index(paperid)
                 size = len(task_queue)
@@ -1008,9 +1008,9 @@ def iacrcc_homepage():
 def iacrj_homepage():
     return render_template('iacrj.html', title='iacrj document class')
 
-@home_bp.route('/iacrj/iacrdoc.pdf', methods=['GET'])
-def iacrj_iacrdoc():
-    pdf_path = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/metacapture/iacrdoc.pdf')
+@home_bp.route('/iacrj/iacrj-doc.pdf', methods=['GET'])
+def iacrj_iacrjdoc():
+    pdf_path = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrj/iacrj-doc.pdf')
     if pdf_path.is_file():
         return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
 
@@ -1018,9 +1018,13 @@ def iacrj_iacrdoc():
 def download_iacrj_zipfile():
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
-        iacrj_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/metacapture')
+        metacapture_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/metacapture')
+        for file in metacapture_dir.iterdir():
+            if file.name in ['metacapture.sty']:
+                zf.write(file, arcname=('iacrj/' + file.name))
+        iacrj_dir = Path(os.path.dirname(os.path.abspath(__file__))) / Path('metadata/latex/iacrj')
         for file in iacrj_dir.iterdir():
-            if file.name in ['iacrj.cls', 'metacapture.sty', 'iacrdoc.tex', 'iacrdoc.pdf', 'template.tex', 'template.bib', 'biblio.bib']:
+            if file.name in ['iacrj.cls', 'iacrj-doc.tex', 'iacrj-doc.pdf', 'iacrj-doc.bib', 'iacrj-template.tex']:
                 zf.write(file, arcname=('iacrj/' + file.name))
     memory_file.seek(0)
     return send_file(memory_file, download_name='iacrj.zip', as_attachment=True)
