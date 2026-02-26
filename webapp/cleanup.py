@@ -20,7 +20,7 @@ def cleanup_task():
             scheduler.app.logger.warning('cleanup should not be configured')
             return
         scheduler.app.logger.warning('cleaning up papers')
-        submit_deadline = datetime.now() - timedelta(days=1)
+        submit_deadline = datetime.now() - timedelta(days=2)
         copyedit_deadline = datetime.now() - timedelta(days=4)
         engine = create_engine(scheduler.app.config['SQLALCHEMY_DATABASE_URI'])
         deleted_ids = set()

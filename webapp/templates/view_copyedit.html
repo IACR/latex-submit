@@ -140,7 +140,7 @@ This template is used to show the status of a compilation for copyedit
             </div>
           </div>
                 <div class="d-flex flex-column justify-content-between w-100">
-                  <div id="warning-text-{{loop.index}}">{{item.text}}</div>
+{#                  <div id="warning-text-{{loop.index}}">{{item.text}}</div>#}
                   <div class="d-flex justify-content-between">
                     <div class="">
                       {% if item.text.startswith('bibtex entry ') %}
@@ -163,7 +163,6 @@ This template is used to show the status of a compilation for copyedit
                   {% if item.help %}
                   <div>{{item.help|safe}}</div>
                   {% endif %}
-          <div class="row"><div class="col-4">This</div></div>
           <div class="item px-3 p-1" data-status="{{item.status.name}}" id="item-{{item.id}}">Status: <span id="status-{{item.id}}">{{item.status.value}}</span>. <span id="reply-{{item.id}}">{% if item.reply %}{{item.reply}}{% endif %}</span></div>
         </div>
         {% endfor %}

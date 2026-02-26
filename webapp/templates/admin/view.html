@@ -40,7 +40,8 @@
   <tbody>
     {% for name, data in versions.items() %}
     <tr>
-      <td><a href="{{data.url}}">{{name}}</a></td>
+      <td><a href="{{data.url}}">{{name}}</a>
+      {% if name == 'final' %}&nbsp;&nbsp;<a href="{{url_for('ojs_file.show_ojs_paper', paperid=paper_status.paperid)}}">OJS view</a>{% endif %}</td>
       <td>{{data.comp.compiled.strftime('%Y-%m-%d %H:%M:%S')}}</td>
       <td>{{data.comp.status.value}}</td>
       <td align="center">{{data.comp.warning_log|count}}</td>

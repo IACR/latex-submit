@@ -54,7 +54,7 @@ def show_admin_home():
     errors = []
     journals = db.session.execute(select(Journal)).scalars().all()
     papers = db.session.execute(select(PaperStatus).order_by(PaperStatus.lastmodified.desc())).scalars().all()
-    data = {'title': 'IACR CC Upload Admin Home',
+    data = {'title': 'Upload Admin Home',
             'errors': errors,
             'journal_name': app.config['SITE_SHORTNAME'],
             'papers': papers,
@@ -383,7 +383,7 @@ def view_issue(issueid):
                 paperids.add(p.paperid)
             accepted = hotcrp_papers.get('acceptedPapers')
             for p in accepted[:]: # loop over a copy of accepted
-                if p['paperid'] in paperids:
+                if p['paperId'] in paperids:
                     accepted.remove(p)
             data['hotcrp'] = hotcrp_papers
     formdata = [{'paperid': p.paperid} for p in finished_papers]

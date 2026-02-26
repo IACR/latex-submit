@@ -1,0 +1,163 @@
+
+{% extends "admin/admin_base.html" %}
+{% block endOfHead %}
+<style>
+  .rowlab {
+    font-weight: 800;
+/*    padding-top: 1em;
+    padding-bottom: 1em;*/
+    text-align: end;
+  }
+ div.copyarea > div.row {
+   align-items: center !important;
+   padding-top: .5rem;
+   border: 1px solid #e0e0e0;
+   padding-bottom: .5rem;
+ }
+</style>
+
+{% endblock %}
+{% block content %}
+<main id="adminContent" class="container px-md-4 py-3">
+  <script>
+   function copyData(id) {
+     console.log('copying ' + id);
+     let el = document.getElementById(id);
+     console.log(el);
+     navigator.clipboard.writeText(el.value).then(() => {
+       const copyTooltip = new bootstrap.Tooltip('#' + id,
+                                                 {trigger: 'manual',
+                                                  title: 'Copied!'});
+       console.log('copied');
+       copyTooltip.show();
+       setTimeout(function() {
+         copyTooltip.dispose();
+       }, 2000);
+     });
+   }
+  </script>
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
+<h1 class="mb-5 text-center">OJS view for paper {{paper.paperid}} in volume {{volume.name}}, <a href="{{url_for('ojs_file.show_ojs_issue', issue_id=issue.id)}}">issue {{issue.name}}</a></h1>
+<p>
+  This view allows you to copy all of the fields of the paper for the quickSubmit plugin in OJS.</p>
+<div class="copyarea">
+  <div class="row">
+    <div class="col-2 rowlab">Article type:</div>
+    <div class="col d-flex align-items-center">{{paper.pubtype.value}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Title:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('title');">Copy</button>
+      <input class="form-control" id='title' value='{{paper.title}}'>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Subtitle:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('subtitle');">Copy</button>
+      <input class="form-control" id="subtitle" value="{{paper.subtitle}}">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Abstract:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('abstract');">Copy</button>
+      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|replace('<p>', '')|replace('</p>', '')}}</textarea>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Rights:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success" onclick="copyData('rights');">Copy</button>
+      <input class="form-control" id="rights" value="Copyright retained by author(s). <a href='{{comp.meta.license.reference}}'>{{comp.meta.license.label}} {{comp.meta.license.name}}</a>">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Keywords:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('keywords');">Copy</button>
+      <input class="form-control" id="keywords" value="{{comp.meta.keywords|join(', ')}}">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">Supporting agencies:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('agencies');">Copy</button>
+      <input class="form-control" id="agencies" value="{% for funder in comp.meta.funders %}{{funder.name}}, {% endfor %}">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 rowlab">References:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('references');">Copy</button>
+      <textarea rows="20" class="form-control" id="references">{% for ref in references %}{{ref}}
+{% endfor %}</textarea>
+    </div>
+  </div>
+  {% for author in authors %}
+  <div class="row">
+    <div class="col-2 rowlab">Contributor {{loop.index}}:</div>
+    <div class="col-10">
+      <div class="row">
+        <div class="col-2 rowlab">Given name:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('given-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="given-{{loop.index}}" value="{{author.given}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">Family name:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('family-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="family-{{loop.index}}" value="{{author.surname}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">Full name:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('name-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="name-{{loop.index}}" value="{{author.name}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">Email:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('email-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="email-{{loop.index}}" value="{{author.email}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">Country:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('country-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="country-{{loop.index}}" value="{{author.country}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">ORCID:</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('orcid-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="orcid-{{loop.index}}" value="https://orcid.org/{{author.orcid}}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 rowlab">Affiliation(s):</div>
+        <div class="col d-flex align-items-center">
+          <button class="btn btn-sm btn-success me-2" onclick="copyData('aff-{{loop.index}}');">Copy</button>
+          <input type="text" class="form-control" id="aff-{{loop.index}}" value="{{author.affiliations}}">
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="row">
+    <div class="col-2 rowlab">Galley file:</div>
+    <div class="col"><a class="btn btn-sm btn-success" href="{{url_for('ojs_file.download_pdf', paperid=paper.paperid)}}">Download PDF</a></div>
+  </div>
+</main>
+{% endblock %}
