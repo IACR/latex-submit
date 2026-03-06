@@ -456,156 +456,156 @@ refers to entry "DBLP:conf/cisc/2011", which doesn't exist"""
 
 
 def test_bib_badcross():
-    with Path('testdata/biblogs/badcross.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 26
-        warnings = parser.warnings()
-        print(warnings)
-        print('error_count=', parser.error_count)
-        assert parser.error_count == 13
-        assert parser.warning_count == 0
+    f =Path('testdata/biblogs/badcross.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 26
+    warnings = parser.warnings()
+    print(warnings)
+    print('error_count=', parser.error_count)
+    assert parser.error_count == 13
+    assert parser.warning_count == 0
 
 def test_bib_badtypes():
-    with Path('testdata/biblogs/badtypes.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 6
-        warnings = parser.warnings()
-        assert len(warnings) == 6
-        assert parser.error_count == len(parser.errors) - len(warnings)
+    f =Path('testdata/biblogs/badtypes.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 6
+    warnings = parser.warnings()
+    assert len(warnings) == 6
+    assert parser.error_count == len(parser.errors) - len(warnings)
     
 def test_bib_badyears():
-    with Path('testdata/biblogs/badyears.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 37
-        for w in parser.errors:
-            assert w.filepath == 'bib.bib'
-        warnings = parser.warnings()
-        assert len(warnings) == 37
-        assert parser.error_count == 0
-        assert parser.warning_count == 37
+    f = Path('testdata/biblogs/badyears.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 37
+    for w in parser.errors:
+        assert w.filepath == 'bib.bib'
+    warnings = parser.warnings()
+    assert len(warnings) == 37
+    assert parser.error_count == 0
+    assert parser.warning_count == 37
     
 def test_bib_commas():
-    with Path('testdata/biblogs/commas.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 11
-        for w in parser.errors:
-            assert w.filepath == 'references.bib'
-        warnings = parser.warnings()
-        assert len(warnings) == 7
-        assert parser.error_count == 4
-        assert parser.warning_count == 0
+    f= Path('testdata/biblogs/commas.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 11
+    for w in parser.errors:
+        assert w.filepath == 'references.bib'
+    warnings = parser.warnings()
+    assert len(warnings) == 7
+    assert parser.error_count == 4
+    assert parser.warning_count == 0
     
 def test_bib_comments():
-    with Path('testdata/biblogs/comments.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 4
-        assert parser.errors[1].filepath == 'bib.bib'
-        assert parser.errors[1].filepath_line == 246
-        assert parser.errors[1].logline == 12
+    f = Path('testdata/biblogs/comments.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 4
+    assert parser.errors[1].filepath == 'bib.bib'
+    assert parser.errors[1].filepath_line == 246
+    assert parser.errors[1].logline == 12
     
 def test_bib_fieldname():
-    with Path('testdata/biblogs/fieldname.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 2
-        assert parser.errors[1].filepath == 'refs.bib'
-        assert parser.errors[1].filepath_line == 407
-        assert parser.errors[1].logline == 6
-        assert parser.errors[0].filepath == 'bibdiffpriv.bib'
+    f = Path('testdata/biblogs/fieldname.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 2
+    assert parser.errors[1].filepath == 'refs.bib'
+    assert parser.errors[1].filepath_line == 407
+    assert parser.errors[1].logline == 6
+    assert parser.errors[0].filepath == 'bibdiffpriv.bib'
     
 def test_bib_greg2():
-    with Path('testdata/biblogs/greg2.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 1
-        assert parser.errors[0].filepath == 'main.bib'
-        assert parser.errors[0].filepath_line == 16
-        assert parser.errors[0].logline == 11
+    f = Path('testdata/biblogs/greg2.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 1
+    assert parser.errors[0].filepath == 'main.bib'
+    assert parser.errors[0].filepath_line == 16
+    assert parser.errors[0].logline == 11
     
 def test_bib_main1():
-    with Path('testdata/biblogs/main1.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 2
-        assert parser.errors[0].filepath == 'misc_ref.bib'
-        assert parser.errors[0].filepath_line == 0 # unknown
-        assert parser.errors[0].logline == 19
+    f = Path('testdata/biblogs/main1.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 2
+    assert parser.errors[0].filepath == 'misc_ref.bib'
+    assert parser.errors[0].filepath_line == 0 # unknown
+    assert parser.errors[0].logline == 19
     
 def test_bib_missing():
-    with Path('testdata/biblogs/missing.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 40
-        for e in parser.errors:
-            assert e.logline > 0
+    f = Path('testdata/biblogs/missing.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 40
+    for e in parser.errors:
+        assert e.logline > 0
     
 def test_bib_multiple():
-    with Path('testdata/biblogs/multiple.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 3
-        assert parser.errors[0].filepath_line == 38
-        assert parser.errors[0].logline == 6
-        assert parser.errors[1].logline == 10
-        assert parser.errors[2].logline == 14
-        for e in parser.errors:
-            assert e.logline > 0
-            assert e.filepath == 'MITM_bib.bib'
+    f = Path('testdata/biblogs/multiple.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 3
+    assert parser.errors[0].filepath_line == 38
+    assert parser.errors[0].logline == 6
+    assert parser.errors[1].logline == 10
+    assert parser.errors[2].logline == 14
+    for e in parser.errors:
+        assert e.logline > 0
+        assert e.filepath == 'MITM_bib.bib'
     
 def test_bib_period():
-    with Path('testdata/biblogs/period.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 3
-        assert parser.errors[0].filepath_line == 1347
-        assert parser.errors[0].logline == 10
-        assert parser.errors[1].logline == 14
-        assert parser.errors[2].logline == 18
-        for e in parser.errors:
-            assert e.logline > 0
-            assert e.filepath == 'extra.bib'
+    f = Path('testdata/biblogs/period.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 3
+    assert parser.errors[0].filepath_line == 1347
+    assert parser.errors[0].logline == 10
+    assert parser.errors[1].logline == 14
+    assert parser.errors[2].logline == 18
+    for e in parser.errors:
+        assert e.logline > 0
+        assert e.filepath == 'extra.bib'
 
 def test_bib_strings():
-    with Path('testdata/biblogs/strings.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 53
-        assert parser.errors[-1].logline == 94
-        assert len([e for e in parser.errors if 'booktitle' in e.text]) == 8
-        assert len([e for e in parser.errors if 'undefined' in e.text]) == 45
-        for i in range(8, len(parser.errors)):
-            e = parser.errors[i]
-            assert e.filepath_line > 0
-            assert e.logline > 0
-            assert e.filepath == 'bib.bib'
+    f = Path('testdata/biblogs/strings.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 53
+    assert parser.errors[-1].logline == 94
+    assert len([e for e in parser.errors if 'booktitle' in e.text]) == 8
+    assert len([e for e in parser.errors if 'undefined' in e.text]) == 45
+    for i in range(8, len(parser.errors)):
+        e = parser.errors[i]
+        assert e.filepath_line > 0
+        assert e.logline > 0
+        assert e.filepath == 'bib.bib'
     
 def test_bib_twostyles():
-    with Path('testdata/biblogs/twostyles.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 2
+    f = Path('testdata/biblogs/twostyles.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 2
     
 def test_bib_whitespace():
-    with Path('testdata/biblogs/whitespace.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 3
-        assert parser.errors[1].filepath == 'main.aux'
-        assert parser.errors[2].filepath == 'main.aux'
-        assert parser.errors[1].filepath_line == 54
-        assert parser.errors[2].filepath_line == 73
-        assert 'to sort, need author or key' in parser.errors[0].text
+    f = Path('testdata/biblogs/whitespace.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 3
+    assert parser.errors[1].filepath == 'main.aux'
+    assert parser.errors[2].filepath == 'main.aux'
+    assert parser.errors[1].filepath_line == 54
+    assert parser.errors[2].filepath_line == 73
+    assert 'to sort, need author or key' in parser.errors[0].text
     
 def test_bib_nofile():
-    with Path('testdata/biblogs/nofile.blg') as f:
-        parser = BibTexLogParser()
-        parser.parse_file(f, True)
-        assert len(parser.errors) == 27
-        assert parser.error_count == 2 # because we don't recognize "I found no database files---while reading file main.aux"
-        warnings = parser.warnings()
-        assert len(warnings) == 0
+    f = Path('testdata/biblogs/nofile.blg')
+    parser = BibTexLogParser()
+    parser.parse_file(f, True)
+    assert len(parser.errors) == 27
+    assert parser.error_count == 2 # because we don't recognize "I found no database files---while reading file main.aux"
+    warnings = parser.warnings()
+    assert len(warnings) == 0
