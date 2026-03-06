@@ -471,6 +471,15 @@ def get_citation_map(output_dir):
                 mapping[key] = label
     return mapping
 
+def _help_lookup(title):
+    searchurl = '/cryptobib?' + urlencode({'textq': title})
+    crossrefurl = 'https://search.crossref.org/search/works?' + urlencode({'q': title,
+                                                                           'from_ui': 'yes'})
+    # In case we switch to a bibliographic style that can support DBLP, we can add this.
+    # dblpurl = 'https://dblp.org/search?' + urlencode({'q': title})
+    # return '<a href="{}" target="_blank">Search cryptobib</a> or <a href="{}" target="_blank">search crossref.org</a> or <a href="{}" target="_blank">search DBLP</a>.'.format(searchurl, crossrefurl, dblpurl)
+    return '<a href="{}" target="_blank">Search cryptobib</a> or <a href="{}" target="_blank">search crossref.org</a>.'.format(searchurl, crossrefurl)
+
 def bibtex_to_html(compilation, cite_map: OrderedDict):
     r"""This populates bibhtml in compilation using input from the raw extracted bibtex
     and the citation map from cite_key to label. We only include references in
@@ -515,11 +524,22 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
                     warning.text = 'bibtex entry {} of type @{} with title "{}" should probably have a doi or url field.'.format(entry.key,
                                                                                                                                  entry.entry_type,
                                                                                                                                  title)
-                    searchurl = '/cryptobib?' + urlencode({'textq': title})
-                    crossrefurl = 'https://search.crossref.org/search/works?' + urlencode({'q': title,
-                                                                                           'from_ui': 'yes'})
-                    warning.help = '<a href="{}" target="_blank">Search cryptobib</a> or <a href="{}" target="_blank">search crossref.org</a>.'.format(searchurl,
-                                                                                                                                                       crossrefurl)
+                    warning.help = _help_lookup(title)
+                compilation.warning_log.append(warning)
+        if (entry.entry_type == 'inproceedings' or
+            entry.entry_type == 'incollection'):
+            if 'editor' not in  entry.fields_dict:
+                warning = CompileError(error_type=ErrorType.BIBTEX_WARNING,
+                                       logline=0,
+                                       text='bibtex entry {} of type @{} should probably have an editor field.'.format(entry.key,
+                                                                                                                       entry.entry_type))
+                if 'title' in entry.fields_dict:
+                    title = entry.fields_dict['title'].value
+                    # supply better text hint with title.
+                    warning.text = 'bibtex entry {} of type @{} with title "{}" should probably have an editor field.'.format(entry.key,
+                                                                                                                              entry.entry_type,
+                                                                                                                              title)
+                    warning.help = _help_lookup(title)
                 compilation.warning_log.append(warning)
         bibitemdata = {'key': entry.key,
                        'label': cite_map.get(entry.key, 'BUG!')}
