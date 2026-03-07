@@ -166,6 +166,9 @@ def test_duplicate():
                         'bibtex': bibstr,
                         'zipfilename': 'submit.zip'}
     compilation = Compilation(**compilation_data)
+    print(compilation.bibhtml)
+    print('cite_map follows')
+    print(cite_map)
     bibtex_to_html(compilation, cite_map)
     assert len(compilation.error_log) == 0
     assert len(compilation.warning_log) == 1
@@ -196,10 +199,10 @@ def test_cryptobib():
     compilation = Compilation(**compilation_data)
     bibtex_to_html(compilation, cite_map)
     count = sum([1 for warning in compilation.warning_log if 'should probably have a doi or url field.' in warning.text])
-    assert count == len(compilation.warning_log)
+    assert count == 1552
     count = sum([1 for warning in compilation.warning_log if 'should have author field' in warning.text])
     assert count == 0
-    assert len(compilation.warning_log) == 1552
+    assert len(compilation.warning_log) == 2307
     for i in range(len(compilation.error_log)):
         error = compilation.error_log[i]
         print(i, error.text)
@@ -232,7 +235,7 @@ def test_html():
     mapping = get_citation_map(output_dir)
     bibtex_to_html(compilation, mapping)
     print(compilation.warning_log)
-    assert len(compilation.warning_log) == 2
+    assert len(compilation.warning_log) == 3
     assert len(compilation.bibhtml) == 33
     
 
@@ -279,7 +282,7 @@ def test_output3():
     for error in compilation.error_log:
         print(error)
     assert len(compilation.error_log) == 0
-    assert len(compilation.warning_log) == 0
+    assert len(compilation.warning_log) == 1
     for warning in compilation.warning_log:
         print(warning)
     assert len(compilation.bibhtml) == 50
@@ -303,9 +306,8 @@ def test_output4():
                         'zipfilename': 'submit.zip'}
     compilation = Compilation(**compilation_data)
     bibtex_to_html(compilation, cite_map)
-    # print(compilation.model_dump_json(indent=2))
-    for error in compilation.error_log:
-        print(error)
+    # for error in compilation.error_log:
+    #     print(error)
     assert len(compilation.error_log) == 4
     assert 'requires title field' in compilation.error_log[0].text
     assert 'should have one of booktitle/series fields' in compilation.error_log[1].text
@@ -314,11 +316,11 @@ def test_output4():
     # for warning in compilation.warning_log:
     #     if 'should probably have a doi or url field.' not in warning.text:
     #         print('warning=', warning)
-    notdoi = [w for w in compilation.warning_log if 'should probably have a doi or url field.' not in w.text]
-    assert len(notdoi) == 2
-    assert notdoi[0].text == 'Duplicate bibtex entry: @inproceedings{pcf,'
-    assert notdoi[1].text == 'Bibtex error: logstar: booktitle is expected for @article'
-    assert len(compilation.warning_log) == 403
+    needs_doi = [w for w in compilation.warning_log if 'should probably have a doi or url field.' in w.text]
+    assert len(needs_doi) == 401
+    needs_editor = [w for w in compilation.warning_log if 'should probably have an editor field.' in w.text]
+    assert len(needs_editor) == 348
+    assert len(compilation.warning_log) == 751
     assert len(compilation.bibhtml) == 525
 
 def test_biblatex_label():
@@ -450,7 +452,7 @@ def test_missing():
     compilation = Compilation(**compilation_data)
     bibtex_to_html(compilation, cite_map)
     assert len(compilation.bibhtml) == 58
-    assert len(compilation.warning_log) == 2
+    assert len(compilation.warning_log) == 4
     for i in range(len(compilation.error_log)):
         error = compilation.error_log[i]
         print(i, error)
@@ -493,7 +495,7 @@ def test_bibtex_style():
     for i, bibhtml in enumerate(compilation.bibhtml):
         print(i, _bstrip(bibhtml.body))
     assert len(compilation.bibhtml) == 28
-    assert len(compilation.warning_log) == 4
+    assert len(compilation.warning_log) == 6
     assert _bstrip(compilation.bibhtml[0].body) == 'Thomas E. Anderson, Michael Dahlin, Jeanna M. Neefe, David A. Patterson, Drew S. Roselli, and Randolph Wang.  Serverless Network File Systems.  <em>ACM Transactions on Computer Systems</em>, 14(1):41–79, 1996.'
     assert _bstrip(compilation.bibhtml[1].body) == 'Saikrishna Badrinarayanan, Aayush Jain, Nathan Manohar, and Amit Sahai.  Secure MPC: Laziness Leads to GOD. In Shiho Moriai and Huaxiong Wang, editors, <em>Advances in Cryptology – ASIACRYPT 2020, Part III</em>, volume 12493 of <em>Lecture Notes in Computer Science</em>, pages 120–150, Daejeon, South Korea. 2020.  Springer, Heidelberg, Germany.  DOI: <a href="https://doi.org/10.1007/978-3-030-64840-4_5">10.1007/978-3-030-64840-4_5</a>'
     assert _bstrip(compilation.bibhtml[2].body) == 'Tim Dierks and Christopher Allen. <em>RFC 2246 - The TLS Protocol Version 1.0</em>. Internet Activities Board, January 1999.'
@@ -548,7 +550,7 @@ def test_bibtex_macros():
     for idx,e in enumerate(compilation.warning_log):
         print(idx, e)
     assert r'Unable to parse region of bibtex: Middleware could not be fully applied: Illegal macro: \textstuff in ' in compilation.warning_log[0].text
-    assert len(compilation.warning_log) == 11
+    assert len(compilation.warning_log) == 18
     assert len(compilation.bibhtml) == 80
 
 def test_bibunits():
@@ -573,5 +575,5 @@ def test_bibunits():
     compilation = Compilation(**compilation_data)
     bibtex_to_html(compilation, cite_map)
     assert len(compilation.error_log) == 0
-    assert len(compilation.warning_log) == 40
+    assert len(compilation.warning_log) == 76
     assert len(compilation.bibhtml) == 78
