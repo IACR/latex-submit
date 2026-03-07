@@ -576,7 +576,8 @@ def bibtex_to_html(compilation, cite_map: OrderedDict):
         compilation.error_log.append(CompileError(error_type=ErrorType.BIBTEX_ERROR,
                                                   logline = 0,
                                                   text='Mismatch in number of bibliographic references {} != {}. This is probably a bibtex parsing error.'.format(len(bibhtml), len(cite_map))))
-    compilation.bibhtml = bibhtml
+    for i in range(len(bibhtml)):
+        compilation.bibhtml.append(bibhtml[i])
     
 if __name__ == '__main__':
     import argparse
