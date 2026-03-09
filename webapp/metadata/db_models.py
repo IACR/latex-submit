@@ -144,6 +144,7 @@ class PaperStatus(Base):
     email: Mapped[str] = mapped_column(String(50), nullable=False)
     submitted: Mapped[str] = mapped_column(String(32), nullable=False)
     accepted: Mapped[str] = mapped_column(String(32), nullable=False)
+    revised: Mapped[str] = mapped_column(String(32), nullable=False, default='')
     pubtype: Mapped[PubType] = mapped_column(default=PubType.RESEARCH)
     status: Mapped[PaperStatusEnum] = mapped_column(default=PaperStatusEnum.PENDING)
     hotcrp: Mapped[str] = mapped_column(String(32),

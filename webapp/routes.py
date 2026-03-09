@@ -1,7 +1,7 @@
 import datetime
 import time
 from io import BytesIO
-from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for
+from flask import json, Blueprint, render_template, request, jsonify, send_file, redirect, url_for, flash
 from flask import current_app as app
 from flask_mail import Message
 import hmac
@@ -66,14 +66,20 @@ def show_submit_version():
         # In this case the submission doesn't come from hotcrp, so we make up some fields.
         random.seed()
         form.paperid.data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        paperid = form.paperid.data
         form.hotcrp.data = NO_HOTCRP
         form.hotcrp_id.data = NO_HOTCRP
         form.version.data = 'candidate'
         now = datetime.datetime.now()
-        submitted = now - datetime.timedelta(days=10)
+        submitted = now - datetime.timedelta(days=32)
         accepted = now - datetime.timedelta(days=5)
         form.accepted.data = accepted.strftime('%Y-%m-%d %H:%M:%S')
         form.submitted.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
+        if random.randint(0, 1) == 0:
+            revised = now - datetime.timedelta(days=7)
+            form.revised.data = submitted.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            form.revised.data = ''
         form.volume.data = '9999'
         form.issue.data = '1'
         form.generate_auth()
@@ -91,7 +97,7 @@ def show_submit_version():
                                    error='The token for this request is invalid')
     paperid = form.paperid.data
     # Submission form is limited to papers that are not in copy editing mode and not already
-    # accepted for publication. 
+    # accepted for publication.
     sql = select(PaperStatus).filter_by(paperid=paperid)
     paper_status = db.session.execute(sql).scalar_one_or_none()
     if paper_status:
@@ -137,6 +143,9 @@ def submit_version():
         logging.critical('{}:{}:{} submission not authenticated'.format(form.paperid.data,
                                                                         form.version.data,
                                                                         form.auth.data))
+        for fieldname, errors in form.errors.items():
+            for error in errors:
+                flash('{}:{}'.format(fieldname,error))
         return render_template('message.html',
                                title='The form data is invalid.',
                                error='The form data is invalid. This is a bug')
@@ -145,6 +154,7 @@ def submit_version():
     version = args.get('version', Version.CANDIDATE.value)
     accepted = args.get('accepted', '')
     submitted = args.get('submitted', '')
+    revised = args.get('revised', '')
     hotcrp = args.get('hotcrp', '')
     hotcrp_id = args.get('hotcrp_id', '')
     task_key = paper_key(paperid, version)
@@ -200,6 +210,7 @@ def submit_version():
                                    email=args.get('email'),
                                    submitted=submitted,
                                    accepted=accepted,
+                                   revised=revised,
                                    pubtype=pubtype,
                                    journal_key=args.get('journal'),
                                    volume_key=args.get('volume'),
@@ -295,6 +306,7 @@ def submit_version():
                         'venue': args.get('journal'),
                         'submitted': submitted,
                         'accepted': accepted,
+                        'revised': revised,
                         'pubtype': pubtype.name,
                         'errata_doi': form.errata_doi.data,
                         'compiled': now,
@@ -326,10 +338,15 @@ def submit_version():
     metadata += '\\def\\IACR@Received{' + receivedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Accepted{' + acceptedDate.strftime('%Y-%m-%d') + '}\n'
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
+    if revised:
+        revisedDate = datetime.datetime.strptime(revised[:10], '%Y-%m-%d')
+        metadata += '\\def\IACR@Revised{' + revisedDate.strftime('%Y-%m-%d') + '}\n'
     if paper_status.issue:
         metadata += '\\def\\IACR@vol{' + str(paper_status.issue.volume.name) + '}\n'
         metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
     metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + r'\&domain=pdf\&date\_stamp=' + publishedDate + '}\n'
+    # We now check for version=final in iacrj.
+    metadata += '\\ifcsstring{@IACRversion}{final}{}{\\ClassError{iacrj}{This production system requires using version=final in \\string\documentclass}{}}'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
@@ -483,6 +500,7 @@ def compile_for_copyedit():
                                  'email': version_compilation.email,
                                  'submitted': version_compilation.submitted,
                                  'accepted': version_compilation.accepted,
+                                 'revised': version_compilation.revised,
                                  'pubtype': version_compilation.pubtype,
                                  'errata_doi': version_compilation.errata_doi,
                                  'compiled': now,
@@ -615,6 +633,7 @@ def view_copyedit(paperid, auth):
                                          volume=paper_status.volume_key,
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
+                                         revised=paper_status.revised,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
                                          pubtype=paper_status.pubtype.name,
@@ -624,6 +643,7 @@ def view_copyedit(paperid, auth):
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted,
+                                                           paper_status.revised,
                                                            paper_status.journal_key,
                                                            paper_status.volume_key,
                                                            paper_status.issue_key,
@@ -699,6 +719,7 @@ def respond_to_comment(paperid, itemid, auth):
                                          volume=paper_status.volume_key,                                         
                                          submitted=paper_status.submitted,
                                          accepted=paper_status.accepted,
+                                         revised=paper_status.revised,
                                          email=paper_status.email,
                                          journal=paper_status.journal_key,
                                          auth=create_hmac([paperid, # TODO: authenticate other fields
@@ -707,6 +728,7 @@ def respond_to_comment(paperid, itemid, auth):
                                                            Version.FINAL.value,
                                                            paper_status.submitted,
                                                            paper_status.accepted,
+                                                           paper_status.revised,
                                                            paper_status.journal_key,
                                                            paper_status.volume_key,
                                                            paper_status.issue_key,
@@ -850,7 +872,6 @@ def view_results(paperid, version, auth):
         json_file = paper_path / Path('compilation.json')
         comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
         data['comp'] = comp
-        data['auth'] = create_hmac([paperid, version, comp.submitted, comp.accepted])
     except Exception as e:
         return render_template('message.html',
                                title='Unable to parse compilation',
@@ -901,12 +922,14 @@ def view_results(paperid, version, auth):
                                  issue=pstatus.issue_key,
                                  submitted=pstatus.submitted,
                                  accepted=pstatus.accepted,
+                                 revised=pstatus.revised,
                                  auth=create_hmac([paperid,
                                                    pstatus.hotcrp,
                                                    pstatus.hotcrp_id,
                                                    version,
                                                    comp.submitted,
                                                    comp.accepted,
+                                                   comp.revised,
                                                    pstatus.journal_key,
                                                    pstatus.volume_key,
                                                    pstatus.issue_key,
