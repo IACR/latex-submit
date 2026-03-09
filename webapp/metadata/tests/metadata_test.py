@@ -341,4 +341,14 @@ def test_pubtype():
     assert comp.pubtype == PubType.ERRATA
     assert comp.errata_doi == '10.1791/foobar'
     
-    
+def test_revised():
+    data = _compile_data
+    data['revised'] = '2022-10-09 13:10:04'
+    comp = Compilation(**data)
+    assert comp.revised == '2022-10-09 13:10:04'
+
+def test_empty_revised():
+    data = _compile_data
+    data['revised'] = ''
+    comp = Compilation(**data)
+    assert comp.revised == ''

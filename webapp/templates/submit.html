@@ -89,6 +89,12 @@
         {% endfor %}
         {% endif %}
         {{ form.accepted }}
+        {% if form.revised.errors %}
+        {% for msg in form.revised.errors %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {{ form.revised }}
         {% if form.volume.errors %}
         {% for msg in form.volume.errors %}
         <div class="form-text text-danger">{{msg}}</div>

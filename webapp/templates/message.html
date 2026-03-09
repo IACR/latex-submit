@@ -10,6 +10,11 @@ in red.
 <main id="mainContent" class="container px-3 px-md-4">
 <h2 class="mt-2 mb-5">{{title}}</h2>
 
+{% for msg in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ msg }}
+</div>
+{% endfor %}
 {% if message %}
 <div class="alert alert-info">
   {{message|safe}}

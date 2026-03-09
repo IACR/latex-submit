@@ -613,6 +613,7 @@ def request_more_changes():
                                  'email': last_compilation.email,
                                  'submitted': last_compilation.submitted,
                                  'accepted': last_compilation.accepted,
+                                 'revised': last_compilation.revised,
                                  'pubtype': last_compilation.pubtype,
                                  'errata_doi': last_compilation.errata_doi,
                                  'compiled': now,
@@ -821,6 +822,8 @@ def change_issue():
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
     metadata += '\\def\\IACR@vol{' + str(volume.name) + '}\n'
     metadata += '\\def\\IACR@no{' + str(issue.name) + '}\n'
+    if compilation.revised:
+        metadata += '\\def\\IACR@Revised{' + compilation.revised[:10] + '}\n'
     metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + '\&domain=pdf\&date\_stamp=' + publishedDate + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)

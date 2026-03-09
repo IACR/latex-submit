@@ -349,6 +349,9 @@ class Compilation(BaseModel):
     accepted: Annotated[str, StringConstraints(pattern=dt_regex)] = Field(...,
                                                title='When the paper was accepted for publication',
                                                description = 'Authenticated upon acceptance.')
+    revised: Annotated[str, StringConstraints(pattern='|' + dt_regex)] = Field('',
+                                   title='When the paper was last revised after submission',
+                                   description = 'Authenticated upon acceptance.')
     pubtype: PubType = Field(default=PubType.RESEARCH,
                              title='Type of publication',
                              description='Originates in review system')

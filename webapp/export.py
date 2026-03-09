@@ -104,6 +104,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         data = comp.meta.model_dump(exclude={'version': True}, exclude_none=True)
         data['submitted'] = comp.submitted
         data['accepted'] = comp.accepted
+        data['revised'] = comp.revised
         data['compiled'] = comp.compiled.strftime('%Y-%m-%d %H:%M:%S')
         data['errata_doi'] = comp.errata_doi
         data['paperid'] = comp.paperid

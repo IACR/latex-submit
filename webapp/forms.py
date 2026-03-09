@@ -3,7 +3,7 @@
 from flask import current_app as app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
-from wtforms.validators import InputRequired, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
+from wtforms.validators import InputRequired, Optional, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField, FieldList, Form, FormField
 from .metadata.db_models import Role, validate_version, Version
 from .metadata import validate_paperid
@@ -11,6 +11,7 @@ from .metadata.compilation import dt_regex, PubType
 import random, string # TODO - remove this
 from . import create_hmac, validate_hmac
 import logging
+import re
 import time
 
 class LoginForm(FlaskForm):
@@ -182,6 +183,15 @@ class SubmitForm(FlaskForm):
                            validators=[InputRequired('Accepted date is required'),
                                        Regexp(dt_regex, message='Format of accepted is YYYY-mm-dd HH:MM:SS')],
                            default='')
+    revised = HiddenField(id='revised',
+                          name='revised',
+                          default='',
+                          validators=[Optional('Revised date could be empty')])
+    def validate_revised(form, field):
+        """Revised field is optional, but must match a regex if specified."""
+        if field.data:
+            if not re.match(dt_regex, field.data):
+                raise ValidationError('Format of revised is YYYY-mm-dd HH:MM:SS')
     pubtype = HiddenField(id='pubtype',
                           name='pubtype',
                           validators=[InputRequired('pubtype field is required'),
@@ -218,6 +228,7 @@ class SubmitForm(FlaskForm):
                               self.version.data,
                               self.submitted.data,
                               self.accepted.data,
+                              self.revised.data,
                               self.journal.data,
                               self.volume.data,
                               self.issue.data,
@@ -232,6 +243,7 @@ class SubmitForm(FlaskForm):
                                       self.version.data,
                                       self.submitted.data,
                                       self.accepted.data,
+                                      self.revised.data,
                                       self.journal.data,
                                       self.volume.data,
                                       self.issue.data,
@@ -241,6 +253,12 @@ class SubmitForm(FlaskForm):
         if not super(FlaskForm, self).validate():
             logging.warning('failed to validate: ' + str(self.errors))
             return False
+        if self.revised.data:
+            if (self.revised.data < self.submitted.data or
+                self.revised.data > self.accepted.data):
+                logging.warning('revised must be between submitted and accepted')
+                self.revised.errors.append('revised must be between submitted and accepted')
+                return False
         return self.check_auth()
 
 class NotifyFinalForm(FlaskForm):
