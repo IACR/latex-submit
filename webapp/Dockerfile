@@ -8,7 +8,7 @@ RUN apt-get update -q \
     && apt-get install -qy build-essential wget libfontconfig1 fonts-font-awesome zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install texlive 2025.
+# Install texlive 2026.
 RUN wget https://mirrors.mit.edu/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz
 RUN mkdir install-tl-unx
 RUN tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
@@ -18,7 +18,7 @@ RUN tar -xvf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1; \
     install-tl-unx/install-tl -profile install-tl-unx/texlive.profile; \
     rm -r install-tl-unx; rm install-tl-unx.tar.gz
 
-ENV PATH="/usr/local/texlive/2025/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/2026/bin/x86_64-linux:${PATH}"
 # Search for cryptobib after of current directory.
 ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 
@@ -27,7 +27,7 @@ ENV BIBINPUTS=".:/home/texlive/texmf/tex/latex/iacrcc"
 # TODO: Remove this later
 RUN tlmgr install latexmk multirow xstring hyperxmp ifmtarg sectsty biblatex lastpage fancyvrb floatrow caption float lineno microtype tocloft sttools relsize import enumitem xargs ieeetran comment pgfplots pgf-blur calculator todonotes adjustbox collectbox currfile gincltex svn-prov filemod biber tikzscale pbox forloop varwidth bigfoot environ ntheorem breakcites ifoddpage bbm cleveref bbm-macros blindtext tcolorbox pdfcol doublestroke paralist glossaries mfirstuc xfor datatool mdframed zref needspace lipsum placeins thmtools tocbibind mmap qtree pict2e tree-dvips braket qcircuit xypic dashbox was threeparttable booktabs cases ascmac cancel autonum etextools textpos everypage apptools boxedminipage chngcntr framed hanging ncctools tablefootnote xifthen subfigure tikz-cd appendix diagbox makecell ifsym capt-of bbold esvect totcount supertabular fifo-stack tikzmark fixmath here tabu hyphenat wrapfig changepage cjhebrew luabidi endnotes xurl seqsplit newunicodechar minibox mathabx quantikz lettrine minifp bbding fontawesome5 tabto-ltx xpatch marginnote morefloats yfonts tabulary pdfsync csquotes printlen csvsimple kantlipsum babel-greek datetime2 spverbatim subfiles version rotfloat ellipsis calrsfs tkz-euclide imakeidx academicons anyfontsize scalerel titlesec fixme blkarray circuitikz multibib sidecap mathalpha outlines graphbox eqparbox epigraph nextpage gensymb newtx dblfloatfix spath3 stmaryrd
 RUN tlmgr install acronym tikz-qtree lkproof layouts totpages tikz-timing pgfopts esint ltablex acro translations breakurl msc picture accsupp accessibility axessibility nag quoting mleftright subdepth tikzpeople stackengine savesym
-RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesanspro sourceserifpro cjk biblatex-trad biblatex-ext marginfix sidenotes doclicense ccicons leftidx tokcycle
+RUN tlmgr install dashrule transparent numprint moresize tasks shipunov sauerj verbatimbox readarray changes truncate fmtcount contour sourcecodepro sourcesans cjk biblatex-trad biblatex-ext marginfix sidenotes doclicense ccicons leftidx tokcycle
 # install some fonts
 RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm asana-math sfmath svrsymbols cm-unicode libertine inconsolata simpleicons
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
