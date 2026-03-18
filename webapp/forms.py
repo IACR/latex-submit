@@ -190,6 +190,9 @@ class SubmitForm(FlaskForm):
     def validate_revised(form, field):
         """Revised field is optional, but must match a regex if specified."""
         if field.data:
+            # we accept just a date in ISO format.
+            if re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', field.data):
+                field.data = field.data + ' 00:00:00'
             if not re.match(dt_regex, field.data):
                 raise ValidationError('Format of revised is YYYY-mm-dd HH:MM:SS')
     pubtype = HiddenField(id='pubtype',
