@@ -20,6 +20,10 @@ from nameparser import HumanName
 
 ojs_bp = Blueprint('ojs_file', __name__)
 
+def regex_replace(s, find, replace):
+    """A non-optimal implementation of a regex filter"""
+    return re.sub(find, replace, s)
+
 @ojs_bp.route('/admin/ojs/issue/<issue_id>')
 @login_required
 @admin_required
@@ -60,6 +64,7 @@ def show_ojs_paper(paperid):
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value)
     if not paper_path.is_dir():
         return admin_message('Unable to open directory: ' + str(paper_path))
+    app.jinja_env.filters['regex_replace'] = regex_replace
     comp_file = paper_path / Path('compilation.json')
     try:
         comp = Compilation.model_validate_json(comp_file.read_text(encoding='UTF-8'))

@@ -23,12 +23,10 @@
    function copyData(id) {
      console.log('copying ' + id);
      let el = document.getElementById(id);
-     console.log(el);
      navigator.clipboard.writeText(el.value).then(() => {
        const copyTooltip = new bootstrap.Tooltip('#' + id,
                                                  {trigger: 'manual',
                                                   title: 'Copied!'});
-       console.log('copied');
        copyTooltip.show();
        setTimeout(function() {
          copyTooltip.dispose();
@@ -67,21 +65,27 @@
     <div class="col-2 rowlab">Abstract:</div>
     <div class="col d-flex align-items-center">
       <button class="btn btn-sm btn-success me-2" onclick="copyData('abstract');">Copy</button>
-      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|replace('<p>', '')|replace('</p>', '')}}</textarea>
+      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|replace('<p>', '')|replace('</p>', '')|regex_replace('[\s]+', ' ')}}</textarea>
     </div>
   </div>
   <div class="row">
     <div class="col-2 rowlab">Rights:</div>
     <div class="col d-flex align-items-center">
-      <button class="btn btn-sm btn-success" onclick="copyData('rights');">Copy</button>
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('rights');">Copy</button>
       <input class="form-control" id="rights" value="Copyright retained by author(s). <a href='{{comp.meta.license.reference}}'>{{comp.meta.license.label}} {{comp.meta.license.name}}</a>">
     </div>
   </div>
   <div class="row">
     <div class="col-2 rowlab">Keywords:</div>
-    <div class="col d-flex align-items-center">
-      <button class="btn btn-sm btn-success me-2" onclick="copyData('keywords');">Copy</button>
-      <input class="form-control" id="keywords" value="{{comp.meta.keywords|join(', ')}}">
+    <div class="col">
+      {% for keyword in comp.meta.keywords %}
+      <div class="d-flex my-2">
+        <button class="btn btn-sm btn-success me-2" onclick="copyData('keywords-{{loop.index}}');">Copy</button>
+        <input class="form-control" id="keywords-{{loop.index}}" value="{{keyword}}">
+      </div>
+      {% endfor %}
+{#      <button class="btn btn-sm btn-success me-2" onclick="copyData('keywords');">Copy</button>
+      <input class="form-control" id="keywords" value="{{comp.meta.keywords|join(', ')}}">#}
     </div>
   </div>
   <div class="row">
@@ -142,7 +146,7 @@
         <div class="col-2 rowlab">ORCID:</div>
         <div class="col d-flex align-items-center">
           <button class="btn btn-sm btn-success me-2" onclick="copyData('orcid-{{loop.index}}');">Copy</button>
-          <input type="text" class="form-control" id="orcid-{{loop.index}}" value="https://orcid.org/{{author.orcid}}">
+          <input type="text" class="form-control" id="orcid-{{loop.index}}" value="{% if author.orcid %}https://orcid.org/{{author.orcid}}{% endif %}">
         </div>
       </div>
       <div class="row">
@@ -155,6 +159,13 @@
     </div>
   </div>
   {% endfor %}
+  <div class="row">
+    <div class="col-2 rowlab">DOI:</div>
+    <div class="col d-flex align-items-center">
+      <button class="btn btn-sm btn-success me-2" onclick="copyData('doi');">Copy</button>
+      <input class="form-control" id="doi" value="{{comp.meta.DOI}}">
+    </div>
+  </div>
   <div class="row">
     <div class="col-2 rowlab">Galley file:</div>
     <div class="col"><a class="btn btn-sm btn-success" href="{{url_for('ojs_file.download_pdf', paperid=paper.paperid)}}">Download PDF</a></div>
