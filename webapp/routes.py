@@ -346,7 +346,7 @@ def submit_version():
         metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
     metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + r'\&domain=pdf\&date\_stamp=' + publishedDate + '}\n'
     # We now check for version=final in iacrj.
-    metadata += '\\ifcsstring{@IACRversion}{final}{}{\\ClassError{iacrj}{This production system requires using version=final in \\string\documentclass}{}}'
+    metadata += '\\IfClassLoadedTF{iacrj}{\\ifcsstring{@IACRversion}{final}{}{\\ClassError{iacrj}{This production system requires using version=final in \\string\documentclass}{}}}{}'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
