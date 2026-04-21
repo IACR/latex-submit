@@ -5,8 +5,8 @@ object is specified in the config and loaded when initialize_data
 is called from create_app.
 """
 
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import List, Optional
+from pydantic import BaseModel, Field, ConfigDict, EmailStr, model_validator
+from typing import List, Optional, Self
 
 class InitJournal(BaseModel):
     hotcrp_key: str = Field(...,
@@ -51,6 +51,20 @@ class InitData(BaseModel):
     journals: List[InitJournal] = Field(default=[],
                                         title='List of journals')
     model_config = ConfigDict(extra='forbid')
+    @model_validator(mode='after')
+    def check_emails(self) -> Self:
+        emails = set([u.email for u in self.users])
+        for journal in self.journals:
+            for e in journal.editors:
+                if e not in emails:
+                    raise ValueError('Journal {} has unknown editor {}'.format(journal.acronym, e))
+            for e in journal.copyeditors:
+                if e not in emails:
+                    raise ValueError('Journal {} has unknown copyeditor {}'.format(journal.acronym, e))
+            for e in journal.viewers:
+                if e not in emails:
+                    raise ValueError('Journal {} has unknown viewer {}'.format(journal.acronym, e))
+        return self
 
 if __name__ == '__main__':
     from pathlib import Path

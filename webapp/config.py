@@ -5,18 +5,24 @@ that are specific to flask_security (these start with SECURITY_).
 from os import path
 
 from enum import Enum
-from pydantic import BaseModel, Field, AnyUrl, ConfigDict, EmailStr
+from pydantic import BaseModel, Field, AnyUrl, ConfigDict, EmailStr, ConfigDict
 from typing import List, Optional
 
 basedir = path.abspath(path.dirname(__file__))
 
 class Config(BaseModel):
-    DEBUG: bool = Field(default=True,
+    DEBUG: bool = Field(default=False,
                         title='Whether to enable debug mode',
                         description='Should be false in production')
     TESTING: bool = Field(default=False,
                           title='Whether to enable testing',
                           description='Should be false in production')
+    INIT_FILE: Optional[str] = Field(None,
+                                     title='Path to InitData JSON file to load users and journals into the database.',
+                                     description='Used for simple setup in development')
+    DEMO_INSTANCE: bool = Field(False,
+                                title='Whether it is set up as a demonstration site with no authentication.',
+                                description='This can be used in development or to run a demo site.')
     HOTCRP_API_KEY: str = Field(default='ChangeThis',
                                 title='Key used to authenticate API calls to HotCRP system',
                                 description='This is used to record that a paper was uploaded and retrieve a list of papers.')
@@ -39,20 +45,12 @@ class Config(BaseModel):
                                 title='The short name for the site. Used in mobile view.')
     PUBLISHER_NAME: str = Field(default='International Association for Cryptologic Research',
                                 title='Name of the publisher')
-    CROSSREF_PUBLISHER_EMAIL: EmailStr = Field(...,
-                                               title='Email of account used for authenticating to crossref.')
-    DEMO_INSTANCE: bool = Field(False,
-                                title='Whether it is set up as a demonstration site with no authentication.',
-                                description='This can be used in development or to run a demo site.')
     WTF_CSRF_TIME_LIMIT: Optional[int] = Field(None,
                                                title='Used by flask_wtf.')
     EXPORT_PATH: str = Field(default='/tmp',
                              title='Location for where exports go for a published issue')
     FUNDING_SEARCH_URL: str = Field(default='/searchapi/search',
                                     title='Allows search for ROR to be on a different site.')
-    INIT_FILE: Optional[str] = Field(None,
-                                     title='Path to initialization file to populate the database upon startup.',
-                                     description='Used for simple setup in development')
     SQLALCHEMY_ENGINES: dict = Field(default={'default': 'sqlite:///db.sqlite'},
                                      title='Used by flask_sqlalchemy_lite')
     SQLALCHEMY_ENGINE_OPTIONS: dict = Field(default= {"pool_pre_ping": True},
@@ -125,6 +123,7 @@ class Config(BaseModel):
     MAIL_BACKEND: str = Field(default='console',
                               title='Which backend to use for flask_mailman.',
                               description='In production this should be smtp, but in debug it should be console.')
+    model_config = ConfigDict(extra='forbid')
 
 # class ProdConfig(Config):
 #     FLASK_ENV = 'production'
