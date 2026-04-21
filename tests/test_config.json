@@ -11,7 +11,6 @@
   "SITE_NAME": "IACR Publishing Portal",
   "SITE_SHORTNAME": "IACR Publishing",
   "PUBLISHER_NAME": "International Association for Cryptologic Research",
-  "CROSSREF_PUBLISHER_EMAIL": "crossref@iacr.org",
   "DEMO_INSTANCE": false,
   "WTF_CSRF_TIME_LIMIT": null,
   "EXPORT_PATH": "/tmp",
