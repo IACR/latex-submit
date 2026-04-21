@@ -6,7 +6,8 @@ is called from create_app.
 """
 
 from pydantic import BaseModel, Field, ConfigDict, EmailStr, model_validator
-from typing import List, Optional, Self
+from typing import List, Optional
+from typing_extensions import Self
 
 class InitJournal(BaseModel):
     hotcrp_key: str = Field(...,

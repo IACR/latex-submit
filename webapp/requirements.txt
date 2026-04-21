@@ -46,3 +46,6 @@ apscheduler
 # flask-login has been replaced by flask_security.
 flask_security
 flask_sqlalchemy_lite
+typing_extensions
+redis
+argon2_cffi
