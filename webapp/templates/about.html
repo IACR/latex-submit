@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block content %}
+{% block page_content %}
 <main id="mainContent" class="container px-3 px-md-4">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
@@ -21,4 +21,4 @@
   </div>
 </div>
 </main>
-{% endblock %} {# content #}
+{% endblock %} {# page_content #}

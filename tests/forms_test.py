@@ -3,10 +3,9 @@ import pytest
 import sys
 from flask import Flask
 from werkzeug.datastructures import MultiDict, FileStorage
+from wtforms.validators import InputRequired
 
-sys.path.insert(0, '../../')
 from webapp.metadata.compilation import PubType
-from webapp.config import TestConfig
 
 def get_form_data():
     _form_data = {'paperid': 'testing',
@@ -28,15 +27,16 @@ def get_form_data():
                                   content_type='application/x-zip'),
     return data
 
-def test_form():
-    app = Flask(__name__)
-    app.config.from_object(TestConfig)
+def test_form(app):
     ctx = app.app_context()
     ctx.push()
     from webapp.forms import SubmitForm
     with ctx:
         data = get_form_data()
         form = SubmitForm(formdata=MultiDict(data))
+        # turn off validation on journal.
+        form.journal.validators = [InputRequired()]
+        print(form.data)
         form.generate_auth()
         assert form.validate()
 

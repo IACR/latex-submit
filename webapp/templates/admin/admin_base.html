@@ -129,18 +129,22 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/admin">Admin Home</a>
         </li>
+        {% if not view_only %}
         <li class="nav-item">
           <a class="nav-link" href="/admin/copyedit">Copy editing</a>
         </li>
+        {% endif %}
+        {% if current_user.has_role('admin') %}
         <li class="nav-item">
           <a class="nav-link" href="/admin/allusers">User management</a>
         </li>
+        {% endif %}
         {% block extraMenu %}
         {% endblock %}
       </ul>
     </div>
   </div>
 </nav>
-{% block content %}{% endblock %}
+{% block page_content %}{% endblock %}
 </body>
 </html>
