@@ -16,23 +16,9 @@
 # Some packages below are pinned by version. In each case we try to explain
 # why.
 arxiv-latex-cleaner>=v1.0.4
-# ##########################################
-# The flask package is frozen because we use flask-login. flask-login is barely being
-# maintained, and the flask developers seem to have no interest in maintaining backward
-# compatibility with extensions.
 flask
-# ##########################################
 flask_mail
 flask_limiter
-# ##################################
-# flask-login is brittle. You cannot install from debian because it
-# has a dependency on an old werkzeug. See
-# https://blog.miguelgrinberg.com/post/we-have-to-talk-about-flask The
-# fix for flask-login has been checked into github, but has not been
-# pushed to pypi at this time:
-# https://github.com/maxcountryman/flask-login/pull/746/files
-flask-login
-# ##########################################
 flask-wtf
 # pydantic when through a major change with 2.0.
 pydantic[email]>=2.0
@@ -41,12 +27,8 @@ pydantic-extra-types
 pycountry
 # sqlalchemy also went through a major change with 2.0.
 sqlalchemy>=2.0
-# we need werkzeug for flask, flask_login, and MultiDict. The
-# version is pinned in order to maintain compatibility with flask_login
 werkzeug
 latex2mathml
-# ##########################################################
-# Packages below can be installed from debian.
 lxml                 # from debian
 nameparser           # from debian
 bibtexparser>=2.0.0b7
@@ -56,5 +38,11 @@ xmlschema            # from debian
 requests
 docker
 markdown
+# flask_limiter needs storage. We could also use redis. The only
+# dependency is in the config.
 pymemcache
 apscheduler
+# ##################################
+# flask-login has been replaced by flask_security.
+flask_security
+flask_sqlalchemy_lite

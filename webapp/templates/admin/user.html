@@ -1,23 +1,45 @@
 {# This is use by forms.py:AdminUserForm #}
 {% extends "admin/admin_base.html" %}
-{% block content %}
+{% block endOfHead %}
+<style>
+ ul#roles {
+   padding-left: 0rem;
+   list-style-type: none;
+ }
+</style>
+
+{% endblock %}
+{% block page_content %}
 <main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-5 text-center">User administration</h1>
 {% if form.email.data %}
 <h1 class="mt-4">Edit user {{form.email.data}}
-  <a class="ms-3 btn btn-warning" href="{{url_for('auth.recover', email=form.email.data)}}">Reset password</a>
+{#  <a class="ms-3 btn btn-warning" href="{{url_for('security_bp.recover', email=form.email.data)}}">Reset password</a>#}
 </h1>
 {% else %}
 <h1 class="mt-4">Create user</h1>
 {% endif %}
 </h1>
-<form method="POST" action="{{url_for('admin_file.user', email=form.email.data)}}">
+<form method="POST" action="{{url_for('admin_file.edit_user', email=form.email.data)}}">
   {{ form.csrf_token }}
   {{ form.old_email() }}
   <div class="form-group mt-3 row">
+    {{ form.name.label(class_="col-2 col-form-label text-end") }}
+    <div class="col-10">
+      {{ form.name(placeholder='Enter name of person',class_="form-control") }}
+      {% if form.name.errors %}
+      <ul class="errors">
+        {% for error in form.name.errors %}
+        <li>{{ error }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="form-group mt-3 row">
     {{ form.email.label(class_="col-2 col-form-label text-end") }}
-    <div class="col-6">
+    <div class="col-10">
       {{ form.email(placeholder='useremail@example.com',class_="form-control") }}
+      <div class="form-text">Email is the login used by the user. It should only be changed if the user loses access to their old one.</div>
       {% if form.email.errors %}
       <ul class="errors">
         {% for error in form.email.errors %}
@@ -27,12 +49,12 @@
     </div>
   </div>
   <div class="form-group row mt-3">
-    {{ form.role.label(class_="col-2 col-form-label text-end")}}
-    <div class="col-6">
-      {{ form.role(class_="form-select") }}
-      {% if form.role.errors %}
+    {{ form.roles.label(class_="col-2 col-form-label text-end")}}
+    <div class="col-10">
+      {{ form.roles(class_="") }}
+      {% if form.roles.errors %}
       <ul class="errors">
-        {% for error in form.role.errors %}
+        {% for error in form.roles.errors %}
         <li>{{ error }}</li>
         {% endfor %}
       </ul>
@@ -40,7 +62,7 @@
     </div>
   </div>
   <div class="row mt-3">
-    <div class="offset-2 col-6">
+    <div class="offset-2 col-10">
       {{ form.submit(class_="btn btn-primary") }}
       <span class="{% if form.email.data %}d-inline{% else %}d-none{% endif %}">
       {{ form.delete_cb(class_="ms-4 btn btn-danger", onclick="show_danger(this)") }}

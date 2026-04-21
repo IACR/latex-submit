@@ -17,7 +17,7 @@ from .metadata.xml_meta import validate_abstract
 from .metadata.compilation import Compilation, Meta, CompileStatus, VersionEnum, CompileError, ErrorType, LicenseEnum
 from .log_parser import LatexLogParser, BibTexLogParser
 from .metadata.db_models import CompileRecord, TaskStatus, PaperStatus
-from sqlalchemy import select
+from sqlalchemy import select, and_
 
 def is_fatal(err):
     """This is used to classify log messages as "fatal" meaning they need to
@@ -74,7 +74,8 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
             task_status = TaskStatus.FAILED_EXCEPTION
         json_file = Path(paper_path) / Path('compilation.json')
         compilation = None
-        comprec = CompileRecord.query.filter_by(paperid=paperid,version=version).first()
+        comprec = db.session.execute(select(CompileRecord).where(and_(CompileRecord.paperid==paperid,
+                                                                      CompileRecord.version==version))).scalar_one_or_none()
         try:
             if not comprec:
                 logging.error('no CompileRecord for {}'.format(paperid))
@@ -251,6 +252,7 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
         db.session.commit()
         task_queue.pop(task_key, None)
     except Exception as e:
+        task_queue.pop(task_key, None)
         logging.error('ERROR in task: {}'.format(str(e)))
     return output.get('errors', [])
 

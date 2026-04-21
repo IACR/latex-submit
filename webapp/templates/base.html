@@ -24,8 +24,8 @@
 	  <span class="navbar-toggler-icon"></span>
 	</button>
 	<a class="navbar-brand mx-md-5" href="https://iacr.org/"><img class="iacrlogo" src="/img/iacrlogo_small.png" alt="IACR Logo" style="max-width:6rem;"></a>
-	<div class="d-none d-md-inline navbar-brand">{{site_name}}</div>
-	<span class="d-inline d-md-none navbar-brand">{{site_shortname}}</span>
+	<div class="d-none d-md-inline navbar-brand">{{config['SITE_NAME']}}</div>
+	<span class="d-inline d-md-none navbar-brand">{{config['SITE_SHORTNAME']}}</span>
           {% if config.DEMO_INSTANCE %}
           <div class="navbar-brand mx-md-2"><span class="text-danger bg-warning p-2 rounded">TEST INSTANCE</span></div>
           {% endif %}
@@ -49,14 +49,11 @@
                 {% if current_user and current_user.is_authenticated %}
                 <li class="dropdown-item-text">{{current_user.email}}</li>
                 <li><hr class="dropdown-divider"></li>
-                {% if current_user.role.value == 'admin' %}
                 <li><a href="{{ url_for('admin_file.show_admin_home') }}" class="dropdown-item">Admin portal</a></li>
-                <li><a href="{{ url_for('auth.recover') }}" class="dropdown-item">Reset someone's password</a></li>
-                {% endif %}
-                <li><a href="{{ url_for('auth.change_password') }}" class="dropdown-item">Change password</a></li>
-                <li><a href="{{ url_for('auth.logout') }}" class="dropdown-item">Logout</a></li>
+                <li><a href="{{ url_for('security_bp.change_password') }}" class="dropdown-item">Change password</a></li>
+                <li><a href="{{ url_for('security_bp.logout') }}" class="dropdown-item">Logout</a></li>
                 {% else %}
-                <li><a href="{{ url_for('auth.login') }}" class="dropdown-item">Login</a></li>
+                <li><a href="{{ url_for('security_bp.login') }}" class="dropdown-item">Login</a></li>
                 {% endif %}
               </ul>
             </li>
@@ -64,7 +61,7 @@
         </div>
       </div>
     </nav>
-    {% block content %}
+    {% block page_content %}
     <main id="mainContent" class="container-fluid px-3 px-md-4">
     </main>
     {% endblock %}

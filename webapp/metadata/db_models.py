@@ -5,9 +5,10 @@ from datetime import datetime
 from enum import Enum
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Integer, String, Text, DateTime, UniqueConstraint, ForeignKey
+from sqlalchemy import Boolean, Integer, String, Text, DateTime, UniqueConstraint, ForeignKey, Table, Column, select
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from flask_security.models import sqla as sqla
 from typing import List, Optional
 try:
     from .compilation import PubType
@@ -27,11 +28,6 @@ class PaperStatusEnum(str, Enum):
     COPY_EDIT_ACCEPT = 'Copy edit complete'
     PUBLISHED = 'Exported (published)'
   
-class Role(str, Enum):
-    AUTHOR = 'author'
-    COPYEDIT = 'copyedit'
-    ADMIN = 'admin'
-
 class Version(str, Enum):
     CANDIDATE = 'candidate'
     COPYEDIT = 'copyedit'
@@ -61,33 +57,87 @@ class Base(DeclarativeBase):
             retval[c.name] = obj
         return retval
 
-class User(UserMixin, Base):
+roles_users = Table(
+    "roles_users",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("user.id")),
+    Column("role_id", Integer, ForeignKey("role.id"))
+)
+
+"""
+The design of the Role is one of many possible designs.
+1. in this choice, we do not use Role.permissions, and there are
+   four kinds of roles:
+  * admin (essentially root on the site). There must be one, and only
+    they can create other users.
+  * editor for a journal, named Role.editor_role(journal_key)
+  * copyeditor for a journal, named as Role.copyeditor_role(journal_key).
+  * viewer for a journal. They have no write permission on papers. This
+    is named Role.viewer_role(journal_key)
+2. Another choice is to make the roles be simply 'admin, 'editor', 'copyeditor', and
+   'viewer', and store the list of journals in the permissions of the role.
+   This makes it clumsy to look up whether a user has access to a journal.
+3. Another choice is to make the role be the same as the journal,
+   and store 'editor' or 'copyeditor' in the permissions for the role.
+If we end up needing finer-grained access on the basis of role, then we
+might change this in the future.
+"""
+class Role(Base, sqla.FsRoleMixin):
+    ADMIN = 'admin'
+    __tablename__ = 'role'
+    users: Mapped[List['User']] = relationship('User',
+                                               secondary=roles_users,
+                                               back_populates='roles')
+    @classmethod
+    def editor_role(cls, journal_key):
+        return journal_key + '_editor'
+    @classmethod
+    def copyeditor_role(cls, journal_key):
+        return journal_key + '_copyeditor'
+    @classmethod
+    def viewer_role(cls, journal_key):
+        return journal_key + '_viewer'
+    @classmethod
+    def user_journal_keys(cls, user):
+        journal_keys = set()
+        for role in user.roles:
+            if 'editor' in role.name:
+                journal_keys.add(role.name)
+        return journal_keys
+
+"""
+User permissions are implemented with the Role class using flask_security,
+but there is an example of a one-to-many relationship for roles with
+flask_login located at https://github.com/maxcountryman/flask-login/issues/421
+"""
+class User(Base, sqla.FsUserMixin):
     __tablename__ = 'user'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    alternate_email: Mapped[str] = mapped_column(String(255), unique=True, nullable=True)
     password: Mapped[str] = mapped_column(String(200), nullable=False)
-    # TODO: make roles be a one-to-many relationship
-    # See https://github.com/maxcountryman/flask-login/issues/421
-    role: Mapped[Role] = mapped_column(nullable=False)
     created_on: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
-    last_login: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
-
-    def __init__(self, email, role, password):
-        self.email = email
-        self.role = role
-        self.set_password(password)
-        self.created_on = datetime.now()
-
-    def set_password(self, password):
-        """Create hashed password."""
-        self.password = generate_password_hash(password, method='scrypt')
-
-    def check_password(self, password):
-        """Check hashed password."""
-        return check_password_hash(self.password, password)
-
+    # last_login was replaced by last_login_at from FsUserMixin.
+    # last_login: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
+    fs_uniquifier: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    roles: Mapped[List['Role']] = relationship('Role',
+                                               secondary=roles_users,
+                                               back_populates='users')
+    @property
+    def is_active(self):
+        return self.active
+    def description(self):
+        return self.name + ' (' + ', '.join(json.loads(self.affiliations)) + ')'
+    def html(self):
+        return self.name + '<div class="form-text">' + ', '.join(json.loads(self.affiliations)) + '</div>'
     def __repr__(self):
-        return '<User {}'.format(self.email)
+        """We use a simplistic version of repr because we use cache.memoize on
+        some functions that take a user as an argument.
+
+        """
+        return 'user{}'.format(self.id)
 
 class CompileRecord(Base):
     __tablename__ = 'compile_record'
@@ -152,6 +202,8 @@ class PaperStatus(Base):
                                         comment='This is the shortName of the HotCRP instance.')
     hotcrp_id: Mapped[str] = mapped_column(String(32),
                                            comment='The paperid in the HotCRP instance')
+    # journal_key is how the journal is known. This should have been
+    # a foreign key to journal, but schema changes are hard.
     journal_key: Mapped[str] = mapped_column(String(32), nullable=False,
                                              comment='Original journal::hotcrp_key. Should not be changed.')
     volume_key: Mapped[str] = mapped_column(String(32), nullable=False,
@@ -173,6 +225,10 @@ class PaperStatus(Base):
     title: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded title')
     authors: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment='Last recorded, comma-delimited list of authors')
     copyeditor: Mapped[str] = mapped_column(ForeignKey('user.email', ondelete='SET NULL'), default=None, nullable=True)
+    def journal(self, db):
+        """TODO: change this to use a foreign key in journal."""
+        return db.session.execute(select(Journal).where(Journal.hotcrp_key == self.journal_key)).scalar_one_or_none()
+
 
 class LogEvent(Base):
     __tablename__ = 'log_event'
@@ -189,6 +245,9 @@ def log_event(db, paperid, action):
 class Journal(Base):
     __tablename__ = 'journal'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # The hotcrp_key is very important, because it is used to uniquely refer
+    # to a journal both within this system and in the HotCRP review system.
+    # They show up in the Role permissions.
     hotcrp_key: Mapped[str] = mapped_column(String(32),
                                             unique=True,
                                             nullable=False,
@@ -199,14 +258,20 @@ class Journal(Base):
     EISSN: Mapped[str] = mapped_column(String(10), nullable=True)
     DOI_PREFIX: Mapped[str] = mapped_column(String(10), nullable=False)
     volumes: Mapped[List['Volume']] = relationship(back_populates='journal', cascade="all, delete-orphan")
-    def __init__(self, data):
-        if 'EISSN' in data:
-            self.EISSN = data['EISSN']
-        self.hotcrp_key = data['hotcrp_key']
-        self.acronym = data['acronym']
-        self.publisher = data['publisher']
-        self.name = data['name']
-        self.DOI_PREFIX = data['DOI_PREFIX']
+    def copyedit_contacts(self, db):
+        """Return copyeditors, or failing that, the editors, or failing that, an admin."""
+        role = db.session.execute(select(Role).where(Role.name == Role.copyeditor_role(self.hotcrp_key))).scalar()
+        users= role.users
+        if len(users) > 0:
+            return users
+        role = db.session.execute(select(Role).where(Role.name == Role.editor_role(self.hotcrp_key))).scalar()
+        users = role.users
+        if len(users) > 0:
+            return users
+        # There is always supposed to be someone with the admin role.
+        role = db.session.execute(select(Role).where(Role.name == Role.ADMIN)).scalar()
+        return role.users
+
 
 class Volume(Base):
     __tablename__ = 'volume'

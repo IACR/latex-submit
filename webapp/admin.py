@@ -10,7 +10,8 @@ from flask import Blueprint, render_template, request, jsonify, send_file, flash
 from flask import current_app as app
 from sqlalchemy import select, or_, and_, desc
 from sqlalchemy.sql import func
-from flask_login import login_required, current_user
+from flask_security import auth_required, current_user, roles_required, hash_password
+from flask_security.confirmable import generate_confirmation_link
 from flask_mail import Message
 import hashlib, hmac
 import json
@@ -18,7 +19,7 @@ import logging
 import os
 from pathlib import Path
 import time
-from . import db, create_hmac, mail, generate_password, task_queue, paper_key, executor
+from . import db, create_hmac, mail, generate_password, task_queue, paper_key, executor, user_datastore
 from .metadata.compilation import Compilation, CompileStatus
 from .metadata import validate_paperid
 from .metadata.db_models import Role, User, validate_version, PaperStatus, PaperStatusEnum, Discussion, Version, LogEvent, DiscussionStatus, Discussion, Journal, Issue, Volume, CompileRecord, TaskStatus, log_event, NO_HOTCRP
@@ -31,30 +32,77 @@ from functools import wraps
 import shutil
 import urllib
 
-# decorator for views that require admin role.
-def admin_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if current_user.role == Role.ADMIN:
-            return f(*args, **kwargs)
-        else:
-            flash('You need to be an admin to view that page')
-            return redirect('/')
-    return wrap
+# We switched to using role-based access control with flask_security
+# instead of flask_login.  We do not use user accounts for authors,
+# but we use them for admins, editors, and copy editors. The
+# check_paper_access() method is used to check that a user has
+# permission to modify a paper.  We also use check_journal_access() to
+# check that an editor or copyeditor has access to a journal. Some
+# things are only accessible to the ADMIN role, and those are marked
+# with @roles_required(Role.ADMIN).
+
+def check_paper_access(paperid: str) -> tuple[PaperStatus, str]:
+    """If str is not None, then access fails with that reason."""
+    if not current_user.is_authenticated:
+        return None, 'User is not authenticated'
+    paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    if not paper_status:
+        return None, 'Unknown paper ' + paperid
+    if (current_user.has_role(Role.editor_role(paper_status.journal_key)) or
+        current_user.has_role(Role.copyeditor_role(paper_status.journal_key))):
+        return paper_status, None
+    return None, 'User lacks authorization for article '
+
+def check_journal_access(journal: Journal) -> bool:
+    return (Role.ADMIN in current_user.roles or
+            Role.editor_role(journal.hotcrp_key) in current_user.roles or
+            Role.copyeditor_role(journal.hotcrp_key) in current_user.roles)
 
 def admin_message(msg):
     return app.jinja_env.get_template('admin/message.html').render({'msg': msg})
 
 admin_bp = Blueprint('admin_file', __name__)
 
+def viewer_only() -> bool:
+    for role in current_user.roles:
+        if role.name == Role.ADMIN or 'editor' in role.name:
+            return False
+    return True    
+              
+@admin_bp.context_processor
+def inject_view_only():
+    return {
+        'view_only': viewer_only()
+        }
+
 @admin_bp.route('/admin/')
-@login_required
-@admin_required
+@auth_required()
 def show_admin_home():
+    """Users see different things depending on the roles they have."""
     errors = []
-    journals = db.session.execute(select(Journal)).scalars().all()
-    papers = db.session.execute(select(PaperStatus).order_by(PaperStatus.lastmodified.desc())).scalars().all()
+    all_roles = db.session.execute(select(Role)).scalars().all()
+    all_journals = db.session.execute(select(Journal)).scalars().all()
+    journals = []
+    if Role.ADMIN in current_user.roles:
+        journals = all_journals
+    else:
+        for j in all_journals:
+            if (Role.copyeditor_role(j.hotcrp_key) in current_user.roles or
+                Role.editor_role(j.hotcrp_key) in current_user.roles or
+                Role.viewer_role(j.hotcrp_key) in current_user.roles):
+                journals.append(j)
+    journals = [j.as_dict() for j in journals]
+    view_only = viewer_only()
+    if view_only:
+        for j in journals:
+            j['ojs_view'] = url_for('ojs_file.show_ojs_journal', hotcrp_key=j['hotcrp_key'])
+    if current_user.has_role(Role.ADMIN):
+        papers = db.session.execute(select(PaperStatus).order_by(PaperStatus.lastmodified.desc())).scalars().all()
+    else:
+        # we could just select the papers that the user has access to, but it's not necessary for the UX.
+        papers = []
     data = {'title': 'Upload Admin Home',
+            'all_roles': all_roles,
             'errors': errors,
             'journal_name': app.config['SITE_SHORTNAME'],
             'papers': papers,
@@ -62,15 +110,21 @@ def show_admin_home():
     return render_template('admin/home.html', **data)
 
 @admin_bp.route('/admin/view/<paperid>')
-@login_required
-@admin_required
+@auth_required()
 def show_admin_paper(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = select(PaperStatus).filter_by(paperid=paperid)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Unknown paper: {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     issue = db.session.execute(select(Issue).where(Issue.id==paper_status.issue_id)).scalar_one_or_none()
     sql = select(LogEvent).filter_by(paperid=paperid)
     events = db.session.execute(sql).scalars().all()
@@ -110,19 +164,20 @@ def show_admin_paper(paperid):
     return render_template('admin/view.html', **data)
 
 @admin_bp.route('/admin/allusers', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
+@roles_required(Role.ADMIN)
 def all_users():
     data = {'title': 'All users',
-            'all_users': User.query.all()}
+            'all_users': db.session.execute(select(User)).scalars().all()}
     return render_template('admin/all_users.html', **data)
 
 @admin_bp.route('/admin/user', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def user():
+@auth_required()
+@roles_required(Role.ADMIN)
+def edit_user():
     """Used for editing a user or creating a new user. At this time, users
-       may not signup themselves."""
+       may not signup themselves. This is controlled in the configuration setting
+       SECURITY_REGISTERABLE"""
     form = AdminUserForm()
     if form.validate_on_submit():
         sql = select(User).filter_by(email=form.old_email.data)
@@ -131,49 +186,61 @@ def user():
             user.email = form.email.data
             if form.delete_cb.data: # delete the user
                 if form.old_email.data == current_user.email:
+                    flash('You are unable to delete yourself')
                     return redirect(url_for('admin_file.all_users'))
-                db.session.delete(user)
-                db.session.commit()
-            else: # change role or email.
-                if user.role != form.role.data:
-                    flash('User role changed from {} to {}'.format(user.role,
-                                                                   form.role.data))
-                    user.role = form.role.data
-                    app.logger.info('role of {} changed to {}'.format(user.email, form.old_email.data, ))
+                user_datastore.delete_user(user)
+                user_datastore.commit()
+                flash('User {} was removed'.format(user.email))
+                return redirect(url_for('admin_file.all_users'))
+            else: # change role or email or name.
+                user_roles = [r.name for r in user.roles]
+                if set(user_roles) != set(form.roles.data):
+                    all_roles = db.session.execute(select(Role)).scalars().all()
+                    all_roles = {r.name: r for r in all_roles}
+                    for r in user_roles:
+                        if r not in form.roles.data:
+                            if r == Role.ADMIN and len(all_roles[r].users) == 1:
+                                flash('Unable to remove the last admin user')
+                                return redirect(url_for('admin_file.all_users'))
+                            user.roles.remove(all_roles[r])
+                    for r in form.roles.data:
+                        if r not in user_roles:
+                            user.roles.append(all_roles[r])
                 if user.email != form.old_email.data:
                     flash('User email changed from {} to {}'.format(form.old_email.data,
                                                                     form.email.data))
                     app.logger.info('email changed from {} to {}'.format(user.email, form.old_email.data, ))
+                if user.name != form.name.data:
+                    user.name = form.name.data
+                    flash('User name changed from {} to {}'.format(user.name,
+                                                                   form.name.data))
                 db.session.add(user)
                 db.session.commit()
         else: # create a new user.
             sql = select(User).filter_by(email=form.email.data)
             existing_user = db.session.execute(sql).scalar_one_or_none()
-            # Legacy API: existing_user = User.query.filter_by(email=form.email.data).first()
             if existing_user:
                 flash('That user already exists')
                 return redirect(url_for('admin_file.user'))
             password = generate_password()
-            user = User(email=form.email.data,
-                        role=form.role.data,
-                        password=password)
-            db.session.add(user)
-            db.session.commit()
+            udata = {'password': hash_password(password),
+                     'name': form.name.data,
+                     'email': form.email.data,
+                     'roles': form.roles.data}
+            user = user_datastore.create_user(**udata)
+            user_datastore.commit()
             # notify the user by email.
             subject = 'New account for {} on {}'.format(user.email,
                                                         app.config['SITE_NAME'])
             msg = Message(subject,
-                  sender=app.config['EDITOR_EMAILS'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[form.email.data])
             timestamp = str(int(time.time()))
+            link, token = generate_confirmation_link(user)
             maildata = {'email': user.email,
                         'servername': app.config['SITE_NAME'],
                         'password': password,
-                        'confirm_url': url_for('auth.confirm_email',
-                                               email=user.email,
-                                               auth=create_hmac([user.email, timestamp]),
-                                               ts=timestamp,
-                                               _external=True)}
+                        'confirm_url': link}
             msg.body = app.jinja_env.get_template('admin/new_account.txt').render(maildata)
             if app.config['DEBUG']:
                 print(msg.body)
@@ -189,7 +256,8 @@ def user():
         if user:
             form.email.data = user.email
             form.old_email.data = user.email
-            form.role.data = user.role
+            form.name.data = user.name
+            form.roles.process_data([r.name for r in user.roles])
             form.submit.label.text = 'Update'
         else:
             flash('no such user {}'.format(args.get('id')))
@@ -209,15 +277,21 @@ def _copyedit_url(paperid: str, status: PaperStatusEnum) -> str:
     return None
 
 @admin_bp.route('/admin/copyedit/<paperid>', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def copyedit(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = select(PaperStatus).filter_by(paperid=paperid)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Unknown paper: {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     paper_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
     input_dir = paper_path / Path('input')
     input_files = sorted([str(p.relative_to(str(input_dir))) for p in input_dir.rglob('*') if p.is_file()])
@@ -249,17 +323,24 @@ def copyedit(paperid):
     return render_template('admin/copyedit.html', **data)
 
 @admin_bp.route('/admin/approve_final', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def approve_final():
     """Called when the final version is approved by the copy editor."""
     args = request.form.to_dict()
     if 'paperid' not in args:
         return admin_message('Missing paperid!')
     paperid = args.get('paperid')
-    paper_status = db.session.execute(select(PaperStatus).filter_by(paperid=paperid)).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Missing PaperStatus for paperid {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     paper_status.status = PaperStatusEnum.COPY_EDIT_ACCEPT
     paper_status.lastmodified = datetime.now()
     if paper_status.issue_id:
@@ -271,9 +352,11 @@ def approve_final():
     db.session.add(paper_status)
     db.session.commit()
     log_event(db, paperid, 'Final version approved for publication')
+    users = journal.copyedit_contacts(db)
+    recipients = [u.email for u in users]
     editor_msg = Message('Copy edit changes approved for {}'.format(paperid),
-                         sender=app.config['EDITOR_EMAILS'],
-                         recipients=[app.config['EDITOR_EMAILS']])
+                         sender=app.config['MAIL_DEFAULT_SENDER'],
+                         recipients=recipients)
     maildata = {'journal_name': paper_status.journal_key,
                 'paperid': paperid,
                 'copyedit_url': url_for('admin_file.copyedit_home', _external=True)}
@@ -288,7 +371,7 @@ def approve_final():
         maildata = {'paperid': paperid,
                     'paper_title': comp.meta.title}
         author_msg = Message('Copy edit changes approved for {}'.format(paperid),
-                             sender=app.config['EDITOR_EMAILS'],
+                             sender=app.config['MAIL_DEFAULT_SENDER'],
                              recipients=[paper_status.email])
         author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
         if app.config['DEBUG']:
@@ -300,13 +383,15 @@ def approve_final():
     return redirect(url_for('admin_file.copyedit_home'), code=302)
 
 @admin_bp.route('/admin/view_journal/<jid>', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def view_journal(jid):
     journal = db.session.execute(select(Journal).where(Journal.id==jid)).scalar_one_or_none()
     if not journal:
         flash('No such journal')
         return redirect(url_for('admin_file.show_admin_home'))
+    if not check_journal_access(journal):
+        flash('You do not have access to journal {}.'.format(journal.name))
+        return redirect(url_for('home_bp.home'))
     volume_info = db.session.execute(select(Volume.id, Volume.name).where(Volume.journal_id==jid)).all()
     volumes = [obj._asdict() for obj in volume_info]
     for volume in volumes:
@@ -337,13 +422,16 @@ def _get_hotcrp_papers(issue: Issue):
         return {'error': 'unable to retrieve hotcrp papers: ' + str(e)}
 
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def view_issue(issueid):
     issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
     if not issue:
         flash('No such issue')
         return redirect(url_for('admin_file.show_admin_home'))
+    journal = issue.volume.journal
+    if not check_journal_access(journal):
+        flash('You do not have access to journal {}.'.format(journal.name))
+        return redirect(url_for('home_bp.home'))
     papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id == issue.id).order_by(PaperStatus.paperno)).scalars().all()
     finished_papers = [p for p in papers if p.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
     unassigned_sql = select(PaperStatus).where(PaperStatus.issue_id == None)
@@ -392,16 +480,21 @@ def view_issue(issueid):
     return render_template('admin/view_issue.html', **data)
 
 @admin_bp.route('/admin/final_review/<paperid>', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def final_review(paperid):
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = select(PaperStatus).filter_by(paperid=paperid)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: paper_status = PaperStatus.query.filter_by(paperid=paperid).first()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Unknown paper: {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     candidate_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.CANDIDATE.value)
     final_path = Path(app.config['DATA_DIR']) / Path(paperid) / Path(Version.FINAL.value)
     diffs = {}
@@ -461,17 +554,23 @@ def final_review(paperid):
     return render_template('admin/final_review.html', **data)
 
 @admin_bp.route('/admin/finish_copyedit', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def finish_copyedit():
     args = request.form.to_dict()
     paperid = args.get('paperid')
     if not validate_paperid(paperid):
         return admin_message('Invalid paperid: {}'.format(paperid))
-    sql = select(PaperStatus).filter_by(paperid=paperid)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Unknown paper: {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     numitems = db.session.query(Discussion).filter_by(paperid=paperid,status=DiscussionStatus.PENDING).count()
     if not numitems:
         # in this case, the paper has no issues for the author to
@@ -505,7 +604,7 @@ def finish_copyedit():
         maildata = {'paperid': paperid,
                     'paper_title': paper_status.title}
         author_msg = Message('Copy edit changes approved for {}'.format(paperid),
-                             sender=app.config['EDITOR_EMAILS'],
+                             sender=app.config['MAIL_DEFAULT_SENDER'],
                              recipients=[paper_status.email])
         author_msg.body = app.jinja_env.get_template('admin/author_finished.txt').render(maildata)
         if app.config['DEBUG']:
@@ -525,7 +624,7 @@ def finish_copyedit():
     db.session.add(paper_status)
     db.session.commit()
     msg = Message('Copy editing was finished on your paper',
-                  sender=app.config['EDITOR_EMAILS'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[paper_status.email])
     maildata = {'journal_name': paper_status.journal_key,
                 'paperid': paperid,
@@ -549,17 +648,23 @@ def finish_copyedit():
 ## 3. All Discussion items are "archived" to indicate that the data in them
 ##    is not trustworthy because it depends on a previous compilation.
 @admin_bp.route('/admin/request_more_changes', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def request_more_changes():
     form = MoreChangesForm()
     if not form.validate_on_submit():
         return admin_message('Invalid form submission. This is a bug.')
     paperid = form.paperid.data
-    sql = select(PaperStatus).filter_by(paperid=paperid)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
     if not paper_status:
-        return admin_message('Unknown paper: {}'.format(paperid))
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     paper_status.status = PaperStatusEnum.EDIT_REVISED
     now = datetime.now()
     paper_status.lastmodified = now
@@ -653,8 +758,7 @@ def request_more_changes():
 
 
 @admin_bp.route('/admin/copyedit', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def copyedit_home():
     """Show the list of papers with pending copy edit actions."""
     sql = select(PaperStatus).where(
@@ -663,7 +767,11 @@ def copyedit_home():
             PaperStatus.status == PaperStatusEnum.EDIT_FINISHED,
             PaperStatus.status == PaperStatusEnum.FINAL_SUBMITTED)).order_by(desc(PaperStatus.lastmodified))
     statuses = db.session.execute(sql).scalars().all()
-    papers = [p.as_dict() for p in statuses]
+    journal_keys = Role.user_journal_keys(current_user)
+    papers = []
+    for p in statuses:
+        if p.journal_key in journal_keys:
+            papers.append(p.as_dict())
     rows = db.session.execute(select(Discussion.paperid, func.count(Discussion.id).label('issues')).group_by(Discussion.paperid)).all()
     counts = {row.paperid: row.issues for row in rows}
     for paper in papers:
@@ -675,21 +783,44 @@ def copyedit_home():
     return render_template('admin/copyedit_home.html', **data)
 
 @admin_bp.route('/admin/comments/<paperid>', methods=['GET'])
-@login_required
-@admin_required
+@auth_required()
 def comments(paperid):
     if not validate_paperid(paperid):
         return jsonify([])
-    sql = select(Discussion).filter_by(paperid=paperid).order_by(Discussion.created)
+    paper_status, msg = check_paper_access(paperid)
+    if not paper_status:
+        logging.warning(msg)
+        return jsonify({'error': msg})
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        logging.critical(msg)
+        return jsonify([])
+    sql = select(Discussion).where(Discussion.paperid == paperid).order_by(Discussion.created)
     notes = db.session.execute(sql).scalars().all()
     return jsonify([n.as_dict() for n in notes])
 
 @admin_bp.route('/admin/comment', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def comment():
     """This is for ajax to handle copy editing comments."""
     data = request.json
+    # access control is tricky because we have to recover the relevant journal first. The
+    # payload either contains the id of the comment or the paperid.
+    if 'id' in data:
+        # check if we can delete that one.
+        paperid = db.session.execute(select(Discussion.paperid).where(Discussion.id==data['id'])).scalar_one_or_none()
+    else:
+        paperid = data['paperid']
+    paper_status, msg = check_paper_access(paperid)
+    if not paper_status:
+        logging.warning(msg)
+        return jsonify({'error': msg})
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        logging.critical(msg)
+        return jsonify({'error': msg})
     try:
         action = data['action']
         if action == 'delete':
@@ -715,8 +846,7 @@ def comment():
         return jsonify({'error': str(e)})
 
 @admin_bp.route('/admin/publish_issue', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def publish_issue():
     form = PublishIssueForm()
     if not form.validate_on_submit():
@@ -729,6 +859,12 @@ def publish_issue():
     issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
     if not issue:
         return admin_message('Nonexistent issue')
+    journal = issue.volume.journal
+    if not check_journal_access(journal):
+        msg = 'User {} does not have access to journal {}'.format(current_user.email,
+                                                                  journal.name)
+        logging.critical(msg)
+        return admin_message(msg)
     try:
         now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
         issue.exported = now
@@ -744,17 +880,24 @@ def publish_issue():
     return redirect(url_for('admin_file.view_issue', issueid=issue.id))
 
 @admin_bp.route('/admin/change_issue', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def change_issue():
     form = ChangeIssueForm()
     if not form.validate_on_submit():
         for key, value in form.errors:
             log_event(db, form.paperid.data, 'Submission error: {}:{}'.format(key, value))
         return admin_message('Invalid form submission. This is a bug.')
-    paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==form.paperid.data)).scalar_one_or_none()
+    paper_status, msg = check_paper_access(form.paperid.data)
     if not paper_status:
+        flash(msg)
+        logging.warning(msg)
         return admin_message('Unknown paper {}'.format(form.paperid.data))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(form.paperid.data,
+                                                   paper_status.journal_key)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     if not form.issueid.data: # paper is being removed from its issue.
         paperno = paper_status.paperno
         issueid = paper_status.issue_id
@@ -824,7 +967,7 @@ def change_issue():
     metadata += '\\def\\IACR@no{' + str(issue.name) + '}\n'
     if compilation.revised:
         metadata += '\\def\\IACR@Revised{' + compilation.revised[:10] + '}\n'
-    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + '\&domain=pdf\&date\_stamp=' + publishedDate + '}\n'
+    metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + '\\&domain=pdf\\&date\\_stamp=' + publishedDate + '}\n'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     # Remove output from any previous run.
@@ -858,10 +1001,10 @@ def change_issue():
 
 
 @admin_bp.route('/admin/change_paperno', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def change_paperno():
-    """This is for increasing or decreasing the paperno on an individual paper."""
+    """This is for increasing or decreasing the paperno on an individual paper. Only ADMIN and
+    journal editors may do this."""
     form = ChangePaperNumberForm()
     if not form.validate_on_submit():
         for key, value in form.errors.items():
@@ -870,7 +1013,16 @@ def change_paperno():
         return admin_message('Invalid form submission. This is a bug.')
     paperid = form.paperid.data
     issueid = form.issueid.data
-    paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
+    paper_status, msg = check_paper_access(paperid)
+    if not paper_status:
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)
+    journal = paper_status.journal(db)
+    if not (Role.ADMIN in current_user.roles or
+            Role.editor_role(paper_status.journal_key) in current_user.roles):
+        flash('You are not allowed to perform that action')
+        return redirect(url_for('admin_file.show_admin_home'))
     old_paperno = paper_status.paperno
     if form.upbutton.data: # decrease the paperno by one. This means the paper above it must be renumbered.
         new_paperno = old_paperno - 1
@@ -917,16 +1069,24 @@ def change_paperno():
     return redirect(url_for('admin_file.view_issue', issueid=form.issueid.data), code=302)
 
 @admin_bp.route('/admin/claimcopyedit', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def claimcopyedit():
     form = CopyeditClaimForm()
     if not form.validate_on_submit():
         for key, value in form.errors.items():
             flash('Invalid form: {}:{}'.format(key, value))
         return admin_message('Invalid form submission. This is a bug.')
-    sql = select(PaperStatus).filter_by(paperid=form.paperid.data)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
+    paper_status, msg = check_paper_access(form.paperid.data)
+    if not paper_status:
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
+    journal = paper_status.journal(db)
+    if not journal:
+        msg = 'Paper {}:{} has no journal!'.format(paperid, paper_status.journal_key)
+        flash(msg)
+        logging.critical(msg)
+        return redirect(url_for('admin_file.show_admin_home'))
     paper_status.copyeditor = form.copyeditor.data
     db.session.commit()
     if form.view.data:
@@ -937,21 +1097,29 @@ def claimcopyedit():
     return redirect(url_for('admin_file.copyedit_home'))
 
 @admin_bp.route('/admin/deletepaper', methods=['POST'])
-@login_required
-@admin_required
+@auth_required()
 def deletePaper():
     form = DeletePaperForm()
     if not form.validate_on_submit():
         for key, value in form.errors.items():
             flash('Invalid form: {}:{}'.format(key, value))
         return admin_message('Invalid form submission. This is a bug.')
+    paper_status, msg = check_paper_access(form.paperid.data)
+    if not paper_status:
+        flash(msg)
+        logging.warning(msg)
+        return redirect(url_for('admin_file.view_issue',
+                                issueid=form.issueid.data))
+    if not (Role.ADMIN in current_user.roles or
+            Role.editor_role(paper_status.journal_key) in current_user.roles):
+        flash('You are not allowed to perform that action')
+        return redirect(url_for('admin_file.view_issue',
+                                issueid=form.issueid.data))
     paper_dir = app.config['DATA_DIR'] / Path(form.paperid.data)
     try:
         shutil.rmtree(paper_dir)
     except Exception as e:
         flash('Unable to delete the directory for the paper {}. Perhaps it was already deleted?'.format(form.paperid.data))
-    sql = select(PaperStatus).filter_by(paperid=form.paperid.data)
-    paper_status = db.session.execute(sql).scalar_one_or_none()
     db.session.delete(paper_status)
     db.session.commit()
     return redirect(url_for('admin_file.view_issue',

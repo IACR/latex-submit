@@ -10,14 +10,13 @@ from db_models import Journal
 from meta_parse import clean_abstract
 from xml_meta import get_jats, text_with_texmath, get_jats_abstract, validate_abstract
 sys.path.insert(0, '../..')
-from config import DebugConfig
 
-_journal = Journal({'EISSN': '3006-5496',
-                    'hotcrp_key': 'testhot',
-                    'name': 'IACR Communications in Cryptology',
-                    'DOI_PREFIX': '10.62056',
-                    'acronym': 'CiC',
-                    'publisher': 'International Association for Cryptologic Research'})
+_journal = Journal(EISSN='3006-5496',
+                   hotcrp_key= 'testhot',
+                   name= 'IACR Communications in Cryptology',
+                   DOI_PREFIX= '10.62056',
+                   acronym= 'CiC',
+                   publisher= 'International Association for Cryptologic Research')
 def test_with_texmath():
     input = "<p>This has $a&lt;b$ and </p><ul><li>first item</li><li>second item</li></ul><p> was a list.</p>"
     output = text_with_texmath(input)

@@ -15,7 +15,7 @@ import shutil
 from sqlalchemy import select, and_
 from sqlalchemy.sql import func
 import string
-from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, admin
+from . import executor, mail, task_queue, get_json_path, get_pdf_url, validate_hmac, create_hmac, paper_key, db, _get_journals
 from .metadata.db_models import CompileRecord, validate_version, TaskStatus, PaperStatus, PaperStatusEnum, Version, log_event, Discussion, DiscussionStatus, Journal, Volume, Issue, NO_HOTCRP
 import zipfile
 from .metadata.compilation import Compilation, CompileStatus, CompileError, ErrorType, PubType
@@ -44,8 +44,9 @@ def inject_variables():
 
 @home_bp.route('/', methods=['GET'])
 def home():
-    return render_template('index.html',
-                           title=app.config['SITE_NAME'])
+    data = {'journals': _get_journals(),
+            'title': app.config['SITE_NAME']}
+    return render_template('index.html', **data)
 
 @home_bp.route('/forbidden', methods=['GET'])
 def forbidden_packages():
@@ -256,7 +257,7 @@ def submit_version():
     try:
         request.files['zipfile'].save(tmpzip_path)
     except Exception as e:
-        logging.error('Unable to save zip file: {}'.format(str(e)))
+        logging.critical('Unable to save zip file: {}'.format(str(e)))
         form.zipfile.errors.append('unable to save zip file')
         return render_template('submit.html', form=form, journal=journal)
     try:
@@ -340,13 +341,13 @@ def submit_version():
     metadata += '\\def\\IACR@Published{' + publishedDate + '}\n'
     if revised:
         revisedDate = datetime.datetime.strptime(revised[:10], '%Y-%m-%d')
-        metadata += '\\def\IACR@Revised{' + revisedDate.strftime('%Y-%m-%d') + '}\n'
+        metadata += '\\def\\IACR@Revised{' + revisedDate.strftime('%Y-%m-%d') + '}\n'
     if paper_status.issue:
         metadata += '\\def\\IACR@vol{' + str(paper_status.issue.volume.name) + '}\n'
         metadata += '\\def\\IACR@no{' + str(paper_status.issue.name) + '}\n'
     metadata += '\\def\\IACR@CROSSMARKURL{https://crossmark.crossref.org/dialog/?doi=' + doi + r'\&domain=pdf\&date\_stamp=' + publishedDate + '}\n'
     # We now check for version=final in iacrj.
-    metadata += '\\IfClassLoadedTF{iacrj}{\\ifcsstring{@IACRversion}{final}{}{\\ClassError{iacrj}{This production system requires using version=final in \\string\documentclass}{}}}{}'
+    metadata += '\\IfClassLoadedTF{iacrj}{\\ifcsstring{@IACRversion}{final}{}{\\ClassError{iacrj}{This production system requires using version=final in \\string\\documentclass}{}}}{}'
     metadata_file = input_dir / Path('main.iacrmetadata')
     metadata_file.write_text(metadata)
     output_dir = version_dir / Path('output')
@@ -370,13 +371,13 @@ def submit_version():
                         _external=True)
     if send_mail:
         msg = Message('Paper {} was uploaded'.format(paperid),
-                      sender=app.config['EDITOR_EMAILS'],
+                      sender=app.config['MAIL_DEFAULT_SENDER'],
                       recipients=[compilation.email])
         body = 'Thank you for uploading your paper. Until you send your paper\nfor copy editing, you will be able to view it at\n\n {}'.format(paper_url)
         msg.body = body
         mail.send(msg)
         msg = Message('FYI: Paper {} was uploaded'.format(paperid),
-                      sender=app.config['EDITOR_EMAILS'],
+                      sender=app.config['MAIL_DEFAULT_SENDER'],
                       recipients=['kmccurley@gmail.com'])
         msg.body = body
         mail.send(msg)
@@ -438,6 +439,7 @@ def compile_for_copyedit():
         return render_template('message.html',
                                title='Missing status',
                                error='Paper status does not exist. This is a bug')
+    journal = db.session.execute(select(Journal).where(Journal.hotcrp_key == paper_status.journal_key)).scalar_one_or_none()
     if (paper_status.status != PaperStatusEnum.PENDING and
         paper_status.status != PaperStatusEnum.EDIT_REVISED):
         return render_template('message.html',
@@ -486,7 +488,6 @@ def compile_for_copyedit():
     copyedit_file.touch() # this iacrcc.cls to add line numbers.
     sql = select(CompileRecord).filter_by(paperid=paperid, version=Version.COPYEDIT.value)
     copyedit_comprec = db.session.execute(sql).scalar_one_or_none()
-    # Legacy API: copyedit_comprec = CompileRecord.query.filter_by(paperid=paperid,version=Version.COPYEDIT.value).first()
     if not copyedit_comprec:
         copyedit_comprec = CompileRecord(paperid=paperid,version=Version.COPYEDIT.value)
     copyedit_comprec.task_status = TaskStatus.PENDING
@@ -536,10 +537,12 @@ def compile_for_copyedit():
                          auth=create_hmac([paperid, Version.COPYEDIT.value]),
                          _external=True)
     _register_hotcrp_upload(paperid)
-    # Notify the copy editor.
+    # Notify the copy editors or the editors or the admin.
+    users = journal.copyedit_contacts(db)
+    recipients = [u.email for u in users]
     msg = Message('Paper {} is ready for copy editing'.format(paperid),
-                  sender=app.config['EDITOR_EMAILS'],
-                  recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=recipients)
     copyedit_url = url_for('admin_file.copyedit', paperid=paperid, _external=True)
     msg.body = 'A paper for {} is being compiled for copy editing.\n\nYou can view it at {}'.format(paper_status.journal_key,
                                                                                                     copyedit_url)
@@ -574,10 +577,12 @@ def final_review():
     paper_status.lastmodified = datetime.datetime.now()
     db.session.add(paper_status)
     db.session.commit()
+    journal = db.session.execute(select(Journal).where(Journal.hotcrp_key == paper_status.journal_key)).scalar()
+    recipients = [u.email for u in journal.copyedit_contacts(db)]
     # Notify the copy editor.
     msg = Message('Paper {} is ready for final review'.format(paperid),
-                  sender=app.config['EDITOR_EMAILS'],
-                  recipients=[app.config['COPYEDITOR_EMAILS']]) # for testing
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=recipients)
     final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
     msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
     mail.send(msg)
@@ -784,11 +789,11 @@ def get_status(paperid, version, auth):
         elif future.done(): # must have returned a result
             # Tasks that are done should remove themselves from task_queue, so this
             # shouldn't happen
+            logging.error('Task was done {}'.format(paperid))
             status = TaskStatus.FINISHED
-            if future.result.get('errors'):
-                msg = 'Finished with errors'
-            else:
-                msg = 'Compilation finished running'
+            result = future.result()
+            logging.critical('result was {}'.format(str(result)))
+            msg = 'Finished with errors. This may be a bug.'
         else: # it's enqueued
             status = TaskStatus.RUNNING
             try:
@@ -800,7 +805,6 @@ def get_status(paperid, version, auth):
     else: # The task would normally remove itself from the task_queue.
         sql = select(CompileRecord).filter_by(paperid=paperid, version=version)
         record = db.session.execute(sql).scalar_one_or_none()
-        # Legacy API: record = CompileRecord.query.filter_by(paperid=paperid, version=version).first()
         if not record:
             status = TaskStatus.ERROR
             msg = 'No record of compilation'

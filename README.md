@@ -468,11 +468,26 @@ Authors do not typically receive accounts on the system - they supply an email
 address and receive notifications to that address. Views of their results
 are authenticated in HMACS that are embedded into the URLs.
 
-#### Admin and copy editor authentication
+#### Admin and copy editor role-based authentication
 
 Administrators and copy editors receive accounts on the system and have
-to login with a username/password. The access control is yet TBD, and for
-the moment there is just one class of user.
+to login with a username/password. The access control is role-based and uses
+`flask_security`. A user may have multiple roles assigned to them.
+There is a single role called `admin` that is used for
+allowing a user to create other users and assign other roles. Then for each
+journal there are two other roles for copyeditors and editors. The design
+for the roles is discussed in `metadata/db_models.py`, along with alternative
+implementations.
+
+From a high level, the difference between the roles is:
+* `admin`: this is essentially root on the system, and should be used
+  sparingly. An admin has control over creating users and assigning other roles
+  and permissions.
+* `copyeditor`. A copyeditor has the ability to interact with authors about
+  what changes should be made in a paper in order to publish it.
+* `editor`: An editor has all the rights of a `copyeditor`, but also gets to
+  order the papers in an issue and move papers between issues. They also get
+  to export an issue when it is ready.
 
 ### The compilation process
 
