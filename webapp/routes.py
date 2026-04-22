@@ -1041,6 +1041,15 @@ def iacrj_iacrjdoc():
     if pdf_path.is_file():
         return send_file(str(pdf_path.absolute()), mimetype='application/pdf')
 
+@home_bp.route('/iacrj/convertiacrtrans', methods=['GET'])
+def convert_to_iacrj():
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrj/iacrj-from-iacrtrans.md')
+    md = md_file.read_text(encoding='UTF-8')
+    html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
+    return render_template('embed_html.html',
+                           title='Converting iacrtrans to iacrj',
+                           html = html5)
+
 @home_bp.route('/iacrj.zip', methods=['GET'])
 def download_iacrj_zipfile():
     memory_file = BytesIO()
