@@ -102,7 +102,7 @@ class Role(Base, sqla.FsRoleMixin):
         journal_keys = set()
         for role in user.roles:
             if 'editor' in role.name:
-                journal_keys.add(role.name)
+                journal_keys.add(role.name.split('_')[0])
         return journal_keys
 
 """
