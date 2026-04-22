@@ -48,7 +48,8 @@ def check_paper_access(paperid: str) -> tuple[PaperStatus, str]:
     paper_status = db.session.execute(select(PaperStatus).where(PaperStatus.paperid==paperid)).scalar_one_or_none()
     if not paper_status:
         return None, 'Unknown paper ' + paperid
-    if (current_user.has_role(Role.editor_role(paper_status.journal_key)) or
+    if (current_user.has_role(Role.ADMIN) or
+        current_user.has_role(Role.editor_role(paper_status.journal_key)) or
         current_user.has_role(Role.copyeditor_role(paper_status.journal_key))):
         return paper_status, None
     return None, 'User lacks authorization for article '
