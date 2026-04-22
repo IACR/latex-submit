@@ -8,7 +8,7 @@ def test_noauth(app, client, auth, admin_user):
         bp = app.blueprints['admin_file']
         assert len(app.blueprints) == 4
         rules = list(app.url_map.iter_rules())
-        assert len(rules) == 61
+        assert len(rules) == 62
         getrules = 0
         for rule in rules:
             rstr = str(rule)
