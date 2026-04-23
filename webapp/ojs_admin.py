@@ -58,7 +58,7 @@ def show_ojs_issue(issue_id):
         flash('You are missing a role')
         return redirect(url_for('home_bp.show_admin_home'))
     if not issue.exported:
-        flash('WARNING: issue has not been exported yet, and may still change.')
+        flash('WARNING: issue has not been exported yet, and may still change. Make sure you communicate with the editor about this')
     volume = issue.volume
     journal = volume.journal
     papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issue_id)).scalars().all()
