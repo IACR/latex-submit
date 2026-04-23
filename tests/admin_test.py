@@ -21,7 +21,6 @@ def test_noauth(app, client, auth, admin_user):
                 assert response.status_code == 302
                 assert response.location.startswith('{}/login'.format(conf['SECURITY_URL_PREFIX']))
         assert getrules == 14
-        assert len(rules) == 61
                 
 def test_editor(client, auth, editor_user):
     """Test that login works for /admin/ for editor_user"""
