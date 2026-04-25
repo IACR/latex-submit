@@ -51,6 +51,7 @@ def test_submit_form(app, client):
     end = resp.find('</form')
     assert start > 0
     assert end > 0
+    # to see why it failed if it does.
     print(resp[start:end])
     soup = BeautifulSoup(resp, features='lxml')
     paperid_input = soup.body.find('input', id='paperid')
