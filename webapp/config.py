@@ -91,6 +91,10 @@ class Config(BaseModel):
                                      title='Used to track when people login and log their IP address')
     SECURITY_OAUTH_ENABLE: bool = Field(default=False,
                                         title='Whether to support OAUTH login providers')
+    SECURITY_AUTO_LOGIN_AFTER_CONFIRM: bool = Field(default=False,
+                                                    title='Whether to automatically log the user in.')
+    SECURITY_POST_CONFIRM_VIEW: Optional[str] = Field(None,
+                                                      title='Path to redirect after a user confirms email.')
     ############################## end options related to flask_security ######################################
     WTF_CSRF_ENABLED: bool = Field(default=True,
                                    title='Whether to use CSRF fields. Only turned off in testing.')

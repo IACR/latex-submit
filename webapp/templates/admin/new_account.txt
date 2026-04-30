@@ -3,4 +3,6 @@ Your temporary password is {{password}}, and you can use this link to login:
 
 {{confirm_url}}
 
+Once you confirm your email with this link, you will be offered a chance to change
+your password.
 
