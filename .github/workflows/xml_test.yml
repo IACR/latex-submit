@@ -32,7 +32,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f webapp/requirements.txt ]; then pip install -r webapp/requirements.txt; fi
     - name: Tests for metadata
       run: |
         python3 -m pytest tests/xml_meta_test.py -vv
