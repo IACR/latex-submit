@@ -4,13 +4,11 @@ import os
 from pathlib import Path
 import pytest
 import sys
-sys.path.insert(0, '../')
-from compilation import Meta, LicenseEnum, VersionEnum
-sys.path.insert(0, '../latex/iacrcc/parser')
-from meta_parse import parse_meta
+from webapp.metadata.compilation import Meta, LicenseEnum, VersionEnum
+from webapp.metadata.latex.iacrcc.parser.meta_parse import parse_meta
 
 def test_meta1():
-    tfile = Path('testdata/test1.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test1.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'final'
@@ -36,7 +34,7 @@ def test_meta1():
     assert meta.affiliations[2].department == 'Department of Mathematics'
 
 def test_meta2():
-    tfile = Path('testdata/test2.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test2.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'preprint'
@@ -60,7 +58,7 @@ def test_meta2():
 
 
 def test_meta3():
-    tfile = Path('testdata/test3.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test3.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'This came from an abstract file'
     data['version'] = 'submission'
@@ -75,7 +73,7 @@ def test_meta3():
     assert len(meta.affiliations) == 0
 
 def test_meta4():
-    tfile = Path('testdata/test4.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test4.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'We added an abstract'
     data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
@@ -104,20 +102,20 @@ def test_meta4():
     assert meta.funders[2].grantid == '57821-3'
 
 def test_meta5():
-    tfile = Path('testdata/test5.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test5.meta').read_text(encoding='UTF-8')
     with pytest.raises(ValueError):
         # This is invalid because an index for affiliation is out of range.
         data = parse_meta(tfile)
 
 def test_meta6():
-    tfile = Path('testdata/test6.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test6.meta').read_text(encoding='UTF-8')
     with pytest.raises(ValueError):
         # This is invalid because an index for affiliation is out of range.
         data = parse_meta(tfile)
 
 def test_meta7():
     ## This one has affil: 1, 2
-    tfile = Path('testdata/test7.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test7.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     data['abstract'] = 'We added an abstract'
     data['license'] = LicenseEnum.license_from_iacrcc(data['license'])
@@ -130,7 +128,7 @@ def test_meta7():
     assert len(meta.affiliations) == 2
 
 def test_meta8():
-    tfile = Path('testdata/test8.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test8.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     print(data)
     data['abstract'] = 'We added an abstract'
@@ -138,7 +136,7 @@ def test_meta8():
     meta = Meta(**data)
 
 def test_meta9():
-    tfile = Path('testdata/test9.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test9.meta').read_text(encoding='UTF-8')
     data = parse_meta(tfile)
     print(data)
     data['abstract'] = 'We added an abstract'
@@ -150,6 +148,6 @@ def test_meta9():
     assert meta.version == VersionEnum.FINAL
     
 def test_meta10():
-    tfile = Path('testdata/test10.meta').read_text(encoding='UTF-8')
+    tfile = Path('tests/testdata/metadata/test10.meta').read_text(encoding='UTF-8')
     with pytest.raises(ValueError, match='Invalid orcid checksum:'):
         data = parse_meta(tfile)

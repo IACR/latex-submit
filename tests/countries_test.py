@@ -1,7 +1,5 @@
 import pytest
-import sys
-sys.path.insert(0, '../')
-from countries import country_lookup
+from webapp.metadata.countries import country_lookup
 
 def test_country_lookup():
     testcases = {'united states': 'US',

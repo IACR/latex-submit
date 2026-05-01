@@ -4,12 +4,10 @@ import xmlschema
 import pytest
 import sys
 from lxml import etree
-sys.path.insert(0, '..')
-from compilation import Compilation, Meta
-from db_models import Journal
-from meta_parse import clean_abstract
-from xml_meta import get_jats, text_with_texmath, get_jats_abstract, validate_abstract
-sys.path.insert(0, '../..')
+from webapp.metadata.compilation import Compilation, Meta
+from webapp.metadata.db_models import Journal
+from webapp.metadata.meta_parse import clean_abstract
+from webapp.metadata.xml_meta import get_jats, text_with_texmath, get_jats_abstract, validate_abstract
 
 _journal = Journal(EISSN='3006-5496',
                    hotcrp_key= 'testhot',
@@ -47,7 +45,7 @@ def test_get_jats_abstract():
     assert children[11].text == r'$$c=\alpha$$'
 
 def test_jats_abstract2():
-    input = Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8')
+    input = Path('tests/testdata/metadata/abstracts/abstract2.txt').read_text(encoding='UTF-8')
     clean = clean_abstract(input)
     elem = get_jats_abstract(clean)
     tags = list(elem.iter())
@@ -73,7 +71,7 @@ def test_jats_abstract2():
     assert tags[16].tag == 'span'
 
 def test_jats_abstract3():
-    input = Path('testdata/abstracts/abstract3.txt').read_text(encoding='UTF-8')
+    input = Path('tests/testdata/metadata/abstracts/abstract3.txt').read_text(encoding='UTF-8')
     clean = clean_abstract(input)
     elem = get_jats_abstract(clean)
     tags = list(elem.iter())
@@ -96,8 +94,8 @@ def test_jats_abstract3():
     assert tags[22].tag == 'p'
 
 def test_jats_creation1():
-    schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
-    json_file = Path('testdata/xml/compilation1.json')
+    schema = etree.XMLSchema(etree.parse('tests/testdata/metadata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
+    json_file = Path('tests/testdata/metadata/xml/compilation1.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(_journal, '1/4/19', compilation)
     journal_meta = article.find('front').find('journal-meta')
@@ -195,8 +193,8 @@ def test_jats_creation1():
     assert schema.validate(root) == True
 
 def test_jats_creation2():
-    schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
-    json_file = Path('testdata/xml/compilation2.json')
+    schema = etree.XMLSchema(etree.parse('tests/testdata/metadata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
+    json_file = Path('tests/testdata/metadata/xml/compilation2.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(_journal, '3/5', compilation)
     ET.indent(article, space=' ', level=1)
@@ -210,8 +208,8 @@ def test_jats_creation2():
     assert schema.validate(root) == True
 
 def test_jats_creation3():
-    schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
-    json_file = Path('testdata/xml/compilation3.json')
+    schema = etree.XMLSchema(etree.parse('tests/testdata/metadata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
+    json_file = Path('tests/testdata/metadata/xml/compilation3.json')
     compilation = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8', errors='replace'))
     article = get_jats(_journal, '3/5', compilation)
     ET.indent(article, space=' ', level=1)
@@ -225,10 +223,10 @@ def test_jats_creation3():
     assert schema.validate(root) == True
 
 def test_jats_example():
-    schema = etree.XMLSchema(etree.parse('testdata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
+    schema = etree.XMLSchema(etree.parse('tests/testdata/metadata/xml/schema/JATS-journalpublishing1-3-mathml3.xsd'))
     # This example is supplied with the JATS 1.3 tagset.
     # See https://jats.nlm.nih.gov/publishing/tag-library/1.3d2/chapter/samples.html
-    with open('testdata/xml/bmj_sample.xml', 'rb') as f:
+    with open('tests/testdata/metadata/xml/bmj_sample.xml', 'rb') as f:
         root = etree.parse(f)
         try:
             assert schema.assertValid(root)

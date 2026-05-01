@@ -6,17 +6,15 @@ from pydantic_extra_types.country import CountryAlpha2
 import pytest
 import random
 import sys
-sys.path.insert(0, '../')
-from compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License, PubType
-from meta_parse import clean_abstract
-from xml_meta import validate_abstract
+from webapp.metadata.compilation import Compilation, CompileStatus, Author, Affiliation, Meta, Funder, LicenseEnum, License, PubType
+from webapp.metadata.meta_parse import clean_abstract
+from webapp.metadata.xml_meta import validate_abstract
 import datetime
 from pathlib import Path
-sys.path.insert(0, '../../')
-from metadata import _alphabet, _scramble, _unscramble
+from webapp.metadata import _alphabet, _scramble, _unscramble
 
 def test_abstract1():
-    input = Path('testdata/abstracts/abstract1.txt').read_text(encoding='UTF-8')
+    input = Path('tests/testdata/metadata/abstracts/abstract1.txt').read_text(encoding='UTF-8')
     output = clean_abstract(input)
     print(output)
     assert 'should be removed' not in output
@@ -36,7 +34,7 @@ def test_abstract1():
     assert 'false' not in output
 
 def test_abstract2():
-    output = clean_abstract(Path('testdata/abstracts/abstract2.txt').read_text(encoding='UTF-8'))
+    output = clean_abstract(Path('tests/testdata/metadata/abstracts/abstract2.txt').read_text(encoding='UTF-8'))
     print(output)
     assert 'just a comment' not in output
     assert output.count('</p><p>') == 2 # four paragraphs
@@ -79,20 +77,20 @@ def test_abstract3():
 
 
 def test_abstract3():
-    abs_file = Path('testdata/abstracts/abstract3.txt')
+    abs_file = Path('tests/testdata/metadata/abstracts/abstract3.txt')
     output = clean_abstract(abs_file.read_text(encoding='UTF-8'))
     print(output)
     assert output.count('</p><p>') == 0
     assert output.count('<li>') == 7
 
 def test_abstract4():
-    abs_file = Path('testdata/abstracts/abstract4.txt')
+    abs_file = Path('tests/testdata/metadata/abstracts/abstract4.txt')
     output = clean_abstract(abs_file.read_text(encoding='UTF-8'))
     print(output)
     assert output == "<p>This is </p><ul> <li>first item </li><li>second item </li></ul><p> but also </p><ul><li>first<span class='text-danger'>nesting of enumerate or itemize is not allowed</span> </li><li>second bullet </li></ul><p>This starts a paragraph.</p><p>This is another paragraph but it's the last one. </p>"
 
 def test_abstract5():
-    abs_file = Path('testdata/abstracts/abstract5.txt')
+    abs_file = Path('tests/testdata/metadata/abstracts/abstract5.txt')
     output = clean_abstract(abs_file.read_text(encoding='UTF-8'))
     print(output)
     assert output == r"<p><span class='text-danger'>Illegal macro in textabstract: '\input'</span> </p>"

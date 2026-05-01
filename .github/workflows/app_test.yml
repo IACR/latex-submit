@@ -38,4 +38,6 @@ jobs:
         if [ -f webapp/requirements.txt ]; then pip install -r webapp/requirements.txt; fi
     - name: Tests for app
       run: |
-        python -m pytest tests/ -vv
+        python -m pytest tests/admin_test.py -vv
+        python -m pytest tests/forms_test.py -vv
+        python -m pytest tests/routes_test.py -vv

@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 import pytest
-from .bibmarkup import mark_bibtex, bibtex_to_html, BibTeXParser, BIBCITE_PATT, get_citation_map, _get_biblatex_label
-from .metadata.compilation import CompileStatus, Compilation, PubType
+from webapp.bibmarkup import mark_bibtex, bibtex_to_html, BibTeXParser, BIBCITE_PATT, get_citation_map, _get_biblatex_label
+from webapp.metadata.compilation import CompileStatus, Compilation, PubType
 import datetime
 import re
 from bibtexparser.model import DuplicateBlockKeyBlock
@@ -86,7 +86,7 @@ title="This is the title"
     assert '<span id="bibtex:FOCS:Yao82b">@inproceedings{FOCS:Yao82b,</span>' in marked
 
 def test_markup_file():
-    bibfile = Path('testdata/test.bib')
+    bibfile = Path('tests/testdata/test.bib')
     bibstr = bibfile.read_text(encoding='UTF-8')
     marked = mark_bibtex(bibstr)
     print(marked)
@@ -96,7 +96,7 @@ def test_markup_file():
     assert marked.count('<span') == entries
 
 def test_parse():
-    bibfile = Path('testdata/test.bib')
+    bibfile = Path('tests/testdata/test.bib')
     bibstr = bibfile.read_text(encoding='UTF-8')
     parser = BibTeXParser()
     db = parser.parse_bibtex(bibstr)
@@ -104,7 +104,7 @@ def test_parse():
     assert len(parser.errors) == 0
     assert len(parser.warnings) == 0
     assert len(db.entries) == 86
-    bibfile = Path('testdata/bibtex/references.bib')
+    bibfile = Path('tests/testdata/bibtex/references.bib')
     bibstr = bibfile.read_text(encoding='UTF-8')
     parser = BibTeXParser()
     db = parser.parse_bibtex(bibstr)
@@ -116,7 +116,7 @@ def test_parse():
     assert len(db.entries) == 86
 
 def test_bibliography():
-    bibfile = Path('testdata/bibtex/bibliography.bib')
+    bibfile = Path('tests/testdata/bibtex/bibliography.bib')
     bibstr = bibfile.read_text(encoding='utf-8')
     parser = BibTeXParser()
     db = parser.parse_bibtex(bibstr)
@@ -125,7 +125,7 @@ def test_bibliography():
     assert len(parser.warnings) == 0
 
 def test_dana_bib():
-    bibfile = Path('testdata/bibtex/dana_bib.bib')
+    bibfile = Path('tests/testdata/bibtex/dana_bib.bib')
     bibstr = bibfile.read_text(encoding='utf-8')
     parser = BibTeXParser()
     db = parser.parse_bibtex(bibstr)
@@ -134,7 +134,7 @@ def test_dana_bib():
     assert len(parser.warnings) == 0
 
 def test_duplicate():
-    output_dir = Path('testdata/bibtex/duplicate/')
+    output_dir = Path('tests/testdata/bibtex/duplicate/')
     bibfile = output_dir / Path('the.bib')
     bibstr = bibfile.read_text(encoding='utf-8')
     cite_map = get_citation_map(output_dir)
@@ -175,7 +175,7 @@ def test_duplicate():
     assert compilation.warning_log[0].text == 'Duplicate bibtex entry: @misc{another,'
     
 def test_cryptobib():
-    output_path = Path('testdata/bibtex/cryptobib/')
+    output_path = Path('tests/testdata/bibtex/cryptobib/')
     bibfile = output_path / Path('bibexport.bib')
     bibstr = bibfile.read_text(encoding='UTF-8')
     cite_map = get_citation_map(output_path)
@@ -217,7 +217,7 @@ def test_cryptobib():
 
     
 def test_html():
-    output_dir = Path('testdata/bibtex/output2')
+    output_dir = Path('tests/testdata/bibtex/output2')
     bibtex_path = output_dir / Path('extracted.bib')
     compilation_data = {'paperid': 'abcdefg',
                         'status': CompileStatus.COMPILING,
@@ -243,7 +243,7 @@ def test_output1():
     """This is a tricky biblatex test because there is one reference
     with no alpha label, plus two that have the same labelalpha and 
     are distinguished only by extraalpha."""
-    output_dir = Path('testdata/bibtex/output1')
+    output_dir = Path('tests/testdata/bibtex/output1')
     mapping = get_citation_map(output_dir)
     print(json.dumps(mapping, indent=2))
     assert len(mapping) == 32
@@ -254,13 +254,13 @@ def test_output1():
 
 def test_output2():
     """This one uses bibtex instead of biblatex."""
-    output_dir = Path('testdata/bibtex/output2')
+    output_dir = Path('tests/testdata/bibtex/output2')
     mapping = get_citation_map(output_dir)
     assert len(mapping) == 33
     assert mapping['C:CGGJK21'] == 'CGG<sup>+</sup>21'
 
 def test_output3():
-    output_dir = Path('testdata/bibtex/output3')
+    output_dir = Path('tests/testdata/bibtex/output3')
     cite_map = get_citation_map(output_dir)
     assert len(cite_map) == 50
     bibtex_file = output_dir / Path('bibexport.bib')
@@ -288,7 +288,7 @@ def test_output3():
     assert len(compilation.bibhtml) == 50
 
 def test_output4():
-    output_dir = Path('testdata/bibtex/output4')
+    output_dir = Path('tests/testdata/bibtex/output4')
     cite_map = get_citation_map(output_dir)
     assert len(cite_map) == 525
     bibtex_file = output_dir / Path('duplicate.bib')
@@ -426,14 +426,14 @@ def test_biblatex_label():
 
 def test_output5():
     """Just another biblatex test."""
-    output_dir = Path('testdata/bibtex/output5')
+    output_dir = Path('tests/testdata/bibtex/output5')
     mapping = get_citation_map(output_dir)
     print(json.dumps(mapping, indent=2))
     assert len(mapping) == 57
     assert mapping['DBLP:conf/crypto/BelliziaBCGGMPP20'] == 'BBC<sup>+</sup>20'
 
 def test_missing():
-    output_dir = Path('testdata/bibtex/missing')
+    output_dir = Path('tests/testdata/bibtex/missing')
     cite_map = get_citation_map(output_dir)
     assert len(cite_map) == 58
     bibtex_file = output_dir / Path('missing.bib')
@@ -474,7 +474,7 @@ def _bstrip(txt):
     return re.sub(r'</div>$', '', txt)
 
 def test_bibtex_style():
-    test_dir = Path('testdata/bibtex/style')
+    test_dir = Path('tests/testdata/bibtex/style')
     cite_map = get_citation_map(test_dir)
     assert len(cite_map) == 28
     bibtex_file = test_dir / Path('alltypes.bib')
@@ -526,7 +526,7 @@ def test_bibtex_style():
     assert _bstrip(compilation.bibhtml[27].body) == 'A. Mauland.  <em>Realizing distributed RSA using secure multiparty computations</em>. Master\'s thesis. Norwegian University of Science and Technology, July 2009.'
 
 def test_bibtex_macros():
-    test_dir = Path('testdata/bibtex/cc2-1-17')
+    test_dir = Path('tests/testdata/bibtex/cc2-1-17')
     cite_map = get_citation_map(test_dir)
     assert len(cite_map) == 81
     bibtex_file = test_dir / Path('stuff.bib')
@@ -556,7 +556,7 @@ def test_bibtex_macros():
 def test_bibunits():
     # If an author uses the bibunits package without bibliography=common then there is an
     # extra bu.aux file (or maybe bu1.aux bu2.aux, etc. This checks that case.
-    test_dir = Path('testdata/bibtex/cc2-1-62')
+    test_dir = Path('tests/testdata/bibtex/cc2-1-62')
     cite_map = get_citation_map(test_dir)
     assert len(cite_map) == 78
     bibtex_file = test_dir / Path('comp.bib')

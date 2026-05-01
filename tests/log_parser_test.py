@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 import re
 import sys
-from .log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re, l3msg_re, BibTexLogParser
-from .metadata.compilation import ErrorType
+from webapp.log_parser import LatexLogParser, badbox_re, line_re, warning_re, error_re, citation_re, l3msg_re, BibTexLogParser
+from webapp.metadata.compilation import ErrorType
 
 def test_overfull():
     m = badbox_re.search('Overfull \\hbox (50.8957pt too wide) in paragraph at lines 98--182')
@@ -106,7 +106,7 @@ def test_examples():
     """This tests a bunch of random lines, some of which we expect to recognize
        as errors, and some of which we do not recognize."""
     parser = LatexLogParser(wrap_len=2000)
-    datafile = Path('testdata/logs/example_lines')
+    datafile = Path('tests/testdata/logs/example_lines')
     lines = datafile.read_text(encoding='UTF-8').splitlines()
     parser.parse_lines(lines)
     errs = parser.errors
@@ -138,7 +138,7 @@ def test_examples():
                 
 def test_no_citations():
     parser = LatexLogParser(wrap_len=2000)
-    parser.parse_file(Path('testdata/logs/citations.log'))
+    parser.parse_file(Path('tests/testdata/logs/citations.log'))
     #for i in range(len(parser.errors)):
     #    print(i, parser.errors[i].json(indent=2))
     counter = Counter()
@@ -171,7 +171,7 @@ def test_no_citations():
     
 def test_working():
     parser = LatexLogParser(wrap_len=2000)
-    parser.parse_file(Path('testdata/logs/working.log'))
+    parser.parse_file(Path('tests/testdata/logs/working.log'))
     #for i in range(len(parser.errors)):
     #    print(i, parser.errors[i].json(indent=2))
     counter = Counter()
@@ -199,7 +199,7 @@ def test_working():
     
 def test_working79():
     parser = LatexLogParser(wrap_len=79)
-    parser.parse_file(Path('testdata/logs/working79.log'))
+    parser.parse_file(Path('tests/testdata/logs/working79.log'))
     #for i in range(len(parser.errors)):
     #    print(i, parser.errors[i].json(indent=2))
     counter = Counter()
@@ -233,7 +233,7 @@ def test_working79():
     
 def test_iacrdoc():
     parser = LatexLogParser(wrap_len=79)
-    parser.parse_file(Path('testdata/logs/iacrdoc.log'))
+    parser.parse_file(Path('tests/testdata/logs/iacrdoc.log'))
     #for i in range(len(parser.errors)):
     #    print(i, parser.errors[i].json(indent=2))
     type_counter = Counter()
@@ -250,7 +250,7 @@ def test_iacrdoc():
 
 def test_lualatex():
     parser = LatexLogParser(wrap_len=79)
-    parser.parse_file(Path('testdata/logs/lualatex.log'))
+    parser.parse_file(Path('tests/testdata/logs/lualatex.log'))
     #for i in range(len(parser.errors)):
     #    print(i, parser.errors[i].json(indent=2))
     type_counter = Counter()
@@ -265,24 +265,24 @@ def test_lualatex():
     
 def test_file_stack():
     parser = LatexLogParser(wrap_len=200)
-    parser.parse_file(Path('testdata/logs/iacrtrans.log'))
+    parser.parse_file(Path('tests/testdata/logs/iacrtrans.log'))
     assert len(parser.opened_files) == 1
     
 def test_undefined_control():
     parser = LatexLogParser()
-    parser.parse_file(Path('testdata/logs/undefined_control.log'))
+    parser.parse_file(Path('tests/testdata/logs/undefined_control.log'))
     assert len(parser.errors) == 1
 
 def test_fontspec_error():
     parser = LatexLogParser()
-    for line in Path('testdata/logs/fontawesome.log2').read_text(encoding='utf-8').splitlines():
+    for line in Path('tests/testdata/logs/fontawesome.log2').read_text(encoding='utf-8').splitlines():
         m = l3msg_re.search(line)
         assert len(m.groups()) == 5
     parser = LatexLogParser()
-    parser.parse_file(Path('testdata/logs/fontawesome.log2'))
+    parser.parse_file(Path('tests/testdata/logs/fontawesome.log2'))
     assert len(parser.errors) == 3
     parser = LatexLogParser()
-    parser.parse_file(Path('testdata/logs/fontawesome'))
+    parser.parse_file(Path('tests/testdata/logs/fontawesome'))
     assert len(parser.errors) == 36
 
 def test_bib_count():
@@ -456,7 +456,7 @@ refers to entry "DBLP:conf/cisc/2011", which doesn't exist"""
 
 
 def test_bib_badcross():
-    f =Path('testdata/biblogs/badcross.blg')
+    f =Path('tests/testdata/biblogs/badcross.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 26
@@ -467,7 +467,7 @@ def test_bib_badcross():
     assert parser.warning_count == 0
 
 def test_bib_badtypes():
-    f =Path('testdata/biblogs/badtypes.blg')
+    f =Path('tests/testdata/biblogs/badtypes.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 6
@@ -476,7 +476,7 @@ def test_bib_badtypes():
     assert parser.error_count == len(parser.errors) - len(warnings)
     
 def test_bib_badyears():
-    f = Path('testdata/biblogs/badyears.blg')
+    f = Path('tests/testdata/biblogs/badyears.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 37
@@ -488,7 +488,7 @@ def test_bib_badyears():
     assert parser.warning_count == 37
     
 def test_bib_commas():
-    f= Path('testdata/biblogs/commas.blg')
+    f= Path('tests/testdata/biblogs/commas.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 11
@@ -500,7 +500,7 @@ def test_bib_commas():
     assert parser.warning_count == 0
     
 def test_bib_comments():
-    f = Path('testdata/biblogs/comments.blg')
+    f = Path('tests/testdata/biblogs/comments.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 4
@@ -509,7 +509,7 @@ def test_bib_comments():
     assert parser.errors[1].logline == 12
     
 def test_bib_fieldname():
-    f = Path('testdata/biblogs/fieldname.blg')
+    f = Path('tests/testdata/biblogs/fieldname.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 2
@@ -519,7 +519,7 @@ def test_bib_fieldname():
     assert parser.errors[0].filepath == 'bibdiffpriv.bib'
     
 def test_bib_greg2():
-    f = Path('testdata/biblogs/greg2.blg')
+    f = Path('tests/testdata/biblogs/greg2.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 1
@@ -528,7 +528,7 @@ def test_bib_greg2():
     assert parser.errors[0].logline == 11
     
 def test_bib_main1():
-    f = Path('testdata/biblogs/main1.blg')
+    f = Path('tests/testdata/biblogs/main1.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 2
@@ -537,7 +537,7 @@ def test_bib_main1():
     assert parser.errors[0].logline == 19
     
 def test_bib_missing():
-    f = Path('testdata/biblogs/missing.blg')
+    f = Path('tests/testdata/biblogs/missing.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 40
@@ -545,7 +545,7 @@ def test_bib_missing():
         assert e.logline > 0
     
 def test_bib_multiple():
-    f = Path('testdata/biblogs/multiple.blg')
+    f = Path('tests/testdata/biblogs/multiple.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 3
@@ -558,7 +558,7 @@ def test_bib_multiple():
         assert e.filepath == 'MITM_bib.bib'
     
 def test_bib_period():
-    f = Path('testdata/biblogs/period.blg')
+    f = Path('tests/testdata/biblogs/period.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 3
@@ -571,7 +571,7 @@ def test_bib_period():
         assert e.filepath == 'extra.bib'
 
 def test_bib_strings():
-    f = Path('testdata/biblogs/strings.blg')
+    f = Path('tests/testdata/biblogs/strings.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 53
@@ -585,13 +585,13 @@ def test_bib_strings():
         assert e.filepath == 'bib.bib'
     
 def test_bib_twostyles():
-    f = Path('testdata/biblogs/twostyles.blg')
+    f = Path('tests/testdata/biblogs/twostyles.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 2
     
 def test_bib_whitespace():
-    f = Path('testdata/biblogs/whitespace.blg')
+    f = Path('tests/testdata/biblogs/whitespace.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 3
@@ -602,7 +602,7 @@ def test_bib_whitespace():
     assert 'to sort, need author or key' in parser.errors[0].text
     
 def test_bib_nofile():
-    f = Path('testdata/biblogs/nofile.blg')
+    f = Path('tests/testdata/biblogs/nofile.blg')
     parser = BibTexLogParser()
     parser.parse_file(f, True)
     assert len(parser.errors) == 27
