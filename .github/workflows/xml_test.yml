@@ -35,10 +35,10 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Tests for metadata
       run: |
-        pytest tests/xml_meta_test.py -vv
-        pytest tests/parse_test.py -vv
-        pytest tests/metadata_test.py -vv
+        python3 -m pytest tests/xml_meta_test.py -vv
+        python3 -m pytest tests/parse_test.py -vv
+        python3 -m pytest tests/metadata_test.py -vv
     - name: Test for log_parser and bibstyle.
       run: |
-        pytest tests/log_parser_test.py -vv
-        pytest tests/bibmarkup_test.py -vv
+        python3 -m pytest tests/log_parser_test.py -vv
+        python3 -m pytest tests/bibmarkup_test.py -vv
