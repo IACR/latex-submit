@@ -470,11 +470,11 @@ def view_issue(issueid):
                 paperids.add(p.paperid)
             for p in unassigned_papers:
                 paperids.add(p.paperid)
-            accepted = hotcrp_papers.get('acceptedPapers')
-            for p in accepted[:]: # loop over a copy of accepted
-                if p['paperId'] in paperids:
-                    accepted.remove(p)
-            data['hotcrp'] = hotcrp_papers
+            accepted = {p['paperId']: p for p in hotcrp_papers.get('acceptedPapers')}
+            for id in paperids:
+                if id in accepted:
+                    del accepted[id]
+            data['hotcrp'] = list(accepted.values())
     formdata = [{'paperid': p.paperid} for p in finished_papers]
     if len(finished_papers) == len(papers) and len(papers) > 0 and not issue.exported:
         data['form'] = PublishIssueForm(issueid=issue.id)
