@@ -49,3 +49,4 @@ flask_sqlalchemy_lite
 typing_extensions
 redis
 argon2_cffi
+bs4
