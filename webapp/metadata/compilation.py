@@ -190,12 +190,17 @@ class VersionEnum(StrEnum):
     PREPRINT = 'preprint'
 
 class PubType(StrEnum):
-    """This must be kept in sync with what HotCRP provides and what cic.iacr.org shows."""
+    """This must be kept in sync with what HotCRP provides and what cic.iacr.org shows.
+       Addendum is supplied by an author to supplement what was published in a paper
+       before. By contrast, Erratum is only to be supplied by the publisher. A
+       preface can be supplied only by an editor.
+    """
     RESEARCH = 'RESEARCH'
     SOK = 'SOK'
-    ERRATA = 'ERRATA'
+    ADDENDUM = 'ADDENDUM',
     CORRIGENDUM = 'CORRIGENDUM'
     PREFACE = 'PREFACE'
+    ERRATUM = 'ERRATUM'
 
 class Meta(BaseModel):
     """Metadata encoded in LaTeX files using iacrcc.cls. Note that
