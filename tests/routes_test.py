@@ -28,7 +28,7 @@ def test_submit_form(app, client):
             'journal': 'cic',
             'volume': '5',
             'issue': '3',
-            'pubtype': PubType.ERRATA.value}
+            'pubtype': PubType.ERRATUM.value}
     key = app.config['HOTCRP_POST_KEY'].encode('utf-8')
     args['auth'] = create_hmac([args['paperid'],
                                 args['hotcrp'],
@@ -75,6 +75,6 @@ def test_submit_form(app, client):
     issue_input = soup.body.find('input', id='issue')
     assert issue_input.attrs.get('value') == '3'
     pubtype_input = soup.body.find('input', id='pubtype')
-    assert pubtype_input.attrs.get('value') == 'ERRATA'
+    assert pubtype_input.attrs.get('value') == 'ERRATUM'
     doi_input = soup.body.find('input', id='errata_doi')
     assert doi_input.attrs.get('value') == '10.1729/feebar'

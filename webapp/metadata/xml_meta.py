@@ -171,7 +171,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
         'xmlns:mml': 'http://www.w3.org/1998/Math/MathML',
         'xmlns:xlink': 'http://www.w3.org/1999/xlink',
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'article-type': 'correction' if comp.pubtype == PubType.ERRATA else 'research-article',
+        'article-type': 'correction' if (comp.pubtype == PubType.ERRATUM or comp.pubtype == PubType.CORRIGENDUM) else 'research-article',
         'dtd-version': '1.3',
         'xml:lang': 'en'})
     front = ET.SubElement(article, 'front')
@@ -254,7 +254,7 @@ def get_jats(journal: Journal, public_paper_id: str, comp: Compilation) -> ET.El
     license = ET.SubElement(permissions, 'license', attrib={'license-type': 'open-access',
                                                             'xlink:href': meta.license.reference})
     ET.SubElement(license, 'license-p').text = meta.license.label
-    if comp.pubtype == PubType.ERRATA and comp.errata_doi:
+    if comp.pubtype == PubType.ERRATUM and comp.errata_doi:
         ET.SubElement(article_meta,
                       'related-article',
                       attrib={'xlink:href': comp.errata_doi,

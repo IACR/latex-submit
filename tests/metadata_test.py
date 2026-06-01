@@ -333,10 +333,10 @@ def test_pubtype():
     comp = Compilation(**_compile_data)
     assert comp.pubtype == PubType.RESEARCH
     data = copy.deepcopy(_compile_data)
-    data['pubtype'] = PubType.ERRATA.name
+    data['pubtype'] = PubType.ERRATUM.name
     data['errata_doi'] = '10.1791/foobar'
     comp = Compilation(**data)
-    assert comp.pubtype == PubType.ERRATA
+    assert comp.pubtype == PubType.ERRATUM
     assert comp.errata_doi == '10.1791/foobar'
     
 def test_revised():
