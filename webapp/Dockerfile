@@ -40,7 +40,7 @@ RUN tlmgr remove --force pyluatex pythontex
 
 COPY compiler/LatexMk /etc
 # Use this for wide log lines.
-# COPY compiler/texmf.cnf /usr/local/texlive/2025/texmf.cnf
+# COPY compiler/texmf.cnf /usr/local/texlive/2026/texmf.cnf
 
 RUN useradd -ms /bin/bash texlive
 # The :33 is to ensure that texlive has the same numeric GID as the www-data group,
