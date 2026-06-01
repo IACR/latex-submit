@@ -95,7 +95,7 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
             logfile = output_path / 'main.log'
             if logfile.is_file():
                 # Note: the class_file will be updated when it runs.
-                logparser = LatexLogParser(main_file='main.tex', class_file='iacrcc.cls')
+                logparser = LatexLogParser(main_file='main.tex', class_file='iacrj.cls')
                 logparser.parse_file(logfile)
                 for error in logparser.errors:
                     if is_fatal(error):
@@ -206,7 +206,7 @@ def run_latex_task(root_path, cmd, paper_path, paperid, doi, version, task_key):
                             compilation.error_log.append(CompileError(error_type=ErrorType.METADATA_ERROR,
                                                                       logline=0,
                                                                       text='Paper should use documentclass[version=final]',
-                                                                      help='See <a href="/iacrcc">the documentation for iacrcc.cls</a>'))
+                                                                      help='See <a href="/iacrj">the documentation for iacrj.cls</a>'))
                         elif compilation.error_log:
                             compilation.status = CompileStatus.COMPILATION_ERRORS
                         else:
