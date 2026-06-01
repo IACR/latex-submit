@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block content %}
+{% block page_content %}
 <main id="mainContent" class="container px-3 px-md-4">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
@@ -14,7 +14,7 @@
       then you should start from your hotcrp instance.
       {% else %}
       This site is currently used for submissions of <strong>final</strong> versions of
-      papers for <a href="https://cic.iacr.org/">IACR Communications in Cryptology</a>.
+      papers for <a href="https://iacr.org/">IACR</a> journals.
       {% endif %}
       If you are looking to submit a paper to the journal, see
       the <a href="https://cic.iacr.org/callforpapers">Call for Papers</a>.
@@ -36,8 +36,8 @@
     <p class="alert alert-info">
       This test server allows people to experiment with the infrastructure, but is not part of
       the actual pipeline for the journal. Papers uploaded here are not private,
-      but they will be deleted every day so nothing is permanent. You can login as an admin
-      to see what it's like as an editor. For further information, contact {{config.COPYEDITOR_EMAILS}}.
+      but they will be deleted every day so nothing is permanent. If you wish to login as an
+      administrator, please contact {{config.SITE_CONTACT_EMAIL|obfuscate_email}}.
     </p>
     <div class="alert alert-secondary my-3">
     <form method="GET" action="{{url_for('home_bp.show_submit_version')}}">
@@ -46,7 +46,7 @@
         <label for="venue" class="col-3 col-form-label text-end">Select a Journal.</label>
         <div class="col-7">
           <select id="venue" name='journal' class='form-select'>
-            {% for j in config['JOURNALS'] %}
+            {% for j in journals %}
             <option value="{{j.hotcrp_key}}">{{j.name}}</option>
             {% endfor %}
           </select>
@@ -74,6 +74,9 @@
     </p>
     <p>This system is now available as <a href="https://github.com/IACR/latex-submit">open
       source</a>. Please feel free to contact us if you think it would be useful for you.
+    </p>
+    <p>
+      For further information, contact <i-mono>{{config.SITE_CONTACT_EMAIL|obfuscate_email}}</i-mono>.
     </p>
   </div>
 </div>

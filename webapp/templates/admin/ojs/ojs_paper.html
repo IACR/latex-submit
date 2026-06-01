@@ -17,7 +17,7 @@
 </style>
 
 {% endblock %}
-{% block content %}
+{% block page_content %}
 <main id="adminContent" class="container px-md-4 py-3">
   <script>
    function copyData(id) {
@@ -65,7 +65,7 @@
     <div class="col-2 rowlab">Abstract:</div>
     <div class="col d-flex align-items-center">
       <button class="btn btn-sm btn-success me-2" onclick="copyData('abstract');">Copy</button>
-      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|replace('<p>', '')|replace('</p>', '')|regex_replace('[\s]+', ' ')}}</textarea>
+      <textarea rows="6" class="form-control" id="abstract">{{comp.meta.abstract|regex_replace('[\s]+', ' ')|regex_replace('^[\s]+', '')}}</textarea>
     </div>
   </div>
   <div class="row">

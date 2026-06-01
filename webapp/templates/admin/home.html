@@ -1,5 +1,5 @@
 {% extends "admin/admin_base.html" %}
-{% block content %}
+{% block page_content %}
 <main id="adminContent" class="container px-md-4 py-3">
 <h1 class="mb-4 text-center">Admin console</h1>
 {% for message in get_flashed_messages() %}
@@ -9,17 +9,20 @@
 {% endfor %}
 <div class="row">
   <div class="col-6">
+    <p class="alert alert-info">
+      You are logged in as {{current_user.name}} with email {{current_user.email}}.
+    </p>
     <p>
       This provides access to administrative actions by Journal editors
-      and copy editors. We plan to restrict access by both role and
-      journal in the future, but for now all admin users can see
-      everything under the admin console.
+      and copy editors. The view you see depends on the permissions that you have.
     </p>
+    <ol>
+      <li>Admins can see everything.</li>
+      <li>Journal editors can see their journals.</li>
+      <li>Journal copyeditors can see the journals they are responsible for.</li>
+    </ol>
     <p>
-      At the moment only Communications in Cryptology is fully supported,
-      because we depend on the metadata extraction from the
-      <i-mono>iacrcc</i-mono> LaTeX document class.
-    </p>
+      Contact us at <i-mono>{{config.SITE_CONTACT_EMAIL}}</i-mono> if you have any questions.
   </div>
   <div class="col-6">
     <p>
@@ -30,6 +33,12 @@
         <li>Publishing to the publicly-facing site for the journal.</li>
       </ol>
     </p>
+    <p>
+      In order for a journal to use this, it must use a document class that loads
+      the <a target="_blank" href="https://ctan.org/pkg/metacapture"><i-mono>metacapture</i-mono>
+      LaTeX package</a>. That includes IACR journals
+      that use the <a href="{{url_for('home_bp.iacrj_homepage')}}"><i-mono>iacrj</i-mono> document class</a>.
+    </p>
   </div>
 </div>
 <h3>List of journals</h3>
@@ -37,19 +46,40 @@
   <thead>
     <tr>
       <th>key</th>
-      <th>name</th>
-      <th>volumes</th>
+      <th>Acronym</th>
+      <th>Name</th>
+{#      <th>Volumes</th>#}
     </tr>
   </thead>
   <tbody>
     {% for journal in journals %}
-    <td>{{journal.acronym}}</td>
-    <td><a href="{{url_for('admin_file.view_journal', jid=journal.id)}}">{{journal.name}}</a></td>
-    <td>{{journal.volumes|length}} volumes</td>
+    <tr>
+      <td>{{journal.hotcrp_key}}</td>
+      <td>{{journal.acronym}}</td>
+      <td>
+        {% if journal.ojs_view %}
+        <a href="{{url_for('ojs_file.show_ojs_journal', hotcrp_key=journal.hotcrp_key)}}">OJS view</a>
+        {% else %}
+        <a href="{{url_for('admin_file.view_journal', jid=journal.id)}}">{{journal.name}}</a>
+        {% endif %}
+      </td>
+{#      <td>{{journal.volumes|length}} volumes</td>#}
     </tr>
     {% endfor %}
   </tbody>
 </table>
+<h3>Roles</h3>
+<div class="row mt-3">
+  <div class="col-md-6 col-12">
+    <h5>Your roles</h5>
+    <ul>{% for role in current_user.roles %}<li>{{role.name}}</li>{% endfor %}</ul>
+  </div>
+  <div class="col-md-6 col-12">
+    <h5>All possible roles</h5>
+    <ul>{% for role in all_roles %}<li>{{role.name}}</li>{% endfor %}</ul>
+  </div>
+</div>
+{% if current_user.has_role('admin') %}
 <h3>Recent activity</h3>
 <table class="table">
   <thead>
@@ -72,6 +102,7 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 {% for error in errors %}
 <div class="alert alert-warning">{{error}}</div>
 {% endfor %}

@@ -1,0 +1,84 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "testing@digicrime.com",
+      "name": "Terence Testing",
+      "password": "mypowers",
+      "is_admin": true,
+      "confirmed": true
+    },
+    {
+      "id": 2,
+      "email": "copyeditor@digicrime.com",
+      "name": "Calvin Copyeditor",
+      "password": "mypowers",
+      "is_admin": false,
+      "confirmed": true
+    },
+    {
+      "id": 3,
+      "email": "unconfirmed@digicrime.com",
+      "name": "Ulrich Unconfirmed",
+      "password": "mypowers",
+      "is_admin": false,
+      "confirmed": false
+    },
+    {
+      "id": 4,
+      "email": "editor@digicrime.com",
+      "name": "Eddy Editor",
+      "password": "mypowers",
+      "is_admin": false,
+      "confirmed": true
+    },
+    {
+      "id": 5,
+      "email": "tosclibrary@digicrime.com",
+      "name": "Rudy Rub",
+      "password": "mypowers",
+      "is_admin": false,
+      "confirmed": true
+    }
+  ],
+  "journals": [
+    {
+      "hotcrp_key": "cic",
+      "acronym": "CiC",
+      "name": "IACR Communications in Cryptology",
+      "publisher": "International Association for Cryptologic Research",
+      "EISSN": "3006-5496",
+      "DOI_PREFIX": "10.62056",
+      "editors": ["testing@digicrime.com"],
+      "copyeditors": ["copyeditor@digicrime.com"]
+    },
+    {
+      "hotcrp_key": "tosc",
+      "acronym": "TOSC",
+      "name": "IACR Transactions on Symmetric Cryptology",
+      "publisher": "International Association for Cryptologic Research",
+      "EISSN": "2519-173X",
+      "DOI_PREFIX": "10.46586",
+      "editors": ["editor@digicrime.com"],
+      "viewers": ["tosclibrary@digicrime.com"]
+    },
+    {
+      "hotcrp_key": "tches",
+      "acronym": "TCHES",
+      "name": "IACR Transactions on Cryptographic Hardware and Embedded Systems",
+      "publisher": "International Association for Cryptologic Research",
+      "EISSN": "2569-2925",
+      "DOI_PREFIX": "10.45686",
+      "editors": ["editor@digicrime.com"]
+    },
+    {
+      "hotcrp_key": "lncs",
+      "acronym": "PIACR",
+      "name": "Proceedings of the IACR",
+      "publisher": "IACR",
+      "EISSN": "1234-5678",
+      "DOI_PREFIX": "10.1234",
+      "editors": ["testing@digicrime.com"]
+    }
+  ]
+}

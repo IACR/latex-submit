@@ -1,0 +1,37 @@
+{% extends "admin/admin_base.html" %}
+{% block page_content %}
+<main id="adminContent" class="container admin-container px-md-4 py-3">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning mt-3">
+  {{ message }}
+</div>
+{% endfor %}
+<h2>{{journal.name}}</h2>
+<p class="alert alert-info">
+  Note: an issue has to be "exported" in order to freeze the contents before
+  importing into OJS.
+</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>volume</th>
+      <th>issue</th>
+      <th>papers</th>
+      <th>exported</th>
+    </tr>
+  </thead>
+  <tbody id="paperList">
+    {% for volume in journal.volumes %}
+    {% for issue in volume.issues %}
+    <tr class="align-middle">
+      <td>{{issue.volume.name}}</td>
+      <td>{{issue.name}} &nbsp;<a href="{{url_for('ojs_file.show_ojs_issue', issue_id=issue.id)}}">OJS view</a></td>
+      <td>{{issue.papers|length}}</td>
+      <td>{{issue.exported}}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+</main>
+{% endblock %}

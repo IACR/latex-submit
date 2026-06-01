@@ -1,0 +1,59 @@
+{% macro field_id(field, sfx='') %}
+  {% if field and field.id %}
+    id="{{ field.id }}-{{ sfx }}"
+  {% endif %}
+{% endmacro %}
+
+{% macro render_field_with_errors(field) %}
+  <div class="fs-div" {{ field_id(field, 'ctr') }}>
+    {{ field.label }} {{ field(**kwargs)|safe }}
+    {% if field.errors %}
+      <ul>
+        {% for error in field.errors %}<li class="fs-error-msg">{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_field(field) %}
+  <div class="fs-div" {{ field_id(field, 'ctr') }}>{{ field(**kwargs)|safe }}</div>
+{% endmacro %}
+
+{% macro render_field_errors(field) %}
+  <div class="fs-div" {{ field_id(field, 'ctr') }}>
+    {% if field and field.errors %}
+      <ul>
+        {% for error in field.errors %}<li class="fs-error-msg">{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# render WTForms (>3.0) form level errors #}
+{% macro render_form_errors(form) %}
+  {% if form.form_errors %}
+    <div class="fs-div" id="fs-form-errors">
+      <ul>
+        {% for error in form.form_errors %}<li class="fs-error-msg">{{ error }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro prop_next() -%}
+  {% if 'next' in request.args %}?next={{ request.args.next|urlencode }}{% endif %}
+{%- endmacro %}
+
+  {# For forms that have multiple POST forms - explicitly render csrf_token so we can change the ID so we don't get duplicates #}
+{% macro render_csrf(form, pfx) %}
+  {% set csrf_field_name = form.meta.csrf_field_name | default %}
+  {% if form[csrf_field_name] is defined %}
+    {{ form[csrf_field_name](id=pfx~'-csrf') }}
+  {% endif %}
+{% endmacro %}
+
+{% macro script_nonce() -%}
+  {% if config["SECURITY_SCRIPT_NONCE_KEY"] and g.get(config["SECURITY_SCRIPT_NONCE_KEY"]) -%}
+    nonce="{{ g.get(config["SECURITY_SCRIPT_NONCE_KEY"]) }}"
+  {%- endif %}
+{%- endmacro %}

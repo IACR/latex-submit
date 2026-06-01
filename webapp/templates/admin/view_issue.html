@@ -1,5 +1,5 @@
 {% extends "admin/admin_base.html" %}
-{% block content %}
+{% block page_content %}
 <main id="adminContent" class="container admin-container px-md-4 py-3">
 {% for message in get_flashed_messages() %}
 <div class="alert alert-warning mt-3">
@@ -26,7 +26,7 @@
         </tr>
         <tr>
           <th>Accepted but not submitted:</th>
-          <td>{% if hotcrp %}{{hotcrp.acceptedPapers|length}}{% else %}<span class="text-danger">no HotCRP instance</span>{% endif %}</td>
+          <td>{% if hotcrp %}{{hotcrp|length}}{% else %}<span class="text-danger">no HotCRP instance</span>{% endif %}</td>
         </tr>
       </tbody>
     </table>
@@ -94,7 +94,7 @@
     {% endfor %}
 {% if hotcrp %}
     <tr><td></td><td colspan="6"><strong>Unsubmitted papers</strong></td></tr>
-    {% for p in hotcrp.acceptedPapers %}
+    {% for p in hotcrp %}
     <tr>
       <td></td>
       <td></td>

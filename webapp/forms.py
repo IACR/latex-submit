@@ -4,72 +4,38 @@ from flask import current_app as app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
 from wtforms.validators import InputRequired, Optional, Email, EqualTo, Length, Regexp, NumberRange, AnyOf
-from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField, FieldList, Form, FormField
-from .metadata.db_models import Role, validate_version, Version
+from wtforms import EmailField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, StringField, ValidationError, IntegerField, FieldList, Form, FormField, SelectMultipleField, widgets
+from .metadata.db_models import  Role, Journal, validate_version, Version
 from .metadata import validate_paperid
 from .metadata.compilation import dt_regex, PubType
 import random, string # TODO - remove this
-from . import create_hmac, validate_hmac
+from . import create_hmac, validate_hmac, db, _get_journals
+from sqlalchemy import select
 import logging
 import re
 import time
 
-class LoginForm(FlaskForm):
-    email = EmailField('Email', validators=[InputRequired(),
-                                            Email(message='Enter a valid email')])
-    password = PasswordField('Password', validators=[InputRequired(message='Password must be at least 8 characters')])
-    submit = SubmitField('Login')
+def role_choices():
+    role_values = db.session.execute(select(Role).order_by(Role.description)).scalars().all()
+    return [(r.name, r.description) for r in role_values]
 
-class SignupForm(FlaskForm):
-    """Not used at present."""
-    email = EmailField('Email', validators=[InputRequired(),
-                                            Email(message='Invalid email')])
-    password = PasswordField('Password',
-                             validators=[
-                                 InputRequired(message='Password must be at least 8 characters'),
-                                 Length(min=8,max=30),
-                                 EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Repeat password')
-    accept_tos = BooleanField('I accept the terms of service.', validators=[InputRequired()])
-    submit = SubmitField('Sign up')
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
 
 class AdminUserForm(FlaskForm):
     """Used by admin to invite new user or change a user's role or email."""
+    name = StringField('Name',
+                       validators=[InputRequired(), Length(min=8)])
     old_email = HiddenField('old_email')
     email = EmailField('Email', validators=[InputRequired(),
                                             Email(message='Invalid email')])
-    role = SelectField('role', choices=[(str(r.value), str(r.value)) for r in Role])
+    roles = MultiCheckboxField('Role(s)',
+                               choices = role_choices(),
+                               description='At least one role should be selected.')
     submit = SubmitField('Create user')
     delete_cb = BooleanField('Delete user',description="Delete user")
-
-class PasswordForm(FlaskForm):
-    """User to change their own password."""
-    password = PasswordField('New password',
-                             validators=[
-                                 InputRequired(message='Password must be at least 8 characters'),
-                                 Length(min=8,max=30),
-                                 EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Repeat new password')
-    email = HiddenField('email', validators=[InputRequired()])
-    submit = SubmitField('Change password')
-
-class RecoverForm(FlaskForm):
-    """Password recovery request. This must be behind admin."""
-    email = EmailField('Email of user', validators=[InputRequired(),
-                                                    Email(message='Enter a valid email')])
-    submit = SubmitField('Send recovery information')
-
-class CaptchaForm(FlaskForm):
-    email = EmailField('Email',
-                       render_kw={'readonly': True},
-                       validators=[InputRequired(),
-                                   Email(message='Enter a valid email')])
-    auth = HiddenField(id='auth',
-                       name='auth',
-                       validators = [InputRequired('auth field is required')])
-    challenge = StringField('Challenge', render_kw={'readonly': True}, validators=[InputRequired()])
-    response = StringField('Response', validators=[InputRequired()])
-    submit = SubmitField('Submit answer')
 
 class ValidPaperId(object):
     """Validator to check paperid."""
@@ -163,8 +129,7 @@ class SubmitForm(FlaskForm):
     journal = HiddenField(id='journal',
                           name='journal',
                           description='key to select the journal from the list of journals',
-                          validators=[InputRequired('journal is required'),
-                                      AnyOf([j['hotcrp_key'] for j in app.config['JOURNALS']])])
+                          validators=[InputRequired('journal is required'),AnyOf([j.hotcrp_key for j in _get_journals()])])
     volume = HiddenField(id='volume',
                          name='volume',
                          description='This is the name field on volume',
