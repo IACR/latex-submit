@@ -1096,6 +1096,10 @@ def download_iacrcc_zipfile():
     memory_file.seek(0)
     return send_file(memory_file, download_name='iacrcc.zip', as_attachment=True)
 
+@home_bp.route('/ror')
+def show_ror():
+    return redirect(url_for('home_bp.show_funding'))
+
 @home_bp.route('/funding')
 def show_funding():
     data = {'title': 'Funding and affiliation data',
