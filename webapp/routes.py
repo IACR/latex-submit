@@ -584,7 +584,8 @@ def final_review():
                   sender=app.config['MAIL_DEFAULT_SENDER'],
                   recipients=recipients)
     final_review_url = url_for('admin_file.final_review', paperid=paperid, _external=True)
-    msg.body = 'A paper for CiC needs final review.\n\nYou can view it at {}'.format(final_review_url)
+    msg.body = 'A paper for {} needs final review.\n\nYou can view it at {}'.format(journal.name,
+                                                                                    final_review_url)
     mail.send(msg)
     if app.config['DEBUG']:
         print(msg.body)
