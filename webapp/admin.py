@@ -417,11 +417,11 @@ def _get_hotcrp_papers(issue: Issue):
         url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(issue.hotcrp, auth)
         with urllib.request.urlopen(url) as response:
             data = json.loads(response.read())
-            app.logger.critical('found {} hotcrp papers from {}'.format(len(data), issue.hotcrp))
+            app.logger.critical('found hotcrp papers for {} from {}'.format(issue.hotcrp, url))
             return data
     except Exception as e:
         app.logger.critical('unable to fetch paper info from hotcrp {}:{} '.format(url, str(e)))
-        return {'error': 'unable to retrieve hotcrp papers: ' + str(e)}
+        return {'error': 'unable to retrieve hotcrp papers {}:{} '.format(url, str(e))}
 
 @admin_bp.route('/admin/view_issue/<issueid>', methods=['GET'])
 @auth_required()
@@ -465,13 +465,14 @@ def view_issue(issueid):
             flash('Mismatch in volume hotcrp_key: {}/{}'.format(hotcrp_papers['volume'],
                                                                 issue.volume.name))
         else:
+            data['shortName'] = hotcrp_papers.get('shortName', 'unknown')
             # go through the hotcrp papers and remove any that already have a PaperStatus in papers.
             paperids = set()
             for p in papers:
                 paperids.add(p.paperid)
             for p in unassigned_papers:
                 paperids.add(p.paperid)
-            accepted = {p['paperId']: p for p in hotcrp_papers.get('acceptedPapers')}
+            accepted = {p['paperid']: p for p in hotcrp_papers.get('acceptedPapers')}
             for id in paperids:
                 if id in accepted:
                     del accepted[id]
