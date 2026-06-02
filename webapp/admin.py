@@ -417,6 +417,7 @@ def _get_hotcrp_papers(issue: Issue):
         url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(issue.hotcrp, auth)
         with urllib.request.urlopen(url) as response:
             data = json.loads(response.read())
+            app.logger.critical('found {} hotcrp papers from {}'.format(len(data), issue.hotcrp))
             return data
     except Exception as e:
         app.logger.critical('unable to fetch paper info from hotcrp {}:{} '.format(url, str(e)))
@@ -471,8 +472,9 @@ def view_issue(issueid):
             for p in unassigned_papers:
                 paperids.add(p.paperid)
             accepted = {p['paperId']: p for p in hotcrp_papers.get('acceptedPapers')}
-            if id in paperids:
-                del accepted[id]
+            for id in paperids:
+                if id in accepted:
+                    del accepted[id]
             data['hotcrp'] = list(accepted.values())
     formdata = [{'paperid': p.paperid} for p in finished_papers]
     if len(finished_papers) == len(papers) and len(papers) > 0 and not issue.exported:
