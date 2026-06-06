@@ -882,6 +882,33 @@ def publish_issue():
     flash('Issue was exported to {}'.format(str(app.config['EXPORT_PATH'])))
     return redirect(url_for('admin_file.view_issue', issueid=issue.id))
 
+@admin_bp.route('/admin/download_issue/<int:issueid>', methods=['GET'])
+@auth_required()
+def download_issue():
+    issueid = form.issueid.data
+    issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
+    if not issue:
+        return admin_message('Nonexistent issue')
+    journal = issue.volume.journal
+    if not check_journal_access(journal):
+        msg = 'User {} does not have access to journal {}'.format(current_user.email,
+                                                                  journal.name)
+        logging.critical(msg)
+        return admin_message(msg)
+    try:
+        now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
+        issue.exported = now
+        db.session.add(issue)
+        db.session.commit()
+    except Exception as e:
+        msg = 'Failure to export issue {}: {}'.format(issue.name, str(e))
+        logging.critical(msg)
+        return admin_message(msg)
+    logging.info('Issue was exported {} to {}'.format(issue.name,
+                                                      str(app.config['EXPORT_PATH'])))
+    flash('Issue was exported to {}'.format(str(app.config['EXPORT_PATH'])))
+    return redirect(url_for('admin_file.view_issue', issueid=issue.id))
+
 @admin_bp.route('/admin/change_issue', methods=['POST'])
 @auth_required()
 def change_issue():

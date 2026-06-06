@@ -97,7 +97,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
         comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
         # build a json object from compilation. The schema for this is in the
-        # IACR/cicjournal repository as PaperMeta, and tha tmust be kept in sync with
+        # IACR/cicjournal repository as PaperMeta, and that must be kept in sync with
         # what we export here. Ideally we would share the code for these, but I hate
         # git submodules. We essentially create an extended Meta class that contains
         # elements of Compilation.

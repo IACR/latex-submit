@@ -134,7 +134,7 @@
           <a class="nav-link" href="/admin/copyedit">Copy editing</a>
         </li>
         {% endif %}
-        {% if current_user.has_role('admin') %}
+        {% if current_user and current_user.has_role('admin') %}
         <li class="nav-item">
           <a class="nav-link" href="/admin/allusers">User management</a>
         </li>

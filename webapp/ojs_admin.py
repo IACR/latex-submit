@@ -47,6 +47,10 @@ def show_ojs_journal(hotcrp_key):
 @ojs_bp.route('/admin/ojs/issue/<issue_id>')
 @auth_required()
 def show_ojs_issue(issue_id):
+    if current_user:
+        logging.critical('user is ' + current_user.name)
+    else:
+        logging.critical('no user')
     issue = db.session.execute(select(Issue).where(Issue.id==issue_id)).scalar_one_or_none()
     if not issue:
         return admin_message('Unknown issue')
@@ -61,7 +65,7 @@ def show_ojs_issue(issue_id):
         flash('WARNING: issue has not been exported yet, and may still change. Make sure you communicate with the editor about this')
     volume = issue.volume
     journal = volume.journal
-    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issue_id)).scalars().all()
+    papers = db.session.execute(select(PaperStatus).where(PaperStatus.issue_id==issue_id).order_by(PaperStatus.paperno)).scalars().all()
     data = {'title': 'Exported issue view for OJS',
             'journal': journal,
             'issue': issue,
