@@ -1,4 +1,5 @@
 """Test for individual web transactions."""
+import re
 from werkzeug.datastructures import MultiDict
 
 def test_noauth(app, client, auth, admin_user):
@@ -8,19 +9,19 @@ def test_noauth(app, client, auth, admin_user):
         bp = app.blueprints['admin_file']
         assert len(app.blueprints) == 4
         rules = list(app.url_map.iter_rules())
-        assert len(rules) == 63
+        assert len(rules) == 64
         getrules = 0
         for rule in rules:
             rstr = str(rule)
-            print(rstr, rule.methods)
             if rstr.startswith('/admin') and 'GET' in rule.methods:
                 getrules += 1
                 print(rstr)
+                rstr = re.sub(r'(<[^>]+>)', '555', rstr)
                 response = client.get(rstr)
                 # all should redirect.
                 assert response.status_code == 302
                 assert response.location.startswith('{}/login'.format(conf['SECURITY_URL_PREFIX']))
-        assert getrules == 14
+        assert getrules == 15
                 
 def test_editor(client, auth, editor_user):
     """Test that login works for /admin/ for editor_user"""
