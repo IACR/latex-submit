@@ -39,22 +39,24 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 import zipfile
-from .metadata.compilation import Compilation, PubType
-from .metadata.xml_meta import get_jats
-from . import db
 
 try:
-    from .metadata.db_models import Issue, PaperStatusEnum, Version
+    from .metadata.db_models import Issue, PaperStatus, Version
+    from .metadata.compilation import Compilation, PubType
+    from .metadata.xml_meta import get_jats
 except Exception as e:
-    from metadata.db_models import Issue, PaperStatusEnum, Version
+    from metadata.db_models import Issue, PaperStatus, Version
+    from metadata.compilation import Compilation, PubType
+    from metadata.xml_meta import get_jats
 
 def _datetime_serialize(obj):
     if isinstance(obj, datetime):
         return obj.strftime('%Y-%m-%d %H:%M:%S')
     raise TypeError('Type {} is not serializable'.format(str(type(obj))))
 
-def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
-    """data_path is the DATA_DIR from app.config"""
+def dump_issue(data_path: Path, output_path: Path, issue: Issue,
+               export_papers: list[PaperStatus]) -> datetime:
+    """data_path is specific to the journal and is a contract with the import system."""
     volume = issue.volume
     journal = volume.journal
     now = datetime.now()
@@ -75,14 +77,8 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
     filename = '{}_{}.zip'.format(volume.name, issue.name)
     zip_path = output_path / Path(filename)
     zip_file = zipfile.ZipFile(zip_path, 'w')
-    # We only export papers in the issue that have status of COPY_EDIT_ACCEPT
-    # The UI should only show the export feature if this is true, but we check anyway.
-    export_papers = []
-    for paperstatus in issue.papers:
-        if paperstatus.status == PaperStatusEnum.COPY_EDIT_ACCEPT:
-            issuedata['paper_numbers'][paperstatus.paperid] = paperstatus.paperno
-            export_papers.append(paperstatus)
     for paperstatus in export_papers:
+        issuedata['paper_numbers'][paperstatus.paperid] = paperstatus.paperno
         paper_path = data_path / Path(paperstatus.paperid) / Path(Version.FINAL.value)
         pdf_file = paper_path / Path('output/main.pdf')
         if not pdf_file.is_file():
@@ -95,7 +91,7 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
             raise ValueError('missing all.zip file {}'.format(str(latex_zip_file)))
         zip_file.write(str(pdf_file), arcname='{}/main.pdf'.format(paperstatus.paperno))
         zip_file.write(str(latex_zip_file), arcname='{}/latex.zip'.format(paperstatus.paperno))
-        comp = Compilation.parse_raw(json_file.read_text(encoding='UTF-8'))
+        comp = Compilation.model_validate_json(json_file.read_text(encoding='UTF-8'))
         # build a json object from compilation. The schema for this is in the
         # IACR/cicjournal repository as PaperMeta, and that must be kept in sync with
         # what we export here. Ideally we would share the code for these, but I hate
@@ -122,8 +118,6 @@ def export_issue(data_path: Path, output_path: Path, issue: Issue) -> datetime:
         ET.indent(jats_elem, space='  ', level=0)
         jats_str = ET.tostring(jats_elem, encoding='utf-8').decode('utf-8')
         zip_file.writestr('{}/jats.xml'.format(paperstatus.paperno), jats_str)
-        paperstatus.status = PaperStatusEnum.PUBLISHED
-        db.session.add(paperstatus) # the commit occurs if and when the issue is updated.
     zip_file.writestr('issue.json', json.dumps(issuedata, indent=2, default=_datetime_serialize))
     zip_file.close()
     return now
@@ -143,6 +137,8 @@ if __name__ == '__main__':
     engine = create_engine(args.sqlalchemy_uri)
     with Session(engine) as session:
         issue = session.execute(select(Issue).where(Issue.id == args.issue_id)).scalar_one_or_none()
-        export_issue(Path('data/'),
-                     Path('/tmp'),
-                     issue)
+        papers = session.execute(select(PaperStatus).where(PaperStatus.issue_id == args.issue_id)).scalars().all()
+        dump_issue(Path('data/'),
+                   Path('/tmp'),
+                   issue,
+                   papers)

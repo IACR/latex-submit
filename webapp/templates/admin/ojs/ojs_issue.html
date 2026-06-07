@@ -7,7 +7,7 @@
 </div>
 {% endfor %}
 {% if issue.exported %}
-<div class="alert alert-success">This was exported on {{issue.exported}}.</div>
+<div class="alert alert-success">This was finalized on {{issue.exported|format_dt}}.</div>
 {% endif %}
 <h4 class="mt-3">Papers in Volume {{volume.name}}, issue {{issue.name}}</h4>
 <table class="table">

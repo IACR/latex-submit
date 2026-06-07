@@ -3,9 +3,9 @@ admin_required decorator on them. All routes should start with /admin."""
 from datetime import datetime, date
 from difflib import HtmlDiff
 try:
-    from .export import export_issue
+    from .export import dump_issue
 except Exception as e:
-    from export import export_issue
+    from export import dump_issue
 from flask import Blueprint, render_template, request, jsonify, send_file, flash, redirect, url_for, jsonify
 from flask import current_app as app
 from sqlalchemy import select, or_, and_, desc
@@ -869,8 +869,15 @@ def publish_issue():
         logging.critical(msg)
         return admin_message(msg)
     try:
-        now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
-        issue.exported = now
+        # We only export papers in the issue that have status of COPY_EDIT_ACCEPT
+        # The UI should only show the export feature if this is true, but we check anyway.
+        export_papers = [ps for ps in issue.papers if ps.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
+        export_path = app.config['EXPORT_PATH'] / Path(journal.hotcrp_key)
+        export_path.mkdir(exist_ok=True)
+        issue.exported = dump_issue(app.config['DATA_DIR'], export_path, issue, export_papers)
+        for paperstatus in export_papers:
+            paperstatus.status = PaperStatusEnum.PUBLISHED
+            db.session.add(paperstatus) # the commit occurs if and when the issue is updated.
         db.session.add(issue)
         db.session.commit()
     except Exception as e:
@@ -884,30 +891,28 @@ def publish_issue():
 
 @admin_bp.route('/admin/download_issue/<int:issueid>', methods=['GET'])
 @auth_required()
-def download_issue():
-    issueid = form.issueid.data
+def download_issue(issueid):
     issue = db.session.execute(select(Issue).where(Issue.id==issueid)).scalar_one_or_none()
     if not issue:
         return admin_message('Nonexistent issue')
-    journal = issue.volume.journal
+    volume  = issue.volume
+    journal = volume.journal
     if not check_journal_access(journal):
         msg = 'User {} does not have access to journal {}'.format(current_user.email,
                                                                   journal.name)
         logging.critical(msg)
         return admin_message(msg)
-    try:
-        now = export_issue(app.config['DATA_DIR'], app.config['EXPORT_PATH'], issue)
-        issue.exported = now
-        db.session.add(issue)
-        db.session.commit()
-    except Exception as e:
-        msg = 'Failure to export issue {}: {}'.format(issue.name, str(e))
+    filename = '{}_{}.zip'.format(volume.name, issue.name)
+    filepath = app.config['EXPORT_PATH'] / Path(journal.hotcrp_key) / Path(filename)
+    if not filepath.is_file():
+        msg = 'File {} does not exist for journal {}'.format(str(filepath),
+                                                             journal.name)
         logging.critical(msg)
         return admin_message(msg)
-    logging.info('Issue was exported {} to {}'.format(issue.name,
-                                                      str(app.config['EXPORT_PATH'])))
-    flash('Issue was exported to {}'.format(str(app.config['EXPORT_PATH'])))
-    return redirect(url_for('admin_file.view_issue', issueid=issue.id))
+    return send_file(filepath,
+                     mimetype='application/zip',
+                     as_attachment=True,
+                     download_name=filename)
 
 @admin_bp.route('/admin/change_issue', methods=['POST'])
 @auth_required()
