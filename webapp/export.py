@@ -133,12 +133,14 @@ if __name__ == '__main__':
                            required=True)
     argparser.add_argument('--sqlalchemy_uri',
                            required=True)
+    argparser.add_argument('--output_dir',
+                           default='/tmp')
     args = argparser.parse_args()
     engine = create_engine(args.sqlalchemy_uri)
     with Session(engine) as session:
         issue = session.execute(select(Issue).where(Issue.id == args.issue_id)).scalar_one_or_none()
         papers = session.execute(select(PaperStatus).where(PaperStatus.issue_id == args.issue_id)).scalars().all()
         dump_issue(Path('data/'),
-                   Path('/tmp'),
+                   Path(args.output_dir),
                    issue,
                    papers)
