@@ -190,15 +190,19 @@ class VersionEnum(StrEnum):
     PREPRINT = 'preprint'
 
 class PubType(StrEnum):
-    """This must be kept in sync with what HotCRP provides and what cic.iacr.org shows.
-       Addendum is supplied by an author to supplement what was published in a paper
-       before. By contrast, Erratum is only to be supplied by the publisher. A
-       preface can be supplied only by an editor.
+    """This must be kept in sync with what HotCRP provides and what
+       journals show on their home pages. Addendum is supplied by an
+       author to supplement what was published in a paper
+       before. Corrigendum is supplied by an author to correct
+       something in a previous paper. By contrast, Erratum is only to
+       be supplied by the publisher. A preface can be supplied only by
+       an editor. Other types may be added in the future (e.g, opinion
+       or book review).
     """
     RESEARCH = 'RESEARCH'
     SOK = 'SOK'
-    ADDENDUM = 'ADDENDUM',
     CORRIGENDUM = 'CORRIGENDUM'
+    ADDENDUM = 'ADDENDUM'
     PREFACE = 'PREFACE'
     ERRATUM = 'ERRATUM'
 
@@ -361,7 +365,7 @@ class Compilation(BaseModel):
                              title='Type of publication',
                              description='Originates in review system')
     errata_doi: Optional[str] = Field(default=None,
-                                      title='If pubtype is errata, this holds the DOI of original paper.',
+                                      title='If pubtype is errata, corrigendum, or addendum, then this holds the DOI of original paper.',
                                       description='Should start with 10.')
     compiled: datetime = Field(...,
                                title='When the article was last compiled',
