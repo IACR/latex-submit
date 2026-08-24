@@ -290,6 +290,10 @@ def submit_version():
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
         return render_template('submit.html', form=form, journal=journal)
+    copyedit_file = input_dir / Path('main.copyedit')
+    if copyedit_file.is_file():
+        copyedit_file.unlink()
+        log_event(db, paperid, 'Zip file contained main.copyedit so I removed it')
     # Check that none of the latex files use \begin{thebibliography}, because that would
     # bypass our bibliography style. The LaTeX runner will automatically remove main.bbl
     # later on.
