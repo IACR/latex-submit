@@ -1048,7 +1048,7 @@ def iacrj_iacrjdoc():
 
 @home_bp.route('/iacrj/convertiacrtrans', methods=['GET'])
 def convert_to_iacrj():
-    md_file = Path(app.root_path) / Path('metadata/latex/iacrj/iacrj-from-iacrtrans.md')
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrj/convert/convertiacrtrans.md')
     md = md_file.read_text(encoding='UTF-8')
     html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
     return render_template('embed_html.html',
