@@ -33,7 +33,7 @@ RUN tlmgr install fandol noto arphic-ttf dutchcal notomath ascii-font eulervm as
 RUN tlmgr install collection-bibtexextra alphalph cellspace tikzfill listingsutf8
 RUN tlmgr install eepic rsfso cbfonts fontawesome threeparttablex bibexport catchfile nomencl mnsymbol arydshln
 RUN tlmgr install upquote urwchancal tagpdf tabularray ninecolors zref-clever
-RUN tlmgr install chronology
+RUN tlmgr install chronology halloweenmath
 
 # people use pdfpages to bypass uploading LaTeX.
 RUN tlmgr remove --force pdfpages pdfjam adhocfilelist amsrefs anysize pdfxup changepage iexec
