@@ -872,7 +872,7 @@ def publish_issue():
         # We only export papers in the issue that have status of COPY_EDIT_ACCEPT
         # The UI should only show the export feature if this is true, but we check anyway.
         export_papers = [ps for ps in issue.papers if ps.status == PaperStatusEnum.COPY_EDIT_ACCEPT]
-        export_path = app.config['EXPORT_PATH'] / Path(journal.hotcrp_key)
+        export_path = app.config['EXPORT_PATH'] / Path(journal.hotcrp_key) / Path('pending')
         export_path.mkdir(exist_ok=True)
         issue.exported = dump_issue(app.config['DATA_DIR'], export_path, issue, export_papers)
         for paperstatus in export_papers:

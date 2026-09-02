@@ -290,6 +290,10 @@ def submit_version():
         form.zipfile.errors.append('Your zip file should contain main.tex at the top level')
         # then no sense trying to compile
         return render_template('submit.html', form=form, journal=journal)
+    copyedit_file = input_dir / Path('main.copyedit')
+    if copyedit_file.is_file():
+        copyedit_file.unlink()
+        log_event(db, paperid, 'Zip file contained main.copyedit so I removed it')
     # Check that none of the latex files use \begin{thebibliography}, because that would
     # bypass our bibliography style. The LaTeX runner will automatically remove main.bbl
     # later on.
@@ -1044,7 +1048,7 @@ def iacrj_iacrjdoc():
 
 @home_bp.route('/iacrj/convertiacrtrans', methods=['GET'])
 def convert_to_iacrj():
-    md_file = Path(app.root_path) / Path('metadata/latex/iacrj/iacrj-from-iacrtrans.md')
+    md_file = Path(app.root_path) / Path('metadata/latex/iacrj/convert/convertiacrtrans.md')
     md = md_file.read_text(encoding='UTF-8')
     html5 = markdown.markdown(md, extensions=['fenced_code'], output_format='html5')
     return render_template('embed_html.html',

@@ -10,7 +10,7 @@ class Config:
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'
-    XAPIAN_PATHS = {'default': '/var/www/wsgi/latex-submit/idsearch/searchapp/index/xapian.db',
+    XAPIAN_PATHS = {'default': '/var/www/wsgi/latex-submit/search/searchapp/index/xapian.db',
                     'cryptobib': '/var/www/wsgi/latex-submit/search/cryptobib/xapian.db'}
     
 class DebugConfig(Config):
