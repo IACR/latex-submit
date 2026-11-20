@@ -32,10 +32,10 @@ jobs:
         sudo apt-get install -y libxapian-dev
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         python3 -m pip install beautifulsoup4
-        python -m pip install pytest
-        if [ -f webapp/requirements.txt ]; then pip install -r webapp/requirements.txt; fi
+        python3 -m pip install pytest
+        python3 -m pip install -r webapp/requirements.txt
     - name: Tests for app
       run: |
         python -m pytest tests/admin_test.py -vv
