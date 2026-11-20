@@ -415,7 +415,10 @@ def _get_hotcrp_papers(issue: Issue):
         auth = hmac.new(app.config['HOTCRP_API_KEY'].encode('utf-8'),
                         conf_msg.encode('utf-8'), hashlib.sha256).hexdigest()
         url = 'https://submit.iacr.org/{}/iacr/api/papers.php?auth={}'.format(issue.hotcrp, auth)
-        with urllib.request.urlopen(url) as response:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; MyApp/1.0)"
+            })
+        with urllib.request.urlopen(req) as response:
             data = json.loads(response.read())
             app.logger.critical('found hotcrp papers for {} from {}'.format(issue.hotcrp, url))
             return data
